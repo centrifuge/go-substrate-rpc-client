@@ -2,14 +2,126 @@ package main
 
 import (
 	"bytes"
+	"encoding/hex"
 	"fmt"
+	"github.com/centrifuge/go-centrifuge/utils"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/vimukthi-git/go-substrate/withreflect"
+	"log"
+	"os/exec"
+	"strings"
 )
+
+type Address []byte
+
+type Signature []byte
+
+type MortalEra struct {
+	Period uint64
+	Phase uint64
+}
+
+type ExtrinsicSignature struct {
+	Version uint8
+	Signer Address
+	Signature Signature
+	Nonce uint32
+	Era uint8 // era enum
+	ImmortalEra []byte
+	MortalEra MortalEra
+}
+
+func (e *ExtrinsicSignature) ParityEncode(encoder withreflection.Encoder) {
+	panic("implement me")
+}
+
+type Args interface {
+	withreflection.Encodeable
+	//withreflection.Decodeable
+}
+
+type Method struct {
+
+	CallIndex MethodIDX
+	//  dynamic struct with the list of arguments defined as fields
+	Args Args
+}
+
+func (m Method) ParityEncode(encoder withreflection.Encoder) {
+	encoder.Encode(&m.CallIndex)
+	encoder.Encode(m.Args)
+}
+
+type Extrinsic struct {
+	Signature ExtrinsicSignature
+	Method Method
+}
+
+func (e Extrinsic) Encode(encoder withreflection.Encoder) []byte {
+	b := make([]byte, 0, 1000)
+	bb := bytes.NewBuffer(b)
+	tempEnc := withreflection.NewEncoder(bb)
+	tempEnc.Encode(&e.Method)
+	bbb := bb.Bytes()
+	encoded := hex.EncodeToString(bbb)
+
+
+	// use "subKey" command for signature
+	//fmt.Println("method", hexutil.Encode(bb.Bytes()))
+	/**
+	subkey sign-transaction --call "070080de8d09fec089eec30b24e7c28859b627454641a057aeb9d4f583b36307c191e280e6fe3357f989cee5691e8393cfd7c3f870307bfbe3cd8fc8bcc561b8783dbcc18033d822a14e34e54d871208a5cef385b336a42da3b2ba729d71336d51df25f253"
+	--nonce 1 --suri "//Alice" --password "" --prior-block-hash "bad7010fc5b729a383599112f97a08d7921a00f2550cb78c71dffb3080162d4d"
+	 */
+	out, err := exec.Command("/Users/vimukthi/.cargo/bin/subkey", "sign-transaction", "--call", encoded, "--nonce", "1", "--suri", "//Alice", "--password", "", "--prior-block-hash", "bad7010fc5b729a383599112f97a08d7921a00f2550cb78c71dffb3080162d4d").Output()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	v := strings.TrimSpace(string(out))
+	fmt.Println("out", v)
+
+	dec, err := hexutil.Decode(v)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	dec = append(dec, bbb...)
+	//fmt.Println(dec)
+
+	return dec
+}
+
+// MethodIDX [sectionIndex, methodIndex] 16bits
+type MethodIDX struct {
+	SectionIndex uint8
+	MethodIndex uint8
+}
+
+func (m MethodIDX) ParityEncode(encoder withreflection.Encoder) {
+	encoder.Encode(m.SectionIndex)
+	encoder.Encode(m.MethodIndex)
+}
 
 type MetadataV4 struct {
 	Modules []ModuleMetaData
+}
+
+func (m *MetadataV4) MethodIndex(method string) MethodIDX {
+	s := strings.Split(method, ".")
+	var sIDX, mIDX uint8 = 0, 0
+	for i, n := range m.Modules {
+		if n.Name == s[0] {
+			sIDX = uint8(i)
+			for j, f := range n.Calls {
+				if f.Name == s[1] {
+					mIDX = uint8(j)
+				}
+			}
+		}
+	}
+
+	return MethodIDX{sIDX, mIDX}
 }
 
 func (m *MetadataV4) ParityDecode(decoder withreflection.Decoder) {
@@ -282,6 +394,18 @@ func (m *MetadataVersioned) ParityDecode(decoder withreflection.Decoder) {
 	decoder.Decode(&m.Metadata)
 }
 
+type AnchorParams struct {
+	AnchorIDPreimage []byte
+	DocRoot []byte
+	Proof []byte
+}
+
+func (a AnchorParams) ParityEncode(encoder withreflection.Encoder) {
+	encoder.Encode(a.AnchorIDPreimage)
+	encoder.Encode(a.DocRoot)
+	encoder.Encode(a.Proof)
+}
+
 func main() {
 
 
@@ -293,7 +417,7 @@ func main() {
 
 	// state_getRuntimeVersion
 	var res string
-	err = client.Call(&res, "state_getMetadata", "0x602f513ba2fca731f934c93110045de627826413e4cd37304fa989821c820287")
+	err = client.Call(&res, "state_getMetadata", "0xd133045f0efad58582772cbdb6f5f0cd6af7bb4bf1f30d039a4b18b4bdaf4901")
 	if err != nil {
 		panic(err)
 	}
@@ -313,4 +437,22 @@ func main() {
 	dec.Decode(n)
 	fmt.Println(res, n)
 
+	//fmt.Println(n.Metadata.MethodIndex("kerplunk.commit"))
+	//err = client.Call(&res, "state_queryStorage", "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")
+	//if err != nil {
+	//	panic(err)
+	//}
+
+
+	e := Extrinsic{Method:Method{CallIndex:n.Metadata.MethodIndex("kerplunk.commit"), Args:&AnchorParams{utils.RandomSlice(32), utils.RandomSlice(32), utils.RandomSlice(32)}}}
+
+	var bi []byte
+	tempEnc := withreflection.NewEncoder(bytes.NewBuffer(bi))
+	enc := e.Encode(*tempEnc)
+	vs := hexutil.Encode(enc)
+	fmt.Println(vs)
+	err = client.Call(&res, "author_submitExtrinsic", vs)
+	if err != nil {
+		panic(err)
+	}
 }

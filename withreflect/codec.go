@@ -43,6 +43,10 @@ type Encoder struct {
 	writer io.Writer
 }
 
+func NewEncoder(writer io.Writer) *Encoder {
+	return &Encoder{writer: writer}
+}
+
 // Write several bytes to the encoder.
 func (pe Encoder) Write(bytes []byte) {
 	c, err := pe.writer.Write(bytes)
@@ -75,9 +79,15 @@ func (pe Encoder) EncodeUintCompact(v uint64) {
 		if v < 1<<6 {
 			pe.PushByte(byte(v) << 2)
 		} else if v < 1<<14 {
-			binary.Write(pe.writer, binary.LittleEndian, uint16(v<<2)+1)
+			err := binary.Write(pe.writer, binary.LittleEndian, uint16(v<<2)+1)
+			if err != nil {
+				panic(err)
+			}
 		} else {
-			binary.Write(pe.writer, binary.LittleEndian, uint32(v<<2)+2)
+			err := binary.Write(pe.writer, binary.LittleEndian, uint32(v<<2)+2)
+			if err != nil {
+				panic(err)
+			}
 		}
 		return
 	}
@@ -100,7 +110,8 @@ func (pe Encoder) EncodeUintCompact(v uint64) {
 // Encode a value to the stream.
 func (pe Encoder) Encode(value interface{}) {
 	t := reflect.TypeOf(value)
-	switch t.Kind() {
+	tk := t.Kind()
+	switch tk {
 
 	// Boolean and numbers are trivially encoded via binary.Write
 	// It will use reflection again and take a performance hit
@@ -132,7 +143,10 @@ func (pe Encoder) Encode(value interface{}) {
 	case reflect.Float32:
 		fallthrough
 	case reflect.Float64:
-		binary.Write(pe.writer, binary.LittleEndian, value)
+		err := binary.Write(pe.writer, binary.LittleEndian, value)
+		if err != nil {
+			panic(err)
+		}
 	case reflect.Ptr:
 		rv := reflect.ValueOf(value)
 		if rv.IsNil() {
@@ -186,6 +200,8 @@ func (pe Encoder) Encode(value interface{}) {
 		fallthrough
 	case reflect.Invalid:
 		panic(fmt.Sprintf("Type %s cannot be encoded", t.Kind()))
+	default:
+		fmt.Println("not captured")
 	}
 }
 
