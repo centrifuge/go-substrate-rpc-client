@@ -9,6 +9,14 @@
   revision = "ea17b1a17847fb6e4c0a91de0b674704693469b0"
 
 [[projects]]
+  digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  pruneopts = "UT"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
+
+[[projects]]
   digest = "1:1aeb4854a1c278e842712cd6684f48d595cbdd7839655d37a77248efa08c9fc0"
   name = "github.com/deckarep/golang-set"
   packages = ["."]
@@ -38,6 +46,14 @@
   version = "v1.5.4"
 
 [[projects]]
+  digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  pruneopts = "UT"
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:4b9bd28bbf14271f4b89a6c401589ea5939d14138e0399c253c1939cc4252d2f"
   name = "github.com/rs/cors"
   packages = ["."]
@@ -54,10 +70,19 @@
   version = "v1.0"
 
 [[projects]]
+  digest = "1:972c2427413d41a1e06ca4897e8528e5a1622894050e2f527b38ddf0f343f759"
+  name = "github.com/stretchr/testify"
+  packages = ["assert"]
+  pruneopts = "UT"
+  revision = "ffdc059bfe9ce6a4e144ba849dbedead332c6053"
+  version = "v1.3.0"
+
+[[projects]]
   branch = "master"
-  digest = "1:d5891c5bca9c62e5d394ca26491d2b710a1dc08cedeb0ca8f9ac4c3305120b02"
+  digest = "1:5766a71dfb959ceeb1c759e97e4f4c8b3463f86c4e53cfc9a3be88eef94739c8"
   name = "golang.org/x/crypto"
   packages = [
+    "blake2b",
     "ed25519",
     "ed25519/internal/edwards25519",
   ]
@@ -75,6 +100,14 @@
   revision = "a6577fac2d73be281a500b310739095313165611"
 
 [[projects]]
+  branch = "master"
+  digest = "1:9289797869517c73400e7b5a93beefbfc86e06f56e3ab03f38fb0d575e685277"
+  name = "golang.org/x/sys"
+  packages = ["cpu"]
+  pruneopts = "UT"
+  revision = "516e3c20635fbe39539f7ed361a15c51fec29cd8"
+
+[[projects]]
   branch = "v2"
   digest = "1:3d3f9391ab615be8655ae0d686a1564f3fec413979bb1aaf018bac1ec1bb1cc7"
   name = "gopkg.in/natefinch/npipe.v2"
@@ -88,6 +121,8 @@
   input-imports = [
     "github.com/ethereum/go-ethereum/common/hexutil",
     "github.com/ethereum/go-ethereum/rpc",
+    "github.com/stretchr/testify/assert",
+    "golang.org/x/crypto/blake2b",
     "golang.org/x/crypto/ed25519",
   ]
   solver-name = "gps-cdcl"
