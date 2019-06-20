@@ -11,14 +11,20 @@ import (
 )
 
 const (
+	AnchorCommit = "kerplunk.commit"
+
+	// Adjust below params accorging to your env + chain state + requirment
+
 	RPCEndPoint = "ws://127.0.0.1:9944"
 
 	// TODO query these from the chain
 	GenesisBlock  = "0x703bffa9bc816a5cd06ab8a95c2ff74e7a60cdaf269ffd64d325eb193266a656"
+	// BestBlock is the earliest block thats not already pruned
 	BestBlock  = "0xcd515661ff266920416ba9f1d48d8c532c586ab0101cbc987fbd74b4503abe87"
-	StartNonce = 83
+	// StartNonce is the current account nonce for Alice (can't use other accounts for now)
+	StartNonce = 93
 
-	AnchorCommit = "kerplunk.commit"
+	NumberOfAnchorsToCreate = 10
 )
 
 type AnchorParams struct {
@@ -87,7 +93,7 @@ func main() {
 	}
 	authRPC := substrate.NewAuthorRPC(StartNonce, gs, *n, client)
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < NumberOfAnchorsToCreate; i++ {
 		// a := NewAnchorParamsFromHex("0x0000000000000000000000000000000000000000000000000000000000000901", "0x0000000000000000000000000000000000000000000000000000000000000000", "0x0000000000000000000000000000000000000000000000000000000000000000")
 		a := NewRandomAnchor()
 		aID := a.AnchorIDHex()
