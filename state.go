@@ -2,7 +2,6 @@ package substrate
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -180,7 +179,7 @@ func (m *ModuleMetaData) ParityDecode(decoder scalecodec.Decoder) {
 	decoder.Decode(&m.EventsOptional)
 	if m.EventsOptional == 1 {
 		decoder.Decode(&m.Events)
-		fmt.Println(m.Events)
+		// fmt.Println(m.Events)
 	}
 }
 
@@ -216,6 +215,7 @@ func (s *State) MetaData(blockHash Hash) (*MetadataVersioned, error) {
 	// "0xd133045f0efad58582772cbdb6f5f0cd6af7bb4bf1f30d039a4b18b4bdaf4901"
 	var res string
 	if !s.nonetwork {
+		// block hash can give error - Error(Client(UnknownBlock("State already discarded for Hash(0xxxx)")), State { next_error: None, backtrace: InternalBacktrace { backtrace: None } })
 		err := s.client.Call(&res, "state_getMetadata", blockHash.String())
 		if err != nil {
 			return nil, err

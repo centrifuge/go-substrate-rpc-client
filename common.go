@@ -41,4 +41,20 @@ func (a Address) ParityEncode(encoder scalecodec.Encoder) {
 
 type Index uint64
 
+type Signature struct {
+	Hash [64]byte
+}
 
+func NewSignature(b []byte) *Signature {
+	s := &Signature{}
+	copy(s.Hash[:], b)
+	return s
+}
+
+func (s *Signature) ParityDecode(decoder scalecodec.Decoder) {
+	decoder.Read(s.Hash[:])
+}
+
+func (s Signature) ParityEncode(encoder scalecodec.Encoder) {
+	encoder.Write(s.Hash[:])
+}
