@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"sync"
+	"sync/atomic"
+	"time"
+
 	"github.com/centrifuge/go-centrifuge/utils"
 	"golang.org/x/crypto/blake2b"
-	"sync"
-
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/vimukthi-git/go-substrate"
 	"github.com/vimukthi-git/go-substrate/scalecodec"
@@ -15,7 +17,7 @@ const (
 	AnchorCommit = "kerplunk.commit"
 	SubKeySign = "sign-blob"
 
-	// Adjust below params accorging to your env + chain state + requirment
+	// Adjust below params accorging to your env + chain state + requirement
 
 	RPCEndPoint = "ws://127.0.0.1:9944"
 
@@ -24,11 +26,11 @@ const (
 	// BestBlock is the earliest block thats not already pruned
 	BestBlock  = "0xcd515661ff266920416ba9f1d48d8c532c586ab0101cbc987fbd74b4503abe87"
 	// StartNonce is the current account nonce for Alice (can't use other accounts for now)
-	StartNonce = 103
+	StartNonce = 683
 	// SubKeyCmd subkey command to create signatures
 	SubKeyCmd = "/Users/vimukthi/.cargo/bin/subkey"
 
-	NumAnchorsPerThread = 10
+	NumAnchorsPerThread = 100
 	Concurrency = 4
 )
 
@@ -98,19 +100,23 @@ func main() {
 	}
 	authRPC := substrate.NewAuthorRPC(StartNonce, gs, SubKeyCmd, SubKeySign, *n, client)
 	wg := sync.WaitGroup{}
+	start := time.Now()
 	wg.Add(Concurrency)
+	var counter uint64
 	for i := 0; i < Concurrency; i++ {
 		go func() {
 			for i := 0; i < NumAnchorsPerThread; i++ {
 				// a := NewAnchorParamsFromHex("0x0000000000000000000000000000000000000000000000000000000000000901", "0x0000000000000000000000000000000000000000000000000000000000000000", "0x0000000000000000000000000000000000000000000000000000000000000000")
 				a := NewRandomAnchor()
 				aID := a.AnchorIDHex()
-				fmt.Println("submitting new anchor with anchor ID", a.AnchorIDHex())
+				// fmt.Println("submitting new anchor with anchor ID", a.AnchorIDHex())
 				res, err := authRPC.SubmitExtrinsic(AnchorCommit, a)
 				if err != nil {
-					fmt.Printf("anchor ID %s failed with %s", aID, err.Error())
+					fmt.Printf("FAIL!!! anchor ID %s failed with %s\n", aID, err.Error())
+					break
 				} else {
-					fmt.Println("tx hash - ", res)
+					fmt.Printf("SUCCESS!!! anchor ID %s , tx hash %s\n", aID, res)
+					atomic.AddUint64(&counter, 1)
 				}
 			}
 			wg.Done()
@@ -118,4 +124,6 @@ func main() {
 	}
 
 	wg.Wait()
+	elapsed := time.Since(start)
+	fmt.Printf("Successful execution of %d transactions took %s", counter, elapsed)
 }
