@@ -12,8 +12,6 @@ import (
 )
 
 const (
-	SubKeyCmd = "/Users/vimukthi/.cargo/bin/subkey"
-	SubKeySign = "sign-blob"
 	Alice = "//Alice"
 	AlicePubKey = "0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
 )
@@ -116,6 +114,8 @@ func (m Method) ParityEncode(encoder scalecodec.Encoder) {
 }
 
 type Extrinsic struct {
+	subKeyCMD string
+	subKeySign string
 	Nonce uint64
 	// BestKnownBlock genesis block
 	BestKnownBlock []byte
@@ -123,8 +123,8 @@ type Extrinsic struct {
 	Method         Method
 }
 
-func NewExtrinsic(accountNonce uint64, bestKnownBlock []byte, method Method) *Extrinsic {
-	return &Extrinsic{Nonce:accountNonce, BestKnownBlock: bestKnownBlock, Method:method}
+func NewExtrinsic(subKeyCMD string, subKeySign string, accountNonce uint64, bestKnownBlock []byte, method Method) *Extrinsic {
+	return &Extrinsic{subKeyCMD: subKeyCMD, subKeySign: subKeySign, Nonce:accountNonce, BestKnownBlock: bestKnownBlock, Method:method}
 }
 
 func (e *Extrinsic) ParityDecode(decoder scalecodec.Decoder) {
@@ -154,7 +154,7 @@ func (e Extrinsic) ParityEncode(encoder scalecodec.Encoder) {
 
 
 	// use "subKey" command for signature
-	out, err := exec.Command(SubKeyCmd, SubKeySign, encoded, Alice).Output()
+	out, err := exec.Command(e.subKeyCMD, e.subKeySign, encoded, Alice).Output()
 	// fmt.Println(SubKeyCmd, SubKeySign, encoded, Alice)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -184,19 +184,22 @@ type Author struct {
 	// mu is an exclusive lock to manage the nonce
 	mu sync.RWMutex
 
+	subKeyCMD string
+	subKeySign string
+
 	// TODO obtain these using RPCs
 	accountNonce uint64
 	bestKnownBlock []byte
 
 }
 
-func NewAuthorRPC(startNonce uint64, bestKnownBlock []byte, meta MetadataVersioned, client Client) *Author {
-	return &Author{ client, meta, sync.RWMutex{}, startNonce, bestKnownBlock}
+func NewAuthorRPC(startNonce uint64, bestKnownBlock []byte, subKeyCMD , SubKeySign string, meta MetadataVersioned, client Client) *Author {
+	return &Author{ client, meta, sync.RWMutex{}, subKeyCMD, SubKeySign, startNonce, bestKnownBlock}
 }
 
 func (a *Author) SubmitExtrinsic(method string, args Args) (string, error) {
 	a.mu.Lock()
-	e :=  NewExtrinsic(a.accountNonce, a.bestKnownBlock, NewMethod(method, args, a.meta))
+	e :=  NewExtrinsic(a.subKeyCMD, a.subKeySign, a.accountNonce, a.bestKnownBlock, NewMethod(method, args, a.meta))
 	a.accountNonce++
 	a.mu.Unlock()
 	bb := make([]byte, 0, 1000)

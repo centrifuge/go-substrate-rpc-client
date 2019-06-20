@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/centrifuge/go-centrifuge/utils"
 	"golang.org/x/crypto/blake2b"
+	"sync"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/vimukthi-git/go-substrate"
@@ -12,6 +13,7 @@ import (
 
 const (
 	AnchorCommit = "kerplunk.commit"
+	SubKeySign = "sign-blob"
 
 	// Adjust below params accorging to your env + chain state + requirment
 
@@ -22,9 +24,12 @@ const (
 	// BestBlock is the earliest block thats not already pruned
 	BestBlock  = "0xcd515661ff266920416ba9f1d48d8c532c586ab0101cbc987fbd74b4503abe87"
 	// StartNonce is the current account nonce for Alice (can't use other accounts for now)
-	StartNonce = 93
+	StartNonce = 103
+	// SubKeyCmd subkey command to create signatures
+	SubKeyCmd = "/Users/vimukthi/.cargo/bin/subkey"
 
-	NumberOfAnchorsToCreate = 10
+	NumAnchorsPerThread = 10
+	Concurrency = 4
 )
 
 type AnchorParams struct {
@@ -91,18 +96,26 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	authRPC := substrate.NewAuthorRPC(StartNonce, gs, *n, client)
-
-	for i := 0; i < NumberOfAnchorsToCreate; i++ {
-		// a := NewAnchorParamsFromHex("0x0000000000000000000000000000000000000000000000000000000000000901", "0x0000000000000000000000000000000000000000000000000000000000000000", "0x0000000000000000000000000000000000000000000000000000000000000000")
-		a := NewRandomAnchor()
-		aID := a.AnchorIDHex()
-		fmt.Println("submitting new anchor with anchor ID %s", a.AnchorIDHex())
-		res, err := authRPC.SubmitExtrinsic(AnchorCommit, a)
-		if err != nil {
-			fmt.Println("anchor ID %s failed with %s", aID, err.Error())
-		} else {
-			fmt.Println("tx hash - ", res)
-		}
+	authRPC := substrate.NewAuthorRPC(StartNonce, gs, SubKeyCmd, SubKeySign, *n, client)
+	wg := sync.WaitGroup{}
+	wg.Add(Concurrency)
+	for i := 0; i < Concurrency; i++ {
+		go func() {
+			for i := 0; i < NumAnchorsPerThread; i++ {
+				// a := NewAnchorParamsFromHex("0x0000000000000000000000000000000000000000000000000000000000000901", "0x0000000000000000000000000000000000000000000000000000000000000000", "0x0000000000000000000000000000000000000000000000000000000000000000")
+				a := NewRandomAnchor()
+				aID := a.AnchorIDHex()
+				fmt.Println("submitting new anchor with anchor ID", a.AnchorIDHex())
+				res, err := authRPC.SubmitExtrinsic(AnchorCommit, a)
+				if err != nil {
+					fmt.Printf("anchor ID %s failed with %s", aID, err.Error())
+				} else {
+					fmt.Println("tx hash - ", res)
+				}
+			}
+			wg.Done()
+		}()
 	}
+
+	wg.Wait()
 }
