@@ -26,7 +26,7 @@ const (
 	// BestBlock is the earliest block thats not already pruned
 	BestBlock  = "0xcd515661ff266920416ba9f1d48d8c532c586ab0101cbc987fbd74b4503abe87"
 	// StartNonce is the current account nonce for Alice (can't use other accounts for now)
-	StartNonce = 1197
+	StartNonce = 1520
 	// SubKeyCmd subkey command to create signatures
 	SubKeyCmd = "/Users/vimukthi/.cargo/bin/subkey"
 

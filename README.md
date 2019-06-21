@@ -9,3 +9,7 @@ The substrate RPC client for go.
    
 - Now adjust the hardcoded const parameters in `test/main.go` according to your env + chain state.
 - Run `test/main.go`
+
+## POC FLow
+
+![Alt text](extrinsic-exec.png?raw=true "Extrinsic Execution")
