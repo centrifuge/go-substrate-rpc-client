@@ -12,4 +12,4 @@ The substrate RPC client for go.
 
 ## POC FLow
 
-![Alt text](extrinsic-exec.png?raw=true "Extrinsic Execution")
+![Alt text](extrinsic-execution.png?raw=true "Extrinsic Execution")
