@@ -1,4 +1,4 @@
-# go-substrate
+# go-substrate-rpc-client
 
 The substrate RPC client for go. Some slides https://docs.google.com/presentation/d/1lvCP7wZpsl2ES6fAkHg8-LfLhgtMHcvHeITp77Bgn2w/edit#slide=id.g5d531cd2a8_0_70
 
