@@ -2,6 +2,7 @@ package substrate
 
 import (
 	"context"
+
 	"github.com/ethereum/go-ethereum/rpc"
 )
 

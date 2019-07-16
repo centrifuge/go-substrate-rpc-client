@@ -1,8 +1,8 @@
 package substrate
 
 import (
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 // Hash is 256 bit by default
@@ -18,7 +18,7 @@ const PREFIX_1BYTE = 0xef;
 const PREFIX_2BYTE = 0xfc;
 const PREFIX_4BYTE = 0xfd;
 const PREFIX_8BYTE = 0xfe;
- */
+*/
 type Address struct {
 	PubKey [32]byte
 }

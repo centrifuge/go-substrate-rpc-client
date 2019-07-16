@@ -255,7 +255,7 @@ type Decoder struct {
 }
 
 func NewDecoder(reader io.Reader) *Decoder {
-	return &Decoder{reader:reader}
+	return &Decoder{reader: reader}
 }
 
 // Read reads bytes from a stream into a buffer

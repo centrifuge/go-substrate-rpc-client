@@ -7,28 +7,27 @@ import (
 	"os/exec"
 	"sync"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 const (
-	Alice = "//Alice"
+	Alice       = "//Alice"
 	AlicePubKey = "0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
 )
 
 type MortalEra struct {
 	Period uint64
-	Phase uint64
+	Phase  uint64
 }
 
 type ExtrinsicSignature struct {
 	SignatureOptional uint8
-	Signer Address
-	Signature Signature
-	Nonce uint64
-	Era uint8 // era enum
+	Signer            Address
+	Signature         Signature
+	Nonce             uint64
+	Era               uint8 // era enum
 }
-
 
 func NewExtrinsicSignature(signature Signature, Nonce uint64) ExtrinsicSignature {
 	return ExtrinsicSignature{Signature: signature, Nonce: Nonce}
@@ -105,9 +104,9 @@ func (e ExtrinsicSignature) Encode(encoder scale.Encoder) error {
 }
 
 type SignaturePayload struct {
-	Nonce uint64
+	Nonce  uint64
 	Method Method
-	Era uint8 // era enum
+	Era    uint8 // era enum
 	//ImmortalEra []byte
 	PriorBlock [32]byte
 }
@@ -138,7 +137,6 @@ type Args interface {
 }
 
 type Method struct {
-
 	CallIndex MethodIDX
 	//  dynamic struct with the list of arguments defined as fields
 	Args Args
@@ -146,7 +144,7 @@ type Method struct {
 
 func NewMethod(name string, a Args, metadata MetadataVersioned) Method {
 	// "kerplunk.commit"
-	return Method{CallIndex: metadata.Metadata.MethodIndex(name), Args:a}
+	return Method{CallIndex: metadata.Metadata.MethodIndex(name), Args: a}
 }
 
 func (e *Method) Decode(decoder scale.Decoder) error {
@@ -176,9 +174,9 @@ func (m Method) Encode(encoder scale.Encoder) error {
 }
 
 type Extrinsic struct {
-	subKeyCMD string
+	subKeyCMD  string
 	subKeySign string
-	Nonce uint64
+	Nonce      uint64
 	// BestKnownBlock genesis block
 	BestKnownBlock []byte
 	Signature      ExtrinsicSignature
@@ -186,7 +184,7 @@ type Extrinsic struct {
 }
 
 func NewExtrinsic(subKeyCMD string, subKeySign string, accountNonce uint64, bestKnownBlock []byte, method Method) *Extrinsic {
-	return &Extrinsic{subKeyCMD: subKeyCMD, subKeySign: subKeySign, Nonce:accountNonce, BestKnownBlock: bestKnownBlock, Method:method}
+	return &Extrinsic{subKeyCMD: subKeyCMD, subKeySign: subKeySign, Nonce: accountNonce, BestKnownBlock: bestKnownBlock, Method: method}
 }
 
 func (e *Extrinsic) Decode(decoder scale.Decoder) error {
@@ -216,7 +214,7 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 	tempEnc := scale.NewEncoder(bb)
 
 	sigPay := SignaturePayload{
-		Nonce: e.Nonce,
+		Nonce:  e.Nonce,
 		Method: e.Method,
 		// Immortal
 		Era: 0,
@@ -228,7 +226,6 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 	}
 	bbb := bb.Bytes()
 	encoded := hex.EncodeToString(bbb)
-
 
 	// use "subKey" command for signature
 	out, err := exec.Command(e.subKeyCMD, e.subKeySign, encoded, Alice).Output()
@@ -269,27 +266,26 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 
 type Author struct {
 	client Client
-	meta MetadataVersioned
+	meta   MetadataVersioned
 
 	// mu is an exclusive lock to manage the nonce
 	mu sync.RWMutex
 
-	subKeyCMD string
+	subKeyCMD  string
 	subKeySign string
 
 	// TODO obtain these using RPCs
-	accountNonce uint64
+	accountNonce   uint64
 	bestKnownBlock []byte
-
 }
 
-func NewAuthorRPC(startNonce uint64, bestKnownBlock []byte, subKeyCMD , SubKeySign string, meta MetadataVersioned, client Client) *Author {
-	return &Author{ client, meta, sync.RWMutex{}, subKeyCMD, SubKeySign, startNonce, bestKnownBlock}
+func NewAuthorRPC(startNonce uint64, bestKnownBlock []byte, subKeyCMD, SubKeySign string, meta MetadataVersioned, client Client) *Author {
+	return &Author{client, meta, sync.RWMutex{}, subKeyCMD, SubKeySign, startNonce, bestKnownBlock}
 }
 
 func (a *Author) SubmitExtrinsic(method string, args Args) (string, error) {
 	a.mu.Lock()
-	e :=  NewExtrinsic(a.subKeyCMD, a.subKeySign, a.accountNonce, a.bestKnownBlock, NewMethod(method, args, a.meta))
+	e := NewExtrinsic(a.subKeyCMD, a.subKeySign, a.accountNonce, a.bestKnownBlock, NewMethod(method, args, a.meta))
 	a.accountNonce++
 	a.mu.Unlock()
 	bb := make([]byte, 0, 1000)

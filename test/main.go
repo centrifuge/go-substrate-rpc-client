@@ -7,15 +7,15 @@ import (
 	"time"
 
 	"github.com/centrifuge/go-centrifuge/utils"
-	"golang.org/x/crypto/blake2b"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"golang.org/x/crypto/blake2b"
 )
 
 const (
 	AnchorCommit = "kerplunk.commit"
-	SubKeySign = "sign-blob"
+	SubKeySign   = "sign-blob"
 
 	// Adjust below params according to your env + chain state + requirement
 
@@ -23,22 +23,22 @@ const (
 
 	// TODO query these from the chain
 	// 0x703bffa9bc816a5cd06ab8a95c2ff74e7a60cdaf269ffd64d325eb193266a656
-	GenesisBlock  = "0xa2a6945bb36576ffeaf3a1f231ade76a104ed6603909fdd9c6728c821fe95d79"
+	GenesisBlock = "0xa2a6945bb36576ffeaf3a1f231ade76a104ed6603909fdd9c6728c821fe95d79"
 	// BestBlock is the earliest block thats not already pruned
-	BestBlock  = "0xa2a6945bb36576ffeaf3a1f231ade76a104ed6603909fdd9c6728c821fe95d79"
+	BestBlock = "0xa2a6945bb36576ffeaf3a1f231ade76a104ed6603909fdd9c6728c821fe95d79"
 	// StartNonce is the current account nonce for Alice (can't use other accounts for now)
 	StartNonce = 18
 	// SubKeyCmd subkey command to create signatures
 	SubKeyCmd = "/Users/vimukthi/.cargo/bin/subkey"
 
 	NumAnchorsPerThread = 100
-	Concurrency = 4
+	Concurrency         = 4
 )
 
 type AnchorParams struct {
 	AnchorIDPreimage [32]byte
-	DocRoot [32]byte
-	Proof [32]byte
+	DocRoot          [32]byte
+	Proof            [32]byte
 }
 
 func NewRandomAnchor() AnchorParams {
@@ -128,6 +128,6 @@ func main() {
 
 	wg.Wait()
 	elapsed := time.Since(start)
-	tps := float64(counter)/elapsed.Seconds()
+	tps := float64(counter) / elapsed.Seconds()
 	fmt.Printf("Successful execution of %d transactions took %s, amounting to %f TPS", counter, elapsed, tps)
 }
