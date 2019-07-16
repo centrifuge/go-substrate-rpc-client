@@ -7,4 +7,3 @@ import (
 func TestExtrinsic_ParityDecode(t *testing.T) {
 
 }
-

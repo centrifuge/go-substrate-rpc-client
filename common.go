@@ -1,8 +1,8 @@
 package substrate
 
 import (
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 // Hash is 256 bit by default
@@ -18,7 +18,7 @@ const PREFIX_1BYTE = 0xef;
 const PREFIX_2BYTE = 0xfc;
 const PREFIX_4BYTE = 0xfd;
 const PREFIX_8BYTE = 0xfe;
- */
+*/
 type Address struct {
 	PubKey [32]byte
 }
@@ -30,14 +30,24 @@ func NewAddress(b []byte) *Address {
 }
 
 func (a *Address) Decode(decoder scale.Decoder) error {
-	decoder.Read(a.PubKey[:])
+	err := decoder.Read(a.PubKey[:])
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (a Address) Encode(encoder scale.Encoder) error {
 	// type of address - public key
-	encoder.Write([]byte{255})
-	encoder.Write(a.PubKey[:])
+	err := encoder.Write([]byte{255})
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Write(a.PubKey[:])
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -54,11 +64,18 @@ func NewSignature(b []byte) *Signature {
 }
 
 func (s *Signature) Decode(decoder scale.Decoder) error {
-	decoder.Read(s.Hash[:])
+	err := decoder.Read(s.Hash[:])
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (s Signature) Encode(encoder scale.Encoder) error {
-	encoder.Write(s.Hash[:])
+	err := encoder.Write(s.Hash[:])
+	if err != nil {
+		return err
+	}
 	return nil
 }

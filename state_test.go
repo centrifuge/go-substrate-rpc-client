@@ -2,12 +2,14 @@ package substrate
 
 import (
 	"fmt"
+
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/minio/blake2b-simd"
 
-	bbb "golang.org/x/crypto/blake2b"
 	"testing"
+
 	"github.com/stretchr/testify/assert"
+	bbb "golang.org/x/crypto/blake2b"
 )
 
 func TestState_GetMetaData(t *testing.T) {
@@ -21,7 +23,7 @@ func TestState_GetMetaData(t *testing.T) {
 func TestBlake(t *testing.T) {
 	bb, _ := hexutil.Decode("0x0000000000000000000000000000000000000000000000000000000000000901")
 	b := blake2b.Sum256(bb)
- 	b2 := bbb.Sum256(bb)
- 	fmt.Println(hexutil.Encode(b[:]))
+	b2 := bbb.Sum256(bb)
+	fmt.Println(hexutil.Encode(b[:]))
 	fmt.Println(hexutil.Encode(b2[:]))
 }

@@ -255,7 +255,7 @@ type Decoder struct {
 }
 
 func NewDecoder(reader io.Reader) *Decoder {
-	return &Decoder{reader:reader}
+	return &Decoder{reader: reader}
 }
 
 // Read reads bytes from a stream into a buffer
@@ -336,7 +336,7 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 		intHolder := reflect.New(t)
 		intPointer := intHolder.Interface()
 		err := binary.Read(pd.reader, binary.LittleEndian, intPointer)
-		if err != nil {
+		if err != nil && err != io.EOF {
 			return err
 		}
 		target.Set(intHolder.Elem())

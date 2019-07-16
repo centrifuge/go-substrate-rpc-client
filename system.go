@@ -5,5 +5,5 @@ type System struct {
 }
 
 func NewSystemRPC(client Client) *System {
-	return &System{client:client}
+	return &System{client: client}
 }

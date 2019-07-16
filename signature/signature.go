@@ -2,11 +2,12 @@ package signature
 
 import (
 	"errors"
-	"golang.org/x/crypto/ed25519"
 	"regexp"
+
+	"golang.org/x/crypto/ed25519"
 )
 
-const DEV_PHRASE = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
+const DEV_PHRASE = "bottom drive obey lake curtain smoke basket hold race lonely fit walk"
 
 type SupportedKeyType int
 
@@ -15,7 +16,7 @@ const (
 )
 
 type Keyring struct {
-	Type SupportedKeyType
+	Type  SupportedKeyType
 	Pairs map[string]KeyringPair
 }
 
@@ -35,17 +36,16 @@ type KeyringPair interface {
 	SetMeta(meta map[string]interface{})
 	Sign(message []byte) []byte
 	// TODO
-	Json (passphrase string)
-	Verify (message []byte, signature []byte) bool
+	Json(passphrase string)
+	Verify(message []byte, signature []byte) bool
 }
-
 
 func sign(privKey []byte, msg []byte) {
 	ed25519.Sign(privKey, msg)
 }
 
 var reCapture = regexp.MustCompile("^(\\w+( \\w+)*)((//?[^/]+)*)(///(.*))?$")
-var reJunction = regexp.MustCompile("//(/?)([^/]+)/g");
+var reJunction = regexp.MustCompile("//(/?)([^/]+)/g")
 
 // extractKey Extracts the phrase, path and password from a SURI format for specifying secret keys
 // `<secret>/<soft-key>//<hard-key>///<password>` (the `///password` may be omitted, and
@@ -69,7 +69,7 @@ func extractKey(suri string) (password, phrase string, path []DeriveJunction, er
 
 type DeriveJunction struct {
 	chainCode []byte
-	isHard bool
+	isHard    bool
 }
 
 //func extractKeyPath(s string) ([]DeriveJunction, error) {
@@ -101,4 +101,4 @@ sign (method: Method, account: KeyringPair, { blockHash, era, nonce, version }: 
 
 return this.injectSignature(signature, signer, signingPayload.nonce, signingPayload.era);
 }
- */
+*/

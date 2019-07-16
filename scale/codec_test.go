@@ -17,11 +17,12 @@ package scale
 import (
 	"bytes"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"math"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func assertEqual(t *testing.T, a interface{}, b interface{}) {
@@ -76,7 +77,7 @@ func TestArrayCannotBeDecodedIntoIncompatible(t *testing.T) {
 	err := Encoder{&buffer}.Encode(value)
 	assert.NoError(t, err)
 	err = Decoder{&buffer}.Decode(&value2)
-    assert.Error(t, err)
+	assert.Error(t, err)
 	buffer.Reset()
 	err = Encoder{&buffer}.Encode(value)
 	assert.NoError(t, err)

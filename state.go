@@ -4,25 +4,41 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 // MethodIDX [sectionIndex, methodIndex] 16bits
 type MethodIDX struct {
 	SectionIndex uint8
-	MethodIndex uint8
+	MethodIndex  uint8
 }
 
 func (e *MethodIDX) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&e.SectionIndex)
-	decoder.Decode(&e.MethodIndex)
+	err := decoder.Decode(&e.SectionIndex)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&e.MethodIndex)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (m MethodIDX) Encode(encoder scale.Encoder) error {
-	encoder.Encode(m.SectionIndex)
-	encoder.Encode(m.MethodIndex)
+	err := encoder.Encode(m.SectionIndex)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.MethodIndex)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -54,7 +70,10 @@ func (m *MetadataV4) MethodIndex(method string) MethodIDX {
 }
 
 func (m *MetadataV4) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Modules)
+	err := decoder.Decode(&m.Modules)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -64,130 +83,254 @@ type FunctionArgumentMetadata struct {
 }
 
 func (m *FunctionArgumentMetadata) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Name)
-	decoder.Decode(&m.Type)
+	err := decoder.Decode(&m.Name)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Type)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 type FunctionMetaData struct {
-	Name string
-	Args []FunctionArgumentMetadata
+	Name          string
+	Args          []FunctionArgumentMetadata
 	Documentation []string
 }
 
 func (m *FunctionMetaData) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Name)
-	decoder.Decode(&m.Args)
-	decoder.Decode(&m.Documentation)
+	err := decoder.Decode(&m.Name)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Args)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Documentation)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 type EventMetadata struct {
-	Name string
-	Args []string
+	Name          string
+	Args          []string
 	Documentation []string
 }
 
 func (m *EventMetadata) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Name)
-	decoder.Decode(&m.Args)
-	decoder.Decode(&m.Documentation)
+	err := decoder.Decode(&m.Name)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Args)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Documentation)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 /**
 [{"name":"AccountNonce","modifier":"Default","type":{"MapType":{"hasher":"Blake2_256","key":"AccountId","value":"Index","isLinked":false}},"fallback":"0x0000000000000000","documentation":[" Extrinsics nonce for accounts."]},{"name":"ExtrinsicCount","modifier":"Optional","type":{"PlainType":"u32"},"fallback":"0x00","documentation":[" Total extrinsics count for the current block."]},{"name":"AllExtrinsicsLen","modifier":"Optional","type":{"PlainType":"u32"},"fallback":"0x00","documentation":[" Total length in bytes for all extrinsics put together, for the current block."]},{"name":"BlockHash","modifier":"Default","type":{"MapType":{"hasher":"Blake2_256","key":"BlockNumber","value":"Hash","isLinked":false}},"fallback":"0x0000000000000000000000000000000000000000000000000000000000000000","documentation":[" Map of block numbers to block hashes."]},{"name":"ExtrinsicData","modifier":"Default","type":{"MapType":{"hasher":"Blake2_256","key":"u32","value":"Bytes","isLinked":false}},"fallback":"0x00","documentation":[" Extrinsics data for the current block (maps extrinsic's index to its data)."]},{"name":"RandomSeed","modifier":"Default","type":{"PlainType":"Hash"},"fallback":"0x0000000000000000000000000000000000000000000000000000000000000000","documentation":[" Random seed of the current block."]},{"name":"Number","modifier":"Default","type":{"PlainType":"BlockNumber"},"fallback":"0x0000000000000000","documentation":[" The current block number being processed. Set by `execute_block`."]},{"name":"ParentHash","modifier":"Default","type":{"PlainType":"Hash"},"fallback":"0x0000000000000000000000000000000000000000000000000000000000000000","documentation":[" Hash of the previous block."]},{"name":"ExtrinsicsRoot","modifier":"Default","type":{"PlainType":"Hash"},"fallback":"0x0000000000000000000000000000000000000000000000000000000000000000","documentation":[" Extrinsics root of the current block, also part of the block header."]},{"name":"Digest","modifier":"Default","type":{"PlainType":"Digest"},"fallback":"0x00","documentation":[" Digest of the current block, also part of the block header."]},{"name":"Events","modifier":"Default","type":{"PlainType":"Vec<EventRecord>"},"fallback":"0x00","documentation":[" Events deposited for the current block."]}]
- */
+*/
 
 type TypMap struct {
-	Hasher uint8
-	Key string
-	Value string
+	Hasher   uint8
+	Key      string
+	Value    string
 	IsLinked bool
 }
 
 func (m *TypMap) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Hasher)
-	decoder.Decode(&m.Key)
-	decoder.Decode(&m.Value)
-	decoder.Decode(&m.IsLinked)
+	err := decoder.Decode(&m.Hasher)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Key)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Value)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.IsLinked)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 type TypDoubleMap struct {
-	Hasher uint8
-	Key string
-	Key2 string
-	Value string
+	Hasher     uint8
+	Key        string
+	Key2       string
+	Value      string
 	Key2Hasher string
 }
 
 func (m *TypDoubleMap) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Hasher)
-	decoder.Decode(&m.Key)
-	decoder.Decode(&m.Key2)
-	decoder.Decode(&m.Value)
-	decoder.Decode(&m.Key2Hasher)
+	err := decoder.Decode(&m.Hasher)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Key)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Key2)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Value)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Key2Hasher)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 type StorageFunctionMetadata struct {
-	Name string
-	Modifier uint8
-	Type uint8
-	Plane string
-	Map TypMap
-	DMap TypDoubleMap
-	Fallback []byte
+	Name          string
+	Modifier      uint8
+	Type          uint8
+	Plane         string
+	Map           TypMap
+	DMap          TypDoubleMap
+	Fallback      []byte
 	Documentation []string
 }
 
 func (m *StorageFunctionMetadata) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Name)
-	decoder.Decode(&m.Modifier)
-	decoder.Decode(&m.Type)
+	err := decoder.Decode(&m.Name)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Modifier)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Type)
+	if err != nil {
+		return err
+	}
+
 	switch m.Type {
 	case 0:
-		decoder.Decode(&m.Plane)
+		err = decoder.Decode(&m.Plane)
+		if err != nil {
+			return err
+		}
 	case 1:
-		decoder.Decode(&m.Map)
+		err = decoder.Decode(&m.Map)
+		if err != nil {
+			return err
+		}
 	default:
-		decoder.Decode(&m.DMap)
+		err = decoder.Decode(&m.DMap)
+		if err != nil {
+			return err
+		}
 	}
-	decoder.Decode(&m.Fallback)
-	decoder.Decode(&m.Documentation)
+	err = decoder.Decode(&m.Fallback)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Documentation)
+	if err != nil {
+		return err
+	}
 	// fmt.Println(m.Documentation)
 	return nil
 }
 
 type ModuleMetaData struct {
-	Name string
-	Prefix string
+	Name            string
+	Prefix          string
 	StorageOptional uint8
-	Storage []StorageFunctionMetadata
-	CallsOptional uint8
-	Calls []FunctionMetaData
-	EventsOptional uint8
-	Events []EventMetadata
+	Storage         []StorageFunctionMetadata
+	CallsOptional   uint8
+	Calls           []FunctionMetaData
+	EventsOptional  uint8
+	Events          []EventMetadata
 }
 
 func (m *ModuleMetaData) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Name)
-	decoder.Decode(&m.Prefix)
+	err := decoder.Decode(&m.Name)
+	if err != nil {
+		return err
+	}
 
-	decoder.Decode(&m.StorageOptional)
+	err = decoder.Decode(&m.Prefix)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.StorageOptional)
+	if err != nil {
+		return err
+	}
+
 	if m.StorageOptional == 1 {
-		decoder.Decode(&m.Storage)
+		err = decoder.Decode(&m.Storage)
+		if err != nil {
+			return err
+		}
 	}
 
-	decoder.Decode(&m.CallsOptional)
+	err = decoder.Decode(&m.CallsOptional)
+	if err != nil {
+		return err
+	}
+
 	if m.CallsOptional == 1 {
-		decoder.Decode(&m.Calls)
+		err = decoder.Decode(&m.Calls)
+		if err != nil {
+			return err
+		}
 	}
 
-	decoder.Decode(&m.EventsOptional)
+	err = decoder.Decode(&m.EventsOptional)
+	if err != nil {
+		return err
+	}
+
 	if m.EventsOptional == 1 {
-		decoder.Decode(&m.Events)
+		err = decoder.Decode(&m.Events)
+		if err != nil {
+			return err
+		}
 		// fmt.Println(m.Events)
 	}
 	return nil
@@ -196,30 +339,41 @@ func (m *ModuleMetaData) Decode(decoder scale.Decoder) error {
 // MetadataVersioned only supports v4
 type MetadataVersioned struct {
 	// 1635018093
-	MagicNumber   uint32
-	Version       uint8
-	Metadata      MetadataV4
+	MagicNumber uint32
+	Version     uint8
+	Metadata    MetadataV4
 }
 
 func NewMetadataVersioned() *MetadataVersioned {
-	return &MetadataVersioned{Metadata:MetadataV4{make([]ModuleMetaData, 0)}}
+	return &MetadataVersioned{Metadata: MetadataV4{make([]ModuleMetaData, 0)}}
 }
 
 func (m *MetadataVersioned) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.MagicNumber)
+	err := decoder.Decode(&m.MagicNumber)
+	if err != nil {
+		return err
+	}
 	// we need to decide which struct to use based on the following number(enum), for now its hardcoded
-	decoder.Decode(&m.Version)
-	decoder.Decode(&m.Metadata)
+	err = decoder.Decode(&m.Version)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Metadata)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 type State struct {
 	nonetwork bool
-	client Client
-} 
+	client    Client
+}
 
 func NewStateRPC(client Client) *State {
-	return &State{client:client}
+	return &State{client: client}
 }
 
 func (s *State) MetaData(blockHash Hash) (*MetadataVersioned, error) {
@@ -243,7 +397,11 @@ func (s *State) MetaData(blockHash Hash) (*MetadataVersioned, error) {
 
 	dec := scale.NewDecoder(bytes.NewReader(b))
 	n := NewMetadataVersioned()
-	dec.Decode(n)
+	err = dec.Decode(n)
+	if err != nil {
+		return nil, err
+	}
+
 	return n, nil
 }
 
