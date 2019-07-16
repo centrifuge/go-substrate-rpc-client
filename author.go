@@ -38,20 +38,32 @@ func (e *ExtrinsicSignature) Decode(decoder scale.Decoder) error {
 	// length of the encoded signature struct
 	//l := decoder.DecodeUintCompact()
 	//fmt.Println(l)
-	decoder.Decode(&e.SignatureOptional) // implement decodeExtrinsicSignature logic to derive if the request is signed
+	err := decoder.Decode(&e.SignatureOptional) // implement decodeExtrinsicSignature logic to derive if the request is signed
+	if err != nil {
+		return err
+	}
 
 	b, _ := decoder.ReadOneByte()
 	// need to add other address representations from Address.decodeAddress
 	if b == 255 {
 		e.Signer = Address{}
-		decoder.Decode(&e.Signer)
+		err = decoder.Decode(&e.Signer)
+		if err != nil {
+			return err
+		}
 	}
 
 	e.Signature = Signature{}
-	decoder.Decode(&e.Signature)
+	err = decoder.Decode(&e.Signature)
+	if err != nil {
+		return err
+	}
 	e.Nonce, _ = decoder.DecodeUintCompact()
 	// assuming immortal for now TODO
-	decoder.Decode(&e.Era)
+	err = decoder.Decode(&e.Era)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -64,11 +76,31 @@ func (e ExtrinsicSignature) Encode(encoder scale.Encoder) error {
 	e.Signer = *NewAddress(s)
 	e.Era = 0
 
-	encoder.Encode(e.SignatureOptional)
-	encoder.Encode(&e.Signer)
-	encoder.Encode(&e.Signature)
-	encoder.EncodeUintCompact(e.Nonce)
-	encoder.Encode(e.Era)
+	err := encoder.Encode(e.SignatureOptional)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(&e.Signer)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(&e.Signature)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.EncodeUintCompact(e.Nonce)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.Era)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -81,11 +113,23 @@ type SignaturePayload struct {
 }
 
 func (e SignaturePayload) Encode(encoder scale.Encoder) error {
-	encoder.EncodeUintCompact(e.Nonce)
-	encoder.Encode(e.Method)
-	encoder.Encode(e.Era)
+	err := encoder.EncodeUintCompact(e.Nonce)
+	if err != nil {
+		return err
+	}
+	err = encoder.Encode(e.Method)
+	if err != nil {
+		return err
+	}
+	err = encoder.Encode(e.Era)
+	if err != nil {
+		return err
+	}
 	// encoder.Encode(e.ImmortalEra) // always immortal
-	encoder.Write(e.PriorBlock[:])
+	err = encoder.Write(e.PriorBlock[:])
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -106,15 +150,28 @@ func NewMethod(name string, a Args, metadata MetadataVersioned) Method {
 }
 
 func (e *Method) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&e.CallIndex)
+	err := decoder.Decode(&e.CallIndex)
+	if err != nil {
+		return err
+	}
 	//e.Args = &AnchorParams{}
-	decoder.Decode(e.Args)
+	err = decoder.Decode(e.Args)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (m Method) Encode(encoder scale.Encoder) error {
-	encoder.Encode(&m.CallIndex)
-	encoder.Encode(m.Args)
+	err := encoder.Encode(&m.CallIndex)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.Args)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -134,11 +191,22 @@ func NewExtrinsic(subKeyCMD string, subKeySign string, accountNonce uint64, best
 
 func (e *Extrinsic) Decode(decoder scale.Decoder) error {
 	// length (not used)
-	decoder.DecodeUintCompact()
+	_, err := decoder.DecodeUintCompact()
+	if err != nil {
+		return err
+	}
 
 	e.Signature = ExtrinsicSignature{}
-	decoder.Decode(&e.Signature)
-	decoder.Decode(&e.Method)
+	err = decoder.Decode(&e.Signature)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&e.Method)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -154,7 +222,10 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 		Era: 0,
 	}
 	copy(sigPay.PriorBlock[:], e.BestKnownBlock)
-	tempEnc.Encode(sigPay)
+	err := tempEnc.Encode(sigPay)
+	if err != nil {
+		return err
+	}
 	bbb := bb.Bytes()
 	encoded := hex.EncodeToString(bbb)
 
@@ -174,13 +245,25 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 	b = make([]byte, 0, 1000)
 	bb = bytes.NewBuffer(b)
 	tempEnc = scale.NewEncoder(bb)
-	tempEnc.Encode(&e.Signature)
-	tempEnc.Encode(&e.Method)
+	err = tempEnc.Encode(&e.Signature)
+	if err != nil {
+		return err
+	}
+	err = tempEnc.Encode(&e.Method)
+	if err != nil {
+		return err
+	}
 
 	// encode with length prefix
 	eb := bb.Bytes()
-	encoder.EncodeUintCompact(uint64(len(eb)))
-	encoder.Write(eb)
+	err = encoder.EncodeUintCompact(uint64(len(eb)))
+	if err != nil {
+		return err
+	}
+	err = encoder.Write(eb)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -212,12 +295,15 @@ func (a *Author) SubmitExtrinsic(method string, args Args) (string, error) {
 	bb := make([]byte, 0, 1000)
 	bbb := bytes.NewBuffer(bb)
 	tempEnc := scale.NewEncoder(bbb)
-	tempEnc.Encode(&e)
+	err := tempEnc.Encode(&e)
+	if err != nil {
+		return "", err
+	}
 	eb := hexutil.Encode(bbb.Bytes())
 	// fmt.Println(eb)
 
 	var res string
-	err := a.client.Call(&res, "author_submitExtrinsic", eb)
+	err = a.client.Call(&res, "author_submitExtrinsic", eb)
 	if err != nil {
 		return "", err
 	}

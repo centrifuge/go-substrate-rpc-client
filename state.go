@@ -15,14 +15,30 @@ type MethodIDX struct {
 }
 
 func (e *MethodIDX) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&e.SectionIndex)
-	decoder.Decode(&e.MethodIndex)
+	err := decoder.Decode(&e.SectionIndex)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&e.MethodIndex)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (m MethodIDX) Encode(encoder scale.Encoder) error {
-	encoder.Encode(m.SectionIndex)
-	encoder.Encode(m.MethodIndex)
+	err := encoder.Encode(m.SectionIndex)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.MethodIndex)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -54,7 +70,10 @@ func (m *MetadataV4) MethodIndex(method string) MethodIDX {
 }
 
 func (m *MetadataV4) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Modules)
+	err := decoder.Decode(&m.Modules)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -64,8 +83,16 @@ type FunctionArgumentMetadata struct {
 }
 
 func (m *FunctionArgumentMetadata) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Name)
-	decoder.Decode(&m.Type)
+	err := decoder.Decode(&m.Name)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Type)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -76,9 +103,21 @@ type FunctionMetaData struct {
 }
 
 func (m *FunctionMetaData) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Name)
-	decoder.Decode(&m.Args)
-	decoder.Decode(&m.Documentation)
+	err := decoder.Decode(&m.Name)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Args)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Documentation)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -89,9 +128,21 @@ type EventMetadata struct {
 }
 
 func (m *EventMetadata) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Name)
-	decoder.Decode(&m.Args)
-	decoder.Decode(&m.Documentation)
+	err := decoder.Decode(&m.Name)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Args)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Documentation)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -107,10 +158,26 @@ type TypMap struct {
 }
 
 func (m *TypMap) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Hasher)
-	decoder.Decode(&m.Key)
-	decoder.Decode(&m.Value)
-	decoder.Decode(&m.IsLinked)
+	err := decoder.Decode(&m.Hasher)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Key)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Value)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.IsLinked)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -123,11 +190,31 @@ type TypDoubleMap struct {
 }
 
 func (m *TypDoubleMap) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Hasher)
-	decoder.Decode(&m.Key)
-	decoder.Decode(&m.Key2)
-	decoder.Decode(&m.Value)
-	decoder.Decode(&m.Key2Hasher)
+	err := decoder.Decode(&m.Hasher)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Key)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Key2)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Value)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Key2Hasher)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -143,19 +230,47 @@ type StorageFunctionMetadata struct {
 }
 
 func (m *StorageFunctionMetadata) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Name)
-	decoder.Decode(&m.Modifier)
-	decoder.Decode(&m.Type)
+	err := decoder.Decode(&m.Name)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Modifier)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Type)
+	if err != nil {
+		return err
+	}
+
 	switch m.Type {
 	case 0:
-		decoder.Decode(&m.Plane)
+		err = decoder.Decode(&m.Plane)
+		if err != nil {
+			return err
+		}
 	case 1:
-		decoder.Decode(&m.Map)
+		err = decoder.Decode(&m.Map)
+		if err != nil {
+			return err
+		}
 	default:
-		decoder.Decode(&m.DMap)
+		err = decoder.Decode(&m.DMap)
+		if err != nil {
+			return err
+		}
 	}
-	decoder.Decode(&m.Fallback)
-	decoder.Decode(&m.Documentation)
+	err = decoder.Decode(&m.Fallback)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Documentation)
+	if err != nil {
+		return err
+	}
 	// fmt.Println(m.Documentation)
 	return nil
 }
@@ -172,22 +287,50 @@ type ModuleMetaData struct {
 }
 
 func (m *ModuleMetaData) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.Name)
-	decoder.Decode(&m.Prefix)
+	err := decoder.Decode(&m.Name)
+	if err != nil {
+		return err
+	}
 
-	decoder.Decode(&m.StorageOptional)
+	err = decoder.Decode(&m.Prefix)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.StorageOptional)
+	if err != nil {
+		return err
+	}
+
 	if m.StorageOptional == 1 {
-		decoder.Decode(&m.Storage)
+		err = decoder.Decode(&m.Storage)
+		if err != nil {
+			return err
+		}
 	}
 
-	decoder.Decode(&m.CallsOptional)
+	err = decoder.Decode(&m.CallsOptional)
+	if err != nil {
+		return err
+	}
+
 	if m.CallsOptional == 1 {
-		decoder.Decode(&m.Calls)
+		err = decoder.Decode(&m.Calls)
+		if err != nil {
+			return err
+		}
 	}
 
-	decoder.Decode(&m.EventsOptional)
+	err = decoder.Decode(&m.EventsOptional)
+	if err != nil {
+		return err
+	}
+
 	if m.EventsOptional == 1 {
-		decoder.Decode(&m.Events)
+		err = decoder.Decode(&m.Events)
+		if err != nil {
+			return err
+		}
 		// fmt.Println(m.Events)
 	}
 	return nil
@@ -206,10 +349,21 @@ func NewMetadataVersioned() *MetadataVersioned {
 }
 
 func (m *MetadataVersioned) Decode(decoder scale.Decoder) error {
-	decoder.Decode(&m.MagicNumber)
+	err := decoder.Decode(&m.MagicNumber)
+	if err != nil {
+		return err
+	}
 	// we need to decide which struct to use based on the following number(enum), for now its hardcoded
-	decoder.Decode(&m.Version)
-	decoder.Decode(&m.Metadata)
+	err = decoder.Decode(&m.Version)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Metadata)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -243,7 +397,11 @@ func (s *State) MetaData(blockHash Hash) (*MetadataVersioned, error) {
 
 	dec := scale.NewDecoder(bytes.NewReader(b))
 	n := NewMetadataVersioned()
-	dec.Decode(n)
+	err = dec.Decode(n)
+	if err != nil {
+		return nil, err
+	}
+
 	return n, nil
 }
 
