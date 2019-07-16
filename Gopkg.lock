@@ -2,11 +2,12 @@
 
 
 [[projects]]
-  digest = "1:f5322546f652db78b7a8efd35047a61d1e492abca2263e1c647eca49e1c8a354"
+  branch = "master"
+  digest = "1:7d191fd0c54ff370eaf6116a14dafe2a328df487baea280699f597aae858d00d"
   name = "github.com/aristanetworks/goarista"
   packages = ["monotime"]
   pruneopts = "UT"
-  revision = "ea17b1a17847fb6e4c0a91de0b674704693469b0"
+  revision = "ed1100a1c0154be237da0078e86b19c523c8c661"
 
 [[projects]]
   digest = "1:f43940a3d4989a4b63f695f63d464e575bd57b159ca933d73bd951e2e2e8c1f8"
@@ -18,17 +19,6 @@
   pruneopts = "UT"
   revision = "2a9356f06eeb815e175f2449ae4a9362b28de36a"
   version = "v0.0.4"
-
-[[projects]]
-  branch = "master"
-  digest = "1:5532b3870e1906635d3d27cea04ca0db2636375ab6e60607cd5d0f59558866ed"
-  name = "github.com/centrifuge/go-substrate-rpc-client"
-  packages = [
-    ".",
-    "scalecodec",
-  ]
-  pruneopts = "UT"
-  revision = "21977bc4d0f9d7f9af5b4afd638479e467224fa0"
 
 [[projects]]
   digest = "1:bdd797d675043d8547be2de04b25bcf7319ca834b72c88dd13f25972ac84e09a"
@@ -46,14 +36,15 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:1aeb4854a1c278e842712cd6684f48d595cbdd7839655d37a77248efa08c9fc0"
+  digest = "1:e47d51dab652d26c3fba6f8cba403f922d02757a82abdc77e90df7948daf296e"
   name = "github.com/deckarep/golang-set"
   packages = ["."]
   pruneopts = "UT"
-  revision = "504e848d77ea4752b3057b8fb46da0e7f746ccf3"
+  revision = "cbaa98ba5575e67703b32b4b19f73c91f3c4159e"
+  version = "v1.7.1"
 
 [[projects]]
-  digest = "1:e275c882f2112d0630abae9609b61de0364f4736707ade4657b670f6b8053467"
+  digest = "1:36c47373c4bc98533813643f1f6c9f9d9505b64a8ac3fbf90784cc7d6b099137"
   name = "github.com/ethereum/go-ethereum"
   packages = [
     "common",
@@ -64,16 +55,16 @@
     "rpc",
   ]
   pruneopts = "UT"
-  revision = "9dc5d1a915ac0e0bd8429d6ac41df50eec91de5f"
-  version = "v1.8.21"
+  revision = "52f2461774bcb8cdd310f86b4bc501df5b783852"
+  version = "v1.9.0"
 
 [[projects]]
-  digest = "1:33542eaf895b5489ccfb059502a721f0e8875379da8b3ff60fdd9212d503705c"
+  digest = "1:586ea76dbd0374d6fb649a91d70d652b7fe0ccffb8910a77468e7702e7901f3d"
   name = "github.com/go-stack/stack"
   packages = ["."]
   pruneopts = "UT"
-  revision = "54be5f394ed2c3e19dac9134a40a95ba5a017f7b"
-  version = "v1.5.4"
+  revision = "2fee6af1a9795aafbe0253a0cfbdf668e1fb8a9a"
+  version = "v1.8.0"
 
 [[projects]]
   digest = "1:48092bf6632f55839850666c33469f546f6d45fdbd59a66759ec12e84d853dc2"
@@ -193,20 +184,12 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:4b9bd28bbf14271f4b89a6c401589ea5939d14138e0399c253c1939cc4252d2f"
+  digest = "1:b0c25f00bad20d783d259af2af8666969e2fc343fa0dc9efe52936bbd67fb758"
   name = "github.com/rs/cors"
   packages = ["."]
   pruneopts = "UT"
-  revision = "a62a804a8a009876ca59105f7899938a1349f4b3"
-  version = "v1.0"
-
-[[projects]]
-  digest = "1:9665a593c0199c193341b8b110e31b19c899923711fc70bde2c2f3eb2d337526"
-  name = "github.com/rs/xhandler"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "d9d9599b6aaf6a058cb7b1f48291ded2cbd13390"
-  version = "v1.0"
+  revision = "9a47f48565a795472d43519dd49aac781f3034fb"
+  version = "v1.6.0"
 
 [[projects]]
   branch = "master"
@@ -254,7 +237,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1c68b9822d729aac9fa42f5cdce82e9d1f52d3c18a03afe45eda3ea9b8606414"
+  digest = "1:4561586da1a366f653d58481fc56e33fb523b3dc6e99b695b61859386b0fa65b"
   name = "golang.org/x/crypto"
   packages = [
     "blake2b",
@@ -263,30 +246,55 @@
     "sha3",
   ]
   pruneopts = "UT"
-  revision = "f99c8df09eb5bff426315721bfa5f16a99cad32c"
+  revision = "4def268fd1a49955bfb3dda92fe3db4f924f2285"
 
 [[projects]]
-  digest = "1:4066028242c434d4a147fdb0975b4cabc2221244703260c6b3281e46b6a2b180"
+  branch = "master"
+  digest = "1:9908fffeaec3701f96cfcd4928b1de7013995a6ba144a4a7da39380f440896ff"
   name = "golang.org/x/net"
   packages = [
-    "context",
     "idna",
     "publicsuffix",
     "websocket",
   ]
   pruneopts = "UT"
-  revision = "a6577fac2d73be281a500b310739095313165611"
+  revision = "da137c7871d730100384dbcf36e6f8fa493aef5b"
 
 [[projects]]
   branch = "master"
-  digest = "1:4c2a24d9ec7f386dec07d1d223ac6e90dffd3e2e9ff20288f364f950ff45f963"
+  digest = "1:a0e4b2275e7939970d395eb6d03f409378eb586aab72e0a461d95e3435c6c5c4"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
     "unix",
   ]
   pruneopts = "UT"
-  revision = "516e3c20635fbe39539f7ed361a15c51fec29cd8"
+  revision = "fae7ac547cb717d141c433a2a173315e216b64c4"
+
+[[projects]]
+  digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
+  name = "golang.org/x/text"
+  packages = [
+    "collate",
+    "collate/build",
+    "internal/colltab",
+    "internal/gen",
+    "internal/language",
+    "internal/language/compact",
+    "internal/tag",
+    "internal/triegen",
+    "internal/ucd",
+    "language",
+    "secure/bidirule",
+    "transform",
+    "unicode/bidi",
+    "unicode/cldr",
+    "unicode/norm",
+    "unicode/rangetable",
+  ]
+  pruneopts = "UT"
+  revision = "342b2e1fbaa52c93f31447ad2c6abc048c63e475"
+  version = "v0.3.2"
 
 [[projects]]
   branch = "master"
@@ -336,8 +344,6 @@
   analyzer-version = 1
   input-imports = [
     "github.com/centrifuge/go-centrifuge/utils",
-    "github.com/centrifuge/go-substrate-rpc-client",
-    "github.com/centrifuge/go-substrate-rpc-client/scalecodec",
     "github.com/ethereum/go-ethereum/common/hexutil",
     "github.com/ethereum/go-ethereum/rpc",
     "github.com/minio/blake2b-simd",
