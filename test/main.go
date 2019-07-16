@@ -9,7 +9,7 @@ import (
 	"github.com/centrifuge/go-centrifuge/utils"
 	"golang.org/x/crypto/blake2b"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/centrifuge/go-substrate"
+	"github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/centrifuge/go-substrate-rpc-client/scalecodec"
 )
 
