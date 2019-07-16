@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/centrifuge/go-substrate-rpc-client/scalecodec"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
 const (
@@ -34,13 +34,13 @@ func NewExtrinsicSignature(signature Signature, Nonce uint64) ExtrinsicSignature
 	return ExtrinsicSignature{Signature: signature, Nonce: Nonce}
 }
 
-func (e *ExtrinsicSignature) ParityDecode(decoder scalecodec.Decoder) {
+func (e *ExtrinsicSignature) Decode(decoder scale.Decoder) error {
 	// length of the encoded signature struct
 	//l := decoder.DecodeUintCompact()
 	//fmt.Println(l)
 	decoder.Decode(&e.SignatureOptional) // implement decodeExtrinsicSignature logic to derive if the request is signed
 
-	b := decoder.ReadOneByte()
+	b, _ := decoder.ReadOneByte()
 	// need to add other address representations from Address.decodeAddress
 	if b == 255 {
 		e.Signer = Address{}
@@ -49,13 +49,14 @@ func (e *ExtrinsicSignature) ParityDecode(decoder scalecodec.Decoder) {
 
 	e.Signature = Signature{}
 	decoder.Decode(&e.Signature)
-	e.Nonce = decoder.DecodeUintCompact()
+	e.Nonce, _ = decoder.DecodeUintCompact()
 	// assuming immortal for now TODO
 	decoder.Decode(&e.Era)
 
+	return nil
 }
 
-func (e ExtrinsicSignature) ParityEncode(encoder scalecodec.Encoder) {
+func (e ExtrinsicSignature) Encode(encoder scale.Encoder) error {
 	// always signed
 	e.SignatureOptional = 129
 	// Alice
@@ -68,6 +69,7 @@ func (e ExtrinsicSignature) ParityEncode(encoder scalecodec.Encoder) {
 	encoder.Encode(&e.Signature)
 	encoder.EncodeUintCompact(e.Nonce)
 	encoder.Encode(e.Era)
+	return nil
 }
 
 type SignaturePayload struct {
@@ -78,16 +80,17 @@ type SignaturePayload struct {
 	PriorBlock [32]byte
 }
 
-func (e SignaturePayload) ParityEncode(encoder scalecodec.Encoder) {
+func (e SignaturePayload) Encode(encoder scale.Encoder) error {
 	encoder.EncodeUintCompact(e.Nonce)
 	encoder.Encode(e.Method)
 	encoder.Encode(e.Era)
 	// encoder.Encode(e.ImmortalEra) // always immortal
 	encoder.Write(e.PriorBlock[:])
+	return nil
 }
 
 type Args interface {
-	scalecodec.Encodeable
+	scale.Encodeable
 }
 
 type Method struct {
@@ -102,15 +105,17 @@ func NewMethod(name string, a Args, metadata MetadataVersioned) Method {
 	return Method{CallIndex: metadata.Metadata.MethodIndex(name), Args:a}
 }
 
-func (e *Method) ParityDecode(decoder scalecodec.Decoder) {
+func (e *Method) Decode(decoder scale.Decoder) error {
 	decoder.Decode(&e.CallIndex)
 	//e.Args = &AnchorParams{}
 	decoder.Decode(e.Args)
+	return nil
 }
 
-func (m Method) ParityEncode(encoder scalecodec.Encoder) {
+func (m Method) Encode(encoder scale.Encoder) error {
 	encoder.Encode(&m.CallIndex)
 	encoder.Encode(m.Args)
+	return nil
 }
 
 type Extrinsic struct {
@@ -127,19 +132,20 @@ func NewExtrinsic(subKeyCMD string, subKeySign string, accountNonce uint64, best
 	return &Extrinsic{subKeyCMD: subKeyCMD, subKeySign: subKeySign, Nonce:accountNonce, BestKnownBlock: bestKnownBlock, Method:method}
 }
 
-func (e *Extrinsic) ParityDecode(decoder scalecodec.Decoder) {
+func (e *Extrinsic) Decode(decoder scale.Decoder) error {
 	// length (not used)
 	decoder.DecodeUintCompact()
 
 	e.Signature = ExtrinsicSignature{}
 	decoder.Decode(&e.Signature)
 	decoder.Decode(&e.Method)
+	return nil
 }
 
-func (e Extrinsic) ParityEncode(encoder scalecodec.Encoder) {
+func (e Extrinsic) Encode(encoder scale.Encoder) error {
 	b := make([]byte, 0, 1000)
 	bb := bytes.NewBuffer(b)
-	tempEnc := scalecodec.NewEncoder(bb)
+	tempEnc := scale.NewEncoder(bb)
 
 	sigPay := SignaturePayload{
 		Nonce: e.Nonce,
@@ -167,7 +173,7 @@ func (e Extrinsic) ParityEncode(encoder scalecodec.Encoder) {
 
 	b = make([]byte, 0, 1000)
 	bb = bytes.NewBuffer(b)
-	tempEnc = scalecodec.NewEncoder(bb)
+	tempEnc = scale.NewEncoder(bb)
 	tempEnc.Encode(&e.Signature)
 	tempEnc.Encode(&e.Method)
 
@@ -175,6 +181,7 @@ func (e Extrinsic) ParityEncode(encoder scalecodec.Encoder) {
 	eb := bb.Bytes()
 	encoder.EncodeUintCompact(uint64(len(eb)))
 	encoder.Write(eb)
+	return nil
 }
 
 type Author struct {
@@ -204,7 +211,7 @@ func (a *Author) SubmitExtrinsic(method string, args Args) (string, error) {
 	a.mu.Unlock()
 	bb := make([]byte, 0, 1000)
 	bbb := bytes.NewBuffer(bb)
-	tempEnc := scalecodec.NewEncoder(bbb)
+	tempEnc := scale.NewEncoder(bbb)
 	tempEnc.Encode(&e)
 	eb := hexutil.Encode(bbb.Bytes())
 	// fmt.Println(eb)

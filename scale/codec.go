@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package scalecodec
+package scale
 
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -32,12 +33,6 @@ import (
 const maxUint = ^uint(0)
 const maxInt = int(maxUint >> 1)
 
-func check(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 // Encoder is a wrapper around a Writer that allows encoding data items to a stream.
 type Encoder struct {
 	writer io.Writer
@@ -48,17 +43,20 @@ func NewEncoder(writer io.Writer) *Encoder {
 }
 
 // Write several bytes to the encoder.
-func (pe Encoder) Write(bytes []byte) {
+func (pe Encoder) Write(bytes []byte) error {
 	c, err := pe.writer.Write(bytes)
-	check(err)
-	if c < len(bytes) {
-		panic(fmt.Sprintf("Could not write %d bytes to writer", len(bytes)))
+	if err != nil {
+		return err
 	}
+	if c < len(bytes) {
+		return fmt.Errorf("Could not write %d bytes to writer", len(bytes))
+	}
+	return nil
 }
 
 // PushByte writes a single byte to an encoder.
-func (pe Encoder) PushByte(b byte) {
-	pe.Write([]byte{b})
+func (pe Encoder) PushByte(b byte) error {
+	return pe.Write([]byte{b})
 }
 
 // EncodeUintCompact writes an unsigned integer to the stream using the compact encoding.
@@ -70,26 +68,29 @@ func (pe Encoder) PushByte(b byte) {
 //   zL zL zL 10 / zM zM zM zL / zM zM zM zM / zH zH zH zM					(2**14 ... 2**30 - 1)	(u16, u32)  low LMMH high
 //   nn nn nn 11 [ / zz zz zz zz ]{4 + n}									(2**30 ... 2**536 - 1)	(u32, u64, u128, U256, U512, U520) straight LE-encoded
 // Rust implementation: see impl<'a> Encode for CompactRef<'a, u64>
-func (pe Encoder) EncodeUintCompact(v uint64) {
+func (pe Encoder) EncodeUintCompact(v uint64) error {
 
-	// TODO: handle numbers wide than 64 bits (byte slices?)
+	// TODO: handle numbers wider than 64 bits (byte slices?)
 	// Currently, Rust implementation only seems to support u128
 
 	if v < 1<<30 {
 		if v < 1<<6 {
-			pe.PushByte(byte(v) << 2)
+			err := pe.PushByte(byte(v) << 2)
+			if err != nil {
+				return err
+			}
 		} else if v < 1<<14 {
 			err := binary.Write(pe.writer, binary.LittleEndian, uint16(v<<2)+1)
 			if err != nil {
-				panic(err)
+				return err
 			}
 		} else {
 			err := binary.Write(pe.writer, binary.LittleEndian, uint32(v<<2)+2)
 			if err != nil {
-				panic(err)
+				return err
 			}
 		}
-		return
+		return nil
 	}
 
 	n := byte(0)
@@ -99,16 +100,23 @@ func (pe Encoder) EncodeUintCompact(v uint64) {
 		limit <<= 8
 	}
 	if n > 4 {
-		panic("Assertion error: n>4 needed to compact-encode uint64")
+		return errors.New("Assertion error: n>4 needed to compact-encode uint64")
 	}
-	pe.PushByte((n << 2) + 3)
+	err := pe.PushByte((n << 2) + 3)
+	if err != nil {
+		return err
+	}
 	buf := make([]byte, 8)
 	binary.LittleEndian.PutUint64(buf, v)
-	pe.Write(buf[:4+n])
+	err = pe.Write(buf[:4+n])
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Encode a value to the stream.
-func (pe Encoder) Encode(value interface{}) {
+func (pe Encoder) Encode(value interface{}) error {
 	t := reflect.TypeOf(value)
 	tk := t.Kind()
 	switch tk {
@@ -145,15 +153,18 @@ func (pe Encoder) Encode(value interface{}) {
 	case reflect.Float64:
 		err := binary.Write(pe.writer, binary.LittleEndian, value)
 		if err != nil {
-			panic(err)
+			return err
 		}
 	case reflect.Ptr:
 		rv := reflect.ValueOf(value)
 		if rv.IsNil() {
-			panic("Encoding null pointers not supported; consider using Option type")
+			return errors.New("Encoding null pointers not supported; consider using Option type")
 		} else {
 			dereferenced := rv.Elem()
-			pe.Encode(dereferenced.Interface())
+			err := pe.Encode(dereferenced.Interface())
+			if err != nil {
+				return err
+			}
 		}
 
 	// Arrays and slices: first compact-encode length, then each item individually
@@ -161,26 +172,38 @@ func (pe Encoder) Encode(value interface{}) {
 		fallthrough
 	case reflect.Slice:
 		rv := reflect.ValueOf(value)
-		len := rv.Len()
-		len64 := uint64(len)
+		l := rv.Len()
+		len64 := uint64(l)
 		if len64 > math.MaxUint32 {
-			panic("Attempted to serialize a collection with too many elements.")
+			return errors.New("Attempted to serialize a collection with too many elements.")
 		}
-		pe.EncodeUintCompact(len64)
-		for i := 0; i < len; i++ {
-			pe.Encode(rv.Index(i).Interface())
+		err := pe.EncodeUintCompact(len64)
+		if err != nil {
+			return err
+		}
+		for i := 0; i < l; i++ {
+			err = pe.Encode(rv.Index(i).Interface())
+			if err != nil {
+				return err
+			}
 		}
 
 	// Strings are encoded as UTF-8 byte slices, just as in Rust
 	case reflect.String:
-		pe.Encode([]byte(value.(string)))
+		err := pe.Encode([]byte(value.(string)))
+		if err != nil {
+			return err
+		}
 
 	case reflect.Struct:
 		encodeable := reflect.TypeOf((*Encodeable)(nil)).Elem()
 		if t.Implements(encodeable) {
-			value.(Encodeable).ParityEncode(pe)
+			err := value.(Encodeable).Encode(pe)
+			if err != nil {
+				return err
+			}
 		} else {
-			panic(fmt.Sprintf("Type %s does not support Encodeable interface", t))
+			return fmt.Errorf("Type %s does not support Encodeable interface", t)
 		}
 
 	// Currently unsupported types
@@ -199,26 +222,34 @@ func (pe Encoder) Encode(value interface{}) {
 	case reflect.UnsafePointer:
 		fallthrough
 	case reflect.Invalid:
-		panic(fmt.Sprintf("Type %s cannot be encoded", t.Kind()))
+		return fmt.Errorf("Type %s cannot be encoded", t.Kind())
 	default:
 		fmt.Println("not captured")
 	}
+	return nil
 }
 
 // EncodeOption stores optionally present value to the stream.
-func (pe Encoder) EncodeOption(hasValue bool, value interface{}) {
+func (pe Encoder) EncodeOption(hasValue bool, value interface{}) error {
 	if !hasValue {
-		pe.PushByte(0)
+		err := pe.PushByte(0)
+		if err != nil {
+			return err
+		}
 	} else {
-		pe.PushByte(1)
-		pe.Encode(value)
+		err := pe.PushByte(1)
+		if err != nil {
+			return err
+		}
+		err = pe.Encode(value)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-// Decoder - a wraper around a Reader that allows decoding data items from a stream.
-// Unlike Rust implementations, decoder methods do not return success state, but just
-// panic on error. Since decoding failue is an "unexpected" error, this approach should
-// be justified.
+// Decoder is a wraper around a Reader that allows decoding data items from a stream.
 type Decoder struct {
 	reader io.Reader
 }
@@ -227,42 +258,47 @@ func NewDecoder(reader io.Reader) *Decoder {
 	return &Decoder{reader:reader}
 }
 
-// Read reads bytes from a stream into a buffer and panics if cannot read the required
-// number of bytes.
-func (pd Decoder) Read(bytes []byte) {
+// Read reads bytes from a stream into a buffer
+func (pd Decoder) Read(bytes []byte) error {
 	c, err := pd.reader.Read(bytes)
-	check(err)
-	if c < len(bytes) {
-		panic(fmt.Sprintf("Cannot read the required number of bytes %d, only %d available", len(bytes), c))
+	if err != nil {
+		return err
 	}
+	if c < len(bytes) {
+		return fmt.Errorf("Cannot read the required number of bytes %d, only %d available", len(bytes), c)
+	}
+	return nil
 }
 
 // ReadOneByte reads a next byte from the stream.
 // Named so to avoid a linter warning about a clash with io.ByteReader.ReadByte
-func (pd Decoder) ReadOneByte() byte {
+func (pd Decoder) ReadOneByte() (byte, error) {
 	buf := []byte{0}
-	pd.Read(buf)
-	return buf[0]
+	err := pd.Read(buf)
+	if err != nil {
+		return buf[0], err
+	}
+	return buf[0], nil
 }
 
 // Decode takes a pointer to a decodable value and populates it from the stream.
-func (pd Decoder) Decode(target interface{}) {
+func (pd Decoder) Decode(target interface{}) error {
 	t0 := reflect.TypeOf(target)
 	if t0.Kind() != reflect.Ptr {
-		panic("Target must be a pointer, but was " + fmt.Sprint(t0))
+		return errors.New("Target must be a pointer, but was " + fmt.Sprint(t0))
 	}
 	val := reflect.ValueOf(target)
 	if val.IsNil() {
-		panic("Target is a nil pointer")
+		return errors.New("Target is a nil pointer")
 	}
-	pd.DecodeIntoReflectValue(val.Elem())
+	return pd.DecodeIntoReflectValue(val.Elem())
 }
 
 // DecodeIntoReflectValue populates a writable reflect.Value from the stream
-func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) {
+func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 	t := target.Type()
 	if !target.CanSet() {
-		panic("Unsettable value " + fmt.Sprint(t))
+		return fmt.Errorf("Unsettable value %v", t)
 	}
 
 	switch t.Kind() {
@@ -299,33 +335,38 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) {
 	case reflect.Float64:
 		intHolder := reflect.New(t)
 		intPointer := intHolder.Interface()
-		binary.Read(pd.reader, binary.LittleEndian, intPointer)
+		err := binary.Read(pd.reader, binary.LittleEndian, intPointer)
+		if err != nil {
+			return err
+		}
 		target.Set(intHolder.Elem())
 
-	// Pointers are encoded just as the referenced types, with panicking on nil.
 	// If you want to replicate Option<T> behavior in Rust, see OptionBool and an
 	// example type OptionInt8 in tests.
 	case reflect.Ptr:
-		pd.DecodeIntoReflectValue(target.Elem())
+		err := pd.DecodeIntoReflectValue(target.Elem())
+		if err != nil {
+			return err
+		}
 
 	// Arrays and slices: first compact-encode length, then each item individually
 	case reflect.Array:
 		fallthrough
 	case reflect.Slice:
-		codedLen64 := pd.DecodeUintCompact()
+		codedLen64, _ := pd.DecodeUintCompact()
 		if codedLen64 > math.MaxUint32 {
-			panic("Encoded array length is higher than allowed by the protocol (32-bit unsigned integer)")
+			return errors.New("Encoded array length is higher than allowed by the protocol (32-bit unsigned integer)")
 		}
 		if codedLen64 > uint64(maxInt) {
-			panic("Encoded array length is higher than allowed by the platform")
+			return errors.New("Encoded array length is higher than allowed by the platform")
 		}
 		codedLen := int(codedLen64)
 		targetLen := target.Len()
 		if codedLen != targetLen {
 			if t.Kind() == reflect.Array {
-				panic(fmt.Sprintf(
+				return fmt.Errorf(
 					"We want to decode an array of length %d, but the encoded length is %d",
-					target.Len(), codedLen))
+					target.Len(), codedLen)
 			}
 			if t.Kind() == reflect.Slice {
 				if int(codedLen) > target.Cap() {
@@ -337,24 +378,33 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) {
 			}
 		}
 		for i := 0; i < codedLen; i++ {
-			pd.DecodeIntoReflectValue(target.Index(i))
+			err := pd.DecodeIntoReflectValue(target.Index(i))
+			if err != nil {
+				return err
+			}
 		}
 
 	// Strings are encoded as UTF-8 byte slices, just as in Rust
 	case reflect.String:
-		var bytes []byte
-		pd.Decode(&bytes)
-		target.SetString(string(bytes))
+		var b []byte
+		err := pd.Decode(&b)
+		if err != nil {
+			return err
+		}
+		target.SetString(string(b))
 
 	case reflect.Struct:
 		encodeable := reflect.TypeOf((*Decodeable)(nil)).Elem()
 		ptrType := reflect.PtrTo(t)
 		if ptrType.Implements(encodeable) {
 			ptrVal := reflect.New(t)
-			ptrVal.Interface().(Decodeable).ParityDecode(pd)
+			err := ptrVal.Interface().(Decodeable).Decode(pd)
+			if err != nil {
+				return err
+			}
 			target.Set(ptrVal.Elem())
 		} else {
-			panic(fmt.Sprintf("Type %s does not support Decodeable interface", ptrType))
+			return fmt.Errorf("Type %s does not support Decodeable interface", ptrType)
 		}
 
 	// Currently unsupported types
@@ -373,61 +423,76 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) {
 	case reflect.UnsafePointer:
 		fallthrough
 	case reflect.Invalid:
-		panic(fmt.Sprintf("Type %s cannot be decoded", t.Kind()))
+		return fmt.Errorf("Type %s cannot be decoded", t.Kind())
 	}
+	return nil
 }
 
 // DecodeUintCompact decodes a compact-encoded integer. See EncodeUintCompact method.
-func (pd Decoder) DecodeUintCompact() uint64 {
-	b := pd.ReadOneByte()
+func (pd Decoder) DecodeUintCompact() (uint64, error) {
+	b, _ := pd.ReadOneByte()
 	mode := b & 3
 	switch mode {
 	case 0:
 		// right shift to remove mode bits
-		return uint64(b >> 2)
+		return uint64(b >> 2), nil
 	case 1:
-		r := uint64(pd.ReadOneByte())
+		b, err := pd.ReadOneByte()
+		if err != nil {
+			return 0, err
+		}
+		r := uint64(b)
 		// * 2^6
 		r <<= 6
 		// right shift to remove mode bits and add to prev
 		r += uint64(b >> 2)
-		return r
+		return r, nil
 	case 2:
 		// value = 32 bits + mode
 		buf := make([]byte, 4)
 		buf[0] = b
-		pd.Read(buf[1:4])
+		err := pd.Read(buf[1:4])
+		if err != nil {
+			return 0, err
+		}
 		// set the buffer in little endian order
 		r := binary.LittleEndian.Uint32(buf)
 		// remove the last 2 mode bits
 		r >>= 2
-		return uint64(r)
+		return uint64(r), nil
 	case 3:
 		// remove mode bits
 		l := b >> 2
 		if l > 4 {
-			panic("Not supported: l>4 encountered when decoding a compact-encoded uint")
+			return 0, errors.New("Not supported: l>4 encountered when decoding a compact-encoded uint")
 		}
 		buf := make([]byte, 8)
-		pd.Read(buf[:l+4])
-		return binary.LittleEndian.Uint64(buf)
+		err := pd.Read(buf[:l+4])
+		if err != nil {
+			return 0, err
+		}
+		return binary.LittleEndian.Uint64(buf), nil
 	default:
-		panic("Code should be unreachable")
+		return 0, errors.New("Code should be unreachable")
 	}
 }
 
 // DecodeOption decodes a optionally available value into a boolean presence field and a value.
-func (pd Decoder) DecodeOption(hasValue *bool, valuePointer interface{}) {
-	b := pd.ReadOneByte()
+func (pd Decoder) DecodeOption(hasValue *bool, valuePointer interface{}) error {
+	b, _ := pd.ReadOneByte()
 	switch b {
 	case 0:
 		*hasValue = false
 	case 1:
 		*hasValue = true
-		pd.Decode(valuePointer)
+		err := pd.Decode(valuePointer)
+		if err != nil {
+			return err
+		}
 	default:
-		panic(fmt.Sprintf("Unknown byte prefix for encoded OptionBool: %d", b))
+		return fmt.Errorf("Unknown byte prefix for encoded OptionBool: %d", b)
 	}
+	return nil
 }
 
 // Encodeable is an interface that defines a custom encoding rules for a data type.
@@ -435,7 +500,7 @@ func (pd Decoder) DecodeOption(hasValue *bool, valuePointer interface{}) {
 // See OptionBool for an example implementation.
 type Encodeable interface {
 	// ParityEncode encodes and write this structure into a stream
-	ParityEncode(encoder Encoder)
+	Encode(encoder Encoder) error
 }
 
 // Decodeable is an interface that defines a custom encoding rules for a data type.
@@ -443,7 +508,7 @@ type Encodeable interface {
 // See OptionBool for an example implementation.
 type Decodeable interface {
 	// ParityDecode populates this structure from a stream (overwriting the current contents), return false on failure
-	ParityDecode(decoder Decoder)
+	Decode(decoder Decoder) error
 }
 
 // OptionBool is a structure that can store a boolean or a missing value.
@@ -464,21 +529,26 @@ func NewOptionBool(value bool) OptionBool {
 }
 
 // ParityEncode implements encoding for OptionBool as per Rust implementation.
-func (o OptionBool) ParityEncode(encoder Encoder) {
+func (o OptionBool) Encode(encoder Encoder) error {
+	var err error
 	if !o.hasValue {
-		encoder.PushByte(0)
+		err = encoder.PushByte(0)
 	} else {
 		if o.value {
-			encoder.PushByte(1)
+			err = encoder.PushByte(1)
 		} else {
-			encoder.PushByte(2)
+			err = encoder.PushByte(2)
 		}
 	}
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // ParityDecode implements decoding for OptionBool as per Rust implementation.
-func (o *OptionBool) ParityDecode(decoder Decoder) {
-	b := decoder.ReadOneByte()
+func (o *OptionBool) Decode(decoder Decoder) error {
+	b, _ := decoder.ReadOneByte()
 	switch b {
 	case 0:
 		o.hasValue = false
@@ -490,13 +560,17 @@ func (o *OptionBool) ParityDecode(decoder Decoder) {
 		o.hasValue = true
 		o.value = false
 	default:
-		panic(fmt.Sprintf("Unknown byte prefix for encoded OptionBool: %d", b))
+		return fmt.Errorf("Unknown byte prefix for encoded OptionBool: %d", b)
 	}
+	return nil
 }
 
 // ToKeyedVec replicates the behaviour of Rust's to_keyed_vec helper.
-func ToKeyedVec(value interface{}, prependKey []byte) []byte {
+func ToKeyedVec(value interface{}, prependKey []byte) ([]byte, error) {
 	var buffer = bytes.NewBuffer(prependKey)
-	Encoder{buffer}.Encode(value)
-	return buffer.Bytes()
+	err := Encoder{buffer}.Encode(value)
+	if err != nil {
+		return nil, err
+	}
+	return buffer.Bytes(), nil
 }

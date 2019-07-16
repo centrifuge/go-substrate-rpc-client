@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package scalecodec
+package scale
 
 import (
 	"bytes"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"math"
 	"reflect"
 	"strings"
@@ -30,23 +31,6 @@ func assertEqual(t *testing.T, a interface{}, b interface{}) {
 	t.Errorf("Received %v (type %v), expected %v (type %v)", a, reflect.TypeOf(a), b, reflect.TypeOf(b))
 }
 
-func assertPanics(code func()) {
-	panicked := false
-	assertPanicsInner(code, &panicked)
-	if !panicked {
-		panic("Panic was expected, but code executed successfully")
-	}
-}
-
-func assertPanicsInner(code func(), panicked *bool) {
-	defer func() {
-		if r := recover(); r != nil {
-			*panicked = true
-		}
-	}()
-	code()
-}
-
 func hexify(bytes []byte) string {
 	res := make([]string, len(bytes))
 	for i, b := range bytes {
@@ -55,30 +39,33 @@ func hexify(bytes []byte) string {
 	return strings.Join(res, " ")
 }
 
-func encodeToBytes(value interface{}) []byte {
+func encodeToBytes(t *testing.T, value interface{}) []byte {
 	var buffer = bytes.Buffer{}
-	Encoder{&buffer}.Encode(value)
+	err := Encoder{&buffer}.Encode(value)
+	assert.NoError(t, err)
 	return buffer.Bytes()
 }
 
 func assertRoundtrip(t *testing.T, value interface{}) {
 	var buffer = bytes.Buffer{}
-	Encoder{&buffer}.Encode(value)
+	err := Encoder{&buffer}.Encode(value)
+	assert.NoError(t, err)
 	target := reflect.New(reflect.TypeOf(value))
-	Decoder{&buffer}.Decode(target.Interface())
+	err = Decoder{&buffer}.Decode(target.Interface())
+	assert.NoError(t, err)
 	assertEqual(t, target.Elem().Interface(), value)
 }
 
 func TestSliceOfBytesEncodedAsExpected(t *testing.T) {
 	value := []byte{0, 1, 1, 2, 3, 5, 8, 13, 21, 34}
 	assertRoundtrip(t, value)
-	assertEqual(t, hexify(encodeToBytes(value)), "28 00 01 01 02 03 05 08 0d 15 22")
+	assertEqual(t, hexify(encodeToBytes(t, value)), "28 00 01 01 02 03 05 08 0d 15 22")
 }
 
 func TestArrayOfBytesEncodedAsExpected(t *testing.T) {
 	value := [10]byte{0, 1, 1, 2, 3, 5, 8, 13, 21, 34}
 	assertRoundtrip(t, value)
-	assertEqual(t, hexify(encodeToBytes(value)), "28 00 01 01 02 03 05 08 0d 15 22")
+	assertEqual(t, hexify(encodeToBytes(t, value)), "28 00 01 01 02 03 05 08 0d 15 22")
 }
 
 func TestArrayCannotBeDecodedIntoIncompatible(t *testing.T) {
@@ -86,20 +73,26 @@ func TestArrayCannotBeDecodedIntoIncompatible(t *testing.T) {
 	value2 := [5]byte{1, 2, 3, 4, 5}
 	value3 := [1]byte{42}
 	var buffer = bytes.Buffer{}
-	Encoder{&buffer}.Encode(value)
-	assertPanics(func() { Decoder{&buffer}.Decode(&value2) })
+	err := Encoder{&buffer}.Encode(value)
+	assert.NoError(t, err)
+	err = Decoder{&buffer}.Decode(&value2)
+    assert.Error(t, err)
 	buffer.Reset()
-	Encoder{&buffer}.Encode(value)
-	assertPanics(func() { Decoder{&buffer}.Decode(&value3) })
+	err = Encoder{&buffer}.Encode(value)
+	assert.NoError(t, err)
+	err = Decoder{&buffer}.Decode(&value3)
+	assert.Error(t, err)
 	buffer.Reset()
-	Encoder{&buffer}.Encode(value)
-	Decoder{&buffer}.Decode(&value)
+	err = Encoder{&buffer}.Encode(value)
+	assert.NoError(t, err)
+	err = Decoder{&buffer}.Decode(&value)
+	assert.NoError(t, err)
 }
 
 func TestSliceOfInt16EncodedAsExpected(t *testing.T) {
 	value := []int16{0, 1, -1, 2, -2, 3, -3}
 	assertRoundtrip(t, value)
-	assertEqual(t, hexify(encodeToBytes(value)), "1c 00 00 01 00 ff ff 02 00 fe ff 03 00 fd ff")
+	assertEqual(t, hexify(encodeToBytes(t, value)), "1c 00 00 01 00 ff ff 02 00 fe ff 03 00 fd ff")
 }
 
 // OptionInt8 is an example implementation of an "Option" type, mirroring Option<u8> in Rust version.
@@ -110,24 +103,24 @@ type OptionInt8 struct {
 	value    int8
 }
 
-func (o OptionInt8) ParityEncode(encoder Encoder) {
-	encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionInt8) Encode(encoder Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
 }
 
-func (o *OptionInt8) ParityDecode(decoder Decoder) {
-	decoder.DecodeOption(&o.hasValue, &o.value)
+func (o *OptionInt8) Decode(decoder Decoder) error {
+	return decoder.DecodeOption(&o.hasValue, &o.value)
 }
 
 func TestSliceOfOptionInt8EncodedAsExpected(t *testing.T) {
 	value := []OptionInt8{OptionInt8{true, 1}, OptionInt8{true, -1}, OptionInt8{false, 0}}
 	assertRoundtrip(t, value)
-	assertEqual(t, hexify(encodeToBytes(value)), "0c 01 01 01 ff 00")
+	assertEqual(t, hexify(encodeToBytes(t, value)), "0c 01 01 01 ff 00")
 }
 
 func TestSliceOfOptionBoolEncodedAsExpected(t *testing.T) {
 	value := []OptionBool{NewOptionBool(true), NewOptionBool(false), NewOptionBoolEmpty()}
 	assertRoundtrip(t, value)
-	assertEqual(t, hexify(encodeToBytes(value)), "0c 01 02 00")
+	assertEqual(t, hexify(encodeToBytes(t, value)), "0c 01 02 00")
 }
 
 func TestSliceOfStringEncodedAsExpected(t *testing.T) {
@@ -137,7 +130,7 @@ func TestSliceOfStringEncodedAsExpected(t *testing.T) {
 		"三国演义",
 		"أَلْف لَيْلَة وَلَيْلَة‎"}
 	assertRoundtrip(t, value)
-	assertEqual(t, hexify(encodeToBytes(value)), "10 18 48 61 6d 6c 65 74 50 d0 92 d0 be d0 b9 d0 bd d0 b0 20 d0 "+
+	assertEqual(t, hexify(encodeToBytes(t, value)), "10 18 48 61 6d 6c 65 74 50 d0 92 d0 be d0 b9 d0 bd d0 b0 20 d0 "+
 		"b8 20 d0 bc d0 b8 d1 80 30 e4 b8 89 e5 9b bd e6 bc 94 e4 b9 89 bc d8 a3 d9 8e d9 84 d9 92 "+
 		"d9 81 20 d9 84 d9 8e d9 8a d9 92 d9 84 d9 8e d8 a9 20 d9 88 d9 8e d9 84 d9 8e d9 8a d9 92 "+
 		"d9 84 d9 8e d8 a9 e2 80 8e")
@@ -161,9 +154,10 @@ func TestCompactIntegersEncodedAsExpected(t *testing.T) {
 		math.MaxUint64: "13 ff ff ff ff ff ff ff ff"}
 	for value, expectedHex := range tests {
 		var buffer = bytes.Buffer{}
-		Encoder{&buffer}.EncodeUintCompact(value)
+		err := Encoder{&buffer}.EncodeUintCompact(value)
+		assert.NoError(t, err)
 		assertEqual(t, hexify(buffer.Bytes()), expectedHex)
-		decoded := Decoder{&buffer}.DecodeUintCompact()
+		decoded, _ := Decoder{&buffer}.DecodeUintCompact()
 		assertEqual(t, decoded, value)
 	}
 }
