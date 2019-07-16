@@ -2,7 +2,7 @@ package substrate
 
 import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/vimukthi-git/go-substrate/scalecodec"
+	"github.com/centrifuge/go-substrate-rpc-client/scalecodec"
 )
 
 // Hash is 256 bit by default

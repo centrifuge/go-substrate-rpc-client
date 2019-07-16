@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/vimukthi-git/go-substrate/scalecodec"
+	"github.com/centrifuge/go-substrate-rpc-client/scalecodec"
 )
 
 const (
