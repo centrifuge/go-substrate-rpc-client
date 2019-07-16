@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/centrifuge/go-substrate-rpc-client/scalecodec"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
 // MethodIDX [sectionIndex, methodIndex] 16bits
@@ -14,14 +14,16 @@ type MethodIDX struct {
 	MethodIndex uint8
 }
 
-func (e *MethodIDX) ParityDecode(decoder scalecodec.Decoder) {
+func (e *MethodIDX) Decode(decoder scale.Decoder) error {
 	decoder.Decode(&e.SectionIndex)
 	decoder.Decode(&e.MethodIndex)
+	return nil
 }
 
-func (m MethodIDX) ParityEncode(encoder scalecodec.Encoder) {
+func (m MethodIDX) Encode(encoder scale.Encoder) error {
 	encoder.Encode(m.SectionIndex)
 	encoder.Encode(m.MethodIndex)
+	return nil
 }
 
 type MetadataV4 struct {
@@ -51,8 +53,9 @@ func (m *MetadataV4) MethodIndex(method string) MethodIDX {
 	return MethodIDX{sIDX, mIDX}
 }
 
-func (m *MetadataV4) ParityDecode(decoder scalecodec.Decoder) {
+func (m *MetadataV4) Decode(decoder scale.Decoder) error {
 	decoder.Decode(&m.Modules)
+	return nil
 }
 
 type FunctionArgumentMetadata struct {
@@ -60,9 +63,10 @@ type FunctionArgumentMetadata struct {
 	Type string
 }
 
-func (m *FunctionArgumentMetadata) ParityDecode(decoder scalecodec.Decoder) {
+func (m *FunctionArgumentMetadata) Decode(decoder scale.Decoder) error {
 	decoder.Decode(&m.Name)
 	decoder.Decode(&m.Type)
+	return nil
 }
 
 type FunctionMetaData struct {
@@ -71,10 +75,11 @@ type FunctionMetaData struct {
 	Documentation []string
 }
 
-func (m *FunctionMetaData) ParityDecode(decoder scalecodec.Decoder) {
+func (m *FunctionMetaData) Decode(decoder scale.Decoder) error {
 	decoder.Decode(&m.Name)
 	decoder.Decode(&m.Args)
 	decoder.Decode(&m.Documentation)
+	return nil
 }
 
 type EventMetadata struct {
@@ -83,10 +88,11 @@ type EventMetadata struct {
 	Documentation []string
 }
 
-func (m *EventMetadata) ParityDecode(decoder scalecodec.Decoder) {
+func (m *EventMetadata) Decode(decoder scale.Decoder) error {
 	decoder.Decode(&m.Name)
 	decoder.Decode(&m.Args)
 	decoder.Decode(&m.Documentation)
+	return nil
 }
 
 /**
@@ -100,11 +106,12 @@ type TypMap struct {
 	IsLinked bool
 }
 
-func (m *TypMap) ParityDecode(decoder scalecodec.Decoder) {
+func (m *TypMap) Decode(decoder scale.Decoder) error {
 	decoder.Decode(&m.Hasher)
 	decoder.Decode(&m.Key)
 	decoder.Decode(&m.Value)
 	decoder.Decode(&m.IsLinked)
+	return nil
 }
 
 type TypDoubleMap struct {
@@ -115,12 +122,13 @@ type TypDoubleMap struct {
 	Key2Hasher string
 }
 
-func (m *TypDoubleMap) ParityDecode(decoder scalecodec.Decoder) {
+func (m *TypDoubleMap) Decode(decoder scale.Decoder) error {
 	decoder.Decode(&m.Hasher)
 	decoder.Decode(&m.Key)
 	decoder.Decode(&m.Key2)
 	decoder.Decode(&m.Value)
 	decoder.Decode(&m.Key2Hasher)
+	return nil
 }
 
 type StorageFunctionMetadata struct {
@@ -134,7 +142,7 @@ type StorageFunctionMetadata struct {
 	Documentation []string
 }
 
-func (m *StorageFunctionMetadata) ParityDecode(decoder scalecodec.Decoder) {
+func (m *StorageFunctionMetadata) Decode(decoder scale.Decoder) error {
 	decoder.Decode(&m.Name)
 	decoder.Decode(&m.Modifier)
 	decoder.Decode(&m.Type)
@@ -149,6 +157,7 @@ func (m *StorageFunctionMetadata) ParityDecode(decoder scalecodec.Decoder) {
 	decoder.Decode(&m.Fallback)
 	decoder.Decode(&m.Documentation)
 	// fmt.Println(m.Documentation)
+	return nil
 }
 
 type ModuleMetaData struct {
@@ -162,7 +171,7 @@ type ModuleMetaData struct {
 	Events []EventMetadata
 }
 
-func (m *ModuleMetaData) ParityDecode(decoder scalecodec.Decoder) {
+func (m *ModuleMetaData) Decode(decoder scale.Decoder) error {
 	decoder.Decode(&m.Name)
 	decoder.Decode(&m.Prefix)
 
@@ -181,6 +190,7 @@ func (m *ModuleMetaData) ParityDecode(decoder scalecodec.Decoder) {
 		decoder.Decode(&m.Events)
 		// fmt.Println(m.Events)
 	}
+	return nil
 }
 
 // MetadataVersioned only supports v4
@@ -195,11 +205,12 @@ func NewMetadataVersioned() *MetadataVersioned {
 	return &MetadataVersioned{Metadata:MetadataV4{make([]ModuleMetaData, 0)}}
 }
 
-func (m *MetadataVersioned) ParityDecode(decoder scalecodec.Decoder) {
+func (m *MetadataVersioned) Decode(decoder scale.Decoder) error {
 	decoder.Decode(&m.MagicNumber)
 	// we need to decide which struct to use based on the following number(enum), for now its hardcoded
 	decoder.Decode(&m.Version)
 	decoder.Decode(&m.Metadata)
+	return nil
 }
 
 type State struct {
@@ -230,7 +241,7 @@ func (s *State) MetaData(blockHash Hash) (*MetadataVersioned, error) {
 		return nil, err
 	}
 
-	dec := scalecodec.NewDecoder(bytes.NewReader(b))
+	dec := scale.NewDecoder(bytes.NewReader(b))
 	n := NewMetadataVersioned()
 	dec.Decode(n)
 	return n, nil

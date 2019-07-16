@@ -2,7 +2,7 @@ package substrate
 
 import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/centrifuge/go-substrate-rpc-client/scalecodec"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
 // Hash is 256 bit by default
@@ -29,14 +29,16 @@ func NewAddress(b []byte) *Address {
 	return s
 }
 
-func (a *Address) ParityDecode(decoder scalecodec.Decoder) {
+func (a *Address) Decode(decoder scale.Decoder) error {
 	decoder.Read(a.PubKey[:])
+	return nil
 }
 
-func (a Address) ParityEncode(encoder scalecodec.Encoder) {
+func (a Address) Encode(encoder scale.Encoder) error {
 	// type of address - public key
 	encoder.Write([]byte{255})
 	encoder.Write(a.PubKey[:])
+	return nil
 }
 
 type Index uint64
@@ -51,10 +53,12 @@ func NewSignature(b []byte) *Signature {
 	return s
 }
 
-func (s *Signature) ParityDecode(decoder scalecodec.Decoder) {
+func (s *Signature) Decode(decoder scale.Decoder) error {
 	decoder.Read(s.Hash[:])
+	return nil
 }
 
-func (s Signature) ParityEncode(encoder scalecodec.Encoder) {
+func (s Signature) Encode(encoder scale.Encoder) error {
 	encoder.Write(s.Hash[:])
+	return nil
 }

@@ -10,7 +10,7 @@ import (
 	"golang.org/x/crypto/blake2b"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/centrifuge/go-substrate-rpc-client"
-	"github.com/centrifuge/go-substrate-rpc-client/scalecodec"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
 const (
@@ -65,16 +65,18 @@ func (a *AnchorParams) AnchorIDHex() string {
 	return hexutil.Encode(b[:])
 }
 
-func (a *AnchorParams) ParityDecode(decoder scalecodec.Decoder)  {
+func (a *AnchorParams) Decode(decoder scale.Decoder) error {
 	decoder.Read(a.AnchorIDPreimage[:])
 	decoder.Read(a.DocRoot[:])
 	decoder.Read(a.Proof[:])
+	return nil
 }
 
-func (a AnchorParams) ParityEncode(encoder scalecodec.Encoder) {
+func (a AnchorParams) Encode(encoder scale.Encoder) error {
 	encoder.Write(a.AnchorIDPreimage[:])
 	encoder.Write(a.DocRoot[:])
 	encoder.Write(a.Proof[:])
+	return nil
 }
 
 func main() {
