@@ -21,17 +21,12 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d47184a88c72e2d1e6fb6c5aac09e0651c4cc70704b37432460e0307968be0a5"
-  name = "github.com/centrifuge/go-substrate"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "21977bc4d0f9d7f9af5b4afd638479e467224fa0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:ccaa53398e1646bfc9b2071f9a3b17cabf0f350bf7a7387e9c88ab4cdb54a404"
+  digest = "1:5532b3870e1906635d3d27cea04ca0db2636375ab6e60607cd5d0f59558866ed"
   name = "github.com/centrifuge/go-substrate-rpc-client"
-  packages = ["scalecodec"]
+  packages = [
+    ".",
+    "scalecodec",
+  ]
   pruneopts = "UT"
   revision = "21977bc4d0f9d7f9af5b4afd638479e467224fa0"
 
@@ -341,7 +336,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/centrifuge/go-centrifuge/utils",
-    "github.com/centrifuge/go-substrate",
+    "github.com/centrifuge/go-substrate-rpc-client",
     "github.com/centrifuge/go-substrate-rpc-client/scalecodec",
     "github.com/ethereum/go-ethereum/common/hexutil",
     "github.com/ethereum/go-ethereum/rpc",
