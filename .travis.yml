@@ -19,7 +19,7 @@ notifications:
   email: false
 
 before_script:
-  - make install
+  - make build
 
 # script always runs to completion (set +e). If we have linter issues AND a
 # failing test, we want to see both. Configure golangci-lint with a
