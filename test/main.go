@@ -14,25 +14,25 @@ import (
 )
 
 const (
-	AnchorCommit = "kerplunk.commit"
+	AnchorCommit = "anchor.commit"
 	SubKeySign   = "sign-blob"
 
 	// Adjust below params according to your env + chain state + requirement
 
-	RPCEndPoint = "ws://10.99.1.86:9944"
+	RPCEndPoint = "ws://127.0.0.1:9944"
 
 	// TODO query these from the chain
 	// 0x703bffa9bc816a5cd06ab8a95c2ff74e7a60cdaf269ffd64d325eb193266a656
-	GenesisBlock = "0xa2a6945bb36576ffeaf3a1f231ade76a104ed6603909fdd9c6728c821fe95d79"
+	GenesisBlock = "0xcedd9988967d60f287700453839ce435584407b4a654040cd3c7f46b1bf61134"
 	// BestBlock is the earliest block thats not already pruned
-	BestBlock = "0xa2a6945bb36576ffeaf3a1f231ade76a104ed6603909fdd9c6728c821fe95d79"
+	BestBlock = "0xcedd9988967d60f287700453839ce435584407b4a654040cd3c7f46b1bf61134"
 	// StartNonce is the current account nonce for Alice (can't use other accounts for now)
-	StartNonce = 18
+	StartNonce = 2
 	// SubKeyCmd subkey command to create signatures
 	SubKeyCmd = "/Users/vimukthi/.cargo/bin/subkey"
 
-	NumAnchorsPerThread = 100
-	Concurrency         = 4
+	NumAnchorsPerThread = 1
+	Concurrency         = 1
 )
 
 type AnchorParams struct {
