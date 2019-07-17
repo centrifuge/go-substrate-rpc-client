@@ -437,11 +437,11 @@ func (pd Decoder) DecodeUintCompact() (uint64, error) {
 		// right shift to remove mode bits
 		return uint64(b >> 2), nil
 	case 1:
-		b, err := pd.ReadOneByte()
+		bb, err := pd.ReadOneByte()
 		if err != nil {
 			return 0, err
 		}
-		r := uint64(b)
+		r := uint64(bb)
 		// * 2^6
 		r <<= 6
 		// right shift to remove mode bits and add to prev
