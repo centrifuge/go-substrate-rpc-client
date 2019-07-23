@@ -2,6 +2,10 @@ package substrate
 
 import (
 	"bytes"
+	"fmt"
+	"github.com/minio/blake2b-simd"
+	"github.com/pierrec/xxHash/xxHash64"
+	"hash"
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
@@ -415,4 +419,75 @@ func (s *State) Keys(blockHash Hash) (*MetadataVersioned, error) {
 		}
 	}
 	return nil, nil
+}
+
+type StorageKey []byte
+
+func NewStorageKey(meta MetadataVersioned, module string, fn string, key []byte) StorageKey {
+	// TODO verify that the module and key exists
+	// TODO retrieve the hash function
+	// TODO for now this is hard coded for anchors.Anchor
+	afn := []byte("Anchor Anchors")
+	fmt.Println(afn)
+	//bb := make([]byte, 0)
+	//buf := bytes.NewBuffer(bb)
+	//tempEnc := scale.NewEncoder(buf)
+	// blake2 256
+	// $hash(module_name ++ " " ++ storage_name ++ encoding(key))
+	h, _ := blake2b.New(&blake2b.Config{Size: 32})
+	// TODO why does key encoding in JS client return the same byte array back?
+	// TODO why is add length prefix step in JS client doesn't add anything to the hashed key?
+	h.Write(append(afn, key...))
+	k := h.Sum(nil)
+	return k
+}
+
+func (s StorageKey) Encode(encoder scale.Encoder) error {
+	return encoder.Encode(s)
+}
+
+type StorageData []byte
+
+func (s *State) Storage(key []byte, block []byte) (StorageData, error) {
+	var res string
+	v := hexutil.Encode(key)
+	fmt.Println(v)
+	// time now 0x0e4944cfd98d6f4cc374d16f5a4e3f9c
+	// 0xb0281586a5826d1d17741f616f08574ca6dc3c5e5265d22ae0ca1d387432e781
+	if !s.nonetwork {
+		var err error
+		if block != nil {
+			err = s.client.Call(&res, "state_getStorage", hexutil.Encode(key), hexutil.Encode(block))
+		} else {
+			err = s.client.Call(&res, "state_getStorage", hexutil.Encode(key))
+		}
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if res == "" {
+		return nil, nil
+	}
+
+	return hexutil.Decode(res)
+}
+
+func getStorageHasher(name string) (hash.Hash, error) {
+	switch name {
+	case "blake2_128":
+		return blake2b.New(&blake2b.Config{Size: 16})
+	case "blake2_256":
+		return blake2b.New(&blake2b.Config{Size: 32})
+	//case "twox_128":
+	//  return new StorageHasher("Twox128");
+	//case "twox_256":
+	//  return new StorageHasher("Twox256");
+	//case "twox_64_concat":
+	//  return new StorageHasher("Twox64Concat");
+	default:
+		// TODO https://github.com/polkadot-js/wasm/blob/master/packages/wasm-crypto/src/hashing.rs#L148
+		return xxHash64.New(0), nil
+	}
 }

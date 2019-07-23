@@ -176,6 +176,14 @@
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:657ca22c61c436fc17a86b5be00bbfedb86c26795dcfe0f3294ed3571aa7223c"
+  name = "github.com/pierrec/xxHash"
+  packages = ["xxHash64"]
+  pruneopts = "UT"
+  revision = "d17cb990ad2d219d5901415ceaeb50d17df59527"
+  version = "v0.1.5"
+
+[[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
@@ -347,6 +355,7 @@
     "github.com/ethereum/go-ethereum/common/hexutil",
     "github.com/ethereum/go-ethereum/rpc",
     "github.com/minio/blake2b-simd",
+    "github.com/pierrec/xxHash/xxHash64",
     "github.com/stretchr/testify/assert",
     "golang.org/x/crypto/blake2b",
     "golang.org/x/crypto/ed25519",

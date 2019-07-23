@@ -25,7 +25,7 @@ const (
 	// 0x703bffa9bc816a5cd06ab8a95c2ff74e7a60cdaf269ffd64d325eb193266a656
 	GenesisBlock = "0xcedd9988967d60f287700453839ce435584407b4a654040cd3c7f46b1bf61134"
 	// BestBlock is the earliest block thats not already pruned
-	BestBlock = "0xcedd9988967d60f287700453839ce435584407b4a654040cd3c7f46b1bf61134"
+	BestBlock = "0xec5c55bdb4733cd3e6278284625379cbfd8ebc706e8a74529358d5673c434234"
 	// StartNonce is the current account nonce for Alice (can't use other accounts for now)
 	StartNonce = 2
 	// SubKeyCmd subkey command to create signatures
