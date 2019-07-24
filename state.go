@@ -470,7 +470,6 @@ func NewStorageKey(meta MetadataVersioned, module string, fn string, key []byte)
 	}
 
 	afn := []byte(module + " " + fn)
-	// TODO why does key encoding in JS client return the same byte array back?
 	// TODO why is add length prefix step in JS client doesn't add anything to the hashed key?
 	if hasher != nil {
 		hasher.Write(append(afn, key...))
