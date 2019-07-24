@@ -33,13 +33,6 @@ func (a *AnchorData) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (a AnchorData) Encode(encoder scale.Encoder) error {
-	//encoder.Write(a.AnchorIDPreimage[:])
-	//encoder.Write(a.DocRoot[:])
-	//encoder.Write(a.AnchoredBlock)
-	return nil
-}
-
 func TestState_GetStorage_Anchors(t *testing.T) {
 	c, _ := Connect("ws://127.0.0.1:9944")
 	s := NewStateRPC(c)
@@ -47,7 +40,7 @@ func TestState_GetStorage_Anchors(t *testing.T) {
 	h, _ := hexutil.Decode("0x142d4b3d1946e4956b4bd5a5bfc906142e921b51415ceccb3c82b3bd3ff3daf1")
 
 	m ,_ := s.MetaData(h)
-	key, _ := NewStorageKey(*m,"System", "AccountNonce", b)
+	key, _ := NewStorageKey(*m,"Anchor", "Anchors", b)
 	res, _ := s.Storage(key,  nil)
 	fmt.Println(res)
 
@@ -55,7 +48,7 @@ func TestState_GetStorage_Anchors(t *testing.T) {
 	tempDec := scale.NewDecoder(buf)
 	a := AnchorData{}
 	tempDec.Decode(&a)
-
+	fmt.Println(a)
 }
 
 func TestState_GetStorage_AccountNonce(t *testing.T) {
@@ -73,22 +66,6 @@ func TestState_GetStorage_AccountNonce(t *testing.T) {
 	var nonce uint64
 	tempDec.Decode(&nonce)
 	fmt.Println(nonce)
-}
-
-func TestState_GetStorage_TimeNow(t *testing.T) {
-	c, _ := Connect("ws://127.0.0.1:9944")
-	s := NewStateRPC(c)
-	h, _ := hexutil.Decode("0x142d4b3d1946e4956b4bd5a5bfc906142e921b51415ceccb3c82b3bd3ff3daf1")
-
-	m ,_ := s.MetaData(h)
-	key, _ := NewStorageKey(*m,"Timestamp", "Now", nil)
-	res, _ := s.Storage(key,  nil)
-
-	buf := bytes.NewBuffer(res)
-	tempDec := scale.NewDecoder(buf)
-	var ts uint64
-	tempDec.Decode(&ts)
-	fmt.Println(ts)
 }
 
 func TestBlake(t *testing.T) {
