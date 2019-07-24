@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"sync"
 	"sync/atomic"
@@ -24,7 +25,7 @@ const (
 	// SubKeyCmd subkey command to create signatures
 	SubKeyCmd = "/Users/vimukthi/.cargo/bin/subkey"
 
-	NumAnchorsPerThread = 1
+	NumAnchorsPerThread = 2
 	Concurrency         = 1
 )
 
@@ -72,6 +73,49 @@ func (a AnchorParams) Encode(encoder scale.Encoder) error {
 	return nil
 }
 
+type AnchorData struct {
+	ID            [32]byte
+	DocRoot       [32]byte
+	AnchoredBlock uint64
+}
+
+func (a *AnchorData) Decode(decoder scale.Decoder) error {
+	decoder.Read(a.ID[:])
+	decoder.Read(a.DocRoot[:])
+	decoder.Decode(&a.AnchoredBlock)
+	return nil
+}
+
+func Anchors(client substrate.Client, anchorIDPreImage []byte) (*AnchorData, error) {
+	h := blake2b.Sum256(anchorIDPreImage)
+	m, err := client.MetaData(true)
+	if err != nil {
+		return nil, err
+	}
+
+	key, err := substrate.NewStorageKey(*m,"Anchor", "Anchors", h[:])
+	if err != nil {
+		return nil, err
+	}
+
+	s := substrate.NewStateRPC(client)
+	res, err := s.Storage(key,  nil)
+	if err != nil {
+		return nil, err
+	}
+
+	//fmt.Println(res)
+	buf := bytes.NewBuffer(res)
+	tempDec := scale.NewDecoder(buf)
+	a := AnchorData{}
+	err = tempDec.Decode(&a)
+	if err != nil {
+		return nil, err
+	}
+
+	return &a, nil
+}
+
 func main() {
 	// Connect the client.
 	client, err := substrate.Connect(RPCEndPoint)
@@ -106,6 +150,16 @@ func main() {
 					fmt.Printf("FAIL!!! anchor ID %s failed with %s\n", aID, err.Error())
 					break
 				} else {
+					// verify anchor
+					for i := 0; i < 10; i++ {
+						time.Sleep(10 * time.Second)
+						anc, err := Anchors(client, a.AnchorIDPreimage[:])
+						fmt.Println(err)
+						if anc != nil {
+							fmt.Printf("SUCCESS!!! anchor %v\n", anc)
+							break
+						}
+					}
 					fmt.Printf("SUCCESS!!! anchor ID %s , tx hash %s\n", aID, res)
 					atomic.AddUint64(&counter, 1)
 					atomic.AddUint64(&nonce, 1)

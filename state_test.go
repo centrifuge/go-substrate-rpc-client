@@ -18,20 +18,8 @@ func TestState_GetMetaData(t *testing.T) {
 	// fmt.Println(res)
 }
 
-type AnchorData struct {
-	ID            [32]byte
-	DocRoot       [32]byte
-	AnchoredBlock uint64
-}
-
-func (a *AnchorData) Decode(decoder scale.Decoder) error {
-	decoder.Read(a.ID[:])
-	decoder.Read(a.DocRoot[:])
-	decoder.Decode(&a.AnchoredBlock)
-	return nil
-}
-
 func TestState_Storage(t *testing.T) {
+	t.SkipNow()
 	c, _ := Connect("ws://127.0.0.1:9944")
 	s := NewStateRPC(c)
 	b, _ := hexutil.Decode(AlicePubKey)
