@@ -77,20 +77,18 @@ func TestState_GetStorage_AccountNonce(t *testing.T) {
 
 func TestState_GetStorage_TimeNow(t *testing.T) {
 	c, _ := Connect("ws://127.0.0.1:9944")
-	fn := []byte("Timestamp Now")
-	h, err := getStorageHasher("")
-	if err != nil {
-		panic(err)
-	}
-	h.Write(fn)
-	key := create2xXxhash(fn, 2)
-	// TODO ask why this is not needed for "Timestamp Now"?
-	//tempEnc.EncodeUintCompact(uint64(len(key)))
-	//tempEnc.Write(key)
-	// key := buf.Bytes()
 	s := NewStateRPC(c)
+	h, _ := hexutil.Decode("0x142d4b3d1946e4956b4bd5a5bfc906142e921b51415ceccb3c82b3bd3ff3daf1")
+
+	m ,_ := s.MetaData(h)
+	key, _ := NewStorageKey(*m,"Timestamp", "Now", nil)
 	res, _ := s.Storage(key,  nil)
-	fmt.Println(res)
+
+	buf := bytes.NewBuffer(res)
+	tempDec := scale.NewDecoder(buf)
+	var ts uint64
+	tempDec.Decode(&ts)
+	fmt.Println(ts)
 }
 
 func TestBlake(t *testing.T) {
