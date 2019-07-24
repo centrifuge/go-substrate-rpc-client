@@ -2,12 +2,13 @@ package substrate
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
-	"github.com/minio/blake2b-simd"
-	"github.com/pierrec/xxHash/xxHash64"
 	"hash"
 	"strings"
 
+	"github.com/minio/blake2b-simd"
+	"github.com/pierrec/xxHash/xxHash64"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )
@@ -161,6 +162,13 @@ type TypMap struct {
 	IsLinked bool
 }
 
+func (t TypMap) HashFunc() (hash.Hash, error) {
+	if t.Hasher == 1 {
+		return blake2b.New(&blake2b.Config{Size: 32})
+	}
+	return nil, errors.New("hash function type not supported")
+}
+
 func (m *TypMap) Decode(decoder scale.Decoder) error {
 	err := decoder.Decode(&m.Hasher)
 	if err != nil {
@@ -231,6 +239,14 @@ type StorageFunctionMetadata struct {
 	DMap          TypDoubleMap
 	Fallback      []byte
 	Documentation []string
+}
+
+func (s StorageFunctionMetadata) isMap() bool {
+	return s.Type == 1
+}
+
+func (s StorageFunctionMetadata) isDMap() bool {
+	return s.Type == 2
 }
 
 func (m *StorageFunctionMetadata) Decode(decoder scale.Decoder) error {
@@ -423,23 +439,45 @@ func (s *State) Keys(blockHash Hash) (*MetadataVersioned, error) {
 
 type StorageKey []byte
 
-func NewStorageKey(meta MetadataVersioned, module string, fn string, key []byte) StorageKey {
-	// TODO verify that the module and key exists
-	// TODO retrieve the hash function
-	// TODO for now this is hard coded for anchors.Anchor
-	afn := []byte("Anchor Anchors")
-	fmt.Println(afn)
-	//bb := make([]byte, 0)
-	//buf := bytes.NewBuffer(bb)
-	//tempEnc := scale.NewEncoder(buf)
-	// blake2 256
-	// $hash(module_name ++ " " ++ storage_name ++ encoding(key))
-	h, _ := blake2b.New(&blake2b.Config{Size: 32})
+func NewStorageKey(meta MetadataVersioned, module string, fn string, key []byte) (StorageKey, error) {
+	var fnMeta *StorageFunctionMetadata
+	for _, m := range meta.Metadata.Modules {
+		if m.Prefix == module {
+			for _, s := range m.Storage {
+				if s.Name == fn {
+					fnMeta = &s
+					break;
+				}
+			}
+		}
+	}
+	if fnMeta == nil {
+		return nil, errors.New("no meta data found for function")
+	}
+
+	var hasher hash.Hash
+	var err error
+	if fnMeta.isMap() {
+		hasher, err = fnMeta.Map.HashFunc()
+		if err != nil {
+			return nil, err
+		}
+	} else if fnMeta.isDMap() {
+		// TODO define hashing for 2 keys
+	}
+
+	afn := []byte(module + " " + fn)
 	// TODO why does key encoding in JS client return the same byte array back?
 	// TODO why is add length prefix step in JS client doesn't add anything to the hashed key?
-	h.Write(append(afn, key...))
-	k := h.Sum(nil)
-	return k
+	if hasher != nil {
+		hasher.Write(append(afn, key...))
+		return hasher.Sum(nil), nil
+	} else {
+		if key != nil {
+			return create2xXxhash(append(afn, key...), 2), nil
+		}
+		return create2xXxhash(append(afn), 2), nil
+	}
 }
 
 func (s StorageKey) Encode(encoder scale.Encoder) error {
@@ -468,26 +506,18 @@ func (s *State) Storage(key []byte, block []byte) (StorageData, error) {
 	}
 
 	if res == "" {
-		return nil, nil
+		return nil, errors.New("empty result")
 	}
 
 	return hexutil.Decode(res)
 }
 
-func getStorageHasher(name string) (hash.Hash, error) {
-	switch name {
-	case "blake2_128":
-		return blake2b.New(&blake2b.Config{Size: 16})
-	case "blake2_256":
-		return blake2b.New(&blake2b.Config{Size: 32})
-	//case "twox_128":
-	//  return new StorageHasher("Twox128");
-	//case "twox_256":
-	//  return new StorageHasher("Twox256");
-	//case "twox_64_concat":
-	//  return new StorageHasher("Twox64Concat");
-	default:
-		// TODO https://github.com/polkadot-js/wasm/blob/master/packages/wasm-crypto/src/hashing.rs#L148
-		return xxHash64.New(0), nil
+func create2xXxhash(data []byte, rounds int) []byte {
+	res := make([]byte, 0)
+	for i := 0; i < rounds; i++ {
+		h := xxHash64.New(uint64(i))
+		h.Write(data)
+		res = append(res, h.Sum(nil)...)
 	}
+	return res
 }
