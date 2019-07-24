@@ -40,7 +40,7 @@ func BlockHash(client substrate.Client, blockNumber uint64) (substrate.Hash, err
 		return nil, err
 	}
 
-	b := make([]byte, 0, 1000)
+	b := make([]byte, 0)
 	bb := bytes.NewBuffer(b)
 	tempEnc := scale.NewEncoder(bb)
 	err = tempEnc.Encode(blockNumber)
