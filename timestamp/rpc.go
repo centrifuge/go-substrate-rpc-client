@@ -14,9 +14,9 @@ func Now(client substrate.Client) (*time.Time, error) {
 		return nil, err
 	}
 
-	key, _ := substrate.NewStorageKey(*m,"Timestamp", "Now", nil)
+	key, _ := substrate.NewStorageKey(*m, "Timestamp", "Now", nil)
 	s := substrate.NewStateRPC(client)
-	res, err := s.Storage(key,  nil)
+	res, err := s.Storage(key, nil)
 	if err != nil {
 		return nil, err
 	}

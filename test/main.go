@@ -6,10 +6,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/centrifuge/go-substrate-rpc-client/system"
 	"github.com/centrifuge/go-centrifuge/utils"
 	"github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/system"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"golang.org/x/crypto/blake2b"
 )

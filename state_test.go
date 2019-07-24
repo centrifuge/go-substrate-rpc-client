@@ -19,8 +19,8 @@ func TestState_GetMetaData(t *testing.T) {
 }
 
 type AnchorData struct {
-	ID [32]byte
-	DocRoot [32]byte
+	ID            [32]byte
+	DocRoot       [32]byte
 	AnchoredBlock uint64
 }
 
@@ -37,9 +37,9 @@ func TestState_Storage(t *testing.T) {
 	b, _ := hexutil.Decode(AlicePubKey)
 	h, _ := hexutil.Decode("0x142d4b3d1946e4956b4bd5a5bfc906142e921b51415ceccb3c82b3bd3ff3daf1")
 
-	m ,_ := s.MetaData(h)
-	key, _ := NewStorageKey(*m,"System", "AccountNonce", b)
-	res, _ := s.Storage(key,  nil)
+	m, _ := s.MetaData(h)
+	key, _ := NewStorageKey(*m, "System", "AccountNonce", b)
+	res, _ := s.Storage(key, nil)
 
 	buf := bytes.NewBuffer(res)
 	tempDec := scale.NewDecoder(buf)
@@ -47,10 +47,3 @@ func TestState_Storage(t *testing.T) {
 	tempDec.Decode(&nonce)
 	fmt.Println(nonce)
 }
-
-
-
-
-
-
-

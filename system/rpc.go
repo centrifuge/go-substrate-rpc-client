@@ -2,7 +2,7 @@ package system
 
 import (
 	"bytes"
-	
+
 	"github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
@@ -12,7 +12,7 @@ func AccountNonce(client substrate.Client, accountPubKey []byte) (uint64, error)
 	if err != nil {
 		return 0, err
 	}
-	key, err := substrate.NewStorageKey(*m,"System", "AccountNonce", accountPubKey)
+	key, err := substrate.NewStorageKey(*m, "System", "AccountNonce", accountPubKey)
 	if err != nil {
 		return 0, err
 	}
@@ -30,7 +30,7 @@ func AccountNonce(client substrate.Client, accountPubKey []byte) (uint64, error)
 	if err != nil {
 		return 0, err
 	}
-	
+
 	return nonce, nil
 }
 
@@ -48,7 +48,7 @@ func BlockHash(client substrate.Client, blockNumber uint64) (substrate.Hash, err
 		return nil, err
 	}
 
-	key, err := substrate.NewStorageKey(*m,"System", "BlockHash", bb.Bytes())
+	key, err := substrate.NewStorageKey(*m, "System", "BlockHash", bb.Bytes())
 	if err != nil {
 		return nil, err
 	}

@@ -261,7 +261,7 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 }
 
 type Author struct {
-	client Client
+	client       Client
 	genesisBlock []byte
 
 	subKeyCMD  string
@@ -285,9 +285,8 @@ func (a *Author) SubmitExtrinsic(accountNonce uint64, method string, args Args) 
 	if err != nil {
 		return "", err
 	}
-	eb := hexutil.Encode(bbb.Bytes())
-	// fmt.Println(eb)
 
+	eb := hexutil.Encode(bbb.Bytes())
 	var res string
 	err = a.client.Call(&res, "author_submitExtrinsic", eb)
 	if err != nil {

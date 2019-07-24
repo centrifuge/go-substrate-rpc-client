@@ -2,10 +2,11 @@ package system
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestBlockHash(t *testing.T) {

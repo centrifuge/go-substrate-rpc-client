@@ -449,7 +449,7 @@ func NewStorageKey(meta MetadataVersioned, module string, fn string, key []byte)
 			for _, s := range m.Storage {
 				if s.Name == fn {
 					fnMeta = &s
-					break;
+					break
 				}
 			}
 		}
