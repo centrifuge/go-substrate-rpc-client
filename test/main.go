@@ -6,6 +6,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/centrifuge/go-substrate-rpc-client/system"
 	"github.com/centrifuge/go-centrifuge/utils"
 	"github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
@@ -24,10 +25,6 @@ const (
 	// TODO query these from the chain
 	// 0x703bffa9bc816a5cd06ab8a95c2ff74e7a60cdaf269ffd64d325eb193266a656
 	GenesisBlock = "0xcedd9988967d60f287700453839ce435584407b4a654040cd3c7f46b1bf61134"
-	// BestBlock is the earliest block thats not already pruned
-	BestBlock = "0xec5c55bdb4733cd3e6278284625379cbfd8ebc706e8a74529358d5673c434234"
-	// StartNonce is the current account nonce for Alice (can't use other accounts for now)
-	StartNonce = 2
 	// SubKeyCmd subkey command to create signatures
 	SubKeyCmd = "/Users/vimukthi/.cargo/bin/subkey"
 
@@ -85,14 +82,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	hs, err := hexutil.Decode(BestBlock)
-	if err != nil {
-		panic(err)
-	}
-
-	s := substrate.NewStateRPC(client)
-	n, err := s.MetaData(hs)
+	alice, _ := hexutil.Decode(substrate.AlicePubKey)
+	nonce, err := system.AccountNonce(client, alice)
 	if err != nil {
 		panic(err)
 	}
@@ -101,7 +92,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	authRPC := substrate.NewAuthorRPC(StartNonce, gs, SubKeyCmd, SubKeySign, *n, client)
+	authRPC := substrate.NewAuthorRPC(client, gs, SubKeyCmd, SubKeySign)
 	wg := sync.WaitGroup{}
 	start := time.Now()
 	wg.Add(Concurrency)
@@ -113,13 +104,14 @@ func main() {
 				a := NewRandomAnchor()
 				aID := a.AnchorIDHex()
 				// fmt.Println("submitting new anchor with anchor ID", a.AnchorIDHex())
-				res, err := authRPC.SubmitExtrinsic(AnchorCommit, a)
+				res, err := authRPC.SubmitExtrinsic(nonce, AnchorCommit, a)
 				if err != nil {
 					fmt.Printf("FAIL!!! anchor ID %s failed with %s\n", aID, err.Error())
 					break
 				} else {
 					fmt.Printf("SUCCESS!!! anchor ID %s , tx hash %s\n", aID, res)
 					atomic.AddUint64(&counter, 1)
+					atomic.AddUint64(&nonce, 1)
 				}
 			}
 			wg.Done()

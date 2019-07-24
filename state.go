@@ -3,14 +3,13 @@ package substrate
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"hash"
 	"strings"
 
-	"github.com/minio/blake2b-simd"
-	"github.com/pierrec/xxHash/xxHash64"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/minio/blake2b-simd"
+	"github.com/pierrec/xxHash/xxHash64"
 )
 
 // MethodIDX [sectionIndex, methodIndex] 16bits
@@ -401,7 +400,12 @@ func (s *State) MetaData(blockHash Hash) (*MetadataVersioned, error) {
 	var res string
 	if !s.nonetwork {
 		// block hash can give error - Error(Client(UnknownBlock("State already discarded for Hash(0xxxx)")), State { next_error: None, backtrace: InternalBacktrace { backtrace: None } })
-		err := s.client.Call(&res, "state_getMetadata", blockHash.String())
+		var err error
+		if blockHash == nil {
+			err = s.client.Call(&res, "state_getMetadata")
+		} else {
+			err = s.client.Call(&res, "state_getMetadata", blockHash.String())
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -474,9 +478,9 @@ func NewStorageKey(meta MetadataVersioned, module string, fn string, key []byte)
 		return hasher.Sum(nil), nil
 	} else {
 		if key != nil {
-			return create2xXxhash(append(afn, key...), 2), nil
+			return createMultiXxhash(append(afn, key...), 2), nil
 		}
-		return create2xXxhash(append(afn), 2), nil
+		return createMultiXxhash(append(afn), 2), nil
 	}
 }
 
@@ -486,12 +490,8 @@ func (s StorageKey) Encode(encoder scale.Encoder) error {
 
 type StorageData []byte
 
-func (s *State) Storage(key []byte, block []byte) (StorageData, error) {
+func (s *State) Storage(key StorageKey, block []byte) (StorageData, error) {
 	var res string
-	v := hexutil.Encode(key)
-	fmt.Println(v)
-	// time now 0x0e4944cfd98d6f4cc374d16f5a4e3f9c
-	// 0xb0281586a5826d1d17741f616f08574ca6dc3c5e5265d22ae0ca1d387432e781
 	if !s.nonetwork {
 		var err error
 		if block != nil {
@@ -512,7 +512,7 @@ func (s *State) Storage(key []byte, block []byte) (StorageData, error) {
 	return hexutil.Decode(res)
 }
 
-func create2xXxhash(data []byte, rounds int) []byte {
+func createMultiXxhash(data []byte, rounds int) []byte {
 	res := make([]byte, 0)
 	for i := 0; i < rounds; i++ {
 		h := xxHash64.New(uint64(i))
