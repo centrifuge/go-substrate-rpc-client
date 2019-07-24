@@ -396,7 +396,6 @@ func NewStateRPC(client Client) *State {
 }
 
 func (s *State) MetaData(blockHash Hash) (*MetadataVersioned, error) {
-	// "0xd133045f0efad58582772cbdb6f5f0cd6af7bb4bf1f30d039a4b18b4bdaf4901"
 	var res string
 	if !s.nonetwork {
 		// block hash can give error - Error(Client(UnknownBlock("State already discarded for Hash(0xxxx)")), State { next_error: None, backtrace: InternalBacktrace { backtrace: None } })

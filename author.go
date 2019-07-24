@@ -33,9 +33,6 @@ func NewExtrinsicSignature(signature Signature, Nonce uint64) ExtrinsicSignature
 }
 
 func (e *ExtrinsicSignature) Decode(decoder scale.Decoder) error {
-	// length of the encoded signature struct
-	//l := decoder.DecodeUintCompact()
-	//fmt.Println(l)
 	err := decoder.Decode(&e.SignatureOptional) // implement decodeExtrinsicSignature logic to derive if the request is signed
 	if err != nil {
 		return err
@@ -57,7 +54,7 @@ func (e *ExtrinsicSignature) Decode(decoder scale.Decoder) error {
 		return err
 	}
 	e.Nonce, _ = decoder.DecodeUintCompact()
-	// assuming immortal for now TODO
+	// TODO assuming immortal for now
 	err = decoder.Decode(&e.Era)
 	if err != nil {
 		return err

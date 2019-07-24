@@ -19,12 +19,8 @@ const (
 	SubKeySign   = "sign-blob"
 
 	// Adjust below params according to your env + chain state + requirement
-
 	RPCEndPoint = "ws://127.0.0.1:9944"
 
-	// TODO query these from the chain
-	// 0x703bffa9bc816a5cd06ab8a95c2ff74e7a60cdaf269ffd64d325eb193266a656
-	GenesisBlock = "0xcedd9988967d60f287700453839ce435584407b4a654040cd3c7f46b1bf61134"
 	// SubKeyCmd subkey command to create signatures
 	SubKeyCmd = "/Users/vimukthi/.cargo/bin/subkey"
 
@@ -88,10 +84,11 @@ func main() {
 		panic(err)
 	}
 
-	gs, err := hexutil.Decode(GenesisBlock)
+	gs, err := system.BlockHash(client, 0)
 	if err != nil {
 		panic(err)
 	}
+
 	authRPC := substrate.NewAuthorRPC(client, gs, SubKeyCmd, SubKeySign)
 	wg := sync.WaitGroup{}
 	start := time.Now()

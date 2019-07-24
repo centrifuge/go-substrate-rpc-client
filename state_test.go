@@ -7,9 +7,7 @@ import (
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/minio/blake2b-simd"
 	"github.com/stretchr/testify/assert"
-	bbb "golang.org/x/crypto/blake2b"
 )
 
 func TestState_GetMetaData(t *testing.T) {
@@ -33,25 +31,7 @@ func (a *AnchorData) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func TestState_GetStorage_Anchors(t *testing.T) {
-	c, _ := Connect("ws://127.0.0.1:9944")
-	s := NewStateRPC(c)
-	b, _ := hexutil.Decode("0x33e423980c9b37d048bd5fadbd4a2aeb95146922045405accc2f468d0ef96988")
-	h, _ := hexutil.Decode("0x142d4b3d1946e4956b4bd5a5bfc906142e921b51415ceccb3c82b3bd3ff3daf1")
-
-	m ,_ := s.MetaData(h)
-	key, _ := NewStorageKey(*m,"Anchor", "Anchors", b)
-	res, _ := s.Storage(key,  nil)
-	fmt.Println(res)
-
-	buf := bytes.NewBuffer(res)
-	tempDec := scale.NewDecoder(buf)
-	a := AnchorData{}
-	tempDec.Decode(&a)
-	fmt.Println(a)
-}
-
-func TestState_GetStorage_AccountNonce(t *testing.T) {
+func TestState_Storage(t *testing.T) {
 	c, _ := Connect("ws://127.0.0.1:9944")
 	s := NewStateRPC(c)
 	b, _ := hexutil.Decode(AlicePubKey)
@@ -66,23 +46,6 @@ func TestState_GetStorage_AccountNonce(t *testing.T) {
 	var nonce uint64
 	tempDec.Decode(&nonce)
 	fmt.Println(nonce)
-}
-
-func TestBlake(t *testing.T) {
-	bb, _ := hexutil.Decode("0x0000000000000000000000000000000000000000000000000000000000000001")
-	b := blake2b.Sum256(bb)
-	b2 := bbb.Sum256(bb)
-	fmt.Println(hexutil.Encode(b[:]))
-	fmt.Println(hexutil.Encode(b2[:]))
-}
-
-func blake128(b []byte) []byte {
-	h, err := blake2b.New(&blake2b.Config{Size: 16})
-	if err != nil {
-		fmt.Println(err)
-	}
-	h.Write(b)
-	return h.Sum(nil)
 }
 
 

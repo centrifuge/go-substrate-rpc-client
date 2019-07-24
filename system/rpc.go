@@ -35,6 +35,29 @@ func AccountNonce(client substrate.Client, accountPubKey []byte) (uint64, error)
 }
 
 func BlockHash(client substrate.Client, blockNumber uint64) (substrate.Hash, error) {
-	// TODO
-	return nil, nil
+	m, err := client.MetaData(true)
+	if err != nil {
+		return nil, err
+	}
+
+	b := make([]byte, 0, 1000)
+	bb := bytes.NewBuffer(b)
+	tempEnc := scale.NewEncoder(bb)
+	err = tempEnc.Encode(blockNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	key, err := substrate.NewStorageKey(*m,"System", "BlockHash", bb.Bytes())
+	if err != nil {
+		return nil, err
+	}
+
+	s := substrate.NewStateRPC(client)
+	data, err := s.Storage(key, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return substrate.Hash(data), nil
 }
