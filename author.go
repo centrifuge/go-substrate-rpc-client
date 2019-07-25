@@ -66,7 +66,7 @@ func (e *ExtrinsicSignature) Decode(decoder scale.Decoder) error {
 func (e ExtrinsicSignature) Encode(encoder scale.Encoder) error {
 	// always signed
 	e.SignatureOptional = 129
-	// Alice
+	// TODO remove hard coded accounts info
 	s, _ := hexutil.Decode(AlicePubKey)
 	e.Signer = *NewAddress(s)
 	e.Era = 0
