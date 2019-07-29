@@ -477,7 +477,7 @@ func (s StorageKey) Encode(encoder scale.Encoder) error {
 
 type StorageData []byte
 
-func (s *StorageData) Decoder() *scale.Decoder {
+func (s StorageData) Decoder() *scale.Decoder {
 	buf := bytes.NewBuffer(s[:])
 	return scale.NewDecoder(buf)
 }
