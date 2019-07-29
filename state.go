@@ -2,10 +2,15 @@ package substrate
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
+	"hash"
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/minio/blake2b-simd"
+	"github.com/pierrec/xxHash/xxHash64"
 )
 
 // MethodIDX [sectionIndex, methodIndex] 16bits
@@ -157,6 +162,13 @@ type TypMap struct {
 	IsLinked bool
 }
 
+func (t TypMap) HashFunc() (hash.Hash, error) {
+	if t.Hasher == 1 {
+		return blake2b.New(&blake2b.Config{Size: 32})
+	}
+	return nil, errors.New("hash function type not supported")
+}
+
 func (m *TypMap) Decode(decoder scale.Decoder) error {
 	err := decoder.Decode(&m.Hasher)
 	if err != nil {
@@ -229,6 +241,14 @@ type StorageFunctionMetadata struct {
 	Documentation []string
 }
 
+func (s StorageFunctionMetadata) isMap() bool {
+	return s.Type == 1
+}
+
+func (s StorageFunctionMetadata) isDMap() bool {
+	return s.Type == 2
+}
+
 func (m *StorageFunctionMetadata) Decode(decoder scale.Decoder) error {
 	err := decoder.Decode(&m.Name)
 	if err != nil {
@@ -271,7 +291,7 @@ func (m *StorageFunctionMetadata) Decode(decoder scale.Decoder) error {
 	if err != nil {
 		return err
 	}
-	// fmt.Println(m.Documentation)
+	// fmt.Println(metadataVersioned.Documentation)
 	return nil
 }
 
@@ -331,7 +351,7 @@ func (m *ModuleMetaData) Decode(decoder scale.Decoder) error {
 		if err != nil {
 			return err
 		}
-		// fmt.Println(m.Events)
+		// fmt.Println(metadataVersioned.Events)
 	}
 	return nil
 }
@@ -377,11 +397,15 @@ func NewStateRPC(client Client) *State {
 }
 
 func (s *State) MetaData(blockHash Hash) (*MetadataVersioned, error) {
-	// "0xd133045f0efad58582772cbdb6f5f0cd6af7bb4bf1f30d039a4b18b4bdaf4901"
 	var res string
 	if !s.nonetwork {
 		// block hash can give error - Error(Client(UnknownBlock("State already discarded for Hash(0xxxx)")), State { next_error: None, backtrace: InternalBacktrace { backtrace: None } })
-		err := s.client.Call(&res, "state_getMetadata", blockHash.String())
+		var err error
+		if blockHash == nil {
+			err = s.client.Call(&res, "state_getMetadata")
+		} else {
+			err = s.client.Call(&res, "state_getMetadata", blockHash.String())
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -405,14 +429,87 @@ func (s *State) MetaData(blockHash Hash) (*MetadataVersioned, error) {
 	return n, nil
 }
 
-// Keys state_getKeys
-func (s *State) Keys(blockHash Hash) (*MetadataVersioned, error) {
+type StorageKey []byte
+
+func NewStorageKey(meta MetadataVersioned, module string, fn string, key []byte) (StorageKey, error) {
+	var fnMeta *StorageFunctionMetadata
+	for _, m := range meta.Metadata.Modules {
+		if m.Prefix == module {
+			for _, s := range m.Storage {
+				if s.Name == fn {
+					fnMeta = &s
+					break
+				}
+			}
+		}
+	}
+	if fnMeta == nil {
+		return nil, fmt.Errorf("no meta data found for module %s function %s", module, fn)
+	}
+
+	var hasher hash.Hash
+	var err error
+	if fnMeta.isMap() {
+		hasher, err = fnMeta.Map.HashFunc()
+		if err != nil {
+			return nil, err
+		}
+	} else if fnMeta.isDMap() {
+		// TODO define hashing for 2 keys
+	}
+
+	afn := []byte(module + " " + fn)
+	// TODO why is add length prefix step in JS client doesn't add anything to the hashed key?
+	if hasher != nil {
+		hasher.Write(append(afn, key...))
+		return hasher.Sum(nil), nil
+	} else {
+		if key != nil {
+			return createMultiXxhash(append(afn, key...), 2), nil
+		}
+		return createMultiXxhash(append(afn), 2), nil
+	}
+}
+
+func (s StorageKey) Encode(encoder scale.Encoder) error {
+	return encoder.Encode(s)
+}
+
+type StorageData []byte
+
+func (s StorageData) Decoder() *scale.Decoder {
+	buf := bytes.NewBuffer(s[:])
+	return scale.NewDecoder(buf)
+}
+
+func (s *State) Storage(key StorageKey, block []byte) (StorageData, error) {
 	var res string
 	if !s.nonetwork {
-		err := s.client.Call(&res, "state_getKeys", blockHash.String())
+		var err error
+		if block != nil {
+			err = s.client.Call(&res, "state_getStorage", hexutil.Encode(key), hexutil.Encode(block))
+		} else {
+			err = s.client.Call(&res, "state_getStorage", hexutil.Encode(key))
+		}
+
 		if err != nil {
 			return nil, err
 		}
 	}
-	return nil, nil
+
+	if res == "" {
+		return nil, errors.New("empty result")
+	}
+
+	return hexutil.Decode(res)
+}
+
+func createMultiXxhash(data []byte, rounds int) []byte {
+	res := make([]byte, 0)
+	for i := 0; i < rounds; i++ {
+		h := xxHash64.New(uint64(i))
+		h.Write(data)
+		res = append(res, h.Sum(nil)...)
+	}
+	return res
 }

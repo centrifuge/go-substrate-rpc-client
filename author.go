@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"log"
 	"os/exec"
-	"sync"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -34,9 +33,6 @@ func NewExtrinsicSignature(signature Signature, Nonce uint64) ExtrinsicSignature
 }
 
 func (e *ExtrinsicSignature) Decode(decoder scale.Decoder) error {
-	// length of the encoded signature struct
-	//l := decoder.DecodeUintCompact()
-	//fmt.Println(l)
 	err := decoder.Decode(&e.SignatureOptional) // implement decodeExtrinsicSignature logic to derive if the request is signed
 	if err != nil {
 		return err
@@ -58,7 +54,7 @@ func (e *ExtrinsicSignature) Decode(decoder scale.Decoder) error {
 		return err
 	}
 	e.Nonce, _ = decoder.DecodeUintCompact()
-	// assuming immortal for now TODO
+	// TODO assuming immortal for now
 	err = decoder.Decode(&e.Era)
 	if err != nil {
 		return err
@@ -70,7 +66,7 @@ func (e *ExtrinsicSignature) Decode(decoder scale.Decoder) error {
 func (e ExtrinsicSignature) Encode(encoder scale.Encoder) error {
 	// always signed
 	e.SignatureOptional = 129
-	// Alice
+	// TODO remove hard coded accounts info
 	s, _ := hexutil.Decode(AlicePubKey)
 	e.Signer = *NewAddress(s)
 	e.Era = 0
@@ -177,14 +173,14 @@ type Extrinsic struct {
 	subKeyCMD  string
 	subKeySign string
 	Nonce      uint64
-	// BestKnownBlock genesis block
-	BestKnownBlock []byte
-	Signature      ExtrinsicSignature
-	Method         Method
+
+	GenesisBlock []byte
+	Signature    ExtrinsicSignature
+	Method       Method
 }
 
-func NewExtrinsic(subKeyCMD string, subKeySign string, accountNonce uint64, bestKnownBlock []byte, method Method) *Extrinsic {
-	return &Extrinsic{subKeyCMD: subKeyCMD, subKeySign: subKeySign, Nonce: accountNonce, BestKnownBlock: bestKnownBlock, Method: method}
+func NewExtrinsic(subKeyCMD string, subKeySign string, accountNonce uint64, genesisBlock []byte, method Method) *Extrinsic {
+	return &Extrinsic{subKeyCMD: subKeyCMD, subKeySign: subKeySign, Nonce: accountNonce, GenesisBlock: genesisBlock, Method: method}
 }
 
 func (e *Extrinsic) Decode(decoder scale.Decoder) error {
@@ -209,8 +205,7 @@ func (e *Extrinsic) Decode(decoder scale.Decoder) error {
 }
 
 func (e Extrinsic) Encode(encoder scale.Encoder) error {
-	b := make([]byte, 0, 1000)
-	bb := bytes.NewBuffer(b)
+	bb := new(bytes.Buffer)
 	tempEnc := scale.NewEncoder(bb)
 
 	sigPay := SignaturePayload{
@@ -219,7 +214,7 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 		// Immortal
 		Era: 0,
 	}
-	copy(sigPay.PriorBlock[:], e.BestKnownBlock)
+	copy(sigPay.PriorBlock[:], e.GenesisBlock)
 	err := tempEnc.Encode(sigPay)
 	if err != nil {
 		return err
@@ -239,8 +234,7 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 
 	e.Signature = NewExtrinsicSignature(*NewSignature(vs), e.Nonce)
 
-	b = make([]byte, 0, 1000)
-	bb = bytes.NewBuffer(b)
+	bb = new(bytes.Buffer)
 	tempEnc = scale.NewEncoder(bb)
 	err = tempEnc.Encode(&e.Signature)
 	if err != nil {
@@ -265,39 +259,31 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 }
 
 type Author struct {
-	client Client
-	meta   MetadataVersioned
-
-	// mu is an exclusive lock to manage the nonce
-	mu sync.RWMutex
+	client       Client
+	genesisBlock []byte
 
 	subKeyCMD  string
 	subKeySign string
-
-	// TODO obtain these using RPCs
-	accountNonce   uint64
-	bestKnownBlock []byte
 }
 
-func NewAuthorRPC(startNonce uint64, bestKnownBlock []byte, subKeyCMD, SubKeySign string, meta MetadataVersioned, client Client) *Author {
-	return &Author{client, meta, sync.RWMutex{}, subKeyCMD, SubKeySign, startNonce, bestKnownBlock}
+func NewAuthorRPC(client Client, genesisBlock []byte, subKeyCMD, SubKeySign string) *Author {
+	return &Author{client, genesisBlock, subKeyCMD, SubKeySign}
 }
 
-func (a *Author) SubmitExtrinsic(method string, args Args) (string, error) {
-	a.mu.Lock()
-	e := NewExtrinsic(a.subKeyCMD, a.subKeySign, a.accountNonce, a.bestKnownBlock, NewMethod(method, args, a.meta))
-	a.accountNonce++
-	a.mu.Unlock()
-	bb := make([]byte, 0, 1000)
-	bbb := bytes.NewBuffer(bb)
-	tempEnc := scale.NewEncoder(bbb)
-	err := tempEnc.Encode(&e)
+func (a *Author) SubmitExtrinsic(accountNonce uint64, method string, args Args) (string, error) {
+	m, err := a.client.MetaData(true)
 	if err != nil {
 		return "", err
 	}
-	eb := hexutil.Encode(bbb.Bytes())
-	// fmt.Println(eb)
+	e := NewExtrinsic(a.subKeyCMD, a.subKeySign, accountNonce, a.genesisBlock, NewMethod(method, args, *m))
+	bbb := new(bytes.Buffer)
+	tempEnc := scale.NewEncoder(bbb)
+	err = tempEnc.Encode(&e)
+	if err != nil {
+		return "", err
+	}
 
+	eb := hexutil.Encode(bbb.Bytes())
 	var res string
 	err = a.client.Call(&res, "author_submitExtrinsic", eb)
 	if err != nil {

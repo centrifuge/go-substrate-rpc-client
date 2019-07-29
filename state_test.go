@@ -1,15 +1,13 @@
 package substrate
 
 import (
+	"bytes"
 	"fmt"
-
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/minio/blake2b-simd"
-
 	"testing"
 
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/stretchr/testify/assert"
-	bbb "golang.org/x/crypto/blake2b"
 )
 
 func TestState_GetMetaData(t *testing.T) {
@@ -20,10 +18,20 @@ func TestState_GetMetaData(t *testing.T) {
 	// fmt.Println(res)
 }
 
-func TestBlake(t *testing.T) {
-	bb, _ := hexutil.Decode("0x0000000000000000000000000000000000000000000000000000000000000901")
-	b := blake2b.Sum256(bb)
-	b2 := bbb.Sum256(bb)
-	fmt.Println(hexutil.Encode(b[:]))
-	fmt.Println(hexutil.Encode(b2[:]))
+func TestState_Storage(t *testing.T) {
+	t.SkipNow()
+	c, _ := Connect("ws://127.0.0.1:9944")
+	s := NewStateRPC(c)
+	b, _ := hexutil.Decode(AlicePubKey)
+	h, _ := hexutil.Decode("0x142d4b3d1946e4956b4bd5a5bfc906142e921b51415ceccb3c82b3bd3ff3daf1")
+
+	m, _ := s.MetaData(h)
+	key, _ := NewStorageKey(*m, "System", "AccountNonce", b)
+	res, _ := s.Storage(key, nil)
+
+	buf := bytes.NewBuffer(res)
+	tempDec := scale.NewDecoder(buf)
+	var nonce uint64
+	tempDec.Decode(&nonce)
+	fmt.Println(nonce)
 }
