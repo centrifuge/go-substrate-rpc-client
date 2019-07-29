@@ -23,8 +23,7 @@ func AccountNonce(client substrate.Client, accountPubKey []byte) (uint64, error)
 		return 0, err
 	}
 
-	buf := bytes.NewBuffer(data)
-	tempDec := scale.NewDecoder(buf)
+	tempDec := data.Decoder()
 	var nonce uint64
 	err = tempDec.Decode(&nonce)
 	if err != nil {
@@ -40,8 +39,7 @@ func BlockHash(client substrate.Client, blockNumber uint64) (substrate.Hash, err
 		return nil, err
 	}
 
-	b := make([]byte, 0)
-	bb := bytes.NewBuffer(b)
+	bb := new(bytes.Buffer)
 	tempEnc := scale.NewEncoder(bb)
 	err = tempEnc.Encode(blockNumber)
 	if err != nil {

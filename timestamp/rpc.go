@@ -1,11 +1,9 @@
 package timestamp
 
 import (
-	"bytes"
 	"time"
 
 	"github.com/centrifuge/go-substrate-rpc-client"
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
 func Now(client substrate.Client) (*time.Time, error) {
@@ -14,15 +12,18 @@ func Now(client substrate.Client) (*time.Time, error) {
 		return nil, err
 	}
 
-	key, _ := substrate.NewStorageKey(*m, "Timestamp", "Now", nil)
+	key, err := substrate.NewStorageKey(*m, "Timestamp", "Now", nil)
+	if err != nil {
+		return nil, err
+	}
+
 	s := substrate.NewStateRPC(client)
 	res, err := s.Storage(key, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	buf := bytes.NewBuffer(res)
-	tempDec := scale.NewDecoder(buf)
+	tempDec := res.Decoder()
 	var ts uint64
 	err = tempDec.Decode(&ts)
 	if err != nil {

@@ -3,6 +3,7 @@ package substrate
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"hash"
 	"strings"
 
@@ -290,7 +291,7 @@ func (m *StorageFunctionMetadata) Decode(decoder scale.Decoder) error {
 	if err != nil {
 		return err
 	}
-	// fmt.Println(m.Documentation)
+	// fmt.Println(metadataVersioned.Documentation)
 	return nil
 }
 
@@ -350,7 +351,7 @@ func (m *ModuleMetaData) Decode(decoder scale.Decoder) error {
 		if err != nil {
 			return err
 		}
-		// fmt.Println(m.Events)
+		// fmt.Println(metadataVersioned.Events)
 	}
 	return nil
 }
@@ -428,18 +429,6 @@ func (s *State) MetaData(blockHash Hash) (*MetadataVersioned, error) {
 	return n, nil
 }
 
-// Keys state_getKeys
-func (s *State) Keys(blockHash Hash) (*MetadataVersioned, error) {
-	var res string
-	if !s.nonetwork {
-		err := s.client.Call(&res, "state_getKeys", blockHash.String())
-		if err != nil {
-			return nil, err
-		}
-	}
-	return nil, nil
-}
-
 type StorageKey []byte
 
 func NewStorageKey(meta MetadataVersioned, module string, fn string, key []byte) (StorageKey, error) {
@@ -455,7 +444,7 @@ func NewStorageKey(meta MetadataVersioned, module string, fn string, key []byte)
 		}
 	}
 	if fnMeta == nil {
-		return nil, errors.New("no meta data found for function")
+		return nil, fmt.Errorf("no meta data found for module %s function %s", module, fn)
 	}
 
 	var hasher hash.Hash
@@ -487,6 +476,11 @@ func (s StorageKey) Encode(encoder scale.Encoder) error {
 }
 
 type StorageData []byte
+
+func (s *StorageData) Decoder() *scale.Decoder {
+	buf := bytes.NewBuffer(s[:])
+	return scale.NewDecoder(buf)
+}
 
 func (s *State) Storage(key StorageKey, block []byte) (StorageData, error) {
 	var res string

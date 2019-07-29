@@ -205,8 +205,7 @@ func (e *Extrinsic) Decode(decoder scale.Decoder) error {
 }
 
 func (e Extrinsic) Encode(encoder scale.Encoder) error {
-	b := make([]byte, 0, 1000)
-	bb := bytes.NewBuffer(b)
+	bb := new(bytes.Buffer)
 	tempEnc := scale.NewEncoder(bb)
 
 	sigPay := SignaturePayload{
@@ -235,8 +234,7 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 
 	e.Signature = NewExtrinsicSignature(*NewSignature(vs), e.Nonce)
 
-	b = make([]byte, 0, 1000)
-	bb = bytes.NewBuffer(b)
+	bb = new(bytes.Buffer)
 	tempEnc = scale.NewEncoder(bb)
 	err = tempEnc.Encode(&e.Signature)
 	if err != nil {
@@ -278,8 +276,7 @@ func (a *Author) SubmitExtrinsic(accountNonce uint64, method string, args Args) 
 		return "", err
 	}
 	e := NewExtrinsic(a.subKeyCMD, a.subKeySign, accountNonce, a.genesisBlock, NewMethod(method, args, *m))
-	bb := make([]byte, 0, 1000)
-	bbb := bytes.NewBuffer(bb)
+	bbb := new(bytes.Buffer)
 	tempEnc := scale.NewEncoder(bbb)
 	err = tempEnc.Encode(&e)
 	if err != nil {
