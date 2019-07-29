@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"sync"
 	"sync/atomic"
@@ -104,9 +103,7 @@ func Anchors(client substrate.Client, anchorIDPreImage []byte) (*AnchorData, err
 		return nil, err
 	}
 
-	//fmt.Println(res)
-	buf := bytes.NewBuffer(res)
-	tempDec := scale.NewDecoder(buf)
+	tempDec := res.Decoder()
 	a := AnchorData{}
 	err = tempDec.Decode(&a)
 	if err != nil {
