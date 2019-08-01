@@ -32,5 +32,5 @@ func TestNow(t *testing.T) {
 	testServer.AddStorageKey("0x0e4944cfd98d6f4cc374d16f5a4e3f9c", "0x7ab3425d00000000")
 	ts, err := Now(testClient)
 	assert.NoError(t, err)
-	assert.Equal(t, "2019-08-01 11:40:10 +0200 CEST", ts.String())
+	assert.Equal(t, "2019-08-01 09:40:10 +0000 UTC", ts.UTC().String())
 }
