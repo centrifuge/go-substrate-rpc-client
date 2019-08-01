@@ -48,7 +48,7 @@ func TestServer(t *testing.T) {
 	// TODO local only for now until subkey is included in the build
 	t.SkipNow()
 	testServer := new(Server)
-	testServer.Init()
+	testServer.Init(GetTestMetaData())
 	c, err := substrate.Connect("ws://127.0.0.1:8080")
 	assert.NoError(t, err)
 
