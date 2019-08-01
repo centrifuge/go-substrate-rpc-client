@@ -139,7 +139,6 @@ type Method struct {
 }
 
 func NewMethod(name string, a Args, metadata MetadataVersioned) Method {
-	// "kerplunk.commit"
 	return Method{CallIndex: metadata.Metadata.MethodIndex(name), Args: a}
 }
 
