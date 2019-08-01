@@ -18,7 +18,7 @@ var rpcPort int
 func TestMain(m *testing.M) {
 	testServer = new(testrpc.Server)
 	var err error
-	rpcPort, err = testServer.Init()
+	rpcPort, err = testServer.Init(testrpc.GetTestMetaData())
 	if err != nil {
 		panic(err)
 	}
