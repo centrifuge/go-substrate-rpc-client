@@ -92,13 +92,13 @@ func Anchors(client substrate.Client, anchorIDPreImage []byte) (*AnchorData, err
 		return nil, err
 	}
 
-	key, err := substrate.NewStorageKey(*m,"Anchor", "Anchors", h[:])
+	key, err := substrate.NewStorageKey(*m, "Anchor", "Anchors", h[:])
 	if err != nil {
 		return nil, err
 	}
 
 	s := substrate.NewStateRPC(client)
-	res, err := s.Storage(key,  nil)
+	res, err := s.Storage(key, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -1,15 +1,16 @@
 package testrpc
 
 import (
+	"testing"
+
 	"github.com/centrifuge/go-centrifuge/utils"
 	"github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 const (
-	SubKeySign   = "sign-blob"
+	SubKeySign = "sign-blob"
 
 	// SubKeyCmd subkey command to create signatures
 	SubKeyCmd = "/Users/vimukthi/.cargo/bin/subkey"
@@ -44,6 +45,8 @@ func (a AnchorParams) Encode(encoder scale.Encoder) error {
 }
 
 func TestServer(t *testing.T) {
+	// TODO local only for now until subkey is included in the build
+	t.SkipNow()
 	testServer := new(Server)
 	testServer.Init()
 	c, err := substrate.Connect("ws://127.0.0.1:8080")

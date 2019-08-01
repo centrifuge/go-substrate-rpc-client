@@ -388,7 +388,7 @@ func (m *MetadataVersioned) Decode(decoder scale.Decoder) error {
 }
 
 type State struct {
-	client    Client
+	client Client
 }
 
 func NewStateRPC(client Client) *State {

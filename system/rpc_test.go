@@ -1,19 +1,37 @@
 package system
 
 import (
-	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client"
+	"github.com/centrifuge/go-substrate-rpc-client/testrpc"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBlockHash(t *testing.T) {
-	t.SkipNow()
-	c, _ := substrate.Connect("ws://127.0.0.1:9944")
-	h, err := BlockHash(c, 0)
-	assert.NoError(t, err)
+var testServer *testrpc.Server
+var testClient substrate.Client
+var rpcPort int
 
-	fmt.Printf("%s", hexutil.Encode(h))
+func TestMain(m *testing.M) {
+	testServer = new(testrpc.Server)
+	var err error
+	rpcPort, err = testServer.Init()
+	if err != nil {
+		panic(err)
+	}
+
+	testClient, err = substrate.Connect("ws://localhost:" + strconv.Itoa(rpcPort))
+	if err != nil {
+		panic(err)
+	}
+	m.Run()
+}
+
+func TestBlockHash(t *testing.T) {
+	testServer.AddStorageKey("0xa8e78ad25e03ac0281ec709fd3f128efb7e112239d0a7c3e1c86375109bff334", "0xa8e78ad25e03ac0281ec709fd3f128efb7e112239d0a7c3e1c86375109bff338")
+	h, err := BlockHash(testClient, 0)
+	assert.NoError(t, err)
+	assert.Equal(t, hexutil.Encode(h), "0xa8e78ad25e03ac0281ec709fd3f128efb7e112239d0a7c3e1c86375109bff338")
 }

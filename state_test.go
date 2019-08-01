@@ -2,6 +2,7 @@ package substrate
 
 import (
 	"bytes"
+	"strconv"
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
@@ -12,17 +13,21 @@ import (
 
 var testServer *testrpc.Server
 var testClient Client
+var rpcPort int
 
 func TestMain(m *testing.M) {
 	testServer = new(testrpc.Server)
-	testServer.Init()
 	var err error
-	testClient, err = Connect("ws://localhost:8080")
+	rpcPort, err = testServer.Init()
+	if err != nil {
+		panic(err)
+	}
+
+	testClient, err = Connect("ws://localhost:" + strconv.Itoa(rpcPort))
 	if err != nil {
 		panic(err)
 	}
 	m.Run()
-	// TODO shutdown server
 }
 
 func TestState_GetMetaData(t *testing.T) {
@@ -40,6 +45,7 @@ func TestState_Storage(t *testing.T) {
 	m, _ := s.MetaData(h)
 	key, err := NewStorageKey(*m, "System", "AccountNonce", b)
 	assert.NoError(t, err)
+	testServer.AddStorageKey(hexutil.Encode(key), "0xf1ffffffffffff0f0000000000000000")
 	res, err := s.Storage(key, nil)
 	assert.NoError(t, err)
 
