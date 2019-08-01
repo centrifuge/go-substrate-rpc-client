@@ -71,8 +71,6 @@ func (s *Server) RemoveStorageKeyForBlock(key, blocknum string) {
 func (ts *Server) Init(metadata string) (int, error) {
 	ts.author = new(authorService)
 	ts.state = newStateService(metadata)
-	ts.state.storage = make(map[string]string)
-	ts.state.storageForBlock = make(map[string]map[string]string)
 	server := rpc.NewServer()
 	err := server.RegisterName("author", ts.author)
 	if err != nil {
