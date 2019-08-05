@@ -10,8 +10,8 @@ install-deps: ## Install Dependencies
 	@mv ./bin/* $(GOPATH)/bin/; rm -rf ./bin
 
 lint-check: ## runs linters on go code
-	@gometalinter --exclude=anchors/service.go  --disable-all --enable=golint --enable=goimports --enable=vet --enable=nakedret \
-	--enable=staticcheck --vendor --skip=resources --skip=testingutils --skip=protobufs  --deadline=1m ./...;
+	@gometalinter  --disable-all --enable=golint --enable=goimports --enable=vet --enable=nakedret \
+	--enable=staticcheck --vendor --skip=resources --deadline=1m ./...;
 
 format-go: ## formats go code
 	@goimports -w .

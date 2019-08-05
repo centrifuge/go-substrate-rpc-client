@@ -1,3 +1,5 @@
+// +build tests
+
 package main
 
 import (
@@ -129,13 +131,13 @@ func Anchors(client substrate.Client, module string, fn string, anchorIDPreImage
 		return nil, err
 	}
 
-	key, err := substrate.NewStorageKey(*m,module, fn, h[:])
+	key, err := substrate.NewStorageKey(*m, module, fn, h[:])
 	if err != nil {
 		return nil, err
 	}
 
 	s := substrate.NewStateRPC(client)
-	res, err := s.Storage(key,  nil)
+	res, err := s.Storage(key, nil)
 	if err != nil {
 		return nil, err
 	}

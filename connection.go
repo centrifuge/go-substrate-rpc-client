@@ -2,6 +2,7 @@ package substrate
 
 import (
 	"context"
+	"sync"
 
 	"github.com/ethereum/go-ethereum/rpc"
 )
@@ -19,10 +20,14 @@ type client struct {
 
 	// metadataVersioned is the metadata cache to prevent unnecessary requests
 	metadataVersioned *MetadataVersioned
+
+	metadataLock sync.RWMutex
 }
 
 func (c *client) MetaData(cache bool) (m *MetadataVersioned, err error) {
 	if cache && c.metadataVersioned != nil {
+		c.metadataLock.RLock()
+		defer c.metadataLock.RUnlock()
 		m = c.metadataVersioned
 	} else {
 		s := NewStateRPC(c)
@@ -31,6 +36,8 @@ func (c *client) MetaData(cache bool) (m *MetadataVersioned, err error) {
 			return nil, err
 		}
 		// set cache
+		c.metadataLock.Lock()
+		defer c.metadataLock.Unlock()
 		c.metadataVersioned = m
 	}
 	return
@@ -42,6 +49,6 @@ func Connect(url string) (Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	cc := client{c, nil}
+	cc := client{c, nil, sync.RWMutex{}}
 	return &cc, nil
 }
