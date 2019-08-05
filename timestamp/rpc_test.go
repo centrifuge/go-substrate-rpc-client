@@ -17,9 +17,11 @@ var rpcURL string
 func TestMain(m *testing.M) {
 	testServer = new(testrpc.Server)
 	var err error
-	rpcURL, err = testServer.Init(testrpc.GetTestMetaData(), nil)
-	if err != nil {
-		panic(err)
+	if rpcURL == "" {
+		rpcURL, err = testServer.Init(testrpc.GetTestMetaData(), nil)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	testClient, err = substrate.Connect(rpcURL)
