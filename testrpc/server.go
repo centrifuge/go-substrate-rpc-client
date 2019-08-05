@@ -1,3 +1,4 @@
+// +build tests
 package testrpc
 
 import (
@@ -67,28 +68,35 @@ func (s *Server) RemoveStorageKeyForBlock(key, blocknum string) {
 	delete(s.state.storageForBlock[key], blocknum)
 }
 
-// Init inits the testrpc server. port is the port that should be used.
-func (ts *Server) Init(metadata string) (int, error) {
+// Init inits the testrpc server. rpcURL is the rpc url, eg: localhost:8080
+func (ts *Server) Init(metadata string, rpcURL *string) (string, error) {
 	ts.author = new(authorService)
 	ts.state = newStateService(metadata)
 	server := rpc.NewServer()
 	err := server.RegisterName("author", ts.author)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	err = server.RegisterName("state", ts.state)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	http.Handle("/", server.WebsocketHandler([]string{"*"}))
 	port := randomPort()
-	go http.ListenAndServe(":"+strconv.Itoa(port), nil)
+	url := ""
+	if rpcURL == nil {
+		url = "localhost:"+strconv.Itoa(port)
+	} else {
+		url = *rpcURL
+	}
+	go http.ListenAndServe(url, nil)
+
 	// allow sometime for the server to start
 	time.Sleep(10 * time.Millisecond)
 
-	return port, nil
+	return "ws://" + url, nil
 }
 
 func randomPort() int {

@@ -1,3 +1,4 @@
+// +build tests
 // Copyright 2018 Jsgenesis
 //
 // Licensed under the Apache License, Version 2.0 (the "License");

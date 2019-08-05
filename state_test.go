@@ -1,8 +1,9 @@
+// +build tests
+
 package substrate
 
 import (
 	"bytes"
-	"strconv"
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
@@ -13,17 +14,17 @@ import (
 
 var testServer *testrpc.Server
 var testClient Client
-var rpcPort int
+var rpcURL string
 
 func TestMain(m *testing.M) {
 	testServer = new(testrpc.Server)
 	var err error
-	rpcPort, err = testServer.Init(testrpc.GetTestMetaData())
+	rpcURL, err = testServer.Init(testrpc.GetTestMetaData(), nil)
 	if err != nil {
 		panic(err)
 	}
 
-	testClient, err = Connect("ws://localhost:" + strconv.Itoa(rpcPort))
+	testClient, err = Connect(rpcURL)
 	if err != nil {
 		panic(err)
 	}

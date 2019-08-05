@@ -1,3 +1,5 @@
+// +build tests
+
 package signature
 
 import "testing"

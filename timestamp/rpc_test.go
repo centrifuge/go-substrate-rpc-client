@@ -1,7 +1,8 @@
+// +build tests
+
 package timestamp
 
 import (
-	"strconv"
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client"
@@ -11,17 +12,17 @@ import (
 
 var testServer *testrpc.Server
 var testClient substrate.Client
-var rpcPort int
+var rpcURL string
 
 func TestMain(m *testing.M) {
 	testServer = new(testrpc.Server)
 	var err error
-	rpcPort, err = testServer.Init(testrpc.GetTestMetaData())
+	rpcURL, err = testServer.Init(testrpc.GetTestMetaData(), nil)
 	if err != nil {
 		panic(err)
 	}
 
-	testClient, err = substrate.Connect("ws://localhost:" + strconv.Itoa(rpcPort))
+	testClient, err = substrate.Connect(rpcURL)
 	if err != nil {
 		panic(err)
 	}
