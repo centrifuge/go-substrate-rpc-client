@@ -18,7 +18,7 @@ func testEncodedLength(t *testing.T, encodedLengthTests []encodedLengthTest) {
 			t.Errorf("Encoded length error for input %v: %v\n", test.input, err)
 		}
 		if result != test.expected {
-			t.Errorf("Fail, input %v, expected %x, result %x\n", test.input, test.expected, result)
+			t.Errorf("Fail, input %v, expected %v, result %v\n", test.input, test.expected, result)
 		}
 	}
 }

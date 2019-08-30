@@ -30,3 +30,12 @@ func _hex(in Codec) (string, error) {
 	}
 	return fmt.Sprintf("%x", e), nil
 }
+
+func isEmpty(b []byte) bool {
+	for _, v := range b {
+		if v != 0 {
+			return false
+		}
+	}
+	return true
+}

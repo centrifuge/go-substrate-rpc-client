@@ -24,12 +24,7 @@ func (b Bytes) Hash() ([32]byte, error) {
 }
 
 func (b Bytes) IsEmpty() bool {
-	for _, v := range b {
-		if v != 0 {
-			return false
-		}
-	}
-	return true
+	return isEmpty(b)
 }
 
 func (b Bytes) Encode() ([]byte, error) {
