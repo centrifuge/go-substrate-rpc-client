@@ -1,11 +1,9 @@
 package codec
 
 import (
-	"bytes"
 	"fmt"
 
 	"github.com/ChainSafe/gossamer/codec"
-	"golang.org/x/crypto/blake2b"
 )
 
 // Bool represents boolean values
@@ -17,18 +15,11 @@ func NewBool(b bool) Bool {
 }
 
 func (b Bool) EncodedLength() (int, error) {
-	buffer := bytes.Buffer{}
-	se := codec.Encoder{&buffer}
-	len, err := se.Encode(bool(b))
-	return len, err
+	return encodedLength(bool(b))
 }
 
-func (b Bool) Hash() (hash [32]byte, err error) {
-	e, err := b.Encode()
-	if err != nil {
-		return hash, err
-	}
-	return blake2b.Sum256(e), err
+func (b Bool) Hash() ([32]byte, error) {
+	return hash(b)
 }
 
 func (b Bool) IsEmpty() bool {
@@ -40,11 +31,7 @@ func (b Bool) Encode() ([]byte, error) {
 }
 
 func (b Bool) Hex() (string, error) {
-	e, err := b.Encode()
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("%x", e), nil
+	return _hex(b)
 }
 
 func (b Bool) String() string {
