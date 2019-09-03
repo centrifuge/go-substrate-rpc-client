@@ -1,0 +1,43 @@
+version: "3.7"
+services:
+  centrifuge-chain:
+    image: centrifugeio/centrifuge-chain:20190814150805-ddd3818
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 2000M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - 9933:9933
+      - 9944:9944
+      - 30333:30333
+    expose:
+      - 9933
+      - 9944
+      - 30333
+    networks:
+      centchain-network:
+        ipv4_address: 172.42.0.2
+    entrypoint:
+      - centrifuge-chain
+      - --dev
+      - --ws-external
+      - --rpc-external
+  rpc-client-tests:
+    build: .
+    # ports:
+    #   - 40000:40000
+    # security_opt:
+    #   - seccomp:unconfined
+    networks:
+      centchain-network:
+        ipv4_address: 172.42.0.99
+networks:
+  centchain-network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.42.0.0/16

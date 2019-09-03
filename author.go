@@ -3,6 +3,7 @@ package substrate
 import (
 	"bytes"
 	"encoding/hex"
+	"fmt"
 	"log"
 	"os/exec"
 
@@ -213,7 +214,11 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 		// Immortal
 		Era: 0,
 	}
+
+	fmt.Println("sigPay 1", sigPay)
+
 	copy(sigPay.PriorBlock[:], e.GenesisBlock)
+	fmt.Println("sigPay 2", sigPay)
 	err := tempEnc.Encode(sigPay)
 	if err != nil {
 		return err
@@ -221,15 +226,21 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 	bbb := bb.Bytes()
 	encoded := hex.EncodeToString(bbb)
 
+	fmt.Println("Execute subkey command ", e.subKeyCMD, e.subKeySign, encoded, Alice)
+
 	// use "subKey" command for signature
 	out, err := exec.Command(e.subKeyCMD, e.subKeySign, encoded, Alice).Output()
+
 	// fmt.Println(SubKeyCmd, SubKeySign, encoded, Alice)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal("Failed to sign with subkey", err.Error())
 	}
 
 	v := string(out)
+
 	vs, err := hex.DecodeString(v)
+
+	fmt.Println("Got vs", string(vs))
 
 	e.Signature = NewExtrinsicSignature(*NewSignature(vs), e.Nonce)
 
@@ -270,10 +281,12 @@ func NewAuthorRPC(client Client, genesisBlock []byte, subKeyCMD, SubKeySign stri
 }
 
 func (a *Author) SubmitExtrinsic(accountNonce uint64, method string, args Args) (string, error) {
+	fmt.Println("will get metadata")
 	m, err := a.client.MetaData(true)
 	if err != nil {
 		return "", err
 	}
+	fmt.Println("will create extrinsic")
 	e := NewExtrinsic(a.subKeyCMD, a.subKeySign, accountNonce, a.genesisBlock, NewMethod(method, args, *m))
 	bbb := new(bytes.Buffer)
 	tempEnc := scale.NewEncoder(bbb)
@@ -282,8 +295,11 @@ func (a *Author) SubmitExtrinsic(accountNonce uint64, method string, args Args) 
 		return "", err
 	}
 
+	fmt.Println("will encode")
 	eb := hexutil.Encode(bbb.Bytes())
 	var res string
+
+	fmt.Println("will call")
 	err = a.client.Call(&res, "author_submitExtrinsic", eb)
 	if err != nil {
 		return "", err

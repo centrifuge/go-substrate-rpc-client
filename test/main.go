@@ -1,10 +1,11 @@
-// +build tests
-
 package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -18,23 +19,27 @@ import (
 )
 
 const (
-	AnchorCommit = "anchor.commit"
+	AnchorCommit    = "anchor.commit"
 	AnchorPreCommit = "anchor.preCommit"
-	SubKeySign   = "sign-blob"
+	SubKeySign      = "sign-blob"
 
 	// Adjust below params according to your env + chain state + requirement
-	RPCEndPoint = "ws://127.0.0.1:9944"
+	EndPoint = "127.0.0.1"
+	// EndPoint = "172.42.0.2"
+	RPCPort = "9933"
+	WSPort  = "9944"
 
 	// SubKeyCmd subkey command to create signatures
-	SubKeyCmd = "/Users/vimukthi/.cargo/bin/subkey"
+	// SubKeyCmd = "/Users/philipstanislaus/.cargo/bin/subkey"
+	SubKeyCmd = "subkey"
 
 	NumAnchorsPerThread = 2
 	Concurrency         = 1
 )
 
 type PreAnchorParams struct {
-	AnchorID 		 [32]byte
-	SigningRoot      [32]byte
+	AnchorID    [32]byte
+	SigningRoot [32]byte
 }
 
 func (a PreAnchorParams) Encode(encoder scale.Encoder) error {
@@ -57,7 +62,7 @@ func NewRandomAnchorParam() AnchorParams {
 	return ap
 }
 
-func NewRandomAnchorPreAnchorParams() (PreAnchorParams, AnchorParams){
+func NewRandomAnchorPreAnchorParams() (PreAnchorParams, AnchorParams) {
 	pa := PreAnchorParams{}
 	ap := AnchorParams{}
 
@@ -71,7 +76,7 @@ func NewRandomAnchorPreAnchorParams() (PreAnchorParams, AnchorParams){
 	copy(ap.Proof[:], utils.RandomSlice(32))
 
 	var docRootPreimage []byte
-	if bytes.Compare(pa.SigningRoot[:], ap.Proof[:]) < 0  {
+	if bytes.Compare(pa.SigningRoot[:], ap.Proof[:]) < 0 {
 		docRootPreimage = append(pa.SigningRoot[:], ap.Proof[:]...)
 	} else {
 		docRootPreimage = append(ap.Proof[:], pa.SigningRoot[:]...)
@@ -153,14 +158,23 @@ func Anchors(client substrate.Client, module string, fn string, anchorIDPreImage
 }
 
 func main() {
+	waitForServer()
+
+	time.Sleep(5 * time.Second)
+
 	// Connect the client.
-	client, err := substrate.Connect(RPCEndPoint)
+	client, err := substrate.Connect(fmt.Sprintf("ws://%v:%v", EndPoint, WSPort))
 	if err != nil {
 		panic(err)
 	}
-	alice, _ := hexutil.Decode(substrate.AlicePubKey)
-	nonce, err := system.AccountNonce(client, alice)
+	alice, err := hexutil.Decode(substrate.AlicePubKey)
 	if err != nil {
+		panic(err)
+	}
+	nonce, err := system.AccountNonce(client, alice)
+	if err != nil && err.Error() == "empty result" {
+		nonce = 0
+	} else if err != nil {
 		panic(err)
 	}
 
@@ -168,6 +182,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println("Nonce", nonce, "gs", gs.String(), "Alice", string(alice))
 
 	authRPC := substrate.NewAuthorRPC(client, gs, SubKeyCmd, SubKeySign)
 	wg := sync.WaitGroup{}
@@ -180,6 +196,7 @@ func main() {
 				// a := NewAnchorParamsFromHex("0x0000000000000000000000000000000000000000000000000000000000000901", "0x0000000000000000000000000000000000000000000000000000000000000000", "0x0000000000000000000000000000000000000000000000000000000000000000")
 				pa, ap := NewRandomAnchorPreAnchorParams()
 				aID := ap.AnchorIDHex()
+
 				res, err := authRPC.SubmitExtrinsic(nonce, AnchorPreCommit, pa)
 				if err != nil {
 					fmt.Printf("FAIL!!! pre commit for anchor ID %s failed with %s\n", aID, err.Error())
@@ -200,7 +217,7 @@ func main() {
 				}
 
 				// fmt.Println("submitting new anchor with anchor ID", a.AnchorIDHex())
-				res, err = authRPC.SubmitExtrinsic(nonce, AnchorCommit, ap)
+				res, err := authRPC.SubmitExtrinsic(nonce, AnchorCommit, ap)
 				if err != nil {
 					fmt.Printf("FAIL!!! commit for anchor ID %s failed with %s\n", aID, err.Error())
 					break
@@ -227,5 +244,60 @@ func main() {
 	wg.Wait()
 	elapsed := time.Since(start)
 	tps := float64(counter) / elapsed.Seconds()
-	fmt.Printf("Successful execution of %d transactions took %s, amounting to %f TPS", counter, elapsed, tps)
+	fmt.Printf("Successful execution of %d transactions took %s, amounting to %f TPS\n", counter, elapsed, tps)
+}
+
+func waitForServer() {
+	reqBody, err := json.Marshal(map[string]string{
+		"id": "1", "jsonrpc": "2.0", "method": "system_health",
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	for i := 0; true; i++ {
+		fmt.Println("iteration", i)
+		resp, err := http.Post(fmt.Sprintf("http://%v:%v", EndPoint, RPCPort), "application/json", bytes.NewBuffer(reqBody))
+		if err != nil {
+			fmt.Println("Error receiving HTTP response, will retry. Error:", err.Error())
+			time.Sleep(100 * time.Millisecond)
+			continue
+		}
+
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		resp.Body.Close()
+
+		type RpcResp struct {
+			JsonRPC string `json:"jsonrpc"`
+			Result  struct {
+				IsSyncing       bool    `json:"isSyncing"`
+				Peers           float64 `json:"peers"`
+				ShouldHavePeers bool    `json:"shouldHavePeers"`
+			} `json:"result"`
+			Id string `json:"id"`
+		}
+
+		var rpcResp RpcResp
+
+		err = json.Unmarshal(body, &rpcResp)
+		if err != nil {
+			fmt.Println("Error unmarhalling JSON, will retry.")
+			time.Sleep(100 * time.Millisecond)
+			continue
+		}
+
+		if rpcResp.Id == "" {
+			fmt.Println("Got unexpected response, will retry. Response:", rpcResp)
+			time.Sleep(100 * time.Millisecond)
+			continue
+		}
+
+		if resp.StatusCode == http.StatusOK {
+			return
+		}
+	}
 }
