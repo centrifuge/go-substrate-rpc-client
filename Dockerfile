@@ -1,7 +1,7 @@
 # Note: We don't use Alpine and its packaged Rust/Cargo because they're too often out of date,
 # preventing them from being used to build Substrate/Polkadot.
 
-FROM cd544298d051
+FROM bc7507526490
 
 # gcc for cgo
 RUN apt-get update && apt-get install -y --no-install-recommends \
