@@ -2,6 +2,18 @@
 
 The substrate RPC client for go. Some slides https://docs.google.com/presentation/d/1lvCP7wZpsl2ES6fAkHg8-LfLhgtMHcvHeITp77Bgn2w/edit#slide=id.g5d531cd2a8_0_70
 
+## Contributing
+
+### Installation
+
+1. Install `golangci-lint`: https://github.com/golangci/golangci-lint#install
+
+### Linting
+
+`golangci-lint run --disable-all --enable=deadcode --enable=errcheck --enable=gosimple --enable=ineffassign --enable=structcheck --enable=typecheck --enable=unused --enable=varcheck --enable=dupl --enable=gochecknoinits --enable=goconst --enable=gocyclo --enable=gofmt --enable=gosec --enable=interfacer --enable=lll --enable=misspell --enable=scopelint --enable=stylecheck --enable=unconvert --enable=unparam --enable=golint --enable=goimports --enable=govet --enable=nakedret --enable=staticcheck --deadline=1m`
+
+## Testing
+
 ## Run with centrifuge-chain
 
 1. Install subkey command from [https://github.com/centrifuge/substrate](https://github.com/centrifuge/substrate): Clone it, `cd subkey` and run `cargo install --force --path .`
