@@ -1,11 +1,13 @@
 // +build tests
 
-package substrate
+package gsrpc
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
+	"github.com/centrifuge/go-substrate-rpc-client/client"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/testrpc"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -13,7 +15,7 @@ import (
 )
 
 var testServer *testrpc.Server
-var testClient Client
+var testClient client.Client
 var rpcURL string
 
 func TestMain(m *testing.M) {
@@ -26,7 +28,7 @@ func TestMain(m *testing.M) {
 		}
 	}
 
-	testClient, err = Connect(rpcURL)
+	testClient, err = client.Connect(rpcURL)
 	if err != nil {
 		panic(err)
 	}
@@ -37,6 +39,9 @@ func TestState_GetMetaData(t *testing.T) {
 	s := NewStateRPC(testClient)
 	res, err := s.MetaData([]byte{})
 	assert.NoError(t, err)
+
+	fmt.Println(res)
+
 	assert.Equal(t, "system", res.Metadata.Modules[0].Name)
 }
 

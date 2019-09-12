@@ -1,9 +1,10 @@
-package substrate
+package gsrpc
 
 import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/centrifuge/go-substrate-rpc-client/client"
 	"hash"
 	"strings"
 
@@ -388,10 +389,10 @@ func (m *MetadataVersioned) Decode(decoder scale.Decoder) error {
 }
 
 type State struct {
-	client Client
+	client client.Client
 }
 
-func NewStateRPC(client Client) *State {
+func NewStateRPC(client client.Client) *State {
 	return &State{client: client}
 }
 

@@ -1,1 +1,1 @@
-package substrate
+package gsrpc

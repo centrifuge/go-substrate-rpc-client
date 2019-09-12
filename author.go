@@ -283,7 +283,7 @@ func NewAuthorRPC(client client.Client, genesisBlock []byte, subKeyCMD, SubKeySi
 
 func (a *Author) SubmitExtrinsic(accountNonce uint64, method string, args Args) (string, error) {
 	fmt.Println("will get metadata")
-	m, err := a.client.MetaData(true)
+	m, err := NewStateRPC(a.client).MetaData(nil)
 	if err != nil {
 		return "", err
 	}

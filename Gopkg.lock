@@ -2,6 +2,17 @@
 
 
 [[projects]]
+  branch = "development"
+  digest = "1:6629b801b53ee73333cd75da2125a636338a2d3cc4ebf602b8e996f64abe7275"
+  name = "github.com/ChainSafe/gossamer"
+  packages = [
+    "codec",
+    "common",
+  ]
+  pruneopts = "UT"
+  revision = "0f0fdaf27982a5abd935a131016d9fda3dae279d"
+
+[[projects]]
   branch = "master"
   digest = "1:7d191fd0c54ff370eaf6116a14dafe2a328df487baea280699f597aae858d00d"
   name = "github.com/aristanetworks/goarista"
@@ -351,6 +362,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/ChainSafe/gossamer/codec",
     "github.com/centrifuge/go-centrifuge/utils",
     "github.com/ethereum/go-ethereum/common/hexutil",
     "github.com/ethereum/go-ethereum/rpc",

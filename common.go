@@ -1,4 +1,4 @@
-package substrate
+package gsrpc
 
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
