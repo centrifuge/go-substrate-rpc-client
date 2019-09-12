@@ -4,16 +4,16 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/centrifuge/go-substrate-rpc-client"
+	"github.com/centrifuge/go-substrate-rpc-client/client"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
 type Chain struct {
-	client *substrate.Client
+	client *client.Client
 }
 
-func NewChain(c *substrate.Client) *Chain {
-	return &Chain{c}
+func NewChain(cl *client.Client) *Chain {
+	return &Chain{cl}
 }
 
 func (c *Chain) GetBlockHash(blockNumber uint64) (types.Hash, error) {
@@ -44,7 +44,7 @@ func (c *Chain) getBlockHash(blockNumber *uint64) (types.Hash, error) {
 	}
 
 	if len(bz) != 32 {
-		return types.Hash{}, fmt.Errorf("Required result to be 32 bytes, but got %v", len(bz))
+		return types.Hash{}, fmt.Errorf("required result to be 32 bytes, but got %v", len(bz))
 	}
 
 	var bz32 [32]byte

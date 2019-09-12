@@ -4,19 +4,19 @@ import (
 	"os"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client"
+	"github.com/centrifuge/go-substrate-rpc-client/client"
 	"github.com/stretchr/testify/assert"
 )
 
 var chain *Chain
 
 func TestMain(m *testing.M) {
-	client, err := substrate.Connect("ws://127.0.0.1:9944")
+	cl, err := client.Connect("ws://127.0.0.1:9944")
 	if err != nil {
 		panic(err)
 	}
 
-	chain = NewChain(&client)
+	chain = NewChain(&cl)
 
 	os.Exit(m.Run())
 }
