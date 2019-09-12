@@ -1,9 +1,10 @@
-package substrate
+package gsrpc
 
 import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"github.com/centrifuge/go-substrate-rpc-client/client"
 	"log"
 	"os/exec"
 
@@ -269,14 +270,14 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 }
 
 type Author struct {
-	client       Client
+	client       client.Client
 	genesisBlock []byte
 
 	subKeyCMD  string
 	subKeySign string
 }
 
-func NewAuthorRPC(client Client, genesisBlock []byte, subKeyCMD, SubKeySign string) *Author {
+func NewAuthorRPC(client client.Client, genesisBlock []byte, subKeyCMD, SubKeySign string) *Author {
 	return &Author{client, genesisBlock, subKeyCMD, SubKeySign}
 }
 

@@ -1,4 +1,4 @@
-package codec
+package types
 
 import (
 	"bytes"
@@ -36,7 +36,7 @@ func (b Bytes) Hex() (string, error) {
 }
 
 func (b Bytes) String() string {
-	return fmt.Sprintf("%x", []byte(b))
+	return fmt.Sprintf("%#x", []byte(b))
 }
 
 func (b Bytes) Eq(o Codec) bool {

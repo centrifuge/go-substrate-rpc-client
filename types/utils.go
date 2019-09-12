@@ -1,4 +1,4 @@
-package codec
+package types
 
 import (
 	"bytes"
@@ -28,7 +28,7 @@ func _hex(in Codec) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%x", e), nil
+	return fmt.Sprintf("%#x", e), nil
 }
 
 func isEmpty(b []byte) bool {

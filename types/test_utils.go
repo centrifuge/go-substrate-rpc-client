@@ -1,4 +1,4 @@
-package codec
+package types
 
 import (
 	"bytes"
@@ -35,7 +35,7 @@ func testEncode(t *testing.T, encodingTests []encodingTest) {
 			t.Errorf("Encoding error for input %v: %v\n", test.input, err)
 		}
 		if !bytes.Equal(result, test.expected) {
-			t.Errorf("Fail, input %v, expected %x, result %x\n", test.input, test.expected, result)
+			t.Errorf("Fail, input %v, expected %#x, result %#x\n", test.input, test.expected, result)
 		}
 	}
 }
@@ -52,7 +52,7 @@ func testHash(t *testing.T, hashTests []hashTest) {
 			t.Errorf("Hash error for input %v: %v\n", test.input, err)
 		}
 		if !bytes.Equal(result[:], test.expected) {
-			t.Errorf("Fail, input %v, expected %x, result %x\n", test.input, test.expected, result)
+			t.Errorf("Fail, input %v, expected %#x, result %#x\n", test.input, test.expected, result)
 		}
 	}
 }

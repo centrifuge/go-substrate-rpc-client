@@ -1,4 +1,4 @@
-package codec
+package types
 
 import (
 	"bytes"
@@ -34,7 +34,7 @@ func (b H160) Hex() (string, error) {
 }
 
 func (b H160) String() string {
-	return fmt.Sprintf("%x", b[:])
+	return fmt.Sprintf("%#x", b[:])
 }
 
 func (b H160) Eq(o Codec) bool {
@@ -71,7 +71,7 @@ func (b H256) Hex() (string, error) {
 }
 
 func (b H256) String() string {
-	return fmt.Sprintf("%x", b[:])
+	return fmt.Sprintf("%#x", b[:])
 }
 
 func (b H256) Eq(o Codec) bool {
@@ -108,7 +108,7 @@ func (b H512) Hex() (string, error) {
 }
 
 func (b H512) String() string {
-	return fmt.Sprintf("%x", b[:])
+	return fmt.Sprintf("%#x", b[:])
 }
 
 func (b H512) Eq(o Codec) bool {
@@ -145,7 +145,7 @@ func (b Hash) Hex() (string, error) {
 }
 
 func (b Hash) String() string {
-	return fmt.Sprintf("%x", b[:])
+	return fmt.Sprintf("%#x", b[:])
 }
 
 func (b Hash) Eq(o Codec) bool {
