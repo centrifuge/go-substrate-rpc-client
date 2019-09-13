@@ -204,7 +204,14 @@ func (pe Encoder) Encode(value interface{}) error {
 				return err
 			}
 		} else {
-			return fmt.Errorf("Type %s does not support Encodeable interface", t)
+			rv := reflect.ValueOf(value)
+			for i := 0; i < rv.NumField(); i++ {
+				err := pe.Encode(rv.Field(i).Interface())
+				if err != nil {
+					return fmt.Errorf("type %s does not support Encodeable interface and could not be "+
+						"encoded field by field, error: %v", t, err)
+				}
+			}
 		}
 
 	// Currently unsupported types
@@ -405,7 +412,13 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 			}
 			target.Set(ptrVal.Elem())
 		} else {
-			return fmt.Errorf("Type %s does not support Decodeable interface", ptrType)
+			for i := 0; i < target.NumField(); i++ {
+				err := pd.DecodeIntoReflectValue(target.Field(i))
+				if err != nil {
+					return fmt.Errorf("type %s does not support Decodeable interface and could not be "+
+						"decoded field by field, error: %v", ptrType, err)
+				}
+			}
 		}
 
 	// Currently unsupported types
