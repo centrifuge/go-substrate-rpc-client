@@ -15,7 +15,10 @@ lint-fix: ## runs linters on go code and automatically fixes issues
 	@golangci-lint run --fix
 
 test: ## runs all tests in project
-	@go test ./...
+	@go test -v ./...
+
+test-cover: ## runs all tests in project and report coverage
+	@go test -cover -count=1 ./...
 
 test-dockerized: ## runs the tests in a docker container against the Substrate Default Docker image
 	@docker-compose build
