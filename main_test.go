@@ -2,12 +2,13 @@ package gsrpc_test
 
 import (
 	"fmt"
+	"github.com/centrifuge/go-substrate-rpc-client/config"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
 )
 
 func Example_simpleConnect() {
-	api, err := gsrpc.NewSubstrateAPI("ws://127.0.0.1:9944")
+	api, err := gsrpc.NewSubstrateAPI(config.NewDefaultConfig().RPCURL)
 	if err != nil {
 		panic(err)
 	}

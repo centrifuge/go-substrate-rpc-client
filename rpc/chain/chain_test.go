@@ -1,6 +1,7 @@
 package chain
 
 import (
+	"github.com/centrifuge/go-substrate-rpc-client/config"
 	"os"
 	"testing"
 
@@ -13,7 +14,7 @@ import (
 var chain *Chain
 
 func TestMain(m *testing.M) {
-	cl, err := client.Connect("ws://127.0.0.1:9944")
+	cl, err := client.Connect(config.NewDefaultConfig().RPCURL)
 	if err != nil {
 		panic(err)
 	}
