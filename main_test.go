@@ -6,10 +6,6 @@ import (
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
 )
 
-func Example() {
-	fmt.Println("Hello world")
-}
-
 func Example_simpleConnect() {
 	api, err := gsrpc.NewSubstrateAPI("ws://127.0.0.1:9944")
 	if err != nil {
