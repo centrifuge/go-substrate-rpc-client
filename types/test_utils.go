@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
-	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
+
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/stretchr/testify/assert"
 )
 
 type encodedLengthAssert struct {

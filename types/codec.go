@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"reflect"
+
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"golang.org/x/crypto/blake2b"
-	"reflect"
 )
 
 func EncodeToBytes(value interface{}) ([]byte, error) { // TODO rename to Encode

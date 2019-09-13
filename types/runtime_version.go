@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
