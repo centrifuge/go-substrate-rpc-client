@@ -8,6 +8,97 @@ import (
 
 // Modelled after https://github.com/paritytech/substrate/blob/v1.0.0rc2/srml/metadata/src/lib.rs
 
+type Metadata struct {
+	MagicNumber uint32
+	Version     uint8
+	Metadata    RuntimeMetadataV4
+}
+
+func NewMetadata() *Metadata {
+	return &Metadata{Version: 4, Metadata: RuntimeMetadataV4{make([]ModuleMetadata, 0)}}
+}
+
+func (m *Metadata) Decode(decoder scale.Decoder) error {
+	err := decoder.Decode(&m.MagicNumber)
+	if err != nil {
+		return err
+	}
+	// TODO: we need to decide which struct to use based on the following number(enum), for now its hardcoded
+	err = decoder.Decode(&m.Version)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Metadata)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m Metadata) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(m.MagicNumber)
+	if err != nil {
+		return err
+	}
+	// TODO: we need to decide which struct to use based on the following number(enum), for now its hardcoded
+	err = encoder.Encode(m.Version)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.Metadata)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type RuntimeMetadataV4 struct {
+	Modules []ModuleMetadata
+}
+
+func (m *RuntimeMetadataV4) Decode(decoder scale.Decoder) error {
+	err := decoder.Decode(&m.Modules)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m RuntimeMetadataV4) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(m.Modules)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *RuntimeMetadataV4) MethodIndex(method string) MethodIDX {
+	s := strings.Split(method, ".")
+	var sIDX, mIDX uint8 = 0, 0
+	// section index
+	var sCounter = 0
+
+	for _, n := range m.Modules {
+		if n.CallsOptional == 1 {
+			if n.Name == s[0] {
+				sIDX = uint8(sCounter)
+				for j, f := range n.Calls {
+					if f.Name == s[1] {
+						mIDX = uint8(j)
+					}
+				}
+			}
+			sCounter++
+		}
+	}
+
+	return MethodIDX{sIDX, mIDX}
+}
+
 // MethodIDX [sectionIndex, methodIndex] 16bits
 type MethodIDX struct {
 	SectionIndex uint8
@@ -42,182 +133,112 @@ func (m MethodIDX) Encode(encoder scale.Encoder) error {
 	return nil
 }
 
-type RuntimeMetadataV4 struct {
-	Modules []ModuleMetadata
+type ModuleMetadata struct {
+	Name            string
+	Prefix          string
+	StorageOptional uint8
+	Storage         []StorageFunctionMetadata
+	CallsOptional   uint8
+	Calls           []FunctionMetadata
+	EventsOptional  uint8
+	Events          []EventMetadata
 }
 
-func (m *RuntimeMetadataV4) MethodIndex(method string) MethodIDX {
-	s := strings.Split(method, ".")
-	var sIDX, mIDX uint8 = 0, 0
-	// section index
-	var sCounter = 0
+func (m *ModuleMetadata) Decode(decoder scale.Decoder) error {
+	err := decoder.Decode(&m.Name)
+	if err != nil {
+		return err
+	}
 
-	for _, n := range m.Modules {
-		if n.CallsOptional == 1 {
-			if n.Name == s[0] {
-				sIDX = uint8(sCounter)
-				for j, f := range n.Calls {
-					if f.Name == s[1] {
-						mIDX = uint8(j)
-					}
-				}
-			}
-			sCounter++
+	err = decoder.Decode(&m.Prefix)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.StorageOptional)
+	if err != nil {
+		return err
+	}
+
+	if m.StorageOptional == 1 {
+		err = decoder.Decode(&m.Storage)
+		if err != nil {
+			return err
 		}
 	}
 
-	return MethodIDX{sIDX, mIDX}
-}
-
-func (m *RuntimeMetadataV4) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&m.Modules)
+	err = decoder.Decode(&m.CallsOptional)
 	if err != nil {
 		return err
+	}
+
+	if m.CallsOptional == 1 {
+		err = decoder.Decode(&m.Calls)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = decoder.Decode(&m.EventsOptional)
+	if err != nil {
+		return err
+	}
+
+	if m.EventsOptional == 1 {
+		err = decoder.Decode(&m.Events)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
-type FunctionArgumentMetadata struct {
-	Name string
-	Type string
-}
-
-func (m *FunctionArgumentMetadata) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&m.Name)
+func (m ModuleMetadata) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(m.Name)
 	if err != nil {
 		return err
 	}
 
-	err = decoder.Decode(&m.Type)
+	err = encoder.Encode(m.Prefix)
 	if err != nil {
 		return err
 	}
 
-	return nil
-}
-
-type FunctionMetadata struct {
-	Name          string
-	Args          []FunctionArgumentMetadata
-	Documentation []string
-}
-
-func (m *FunctionMetadata) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&m.Name)
+	err = encoder.Encode(m.StorageOptional)
 	if err != nil {
 		return err
 	}
 
-	err = decoder.Decode(&m.Args)
+	if m.StorageOptional == 1 {
+		err = encoder.Encode(m.Storage)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = encoder.Encode(m.CallsOptional)
 	if err != nil {
 		return err
 	}
 
-	err = decoder.Decode(&m.Documentation)
+	if m.CallsOptional == 1 {
+		err = encoder.Encode(m.Calls)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = encoder.Encode(m.EventsOptional)
 	if err != nil {
 		return err
 	}
 
-	return nil
-}
-
-type EventMetadata struct {
-	Name          string
-	Args          []string
-	Documentation []string
-}
-
-func (m *EventMetadata) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&m.Name)
-	if err != nil {
-		return err
+	if m.EventsOptional == 1 {
+		err = encoder.Encode(m.Events)
+		if err != nil {
+			return err
+		}
 	}
-
-	err = decoder.Decode(&m.Args)
-	if err != nil {
-		return err
-	}
-
-	err = decoder.Decode(&m.Documentation)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-type TypMap struct {
-	Hasher   uint8
-	Key      string
-	Value    string
-	IsLinked bool
-}
-
-//func (t TypMap) HashFunc() (hash.Hash, error) {
-//	if t.Hasher == 1 {
-//		return blake2b.New(&blake2b.Config{Size: 32})
-//	}
-//	return hash.Hash{}, errors.New("hash function type not supported")
-//}
-
-func (m *TypMap) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&m.Hasher)
-	if err != nil {
-		return err
-	}
-
-	err = decoder.Decode(&m.Key)
-	if err != nil {
-		return err
-	}
-
-	err = decoder.Decode(&m.Value)
-	if err != nil {
-		return err
-	}
-
-	err = decoder.Decode(&m.IsLinked)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-type TypDoubleMap struct {
-	Hasher     uint8
-	Key        string
-	Key2       string
-	Value      string
-	Key2Hasher string
-}
-
-func (m *TypDoubleMap) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&m.Hasher)
-	if err != nil {
-		return err
-	}
-
-	err = decoder.Decode(&m.Key)
-	if err != nil {
-		return err
-	}
-
-	err = decoder.Decode(&m.Key2)
-	if err != nil {
-		return err
-	}
-
-	err = decoder.Decode(&m.Value)
-	if err != nil {
-		return err
-	}
-
-	err = decoder.Decode(&m.Key2Hasher)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -288,89 +309,294 @@ func (s *StorageFunctionMetadata) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-type ModuleMetadata struct {
-	Name            string
-	Prefix          string
-	StorageOptional uint8
-	Storage         []StorageFunctionMetadata
-	CallsOptional   uint8
-	Calls           []FunctionMetadata
-	EventsOptional  uint8
-	Events          []EventMetadata
+func (s StorageFunctionMetadata) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(s.Name)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(s.Modifier)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(s.Type)
+	if err != nil {
+		return err
+	}
+
+	switch s.Type {
+	case 0:
+		err = encoder.Encode(s.Plane)
+		if err != nil {
+			return err
+		}
+	case 1:
+		err = encoder.Encode(s.Map)
+		if err != nil {
+			return err
+		}
+	default:
+		err = encoder.Encode(s.DMap)
+		if err != nil {
+			return err
+		}
+	}
+	err = encoder.Encode(s.Fallback)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(s.Documentation)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (m *ModuleMetadata) Decode(decoder scale.Decoder) error {
+type FunctionMetadata struct {
+	Name          string
+	Args          []FunctionArgumentMetadata
+	Documentation []string
+}
+
+func (m *FunctionMetadata) Decode(decoder scale.Decoder) error {
 	err := decoder.Decode(&m.Name)
 	if err != nil {
 		return err
 	}
 
-	err = decoder.Decode(&m.Prefix)
+	err = decoder.Decode(&m.Args)
 	if err != nil {
 		return err
 	}
 
-	err = decoder.Decode(&m.StorageOptional)
+	err = decoder.Decode(&m.Documentation)
 	if err != nil {
 		return err
 	}
 
-	if m.StorageOptional == 1 {
-		err = decoder.Decode(&m.Storage)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = decoder.Decode(&m.CallsOptional)
-	if err != nil {
-		return err
-	}
-
-	if m.CallsOptional == 1 {
-		err = decoder.Decode(&m.Calls)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = decoder.Decode(&m.EventsOptional)
-	if err != nil {
-		return err
-	}
-
-	if m.EventsOptional == 1 {
-		err = decoder.Decode(&m.Events)
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
-// Metadata only supports v4
-type Metadata struct {
-	MagicNumber uint32
-	Version     uint8
-	Metadata    RuntimeMetadataV4
-}
-
-func NewMetadata() *Metadata {
-	return &Metadata{Version: 4, Metadata: RuntimeMetadataV4{make([]ModuleMetadata, 0)}}
-}
-
-func (m *Metadata) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&m.MagicNumber)
-	if err != nil {
-		return err
-	}
-	// we need to decide which struct to use based on the following number(enum), for now its hardcoded
-	err = decoder.Decode(&m.Version)
+func (m FunctionMetadata) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(m.Name)
 	if err != nil {
 		return err
 	}
 
-	err = decoder.Decode(&m.Metadata)
+	err = encoder.Encode(m.Args)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.Documentation)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type EventMetadata struct {
+	Name          string
+	Args          []string
+	Documentation []string
+}
+
+func (m *EventMetadata) Decode(decoder scale.Decoder) error {
+	err := decoder.Decode(&m.Name)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Args)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Documentation)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m EventMetadata) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(m.Name)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.Args)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.Documentation)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type TypMap struct {
+	Hasher   uint8
+	Key      string
+	Value    string
+	IsLinked bool
+}
+
+//func (t TypMap) HashFunc() (hash.Hash, error) {
+//	if t.Hasher == 1 {
+//		return blake2b.New(&blake2b.Config{Size: 32})
+//	}
+//	return hash.Hash{}, errors.New("hash function type not supported")
+//}
+
+func (m *TypMap) Decode(decoder scale.Decoder) error {
+	err := decoder.Decode(&m.Hasher)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Key)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Value)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.IsLinked)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m TypMap) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(m.Hasher)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.Key)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.Value)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.IsLinked)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type TypDoubleMap struct {
+	Hasher     uint8
+	Key        string
+	Key2       string
+	Value      string
+	Key2Hasher string
+}
+
+func (m *TypDoubleMap) Decode(decoder scale.Decoder) error {
+	err := decoder.Decode(&m.Hasher)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Key)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Key2)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Value)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Key2Hasher)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m TypDoubleMap) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(m.Hasher)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.Key)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.Key2)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.Value)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.Key2Hasher)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type FunctionArgumentMetadata struct {
+	Name string
+	Type string
+}
+
+func (m *FunctionArgumentMetadata) Decode(decoder scale.Decoder) error {
+	err := decoder.Decode(&m.Name)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Type)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m FunctionArgumentMetadata) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(m.Name)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.Type)
 	if err != nil {
 		return err
 	}
