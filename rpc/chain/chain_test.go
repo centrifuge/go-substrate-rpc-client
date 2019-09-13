@@ -1,9 +1,10 @@
 package chain
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/config"
 	"os"
 	"testing"
+
+	"github.com/centrifuge/go-substrate-rpc-client/config"
 
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 

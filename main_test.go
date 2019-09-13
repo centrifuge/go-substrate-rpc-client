@@ -2,6 +2,7 @@ package gsrpc_test
 
 import (
 	"fmt"
+
 	"github.com/centrifuge/go-substrate-rpc-client/config"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
