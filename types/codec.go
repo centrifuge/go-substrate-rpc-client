@@ -1,5 +1,12 @@
 package types
 
+import (
+	"bytes"
+	"encoding/hex"
+	"fmt"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
+)
+
 // Codec is the base interface that all types implement. The Codec Base is required for operating as an
 // encoding/decoding layer.
 type Codec interface {
@@ -17,4 +24,34 @@ type Codec interface {
 	String() string
 	// Encodes the value as a byte array as per the SCALE specifications
 	Encode() ([]byte, error)
+}
+
+func EncodeToBytes(value interface{}) ([]byte, error) {
+	var buffer = bytes.Buffer{}
+	err := scale.NewEncoder(&buffer).Encode(value)
+	if err != nil {
+		return buffer.Bytes(), err
+	}
+	return buffer.Bytes(), nil
+}
+
+func EncodeToHexString(value interface{}) (string, error) {
+	bz, err := EncodeToBytes(value)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%#x", bz), nil
+}
+
+func DecodeFromBytes(bz []byte, target interface{}) error {
+	return scale.NewDecoder(bytes.NewReader(bz)).Decode(target)
+}
+
+func DecodeFromHexString(str string, target interface{}) error {
+	bz, err := hex.DecodeString(str[2:])
+	if err != nil {
+		return err
+	}
+	return DecodeFromBytes(bz, target)
 }

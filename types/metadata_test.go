@@ -1,11 +1,9 @@
 package types
 
 import (
-	"bytes"
 	"fmt"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -81,7 +79,7 @@ var decodedMetadata = "&{1635018093 4 {[{system System 1 [{AccountNonce 1 1  {1 
 func TestMetadata_Decode(t *testing.T) {
 	metadata := NewMetadata()
 
-	err := decodeFromBytes(encodedMetadata, metadata)
+	err := DecodeFromBytes(encodedMetadata, metadata)
 	assert.NoError(t, err)
 
 	fmt.Printf("%#v\n", metadata)
@@ -90,124 +88,111 @@ func TestMetadata_Decode(t *testing.T) {
 }
 
 func TestMetadata_Encode_Decode(t *testing.T) {
-	enc, err := encodeToBytes(exampleMetadata)
+	enc, err := EncodeToBytes(exampleMetadata)
 	assert.NoError(t, err)
 
 	var output Metadata
-	err = decodeFromBytes(enc, &output)
+	err = DecodeFromBytes(enc, &output)
 	assert.NoError(t, err)
 
 	assert.Equal(t, exampleMetadata, output)
 }
 
 func TestRuntimeMetadataV4_Encode_Decode(t *testing.T) {
-	enc, err := encodeToBytes(exampleRuntimeMetadataV4)
+	enc, err := EncodeToBytes(exampleRuntimeMetadataV4)
 	assert.NoError(t, err)
 
 	var output RuntimeMetadataV4
-	err = decodeFromBytes(enc, &output)
+	err = DecodeFromBytes(enc, &output)
 	assert.NoError(t, err)
 
 	assert.Equal(t, exampleRuntimeMetadataV4, output)
 }
 
 func TestMethodIDX_Encode_Decode(t *testing.T) {
-	enc, err := encodeToBytes(exampleMethodIDX)
+	enc, err := EncodeToBytes(exampleMethodIDX)
 	assert.NoError(t, err)
 
 	var output MethodIDX
-	err = decodeFromBytes(enc, &output)
+	err = DecodeFromBytes(enc, &output)
 	assert.NoError(t, err)
 
 	assert.Equal(t, exampleMethodIDX, output)
 }
 
 func TestModuleMetadata_Encode_Decode(t *testing.T) {
-	enc, err := encodeToBytes(exampleModuleMetadata)
+	enc, err := EncodeToBytes(exampleModuleMetadata)
 	assert.NoError(t, err)
 
 	var output ModuleMetadata
-	err = decodeFromBytes(enc, &output)
+	err = DecodeFromBytes(enc, &output)
 	assert.NoError(t, err)
 
 	assert.Equal(t, exampleModuleMetadata, output)
 }
 
 func TestStorageFunctionMetadata_Encode_Decode(t *testing.T) {
-	enc, err := encodeToBytes(exampleStorageFunctionMetadata)
+	enc, err := EncodeToBytes(exampleStorageFunctionMetadata)
 	assert.NoError(t, err)
 
 	var output StorageFunctionMetadata
-	err = decodeFromBytes(enc, &output)
+	err = DecodeFromBytes(enc, &output)
 	assert.NoError(t, err)
 
 	assert.Equal(t, exampleStorageFunctionMetadata, output)
 }
 
 func TestFunctionMetadata_Encode_Decode(t *testing.T) {
-	enc, err := encodeToBytes(exampleFunctionMetadata)
+	enc, err := EncodeToBytes(exampleFunctionMetadata)
 	assert.NoError(t, err)
 
 	var output FunctionMetadata
-	err = decodeFromBytes(enc, &output)
+	err = DecodeFromBytes(enc, &output)
 	assert.NoError(t, err)
 
 	assert.Equal(t, exampleFunctionMetadata, output)
 }
 
 func TestEventMetadata_Encode_Decode(t *testing.T) {
-	enc, err := encodeToBytes(exampleEventMetadata)
+	enc, err := EncodeToBytes(exampleEventMetadata)
 	assert.NoError(t, err)
 
 	var output EventMetadata
-	err = decodeFromBytes(enc, &output)
+	err = DecodeFromBytes(enc, &output)
 	assert.NoError(t, err)
 
 	assert.Equal(t, exampleEventMetadata, output)
 }
 
 func TestTypMap_Encode_Decode(t *testing.T) {
-	enc, err := encodeToBytes(exampleTypMap)
+	enc, err := EncodeToBytes(exampleTypMap)
 	assert.NoError(t, err)
 
 	var output TypMap
-	err = decodeFromBytes(enc, &output)
+	err = DecodeFromBytes(enc, &output)
 	assert.NoError(t, err)
 
 	assert.Equal(t, exampleTypMap, output)
 }
 
 func TestTypDoubleMap_Encode_Decode(t *testing.T) {
-	enc, err := encodeToBytes(exampleTypDoubleMap)
+	enc, err := EncodeToBytes(exampleTypDoubleMap)
 	assert.NoError(t, err)
 
 	var output TypDoubleMap
-	err = decodeFromBytes(enc, &output)
+	err = DecodeFromBytes(enc, &output)
 	assert.NoError(t, err)
 
 	assert.Equal(t, exampleTypDoubleMap, output)
 }
 
 func TestFunctionArgumentMetadata_Encode_Decode(t *testing.T) {
-	enc, err := encodeToBytes(exampleFunctionArgumentMetadata)
+	enc, err := EncodeToBytes(exampleFunctionArgumentMetadata)
 	assert.NoError(t, err)
 
 	var output FunctionArgumentMetadata
-	err = decodeFromBytes(enc, &output)
+	err = DecodeFromBytes(enc, &output)
 	assert.NoError(t, err)
 
 	assert.Equal(t, exampleFunctionArgumentMetadata, output)
-}
-
-func encodeToBytes(value interface{}) ([]byte, error) {
-	var buffer = bytes.Buffer{}
-	err := scale.NewEncoder(&buffer).Encode(value)
-	if err != nil {
-		return buffer.Bytes(), err
-	}
-	return buffer.Bytes(), nil
-}
-
-func decodeFromBytes(bz []byte, target interface{}) error {
-	return scale.NewDecoder(bytes.NewReader(bz)).Decode(target)
 }
