@@ -3,17 +3,18 @@ clean: ##clean vendor's folder. Should be run before a make install
 	@rm -rf vendor/
 	@echo 'done cleaning'
 
-install-deps: ## Install Dependencies
+install: ## Install Dependencies
 	@command -v dep >/dev/null 2>&1 || go get -u github.com/golang/dep/...
+	@command -v golangci-lint >/dev/null 2>&1 || go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 	@dep ensure
-	@curl -L https://git.io/vp6lP | sh -s ${GOMETALINTER_VERSION}
-	@mv ./bin/* $(GOPATH)/bin/; rm -rf ./bin
 
-lint-check: ## runs linters on go code
-	@gometalinter  --disable-all --enable=golint --enable=goimports --enable=vet --enable=nakedret \
-	--enable=staticcheck --vendor --skip=resources --deadline=1m ./...;
+lint: ## runs linters on go code
+	@golangci-lint run
 
-format-go: ## formats go code
-	@goimports -w .
+lint-fix: ## runs linters on go code and automatically fixes issues
+	@golangci-lint run --fix
 
-build: install-deps
+test: ## runs all tests in project
+	@go test ./...
+
+.PHONY: clean install lint lint-fix test

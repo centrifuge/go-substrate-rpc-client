@@ -4,15 +4,9 @@ The substrate RPC client for go. Some slides https://docs.google.com/presentatio
 
 ## Contributing
 
-### Installation
-
-1. Install `golangci-lint`: https://github.com/golangci/golangci-lint#install
-
-### Linting
-
-`golangci-lint run --disable-all --enable=deadcode --enable=errcheck --enable=gosimple --enable=ineffassign --enable=structcheck --enable=typecheck --enable=unused --enable=varcheck --enable=dupl --enable=gochecknoinits --enable=goconst --enable=gocyclo --enable=gofmt --enable=gosec --enable=interfacer --enable=lll --enable=misspell --enable=scopelint --enable=stylecheck --enable=unconvert --enable=unparam --enable=golint --enable=goimports --enable=govet --enable=nakedret --enable=staticcheck --deadline=1m`
-
-## Testing
+1. Install dependencies by running `make` followed by `make install`
+1. Run tests `make test`
+1. Lint `make lint` (you can use `make lint-fix` to automatically fix issues)
 
 ## Run with centrifuge-chain
 

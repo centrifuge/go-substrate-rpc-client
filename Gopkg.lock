@@ -21,24 +21,6 @@
   revision = "ed1100a1c0154be237da0078e86b19c523c8c661"
 
 [[projects]]
-  digest = "1:f43940a3d4989a4b63f695f63d464e575bd57b159ca933d73bd951e2e2e8c1f8"
-  name = "github.com/centrifuge/go-centrifuge"
-  packages = [
-    "errors",
-    "utils",
-  ]
-  pruneopts = "UT"
-  revision = "2a9356f06eeb815e175f2449ae4a9362b28de36a"
-  version = "v0.0.4"
-
-[[projects]]
-  digest = "1:bdd797d675043d8547be2de04b25bcf7319ca834b72c88dd13f25972ac84e09a"
-  name = "github.com/centrifuge/gocelery"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "98e4381dac54051f9a6cd6d4e0c2815d87f625d8"
-
-[[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
@@ -55,10 +37,9 @@
   version = "v1.7.1"
 
 [[projects]]
-  digest = "1:36c47373c4bc98533813643f1f6c9f9d9505b64a8ac3fbf90784cc7d6b099137"
+  digest = "1:37a3da05af5c5824b10812b346e413395d2b34eea64f35fbadb6d5a5a8f23772"
   name = "github.com/ethereum/go-ethereum"
   packages = [
-    "common",
     "common/hexutil",
     "common/mclock",
     "log",
@@ -78,123 +59,6 @@
   version = "v1.8.0"
 
 [[projects]]
-  digest = "1:48092bf6632f55839850666c33469f546f6d45fdbd59a66759ec12e84d853dc2"
-  name = "github.com/gogo/protobuf"
-  packages = ["proto"]
-  pruneopts = "UT"
-  revision = "ba06b47c162d49f2af050fb4c75bcbc86a159d5c"
-  version = "v1.2.1"
-
-[[projects]]
-  digest = "1:b532ee3f683c057e797694b5bfeb3827d89e6adf41c53dbc80e549bca76364ea"
-  name = "github.com/golang/protobuf"
-  packages = [
-    "jsonpb",
-    "proto",
-    "protoc-gen-go/descriptor",
-    "protoc-gen-go/generator",
-    "protoc-gen-go/generator/internal/remap",
-    "protoc-gen-go/plugin",
-    "ptypes",
-    "ptypes/any",
-    "ptypes/duration",
-    "ptypes/struct",
-    "ptypes/timestamp",
-    "ptypes/wrappers",
-  ]
-  pruneopts = "UT"
-  revision = "6c65a5562fc06764971b7c5d05c76c75e84bdbf7"
-  version = "v1.3.2"
-
-[[projects]]
-  digest = "1:e4f5819333ac698d294fe04dbf640f84719658d5c7ce195b10060cc37292ce79"
-  name = "github.com/golang/snappy"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "2a8bb927dd31d8daada140a5d09578521ce5c36a"
-  version = "v0.0.1"
-
-[[projects]]
-  digest = "1:38ec74012390146c45af1f92d46e5382b50531247929ff3a685d2b2be65155ac"
-  name = "github.com/gomodule/redigo"
-  packages = [
-    "internal",
-    "redis",
-  ]
-  pruneopts = "UT"
-  revision = "9c11da706d9b7902c6da69c592f75637793fe121"
-  version = "v2.0.0"
-
-[[projects]]
-  digest = "1:07ac748d2913b3c6d963aceec7fc4348c34a4ea58c0063779d08c2717380f7e9"
-  name = "github.com/grpc-ecosystem/grpc-gateway"
-  packages = [
-    "internal",
-    "runtime",
-    "utilities",
-  ]
-  pruneopts = "UT"
-  revision = "bebc7374a79e1105d786ef3468b474e47d652511"
-  version = "v1.9.4"
-
-[[projects]]
-  digest = "1:e8c78569402b8dcf846924dea6eb27b1de135c9a53d7adbd2629250ef66c021a"
-  name = "github.com/ipfs/go-log"
-  packages = [
-    ".",
-    "tracer",
-    "tracer/wire",
-    "writer",
-  ]
-  pruneopts = "UT"
-  revision = "91b837264c0f35dd4e2be341d711316b91d3573d"
-  version = "v0.0.1"
-
-[[projects]]
-  digest = "1:7c084e0e780596dd2a7e20d25803909a9a43689c153de953520dfbc0b0e51166"
-  name = "github.com/mattn/go-colorable"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "8029fb3788e5a4a9c00e415f586a6d033f5d38b3"
-  version = "v0.1.2"
-
-[[projects]]
-  digest = "1:9b90c7639a41697f3d4ad12d7d67dfacc9a7a4a6e0bbfae4fc72d0da57c28871"
-  name = "github.com/mattn/go-isatty"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "1311e847b0cb909da63b5fecfb5370aa66236465"
-  version = "v0.0.8"
-
-[[projects]]
-  branch = "master"
-  digest = "1:130cefe87d7eeefc824978dcb78e35672d4c49a11f25c153fbf0cfd952756fa3"
-  name = "github.com/minio/blake2b-simd"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "3f5f724cb5b182a5c278d6d3d55b40e7f8c2efb4"
-
-[[projects]]
-  digest = "1:11e62d6050198055e6cd87ed57e5d8c669e84f839c16e16f192374d913d1a70d"
-  name = "github.com/opentracing/opentracing-go"
-  packages = [
-    ".",
-    "ext",
-    "log",
-  ]
-  pruneopts = "UT"
-  revision = "659c90643e714681897ec2521c60567dd21da733"
-  version = "v1.1.0"
-
-[[projects]]
-  digest = "1:657ca22c61c436fc17a86b5be00bbfedb86c26795dcfe0f3294ed3571aa7223c"
-  name = "github.com/pierrec/xxHash"
-  packages = ["xxHash64"]
-  pruneopts = "UT"
-  revision = "d17cb990ad2d219d5901415ceaeb50d17df59527"
-  version = "v0.1.5"
-
-[[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
@@ -211,14 +75,6 @@
   version = "v1.6.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:a3b8912deeef29007fab9a13a9f21b9e9b59c621a2ed61e2fe7b37320a71fbd5"
-  name = "github.com/satori/go.uuid"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "b2ce2384e17bbe0c6d34077efa39dbab3e09123b"
-
-[[projects]]
   digest = "1:972c2427413d41a1e06ca4897e8528e5a1622894050e2f527b38ddf0f343f759"
   name = "github.com/stretchr/testify"
   packages = ["assert"]
@@ -227,120 +83,28 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:9ff9e1808adfc43f788f1c1e9fd2660c285b522243da985a4c043ec6f2a2d736"
-  name = "github.com/syndtr/goleveldb"
-  packages = [
-    "leveldb",
-    "leveldb/cache",
-    "leveldb/comparer",
-    "leveldb/errors",
-    "leveldb/filter",
-    "leveldb/iterator",
-    "leveldb/journal",
-    "leveldb/memdb",
-    "leveldb/opt",
-    "leveldb/storage",
-    "leveldb/table",
-    "leveldb/util",
-  ]
-  pruneopts = "UT"
-  revision = "f9080354173f192dfc8821931eacf9cfd6819253"
-
-[[projects]]
   branch = "master"
-  digest = "1:0102dfa2f98777db8ff68c920bef1be3ff8504e90485b6cdd24d61b981b487b6"
-  name = "github.com/whyrusleeping/go-logging"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "0457bb6b88fc1973573aaf6b5145d8d3ae972390"
-
-[[projects]]
-  branch = "master"
-  digest = "1:4561586da1a366f653d58481fc56e33fb523b3dc6e99b695b61859386b0fa65b"
+  digest = "1:73f9bd0a36bd49a7a46061dd5d6370fbf7c7afcd92a31dcb18661497610672aa"
   name = "golang.org/x/crypto"
-  packages = [
-    "blake2b",
-    "ed25519",
-    "ed25519/internal/edwards25519",
-    "sha3",
-  ]
+  packages = ["blake2b"]
   pruneopts = "UT"
   revision = "4def268fd1a49955bfb3dda92fe3db4f924f2285"
 
 [[projects]]
   branch = "master"
-  digest = "1:9908fffeaec3701f96cfcd4928b1de7013995a6ba144a4a7da39380f440896ff"
+  digest = "1:7427036b6d926b3d1fa0773771820735b35554a98296f1074df440ee30a97296"
   name = "golang.org/x/net"
-  packages = [
-    "idna",
-    "publicsuffix",
-    "websocket",
-  ]
+  packages = ["websocket"]
   pruneopts = "UT"
   revision = "da137c7871d730100384dbcf36e6f8fa493aef5b"
 
 [[projects]]
   branch = "master"
-  digest = "1:a0e4b2275e7939970d395eb6d03f409378eb586aab72e0a461d95e3435c6c5c4"
+  digest = "1:9289797869517c73400e7b5a93beefbfc86e06f56e3ab03f38fb0d575e685277"
   name = "golang.org/x/sys"
-  packages = [
-    "cpu",
-    "unix",
-  ]
+  packages = ["cpu"]
   pruneopts = "UT"
   revision = "fae7ac547cb717d141c433a2a173315e216b64c4"
-
-[[projects]]
-  digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
-  name = "golang.org/x/text"
-  packages = [
-    "collate",
-    "collate/build",
-    "internal/colltab",
-    "internal/gen",
-    "internal/language",
-    "internal/language/compact",
-    "internal/tag",
-    "internal/triegen",
-    "internal/ucd",
-    "language",
-    "secure/bidirule",
-    "transform",
-    "unicode/bidi",
-    "unicode/cldr",
-    "unicode/norm",
-    "unicode/rangetable",
-  ]
-  pruneopts = "UT"
-  revision = "342b2e1fbaa52c93f31447ad2c6abc048c63e475"
-  version = "v0.3.2"
-
-[[projects]]
-  branch = "master"
-  digest = "1:3565a93b7692277a5dea355bc47bd6315754f3246ed07a224be6aec28972a805"
-  name = "google.golang.org/genproto"
-  packages = [
-    "googleapis/api/httpbody",
-    "googleapis/rpc/status",
-    "protobuf/field_mask",
-  ]
-  pruneopts = "UT"
-  revision = "3bdd9d9f5532d75d09efb230bd767d265245cfe5"
-
-[[projects]]
-  digest = "1:b2e916ef97c4174457d63733748a3762bb231b6f4b8f14280f3aad6937a4d811"
-  name = "google.golang.org/grpc"
-  packages = [
-    "codes",
-    "connectivity",
-    "grpclog",
-    "internal",
-    "metadata",
-    "status",
-  ]
-  pruneopts = "UT"
-  revision = "1d89a3c832915b2314551c1d2a506874d62e53f7"
-  version = "v1.22.0"
 
 [[projects]]
   branch = "v2"
@@ -350,27 +114,14 @@
   pruneopts = "UT"
   revision = "c1b8fa8bdccecb0b8db834ee0b92fdbcfa606dd6"
 
-[[projects]]
-  digest = "1:41206f4d0410803e64cfb203f665330c3183988408cb532b56305a816a87bd99"
-  name = "gopkg.in/resty.v1"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "fa5875c0caa5c260ab78acec5a244215a730247f"
-  version = "v1.12.0"
-
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
     "github.com/ChainSafe/gossamer/codec",
-    "github.com/centrifuge/go-centrifuge/utils",
-    "github.com/ethereum/go-ethereum/common/hexutil",
     "github.com/ethereum/go-ethereum/rpc",
-    "github.com/minio/blake2b-simd",
-    "github.com/pierrec/xxHash/xxHash64",
     "github.com/stretchr/testify/assert",
     "golang.org/x/crypto/blake2b",
-    "golang.org/x/crypto/ed25519",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
