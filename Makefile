@@ -17,4 +17,11 @@ lint-fix: ## runs linters on go code and automatically fixes issues
 test: ## runs all tests in project
 	@go test ./...
 
-.PHONY: clean install lint lint-fix test
+test-dockerized: ## runs the tests in a docker container against the Substrate Default Docker image
+	@docker-compose build
+	@docker-compose up --abort-on-container-exit
+
+run-substrate-docker: ## runs the Substrate Default Docker image
+	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:latest-v1.0 --dev --rpc-external --ws-external
+
+.PHONY: clean install lint lint-fix test test-dockerized run-substrate-docker
