@@ -4,16 +4,22 @@ import (
 	"testing"
 )
 
-func TestBytesEncodedLength(t *testing.T) {
-	testEncodedLength(t, []encodedLengthTest{
+func TestBytes_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, NewBytes(mustDecodeHexString("0x00")))
+	assertRoundtrip(t, NewBytes(mustDecodeHexString("0xab1234")))
+	assertRoundtrip(t, NewBytes(mustDecodeHexString("0x0001")))
+}
+
+func TestBytes_EncodedLength(t *testing.T) {
+	assertEncodedLength(t, []encodedLengthAssert{
 		{NewBytes(mustDecodeHexString("0x00")), 2},
 		{NewBytes(mustDecodeHexString("0xab1234")), 4},
 		{NewBytes(mustDecodeHexString("0x0001")), 3},
 	})
 }
 
-func TestBytesEncode(t *testing.T) {
-	testEncode(t, []encodingTest{
+func TestBytes_Encode(t *testing.T) {
+	assertEncode(t, []encodingAssert{
 		{NewBytes([]byte{0, 0, 0}), mustDecodeHexString("0x0c000000")},
 		{NewBytes([]byte{171, 18, 52}), mustDecodeHexString("0x0cab1234")},
 		{NewBytes([]byte{0, 1}), mustDecodeHexString("0x080001")},
@@ -21,8 +27,8 @@ func TestBytesEncode(t *testing.T) {
 	})
 }
 
-func TestBytesHash(t *testing.T) {
-	testHash(t, []hashTest{
+func TestBytes_Hash(t *testing.T) {
+	assertHash(t, []hashAssert{
 		{NewBytes([]byte{0, 42, 254}), mustDecodeHexString(
 			"0xabf7fe6eb94e0816bf2db57abb296d012f7cb9ddfe59ebf52f9c2770f49a0a46")},
 		{NewBytes([]byte{0, 0}), mustDecodeHexString(
@@ -30,8 +36,8 @@ func TestBytesHash(t *testing.T) {
 	})
 }
 
-func TestBytesHex(t *testing.T) {
-	testHex(t, []hexTest{
+func TestBytes_Hex(t *testing.T) {
+	assertHex(t, []hexAssert{
 		{NewBytes([]byte{0, 0, 0}), "0x0c000000"},
 		{NewBytes([]byte{171, 18, 52}), "0x0cab1234"},
 		{NewBytes([]byte{0, 1}), "0x080001"},
@@ -39,17 +45,17 @@ func TestBytesHex(t *testing.T) {
 	})
 }
 
-func TestBytesString(t *testing.T) {
-	testString(t, []stringTest{
-		{NewBytes([]byte{0, 0, 0}), "0x000000"},
-		{NewBytes([]byte{171, 18, 52}), "0xab1234"},
-		{NewBytes([]byte{0, 1}), "0x0001"},
-		{NewBytes([]byte{18, 52, 86}), "0x123456"},
+func TestBytes_String(t *testing.T) {
+	assertString(t, []stringAssert{
+		{NewBytes([]byte{0, 0, 0}), "[0 0 0]"},
+		{NewBytes([]byte{171, 18, 52}), "[171 18 52]"},
+		{NewBytes([]byte{0, 1}), "[0 1]"},
+		{NewBytes([]byte{18, 52, 86}), "[18 52 86]"},
 	})
 }
 
-func TestBytesEq(t *testing.T) {
-	testEq(t, []eqTest{
+func TestBytes_Eq(t *testing.T) {
+	assertEq(t, []eqAssert{
 		{NewBytes([]byte{1, 0, 0}), NewBytes([]byte{1, 0}), false},
 		{NewBytes([]byte{0, 0, 1}), NewBytes([]byte{0, 1}), false},
 		{NewBytes([]byte{0, 0, 0}), NewBytes([]byte{0, 0}), false},

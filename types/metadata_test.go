@@ -82,117 +82,45 @@ func TestMetadata_Decode(t *testing.T) {
 	err := DecodeFromBytes(encodedMetadata, metadata)
 	assert.NoError(t, err)
 
-	fmt.Printf("%#v\n", metadata)
-
 	assert.Equal(t, decodedMetadata, fmt.Sprintf("%v", metadata))
 }
 
-func TestMetadata_Encode_Decode(t *testing.T) {
-	enc, err := EncodeToBytes(exampleMetadata)
-	assert.NoError(t, err)
-
-	var output Metadata
-	err = DecodeFromBytes(enc, &output)
-	assert.NoError(t, err)
-
-	assert.Equal(t, exampleMetadata, output)
+func TestMetadata_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleMetadata)
 }
 
-func TestRuntimeMetadataV4_Encode_Decode(t *testing.T) {
-	enc, err := EncodeToBytes(exampleRuntimeMetadataV4)
-	assert.NoError(t, err)
-
-	var output RuntimeMetadataV4
-	err = DecodeFromBytes(enc, &output)
-	assert.NoError(t, err)
-
-	assert.Equal(t, exampleRuntimeMetadataV4, output)
+func TestRuntimeMetadataV4_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleRuntimeMetadataV4)
 }
 
-func TestMethodIDX_Encode_Decode(t *testing.T) {
-	enc, err := EncodeToBytes(exampleMethodIDX)
-	assert.NoError(t, err)
-
-	var output MethodIDX
-	err = DecodeFromBytes(enc, &output)
-	assert.NoError(t, err)
-
-	assert.Equal(t, exampleMethodIDX, output)
+func TestMethodIDX_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleMethodIDX)
 }
 
-func TestModuleMetadata_Encode_Decode(t *testing.T) {
-	enc, err := EncodeToBytes(exampleModuleMetadata)
-	assert.NoError(t, err)
-
-	var output ModuleMetadata
-	err = DecodeFromBytes(enc, &output)
-	assert.NoError(t, err)
-
-	assert.Equal(t, exampleModuleMetadata, output)
+func TestModuleMetadata_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleModuleMetadata)
 }
 
-func TestStorageFunctionMetadata_Encode_Decode(t *testing.T) {
-	enc, err := EncodeToBytes(exampleStorageFunctionMetadata)
-	assert.NoError(t, err)
-
-	var output StorageFunctionMetadata
-	err = DecodeFromBytes(enc, &output)
-	assert.NoError(t, err)
-
-	assert.Equal(t, exampleStorageFunctionMetadata, output)
+func TestStorageFunctionMetadata_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleStorageFunctionMetadata)
 }
 
-func TestFunctionMetadata_Encode_Decode(t *testing.T) {
-	enc, err := EncodeToBytes(exampleFunctionMetadata)
-	assert.NoError(t, err)
-
-	var output FunctionMetadata
-	err = DecodeFromBytes(enc, &output)
-	assert.NoError(t, err)
-
-	assert.Equal(t, exampleFunctionMetadata, output)
+func TestFunctionMetadata_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleFunctionMetadata)
 }
 
-func TestEventMetadata_Encode_Decode(t *testing.T) {
-	enc, err := EncodeToBytes(exampleEventMetadata)
-	assert.NoError(t, err)
-
-	var output EventMetadata
-	err = DecodeFromBytes(enc, &output)
-	assert.NoError(t, err)
-
-	assert.Equal(t, exampleEventMetadata, output)
+func TestEventMetadata_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleEventMetadata)
 }
 
-func TestTypMap_Encode_Decode(t *testing.T) {
-	enc, err := EncodeToBytes(exampleTypMap)
-	assert.NoError(t, err)
-
-	var output TypMap
-	err = DecodeFromBytes(enc, &output)
-	assert.NoError(t, err)
-
-	assert.Equal(t, exampleTypMap, output)
+func TestTypMap_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleTypMap)
 }
 
-func TestTypDoubleMap_Encode_Decode(t *testing.T) {
-	enc, err := EncodeToBytes(exampleTypDoubleMap)
-	assert.NoError(t, err)
-
-	var output TypDoubleMap
-	err = DecodeFromBytes(enc, &output)
-	assert.NoError(t, err)
-
-	assert.Equal(t, exampleTypDoubleMap, output)
+func TestTypDoubleMap_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleTypDoubleMap)
 }
 
-func TestFunctionArgumentMetadata_Encode_Decode(t *testing.T) {
-	enc, err := EncodeToBytes(exampleFunctionArgumentMetadata)
-	assert.NoError(t, err)
-
-	var output FunctionArgumentMetadata
-	err = DecodeFromBytes(enc, &output)
-	assert.NoError(t, err)
-
-	assert.Equal(t, exampleFunctionArgumentMetadata, output)
+func TestFunctionArgumentMetadata_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleFunctionArgumentMetadata)
 }
