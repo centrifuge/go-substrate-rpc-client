@@ -2,6 +2,7 @@ package gsrpc_test
 
 import (
 	"fmt"
+
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
 )
 
@@ -10,7 +11,7 @@ func Example() {
 }
 
 func Example_simpleConnect() {
-	api, err := gsrpc.NewSubstrateApi("ws://127.0.0.1:9944")
+	api, err := gsrpc.NewSubstrateAPI("ws://127.0.0.1:9944")
 	if err != nil {
 		panic(err)
 	}
@@ -20,12 +21,12 @@ func Example_simpleConnect() {
 	//name := api.RPC.System.Name()
 	//version := api.RPC.System.Version()
 
-	// Output: 0xa310
+	// TODO Output: 0x26735e602578d1f1741552e32d074a5fdefde5bf5e1ad074ba0ba6a96c9cc014
 }
 
 // listen to new blocks
 // func Example_listenToNewBlocks(t *testing.T) {
-//	api := NewSubstrateApi("ws://127.0.0.1:9944")
+//	api := NewSubstrateAPI("ws://127.0.0.1:9944")
 //
 //	heads, errs, close, err := api.RPC.System.SubscribeNewHead()
 //	if err != nil {

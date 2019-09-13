@@ -103,8 +103,9 @@ func testEq(t *testing.T, eqTests []eqTest) {
 	}
 }
 
+// mustDecodeHexString panics if str cannot be decoded. Param str is expected to start with "0x"
 func mustDecodeHexString(str string) []byte {
-	bytes, err := hex.DecodeString(str)
+	bytes, err := hex.DecodeString(str[2:])
 	if err != nil {
 		panic(err)
 	}

@@ -20,15 +20,15 @@ func TestEncode(t *testing.T) {
 
 func TestHash(t *testing.T) {
 	testHash(t, []hashTest{
-		{NewBool(true), mustDecodeHexString("ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25")},
-		{NewBool(false), mustDecodeHexString("03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314")},
+		{NewBool(true), mustDecodeHexString("0xee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25")},
+		{NewBool(false), mustDecodeHexString("0x03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314")},
 	})
 }
 
 func TestHex(t *testing.T) {
 	testHex(t, []hexTest{
-		{NewBool(true), "01"},
-		{NewBool(false), "00"},
+		{NewBool(true), "0x01"},
+		{NewBool(false), "0x00"},
 	})
 }
 

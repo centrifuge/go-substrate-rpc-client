@@ -7,7 +7,7 @@ import (
 	"golang.org/x/crypto/ed25519"
 )
 
-const DEV_PHRASE = "bottom drive obey lake curtain smoke basket hold race lonely fit walk"
+const devPhrase = "bottom drive obey lake curtain smoke basket hold race lonely fit walk"
 
 type SupportedKeyType int
 
@@ -20,7 +20,7 @@ type Keyring struct {
 	Pairs map[string]KeyringPair
 }
 
-func (kr *Keyring) AddFromURI(SURI string, meta map[string]interface{}, tp SupportedKeyType) {
+func (kr *Keyring) AddFromURI(suri string, meta map[string]interface{}, tp SupportedKeyType) {
 
 }
 
@@ -51,7 +51,7 @@ var reJunction = regexp.MustCompile("//(/?)([^/]+)/g")
 // `<secret>/<soft-key>//<hard-key>///<password>` (the `///password` may be omitted, and
 // `/<soft-key>` and `//<hard-key>` maybe repeated and mixed). The secret can be a hex string,
 // mnemonic phrase or a string (to be padded)
-func extractKey(suri string) (password, phrase string, path []DeriveJunction, err error) {
+func extractKey(suri string) (password, phrase string, path []DeriveJunction, err error) { //nolint:unparam
 	matches := reCapture.FindStringSubmatch(suri)
 	if len(matches) < 6 {
 		return "", "", nil, errors.New("suri is not correct")

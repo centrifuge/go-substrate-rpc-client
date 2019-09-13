@@ -10,7 +10,7 @@ import (
 
 func encodedLength(in interface{}) (int, error) {
 	buffer := bytes.Buffer{}
-	se := codec.Encoder{&buffer}
+	se := codec.Encoder{Writer: &buffer}
 	len, err := se.Encode(in)
 	return len, err
 }

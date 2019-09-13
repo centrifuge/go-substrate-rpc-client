@@ -1,6 +1,7 @@
 package types
 
-// Codec is the base interface that all types implement. The Codec Base is required for operating as an encoding/decoding layer.
+// Codec is the base interface that all types implement. The Codec Base is required for operating as an
+// encoding/decoding layer.
 type Codec interface {
 	// The length of the value when encoded as a byte array
 	EncodedLength() (int, error)

@@ -7,15 +7,15 @@ import (
 )
 
 type RPC struct {
-	Chain *chain.Chain
-	State *state.State
+	Chain  *chain.Chain
+	State  *state.State
 	client *client.Client
 }
 
 func NewRPC(cl *client.Client) *RPC {
 	return &RPC{
-		Chain: chain.NewChain(cl),
-		State: state.NewState(cl),
+		Chain:  chain.NewChain(cl),
+		State:  state.NewState(cl),
 		client: cl,
 	}
 }

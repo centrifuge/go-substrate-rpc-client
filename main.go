@@ -6,24 +6,23 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/rpc"
 )
 
-
-type SubstrateApi struct {
-	RPC *rpc.RPC
-	Url string
+type SubstrateAPI struct {
+	RPC    *rpc.RPC
+	URL    string
 	client *client.Client
 }
 
-func NewSubstrateApi(url string) (*SubstrateApi, error) {
+func NewSubstrateAPI(url string) (*SubstrateAPI, error) {
 	cl, err := client.Connect(url)
 	if err != nil {
-		return &SubstrateApi{}, err
+		return &SubstrateAPI{}, err
 	}
 
 	clPtr := &cl
 
-	return &SubstrateApi{
-		RPC: rpc.NewRPC(clPtr),
-		Url: url,
+	return &SubstrateAPI{
+		RPC:    rpc.NewRPC(clPtr),
+		URL:    url,
 		client: clPtr,
 	}, nil
 }

@@ -146,10 +146,6 @@ func (m *EventMetadata) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-/**
-[{"name":"AccountNonce","modifier":"Default","type":{"MapType":{"hasher":"Blake2_256","key":"AccountId","value":"Index","isLinked":false}},"fallback":"0x0000000000000000","documentation":[" Extrinsics nonce for accounts."]},{"name":"ExtrinsicCount","modifier":"Optional","type":{"PlainType":"u32"},"fallback":"0x00","documentation":[" Total extrinsics count for the current block."]},{"name":"AllExtrinsicsLen","modifier":"Optional","type":{"PlainType":"u32"},"fallback":"0x00","documentation":[" Total length in bytes for all extrinsics put together, for the current block."]},{"name":"BlockHash","modifier":"Default","type":{"MapType":{"hasher":"Blake2_256","key":"BlockNumber","value":"Hash","isLinked":false}},"fallback":"0x0000000000000000000000000000000000000000000000000000000000000000","documentation":[" Map of block numbers to block hashes."]},{"name":"ExtrinsicData","modifier":"Default","type":{"MapType":{"hasher":"Blake2_256","key":"u32","value":"Bytes","isLinked":false}},"fallback":"0x00","documentation":[" Extrinsics data for the current block (maps extrinsic's index to its data)."]},{"name":"RandomSeed","modifier":"Default","type":{"PlainType":"Hash"},"fallback":"0x0000000000000000000000000000000000000000000000000000000000000000","documentation":[" Random seed of the current block."]},{"name":"Number","modifier":"Default","type":{"PlainType":"BlockNumber"},"fallback":"0x0000000000000000","documentation":[" The current block number being processed. Set by `execute_block`."]},{"name":"ParentHash","modifier":"Default","type":{"PlainType":"Hash"},"fallback":"0x0000000000000000000000000000000000000000000000000000000000000000","documentation":[" Hash of the previous block."]},{"name":"ExtrinsicsRoot","modifier":"Default","type":{"PlainType":"Hash"},"fallback":"0x0000000000000000000000000000000000000000000000000000000000000000","documentation":[" Extrinsics root of the current block, also part of the block header."]},{"name":"Digest","modifier":"Default","type":{"PlainType":"Digest"},"fallback":"0x00","documentation":[" Digest of the current block, also part of the block header."]},{"name":"Events","modifier":"Default","type":{"PlainType":"Vec<EventRecord>"},"fallback":"0x00","documentation":[" Events deposited for the current block."]}]
-*/
-
 type TypMap struct {
 	Hasher   uint8
 	Key      string
@@ -236,53 +232,55 @@ type StorageFunctionMetadata struct {
 	Documentation []string
 }
 
-func (s StorageFunctionMetadata) isMap() bool {
-	return s.Type == 1
-}
+// TODO add again, write test
+//func (s StorageFunctionMetadata) isMap() bool {
+//	return s.Type == 1
+//}
 
-func (s StorageFunctionMetadata) isDMap() bool {
-	return s.Type == 2
-}
+// TODO add again, write test
+//func (s StorageFunctionMetadata) isDMap() bool {
+//	return s.Type == 2
+//}
 
-func (m *StorageFunctionMetadata) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&m.Name)
+func (s *StorageFunctionMetadata) Decode(decoder scale.Decoder) error {
+	err := decoder.Decode(&s.Name)
 	if err != nil {
 		return err
 	}
 
-	err = decoder.Decode(&m.Modifier)
+	err = decoder.Decode(&s.Modifier)
 	if err != nil {
 		return err
 	}
 
-	err = decoder.Decode(&m.Type)
+	err = decoder.Decode(&s.Type)
 	if err != nil {
 		return err
 	}
 
-	switch m.Type {
+	switch s.Type {
 	case 0:
-		err = decoder.Decode(&m.Plane)
+		err = decoder.Decode(&s.Plane)
 		if err != nil {
 			return err
 		}
 	case 1:
-		err = decoder.Decode(&m.Map)
+		err = decoder.Decode(&s.Map)
 		if err != nil {
 			return err
 		}
 	default:
-		err = decoder.Decode(&m.DMap)
+		err = decoder.Decode(&s.DMap)
 		if err != nil {
 			return err
 		}
 	}
-	err = decoder.Decode(&m.Fallback)
+	err = decoder.Decode(&s.Fallback)
 	if err != nil {
 		return err
 	}
 
-	err = decoder.Decode(&m.Documentation)
+	err = decoder.Decode(&s.Documentation)
 	if err != nil {
 		return err
 	}
@@ -379,43 +377,7 @@ func (m *Metadata) Decode(decoder scale.Decoder) error {
 
 	return nil
 }
-//
-//type State struct {
-//	client Client
-//}
-//
-//func NewStateRPC(client Client) *State {
-//	return &State{client: client}
-//}
-//
-//func (s *State) MetaData(blockHash Hash) (*Metadata, error) {
-//	var res string
-//	// block hash can give error - Error(Client(UnknownBlock("State already discarded for Hash(0xxxx)")), State { next_error: None, backtrace: InternalBacktrace { backtrace: None } })
-//	var err error
-//	if blockHash == nil {
-//		err = s.client.Call(&res, "state_getMetadata")
-//	} else {
-//		err = s.client.Call(&res, "state_getMetadata", blockHash.String())
-//	}
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	b, err := hexutil.Decode(res)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	dec := scale.NewDecoder(bytes.NewReader(b))
-//	n := NewMetadataVersioned()
-//	err = dec.Decode(n)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	return n, nil
-//}
-//
+
 //type StorageKey []byte
 
 //func NewStorageKey(meta Metadata, module string, fn string, key []byte) (StorageKey, error) {
