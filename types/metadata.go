@@ -83,7 +83,7 @@ func (m *RuntimeMetadataV4) MethodIndex(method string) MethodIDX {
 	var sCounter = 0
 
 	for _, n := range m.Modules {
-		if n.CallsOptional == 1 {
+		if n.HasCalls {
 			if n.Name == s[0] {
 				sIDX = uint8(sCounter)
 				for j, f := range n.Calls {
@@ -134,14 +134,14 @@ func (m MethodIDX) Encode(encoder scale.Encoder) error {
 }
 
 type ModuleMetadata struct {
-	Name            string
-	Prefix          string
-	StorageOptional uint8
-	Storage         []StorageFunctionMetadata
-	CallsOptional   uint8
-	Calls           []FunctionMetadata
-	EventsOptional  uint8
-	Events          []EventMetadata
+	Name       string
+	Prefix     string
+	HasStorage bool
+	Storage    []StorageFunctionMetadata
+	HasCalls   bool
+	Calls      []FunctionMetadata
+	HasEvents  bool
+	Events     []EventMetadata
 }
 
 func (m *ModuleMetadata) Decode(decoder scale.Decoder) error {
@@ -155,36 +155,36 @@ func (m *ModuleMetadata) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	err = decoder.Decode(&m.StorageOptional)
+	err = decoder.Decode(&m.HasStorage)
 	if err != nil {
 		return err
 	}
 
-	if m.StorageOptional == 1 {
+	if m.HasStorage {
 		err = decoder.Decode(&m.Storage)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = decoder.Decode(&m.CallsOptional)
+	err = decoder.Decode(&m.HasCalls)
 	if err != nil {
 		return err
 	}
 
-	if m.CallsOptional == 1 {
+	if m.HasCalls {
 		err = decoder.Decode(&m.Calls)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = decoder.Decode(&m.EventsOptional)
+	err = decoder.Decode(&m.HasEvents)
 	if err != nil {
 		return err
 	}
 
-	if m.EventsOptional == 1 {
+	if m.HasEvents {
 		err = decoder.Decode(&m.Events)
 		if err != nil {
 			return err
@@ -204,36 +204,36 @@ func (m ModuleMetadata) Encode(encoder scale.Encoder) error {
 		return err
 	}
 
-	err = encoder.Encode(m.StorageOptional)
+	err = encoder.Encode(m.HasStorage)
 	if err != nil {
 		return err
 	}
 
-	if m.StorageOptional == 1 {
+	if m.HasStorage {
 		err = encoder.Encode(m.Storage)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = encoder.Encode(m.CallsOptional)
+	err = encoder.Encode(m.HasCalls)
 	if err != nil {
 		return err
 	}
 
-	if m.CallsOptional == 1 {
+	if m.HasCalls {
 		err = encoder.Encode(m.Calls)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = encoder.Encode(m.EventsOptional)
+	err = encoder.Encode(m.HasEvents)
 	if err != nil {
 		return err
 	}
 
-	if m.EventsOptional == 1 {
+	if m.HasEvents {
 		err = encoder.Encode(m.Events)
 		if err != nil {
 			return err
