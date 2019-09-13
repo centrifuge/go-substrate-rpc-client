@@ -1,6 +1,10 @@
-# go-substrate-rpc-client
+# go-substrate-rpc-client (GSRPC)
 
-The substrate RPC client for go. Some slides https://docs.google.com/presentation/d/1lvCP7wZpsl2ES6fAkHg8-LfLhgtMHcvHeITp77Bgn2w/edit#slide=id.g5d531cd2a8_0_70
+Substrate RPC client in Go. It provides APIs and Types around Polkadot and any Substrate-based chain RPC calls. This client is modelled after [polkadot-js/api](https://github.com/polkadot-js/api).
+
+## Documentation & Usage Examples
+
+Please refer to https://godoc.org/github.com/centrifuge/go-substrate-rpc-client
 
 ## Contributing
 
