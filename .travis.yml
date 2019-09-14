@@ -18,11 +18,28 @@ install: true
 notifications:
   email: false
 
-before_script:
-  - make build
+# before_script:
+#   - make build
 
 # script always runs to completion (set +e). If we have linter issues AND a
 # failing test, we want to see both. Configure golangci-lint with a
 # .golangci.yml file at the top level of your repo.
+# script:
+#   - go test -v -tags=tests -race ./...  # Run all the tests with the race detector enabled
+
+services:
+  - docker
+
+# Upgrade docker compose
+# env:
+#   - DOCKER_COMPOSE_VERSION=1.4.2
+
+# before_install:
+#   - sudo rm /usr/local/bin/docker-compose
+#   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+#   - chmod +x docker-compose
+#   - sudo mv docker-compose /usr/local/bin
+
 script:
-  - go test -v -tags=tests -race ./...  # Run all the tests with the race detector enabled
+  - make lint
+  - make test-dockerized
