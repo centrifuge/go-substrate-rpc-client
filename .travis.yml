@@ -12,7 +12,7 @@ git:
 
 # Skip the install step. Don't `go get` dependencies. Only build with the code
 # in vendor/
-install: true
+# install: true
 
 # Don't email me the results of the test runs.
 notifications:
@@ -39,6 +39,9 @@ services:
 #   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
 #   - chmod +x docker-compose
 #   - sudo mv docker-compose /usr/local/bin
+
+install:
+  - make install
 
 script:
   - make lint
