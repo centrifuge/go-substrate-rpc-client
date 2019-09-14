@@ -10,13 +10,13 @@ type Config struct {
 // most importantly RPC_URL for a custom endpoint.
 func NewDefaultConfig() Config {
 	c := Config{}
-	c.SetDefaultRpcUrl()
+	c.SetDefaultRPCURL()
 	return c
 }
 
-// SetDefaultRpcUrl reads the env variable RPC_URL and sets it in the config. If that variable is unset or empty,
+// SetDefaultRPCURL reads the env variable RPC_URL and sets it in the config. If that variable is unset or empty,
 // it will fallback to "http://127.0.0.1:9933"
-func (c *Config) SetDefaultRpcUrl() {
+func (c *Config) SetDefaultRPCURL() {
 	if url, ok := os.LookupEnv("RPC_URL"); ok {
 		c.RPCURL = url
 		return

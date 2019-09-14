@@ -56,7 +56,7 @@ func (o *OptionBool) Decode(decoder scale.Decoder) error {
 		o.hasValue = true
 		o.value = false
 	default:
-		return fmt.Errorf("Unknown byte prefix for encoded OptionBool: %d", b)
+		return fmt.Errorf("unknown byte prefix for encoded OptionBool: %d", b)
 	}
 	return nil
 }
