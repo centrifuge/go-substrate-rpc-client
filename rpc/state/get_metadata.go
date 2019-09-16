@@ -43,6 +43,9 @@ func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
 			return metadata, err
 		}
 		err = (*s.client).Call(&res, "state_getMetadata", hexHash)
+		if err != nil {
+			return metadata, err
+		}
 	}
 	if err != nil {
 		return metadata, err

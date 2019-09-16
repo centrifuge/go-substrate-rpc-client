@@ -39,3 +39,31 @@ linters:
   # - maligned,prealloc
   # - gochecknoglobals
 
+issues:
+  # Excluding configuration per-path, per-linter, per-text and per-source
+  exclude-rules:
+    # Exclude some linters from running on tests files.
+    - path: scale
+      text: ".*"
+    - path: types/int.go
+      linters:
+        - dupl
+    - path: types/uint.go
+      linters:
+        - dupl
+    - path: types/option_int.go
+      linters:
+        - dupl
+    - path: types/option_uint.go
+      linters:
+        - dupl
+    - path: doc.go
+      linters:
+        - lll
+    - path: types/test_utils.go
+      linters:
+        - deadcode
+        - unused
+    - path: types/example_tuple_test.go
+      linters:
+        - lll

@@ -23,7 +23,7 @@ import (
 	"reflect"
 )
 
-func ExampleVec_simple() {
+func ExampleExampleVec_simple() {
 	ingredients := []string{"salt", "sugar"}
 
 	encoded, err := EncodeToHexString(ingredients)
@@ -42,7 +42,7 @@ func ExampleVec_simple() {
 	// [salt sugar]
 }
 
-func ExampleVec_struct() {
+func ExampleExampleVec_struct() {
 	type Votes struct {
 		Options     [2]string
 		Yay         []string
@@ -70,3 +70,35 @@ func ExampleVec_struct() {
 	fmt.Println(reflect.DeepEqual(votes, decoded))
 	// Output: true
 }
+
+// type MyOption struct {
+// 	Woohoo *bool
+// }
+
+// type MyOptionNoPoointer struct {
+// 	Woohoo bool
+// }
+
+// func NewMyOption(b bool) MyOption {
+// 	return MyOption{&b}
+// }
+
+// func Example2() {
+// 	myopt := NewMyOption(true)
+// 	// myopt := NewBool(true)
+
+// 	encoded, err := EncodeToHexString(myopt)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	fmt.Println(encoded)
+
+// 	var decoded MyOption
+// 	err = DecodeFromHexString(encoded, &decoded)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	fmt.Println(decoded)
+// 	// Output: 0x081073616c74147375676172
+// 	// [salt sugar]
+// }

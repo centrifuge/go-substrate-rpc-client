@@ -22,7 +22,7 @@ This client is modelled after [polkadot-js/api](https://github.com/polkadot-js/a
 
 Calling RPC methods
 
-Simply instanciate the gsrpc with a URL of your choice, e. g.
+Simply instantiate the gsrpc with a URL of your choice, e. g.
 
 	api, err := gsrpc.NewSubstrateAPI("wss://substrate-rpc.parity.io/")
 

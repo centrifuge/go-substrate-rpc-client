@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//nolint
-
 package scale
 
 import (
@@ -124,7 +122,7 @@ func (o *OptionInt8) Decode(decoder Decoder) error {
 }
 
 func TestSliceOfOptionInt8EncodedAsExpected(t *testing.T) {
-	value := []OptionInt8{OptionInt8{true, 1}, OptionInt8{true, -1}, OptionInt8{false, 0}}
+	value := []OptionInt8{{true, 1}, {true, -1}, {false, 0}}
 	assertRoundtrip(t, value)
 	assertEqual(t, hexify(encodeToBytes(t, value)), "0c 01 01 01 ff 00")
 }
