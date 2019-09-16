@@ -62,7 +62,7 @@ func extractKey(suri string) (password, phrase string, path []DeriveJunction, er
 	//if err != nil {
 	//	return "", "", nil, err
 	//}
-	//fmt.Println(matches[6], matches[3], matches[1])
+	//log.Println(matches[6], matches[3], matches[1])
 	// TODO process the path
 	return matches[6], matches[1], path, nil
 }

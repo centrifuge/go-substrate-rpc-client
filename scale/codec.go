@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math"
 	"reflect"
 )
@@ -232,7 +233,7 @@ func (pe Encoder) Encode(value interface{}) error {
 	case reflect.Invalid:
 		return fmt.Errorf("Type %s cannot be encoded", t.Kind())
 	default:
-		fmt.Println("not captured")
+		log.Println("not captured")
 	}
 	return nil
 }

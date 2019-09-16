@@ -183,7 +183,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("Nonce", nonce, "gs", gs.String(), "Alice", string(alice))
+	log.Println("Nonce", nonce, "gs", gs.String(), "Alice", string(alice))
 
 	authRPC := substrate.NewAuthorRPC(client, gs, SubKeyCmd, SubKeySign)
 	wg := sync.WaitGroup{}
@@ -199,40 +199,40 @@ func main() {
 
 				res, err := authRPC.SubmitExtrinsic(nonce, AnchorPreCommit, pa)
 				if err != nil {
-					fmt.Printf("FAIL!!! pre commit for anchor ID %s failed with %s\n", aID, err.Error())
+					log.Printf("FAIL!!! pre commit for anchor ID %s failed with %s\n", aID, err.Error())
 					break
 				} else {
 					// verify pre anchor
 					for i := 0; i < 10; i++ {
 						time.Sleep(10 * time.Second)
 						anc, err := Anchors(client, "Anchor", "PreAnchors", ap.AnchorIDPreimage[:])
-						fmt.Println(err)
+						log.Println(err)
 						if anc != nil {
-							fmt.Printf("SUCCESS!!! pre anchor %v\n", anc)
+							log.Printf("SUCCESS!!! pre anchor %v\n", anc)
 							break
 						}
 					}
-					fmt.Printf("SUCCESS!!! pre anchor ID %s , tx hash %s\n", aID, res)
+					log.Printf("SUCCESS!!! pre anchor ID %s , tx hash %s\n", aID, res)
 					atomic.AddUint64(&nonce, 1)
 				}
 
-				// fmt.Println("submitting new anchor with anchor ID", a.AnchorIDHex())
+				// log.Println("submitting new anchor with anchor ID", a.AnchorIDHex())
 				res, err := authRPC.SubmitExtrinsic(nonce, AnchorCommit, ap)
 				if err != nil {
-					fmt.Printf("FAIL!!! commit for anchor ID %s failed with %s\n", aID, err.Error())
+					log.Printf("FAIL!!! commit for anchor ID %s failed with %s\n", aID, err.Error())
 					break
 				} else {
 					// verify anchor
 					for i := 0; i < 10; i++ {
 						time.Sleep(10 * time.Second)
 						anc, err := Anchors(client, "Anchor", "Anchors", ap.AnchorIDPreimage[:])
-						fmt.Println(err)
+						log.Println(err)
 						if anc != nil {
-							fmt.Printf("SUCCESS!!! anchor %v\n", anc)
+							log.Printf("SUCCESS!!! anchor %v\n", anc)
 							break
 						}
 					}
-					fmt.Printf("SUCCESS!!! anchor ID %s , tx hash %s\n", aID, res)
+					log.Printf("SUCCESS!!! anchor ID %s , tx hash %s\n", aID, res)
 					atomic.AddUint64(&counter, 1)
 					atomic.AddUint64(&nonce, 1)
 				}
@@ -244,7 +244,7 @@ func main() {
 	wg.Wait()
 	elapsed := time.Since(start)
 	tps := float64(counter) / elapsed.Seconds()
-	fmt.Printf("Successful execution of %d transactions took %s, amounting to %f TPS\n", counter, elapsed, tps)
+	log.Printf("Successful execution of %d transactions took %s, amounting to %f TPS\n", counter, elapsed, tps)
 }
 
 func waitForServer() {
@@ -256,10 +256,10 @@ func waitForServer() {
 	}
 
 	for i := 0; true; i++ {
-		fmt.Println("iteration", i)
+		log.Println("iteration", i)
 		resp, err := http.Post(fmt.Sprintf("http://%v:%v", EndPoint, RPCPort), "application/json", bytes.NewBuffer(reqBody))
 		if err != nil {
-			fmt.Println("Error receiving HTTP response, will retry. Error:", err.Error())
+			log.Println("Error receiving HTTP response, will retry. Error:", err.Error())
 			time.Sleep(100 * time.Millisecond)
 			continue
 		}
@@ -285,13 +285,13 @@ func waitForServer() {
 
 		err = json.Unmarshal(body, &rpcResp)
 		if err != nil {
-			fmt.Println("Error unmarhalling JSON, will retry.")
+			log.Println("Error unmarhalling JSON, will retry.")
 			time.Sleep(100 * time.Millisecond)
 			continue
 		}
 
 		if rpcResp.Id == "" {
-			fmt.Println("Got unexpected response, will retry. Response:", rpcResp)
+			log.Println("Got unexpected response, will retry. Response:", rpcResp)
 			time.Sleep(100 * time.Millisecond)
 			continue
 		}

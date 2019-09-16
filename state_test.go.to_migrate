@@ -40,7 +40,7 @@ func TestState_GetMetaData(t *testing.T) {
 	res, err := s.MetaData([]byte{})
 	assert.NoError(t, err)
 
-	fmt.Println(res)
+	log.Println(res)
 
 	assert.Equal(t, "system", res.Metadata.Modules[0].Name)
 }

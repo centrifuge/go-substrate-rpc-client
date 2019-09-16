@@ -323,7 +323,7 @@ func (s *StorageFunctionMetadata) Decode(decoder scale.Decoder) error {
 	if err != nil {
 		return err
 	}
-	// fmt.Println(metadataVersioned.Documentation)
+	// log.Println(metadataVersioned.Documentation)
 	return nil
 }
 

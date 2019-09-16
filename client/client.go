@@ -36,6 +36,8 @@ type Client interface {
 type client struct {
 	*rpc.Client
 
+	URL string
+
 	// metadataVersioned is the metadata cache to prevent unnecessary requests
 	//metadataVersioned *MetadataVersioned
 
@@ -68,6 +70,6 @@ func Connect(url string) (Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	cc := client{c}
+	cc := client{c, url}
 	return &cc, nil
 }

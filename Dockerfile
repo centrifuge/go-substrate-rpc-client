@@ -52,45 +52,6 @@ RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 WORKDIR $GOPATH
 
-# For debugging
-# compile Delve
-# RUN apt-get update && apt-get install -y git
-# RUN go get github.com/derekparker/delve/cmd/dlv
-
-# Port 40000 belongs to Delve
-# EXPOSE 40000
-
-# Allow delve to run on Alpine based containers.
-# RUN apk add --no-cache libc6-compat
-
-# FROM phusion/baseimage:0.10.2
-# LABEL maintainer="chevdor@gmail.com"
-# LABEL description="This is the 2nd stage: a very small image where we copy the subkey binary."
-# ARG PROFILE=release
-
-# RUN mv /usr/share/ca* /tmp && \
-# 	rm -rf /usr/share/*  && \
-# 	mv /tmp/ca-certificates /usr/share/ && \
-# 	mkdir -p /root/.local/share/Polkadot && \
-# 	ln -s /root/.local/share/Polkadot /data && \
-# 	useradd -m -u 1000 -U -s /bin/sh -d /substrate substrate
-
-# COPY --from=builder /substrate/target/$PROFILE/substrate /usr/local/bin
-
-# # checks
-# RUN ldd /usr/local/bin/substrate && \
-# 	/usr/local/bin/substrate --version
-
-# # Shrinking
-# RUN rm -rf /usr/lib/python* && \
-# 	rm -rf /usr/bin /usr/sbin /usr/share/man
-
-# USER substrate
-# EXPOSE 30333 9933 9944
-# VOLUME ["/data"]
-
-# CMD ["/usr/local/bin/substrate"]
-
 RUN mkdir -p $GOPATH/src/github.com/centrifuge/go-substrate-rpc-client
 WORKDIR $GOPATH/src/github.com/centrifuge/go-substrate-rpc-client
 COPY . .
@@ -98,4 +59,3 @@ COPY . .
 RUN make install
 
 CMD ["make", "test"]
-# CMD ["dlv", "debug", "--listen=:40000", "--headless=true", "--api-version=2", "--log", "github.com/centrifuge/go-substrate-rpc-client/test"]
