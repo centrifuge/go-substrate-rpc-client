@@ -28,10 +28,12 @@ import (
 	"golang.org/x/crypto/blake2b"
 )
 
+// Hexer interface is implemented by any type that has a Hex() function returning a string
 type Hexer interface {
 	Hex() string
 }
 
+// EncodeToBytes encodes `value` with the scale codec, returning []byte
 func EncodeToBytes(value interface{}) ([]byte, error) { // TODO rename to Encode
 	var buffer = bytes.Buffer{}
 	err := scale.NewEncoder(&buffer).Encode(value)
@@ -41,6 +43,7 @@ func EncodeToBytes(value interface{}) ([]byte, error) { // TODO rename to Encode
 	return buffer.Bytes(), nil
 }
 
+// EncodeToHexString encodes `value` with the scale codec, returning a hex string (prefixed by 0x)
 func EncodeToHexString(value interface{}) (string, error) { // TODO rename to EncodeToHex
 	bz, err := EncodeToBytes(value)
 	if err != nil {
@@ -50,10 +53,12 @@ func EncodeToHexString(value interface{}) (string, error) { // TODO rename to En
 	return fmt.Sprintf("%#x", bz), nil
 }
 
+// DecodeFromBytes decodes `bz` with the scale codec into `target`. `target` should be a pointer.
 func DecodeFromBytes(bz []byte, target interface{}) error { // TODO rename to Decode
 	return scale.NewDecoder(bytes.NewReader(bz)).Decode(target)
 }
 
+// DecodeFromHexString decodes `str` with the scale codec into `target`. `target` should be a pointer.
 func DecodeFromHexString(str string, target interface{}) error { // TODO rename to DecodeFromHex
 	bz, err := hex.DecodeString(str[2:])
 	if err != nil {
@@ -86,7 +91,7 @@ func Eq(one, other interface{}) bool {
 	return reflect.DeepEqual(one, other)
 }
 
-// Hex returns a hex string representation of the value
+// Hex returns a hex string representation of the value (not of the encoded value)
 func Hex(value interface{}) (string, error) {
 	switch v := value.(type) {
 	case Hexer:
