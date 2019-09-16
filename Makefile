@@ -1,5 +1,5 @@
 # Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
-# Copyright (C) 2019  Philip Stanislaus, Philip Stehlik, Vimukthi Wickramasinghe
+# Copyright (C) 2019  Centrifuge GmbH
 #
 # This file is part of Go Substrate RPC Client (GSRPC).
 #
