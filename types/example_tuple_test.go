@@ -16,33 +16,35 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package state
+package types
 
 import (
-	"strings"
-	"testing"
+	"fmt"
 
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
-	"github.com/stretchr/testify/assert"
+	"golang.org/x/crypto/blake2b"
 )
 
-func TestState_GetMetadataLatest(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping end-to-end test in short mode.")
+func ExampleExampleTuple() {
+	// This represents a document tuple of types [uint64, hash]
+	type Doc struct {
+		ID   U64
+		Hash Hash
 	}
 
-	metadata, err := state.GetMetadataLatest()
-	assert.NoError(t, err)
-	assert.Equal(t, "system", strings.ToLower(metadata.Metadata.Modules[0].Name))
-}
+	doc := Doc{12, blake2b.Sum256([]byte("My document"))}
 
-func TestState_GetMetadata(t *testing.T) {
-	chain := chain.NewChain(state.client)
+	encoded, err := EncodeToHexString(doc)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(encoded)
 
-	hash, err := chain.GetBlockHashLatest()
-	assert.NoError(t, err)
-
-	metadata, err := state.GetMetadata(hash)
-	assert.NoError(t, err)
-	assert.Equal(t, "system", strings.ToLower(metadata.Metadata.Modules[0].Name))
+	var decoded Doc
+	err = DecodeFromHexString(encoded, &decoded)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(decoded)
+	// Output: 0x0c00000000000000809199a254aedc9d92a3157cd27bd21ceccc1e2ecee5760788663a3e523bc1a759
+	// {12 [145 153 162 84 174 220 157 146 163 21 124 210 123 210 28 236 204 30 46 206 229 118 7 136 102 58 62 82 59 193 167 89]}
 }

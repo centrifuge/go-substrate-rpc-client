@@ -81,18 +81,6 @@ func GetHash(value interface{}) (Hash, error) {
 	return blake2b.Sum256(enc), err
 }
 
-// IsEmpty checks if the value is an empty value
-func IsEmpty(value interface{}) bool {
-	// TODO
-	//for _, v := range value {
-	//	if v != 0 {
-	//		return false
-	//	}
-	//}
-	//return true
-	return false
-}
-
 // Eq compares the value of the input to see if there is a match
 func Eq(one, other interface{}) bool {
 	return reflect.DeepEqual(one, other)

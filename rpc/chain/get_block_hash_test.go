@@ -16,33 +16,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package state
+package chain
 
 import (
-	"strings"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestState_GetMetadataLatest(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping end-to-end test in short mode.")
-	}
-
-	metadata, err := state.GetMetadataLatest()
+func TestChain_GetBlockHash(t *testing.T) {
+	res, err := chain.GetBlockHash(1)
 	assert.NoError(t, err)
-	assert.Equal(t, "system", strings.ToLower(metadata.Metadata.Modules[0].Name))
+	hex, err := types.Hex(res)
+	assert.NoError(t, err)
+	assert.True(t, len(hex) > 0)
 }
 
-func TestState_GetMetadata(t *testing.T) {
-	chain := chain.NewChain(state.client)
-
-	hash, err := chain.GetBlockHashLatest()
+func TestChain_GetBlockHashLatest(t *testing.T) {
+	res, err := chain.GetBlockHashLatest()
 	assert.NoError(t, err)
-
-	metadata, err := state.GetMetadata(hash)
+	hex, err := types.Hex(res)
 	assert.NoError(t, err)
-	assert.Equal(t, "system", strings.ToLower(metadata.Metadata.Modules[0].Name))
+	assert.True(t, len(hex) > 0)
 }

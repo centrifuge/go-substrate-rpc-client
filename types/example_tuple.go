@@ -16,33 +16,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package state
+package types
 
-import (
-	"strings"
-	"testing"
-
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
-	"github.com/stretchr/testify/assert"
-)
-
-func TestState_GetMetadataLatest(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping end-to-end test in short mode.")
-	}
-
-	metadata, err := state.GetMetadataLatest()
-	assert.NoError(t, err)
-	assert.Equal(t, "system", strings.ToLower(metadata.Metadata.Modules[0].Name))
-}
-
-func TestState_GetMetadata(t *testing.T) {
-	chain := chain.NewChain(state.client)
-
-	hash, err := chain.GetBlockHashLatest()
-	assert.NoError(t, err)
-
-	metadata, err := state.GetMetadata(hash)
-	assert.NoError(t, err)
-	assert.Equal(t, "system", strings.ToLower(metadata.Metadata.Modules[0].Name))
-}
+// ExampleTuple - Tuple types (fixed-sized series of values with predetermined and fixed types, typically without
+// names/labels/keys) can be represented using Go's structs. To use tuples, just define a struct that has exported
+// fields with the right types for each value in the tuple, and the encoding manages the rest for you.
+// The ExampleTuple type itself is not used anywhere, it's just here for documentation purposes.
+type ExampleTuple struct{}

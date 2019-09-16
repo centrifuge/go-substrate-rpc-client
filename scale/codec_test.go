@@ -13,6 +13,7 @@
 // limitations under the License.
 
 //nolint
+
 package scale
 
 import (

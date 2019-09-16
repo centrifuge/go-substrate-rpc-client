@@ -16,33 +16,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package state
+package types
 
-import (
-	"strings"
-	"testing"
-
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
-	"github.com/stretchr/testify/assert"
-)
-
-func TestState_GetMetadataLatest(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping end-to-end test in short mode.")
-	}
-
-	metadata, err := state.GetMetadataLatest()
-	assert.NoError(t, err)
-	assert.Equal(t, "system", strings.ToLower(metadata.Metadata.Modules[0].Name))
-}
-
-func TestState_GetMetadata(t *testing.T) {
-	chain := chain.NewChain(state.client)
-
-	hash, err := chain.GetBlockHashLatest()
-	assert.NoError(t, err)
-
-	metadata, err := state.GetMetadata(hash)
-	assert.NoError(t, err)
-	assert.Equal(t, "system", strings.ToLower(metadata.Metadata.Modules[0].Name))
-}
+// ExampleVecAny - VecAny is used in polkadot-js as a list of elements that are of any type, while Vec and VecFixed
+// require fixed types.
+// Albeit Go has no dynamic types, VecAny can be implemented using arrays/slices of custom types with custom encoding.
+// An example is provided here.
+// The ExampleVecAny type itself is not used anywhere, it's just here for documentation purposes.
+type ExampleVecAny struct{}

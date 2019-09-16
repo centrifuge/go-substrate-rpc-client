@@ -13,6 +13,7 @@
 // limitations under the License.
 
 //nolint
+
 package scale
 
 import (
@@ -353,7 +354,13 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 	// If you want to replicate Option<T> behavior in Rust, see OptionBool and an
 	// example type OptionInt8 in tests.
 	case reflect.Ptr:
-		err := pd.DecodeIntoReflectValue(target.Elem())
+		isNil := target.IsNil()
+		if isNil {
+			// target.set
+			// return nil
+		}
+		ptr := target.Elem()
+		err := pd.DecodeIntoReflectValue(ptr)
 		if err != nil {
 			return err
 		}

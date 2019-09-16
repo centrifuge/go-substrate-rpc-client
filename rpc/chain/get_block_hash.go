@@ -16,33 +16,50 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package state
+package chain
 
 import (
-	"strings"
-	"testing"
+	"encoding/hex"
+	"fmt"
 
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
-	"github.com/stretchr/testify/assert"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-func TestState_GetMetadataLatest(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping end-to-end test in short mode.")
-	}
-
-	metadata, err := state.GetMetadataLatest()
-	assert.NoError(t, err)
-	assert.Equal(t, "system", strings.ToLower(metadata.Metadata.Modules[0].Name))
+func (c *Chain) GetBlockHash(blockNumber uint64) (types.Hash, error) {
+	return c.getBlockHash(&blockNumber)
 }
 
-func TestState_GetMetadata(t *testing.T) {
-	chain := chain.NewChain(state.client)
+func (c *Chain) GetBlockHashLatest() (types.Hash, error) {
+	return c.getBlockHash(nil)
+}
 
-	hash, err := chain.GetBlockHashLatest()
-	assert.NoError(t, err)
+func (c *Chain) getBlockHash(blockNumber *uint64) (types.Hash, error) {
+	var res string
+	var err error
 
-	metadata, err := state.GetMetadata(hash)
-	assert.NoError(t, err)
-	assert.Equal(t, "system", strings.ToLower(metadata.Metadata.Modules[0].Name))
+	if blockNumber == nil {
+		err = (*c.client).Call(&res, "chain_getBlockHash")
+	} else {
+		err = (*c.client).Call(&res, "chain_getBlockHash", *blockNumber)
+	}
+
+	if err != nil {
+		return types.Hash{}, err
+	}
+
+	bz, err := hex.DecodeString(res[2:])
+	if err != nil {
+		return types.Hash{}, err
+	}
+
+	if len(bz) != 32 {
+		return types.Hash{}, fmt.Errorf("required result to be 32 bytes, but got %v", len(bz))
+	}
+
+	var bz32 [32]byte
+	copy(bz32[:], bz)
+
+	hash := types.NewHash(bz32)
+
+	return hash, nil
 }

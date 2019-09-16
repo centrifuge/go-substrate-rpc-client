@@ -20,6 +20,7 @@ package client
 
 import (
 	"context"
+	"log"
 
 	"github.com/ethereum/go-ethereum/rpc"
 )
@@ -66,6 +67,7 @@ type client struct {
 
 // Connect
 func Connect(url string) (Client, error) {
+	log.Printf("Connecting to %v...", url)
 	c, err := rpc.Dial(url)
 	if err != nil {
 		return nil, err

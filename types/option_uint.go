@@ -17,6 +17,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //nolint:dupl
+
 package types
 
 import "github.com/centrifuge/go-substrate-rpc-client/scale"

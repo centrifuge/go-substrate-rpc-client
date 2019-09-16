@@ -16,33 +16,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package state
+package types
 
 import (
-	"strings"
-	"testing"
-
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
-	"github.com/stretchr/testify/assert"
+	"fmt"
 )
 
-func TestState_GetMetadataLatest(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping end-to-end test in short mode.")
+func ExampleExampleStruct() {
+	type Animal struct {
+		Name     string
+		Legs     U8
+		Children []string
 	}
 
-	metadata, err := state.GetMetadataLatest()
-	assert.NoError(t, err)
-	assert.Equal(t, "system", strings.ToLower(metadata.Metadata.Modules[0].Name))
-}
+	dog := Animal{Name: "Bello", Legs: 2, Children: []string{"Sam"}}
 
-func TestState_GetMetadata(t *testing.T) {
-	chain := chain.NewChain(state.client)
+	encoded, err := EncodeToHexString(dog)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(encoded)
 
-	hash, err := chain.GetBlockHashLatest()
-	assert.NoError(t, err)
-
-	metadata, err := state.GetMetadata(hash)
-	assert.NoError(t, err)
-	assert.Equal(t, "system", strings.ToLower(metadata.Metadata.Modules[0].Name))
+	var decoded Animal
+	err = DecodeFromHexString(encoded, &decoded)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(decoded)
+	// Output: 0x1442656c6c6f02040c53616d
+	// {Bello 2 [Sam]}
 }

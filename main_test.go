@@ -21,9 +21,9 @@ package gsrpc_test
 import (
 	"fmt"
 
-	"github.com/centrifuge/go-substrate-rpc-client/config"
-
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
+	"github.com/centrifuge/go-substrate-rpc-client/config"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
 func Example_simpleConnect() {
@@ -32,12 +32,12 @@ func Example_simpleConnect() {
 		panic(err)
 	}
 
-	fmt.Println(api.RPC.Chain.GetBlockHashLatest())
-	//chain := api.RPC.System.Chain()
-	//name := api.RPC.System.Name()
-	//version := api.RPC.System.Version()
+	hash, err := api.RPC.Chain.GetBlockHashLatest()
+	if err != nil {
+		panic(err)
+	}
 
-	// TODO Output: 0x26735e602578d1f1741552e32d074a5fdefde5bf5e1ad074ba0ba6a96c9cc014
+	fmt.Println(types.Hex(hash))
 }
 
 // TODO: add example for listening to new blocks

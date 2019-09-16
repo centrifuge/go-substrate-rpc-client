@@ -16,23 +16,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package types_test
+package types
 
 import (
-	"testing"
+	"fmt"
+	"reflect"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
-	"github.com/centrifuge/go-substrate-rpc-client/types"
-	"github.com/stretchr/testify/assert"
 )
 
-type PhaseEnum struct {
-	IsApplyExtrinsic bool
-	AsApplyExtrinsic uint32
-	IsFinalization   bool
+// MyVal is a custom type that is used to hold arbitrarily encoded data. In this example, we encode uint8s with a 0x00
+// and strings with 0x01 as the first byte.
+type MyVal struct {
+	Value interface{}
 }
 
-func (m *PhaseEnum) Decode(decoder scale.Decoder) error {
+func (a *MyVal) Decode(decoder scale.Decoder) error {
 	b, err := decoder.ReadOneByte()
 
 	if err != nil {
@@ -40,10 +39,13 @@ func (m *PhaseEnum) Decode(decoder scale.Decoder) error {
 	}
 
 	if b == 0 {
-		m.IsApplyExtrinsic = true
-		err = decoder.Decode(&m.AsApplyExtrinsic)
+		var u uint8
+		err = decoder.Decode(&u)
+		a.Value = u
 	} else if b == 1 {
-		m.IsFinalization = true
+		var s string
+		err = decoder.Decode(&s)
+		a.Value = s
 	}
 
 	if err != nil {
@@ -53,13 +55,18 @@ func (m *PhaseEnum) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (m PhaseEnum) Encode(encoder scale.Encoder) error {
+func (a MyVal) Encode(encoder scale.Encoder) error {
 	var err1, err2 error
-	if m.IsApplyExtrinsic {
+
+	switch v := a.Value.(type) {
+	case uint8:
 		err1 = encoder.PushByte(0)
-		err2 = encoder.Encode(m.AsApplyExtrinsic)
-	} else if m.IsFinalization {
+		err2 = encoder.Encode(v)
+	case string:
 		err1 = encoder.PushByte(1)
+		err2 = encoder.Encode(v)
+	default:
+		return fmt.Errorf("unknown type %T", v)
 	}
 
 	if err1 != nil {
@@ -72,33 +79,22 @@ func (m PhaseEnum) Encode(encoder scale.Encoder) error {
 	return nil
 }
 
-func TestPhaseEnumApplyExtrinsic(t *testing.T) {
-	applyExtrinsic := PhaseEnum{
-		IsApplyExtrinsic: true,
-		AsApplyExtrinsic: 1234,
+func ExampleExampleVecAny() {
+	myValSlice := []MyVal{{uint8(12)}, {"Abc"}}
+
+	encoded, err := EncodeToBytes(myValSlice)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(encoded)
+
+	var decoded []MyVal
+	err = DecodeFromBytes(encoded, &decoded)
+	if err != nil {
+		panic(err)
 	}
 
-	enc, err := types.EncodeToHexString(applyExtrinsic)
-	assert.NoError(t, err)
-
-	var dec PhaseEnum
-	err = types.DecodeFromHexString(enc, &dec)
-	assert.NoError(t, err)
-
-	assert.Equal(t, applyExtrinsic, dec)
-}
-
-func TestPhaseEnumFinalization(t *testing.T) {
-	finalization := PhaseEnum{
-		IsFinalization: true,
-	}
-
-	enc, err := types.EncodeToHexString(finalization)
-	assert.NoError(t, err)
-
-	var dec PhaseEnum
-	err = types.DecodeFromHexString(enc, &dec)
-	assert.NoError(t, err)
-
-	assert.Equal(t, finalization, dec)
+	fmt.Println(reflect.DeepEqual(myValSlice, decoded))
+	// Output: [8 0 12 1 12 65 98 99]
+	// true
 }
