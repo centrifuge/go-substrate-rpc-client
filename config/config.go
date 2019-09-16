@@ -40,9 +40,6 @@ func (c *Config) ExtractDefaultRPCURL() {
 		return
 	}
 
-	// FIXME: due to a size limit, websocket connections don't work with getMetadata right now.
-	// 	Related issue: https://github.com/ethereum/go-ethereum/issues/16846
-	//  Should get fixed with https://github.com/ethereum/go-ethereum/pull/19866 , released in 1.9.1
-	//c.RPCURL = "ws://127.0.0.1:9944"
-	c.RPCURL = "http://127.0.0.1:9933"
+	// Fallback
+	c.RPCURL = "ws://127.0.0.1:9944"
 }

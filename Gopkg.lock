@@ -37,7 +37,7 @@
   version = "v1.7.1"
 
 [[projects]]
-  digest = "1:37a3da05af5c5824b10812b346e413395d2b34eea64f35fbadb6d5a5a8f23772"
+  digest = "1:ce3573a68e13583911e3c1edb08d00987c2270aacc10631a0cdfc3eff6cbc180"
   name = "github.com/ethereum/go-ethereum"
   packages = [
     "common/hexutil",
@@ -47,8 +47,8 @@
     "rpc",
   ]
   pruneopts = "UT"
-  revision = "52f2461774bcb8cdd310f86b4bc501df5b783852"
-  version = "v1.9.0"
+  revision = "cfbb969da803d4cc92e1a64fc1b3c06db299b564"
+  version = "v1.9.3"
 
 [[projects]]
   digest = "1:586ea76dbd0374d6fb649a91d70d652b7fe0ccffb8910a77468e7702e7901f3d"
@@ -57,6 +57,14 @@
   pruneopts = "UT"
   revision = "2fee6af1a9795aafbe0253a0cfbdf668e1fb8a9a"
   version = "v1.8.0"
+
+[[projects]]
+  digest = "1:e62657cca9badaa308d86e7716083e4c5933bb78e30a17743fc67f50be26f6f4"
+  name = "github.com/gorilla/websocket"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "c3e18be99d19e6b3e8f1559eea2c161a665c4b6b"
+  version = "v1.4.1"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
@@ -89,14 +97,6 @@
   packages = ["blake2b"]
   pruneopts = "UT"
   revision = "4def268fd1a49955bfb3dda92fe3db4f924f2285"
-
-[[projects]]
-  branch = "master"
-  digest = "1:7427036b6d926b3d1fa0773771820735b35554a98296f1074df440ee30a97296"
-  name = "golang.org/x/net"
-  packages = ["websocket"]
-  pruneopts = "UT"
-  revision = "da137c7871d730100384dbcf36e6f8fa493aef5b"
 
 [[projects]]
   branch = "master"
