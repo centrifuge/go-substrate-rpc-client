@@ -60,10 +60,6 @@ issues:
     - path: doc.go
       linters:
         - lll
-    - path: types/test_utils.go
-      linters:
-        - deadcode
-        - unused
     - path: types/example_tuple_test.go
       linters:
         - lll

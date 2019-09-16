@@ -16,13 +16,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package types
+package types_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	. "github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
 var exampleMetadata = Metadata{

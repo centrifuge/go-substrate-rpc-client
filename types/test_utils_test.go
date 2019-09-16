@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package types
+package types_test
 
 import (
 	"bytes"
@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	. "github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
 )
 
