@@ -28,6 +28,10 @@ import (
 	"golang.org/x/crypto/blake2b"
 )
 
+type Hexer interface {
+	Hex() string
+}
+
 func EncodeToBytes(value interface{}) ([]byte, error) { // TODO rename to Encode
 	var buffer = bytes.Buffer{}
 	err := scale.NewEncoder(&buffer).Encode(value)
@@ -96,5 +100,12 @@ func Eq(one, other interface{}) bool {
 
 // Hex returns a hex string representation of the value
 func Hex(value interface{}) (string, error) {
-	return EncodeToHexString(value)
+	switch v := value.(type) {
+	case Hexer:
+		return v.Hex(), nil
+	case []byte:
+		return fmt.Sprintf("%#x", v), nil
+	default:
+		return "", fmt.Errorf("does not support %T", v)
+	}
 }

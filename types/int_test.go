@@ -45,7 +45,7 @@ func TestI8_Hash(t *testing.T) {
 }
 
 func TestI8_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewI8(-29), "0xe3"},
 	})
 }
@@ -88,7 +88,7 @@ func TestI16_Hash(t *testing.T) {
 }
 
 func TestI16_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewI16(-29), "0xe3ff"},
 	})
 }
@@ -131,7 +131,7 @@ func TestI32_Hash(t *testing.T) {
 }
 
 func TestI32_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewI32(-29), "0xe3ffffff"},
 	})
 }
@@ -174,7 +174,7 @@ func TestI64_Hash(t *testing.T) {
 }
 
 func TestI64_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewI64(-29), "0xe3ffffffffffffff"},
 	})
 }

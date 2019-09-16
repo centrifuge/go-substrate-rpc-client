@@ -56,7 +56,7 @@ func TestBool_Hash(t *testing.T) {
 }
 
 func TestBool_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewBool(true), "0x01"},
 		{NewBool(false), "0x00"},
 	})

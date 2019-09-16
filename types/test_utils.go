@@ -113,14 +113,14 @@ func assertHash(t *testing.T, hashAsserts []hashAssert) {
 	}
 }
 
-type hexAssert struct {
+type encodeToHexAssert struct {
 	input    interface{}
 	expected string
 }
 
-func assertHex(t *testing.T, hexAsserts []hexAssert) {
-	for _, test := range hexAsserts {
-		result, err := Hex(test.input)
+func assertEncodeToHex(t *testing.T, encodeToHexAsserts []encodeToHexAssert) {
+	for _, test := range encodeToHexAsserts {
+		result, err := EncodeToHexString(test.input)
 		if err != nil {
 			t.Errorf("Hex error for input %v: %v\n", test.input, err)
 		}

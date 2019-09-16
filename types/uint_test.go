@@ -44,7 +44,7 @@ func TestU8_Hash(t *testing.T) {
 }
 
 func TestU8_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewU8(29), "0x1d"},
 	})
 }
@@ -84,7 +84,7 @@ func TestU16_Hash(t *testing.T) {
 }
 
 func TestU16_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewU16(29), "0x1d00"},
 	})
 }
@@ -124,7 +124,7 @@ func TestU32_Hash(t *testing.T) {
 }
 
 func TestU32_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewU32(29), "0x1d000000"},
 	})
 }
@@ -164,7 +164,7 @@ func TestU64_Hash(t *testing.T) {
 }
 
 func TestU64_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewU64(29), "0x1d00000000000000"},
 	})
 }

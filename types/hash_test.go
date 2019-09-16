@@ -47,7 +47,7 @@ func TestH160_Hash(t *testing.T) {
 }
 
 func TestH160_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewH160(hash20), "0x500102030405060708090001020304050607080900"},
 	})
 }
@@ -92,7 +92,7 @@ func TestH256_Hash(t *testing.T) {
 }
 
 func TestH256_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewH256(hash32), "0x800102030405060708090001020304050607080900010203040506070809000102"},
 	})
 }
@@ -132,7 +132,7 @@ func TestHash_Hash(t *testing.T) {
 }
 
 func TestHash_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewHash(hash32), "0x800102030405060708090001020304050607080900010203040506070809000102"},
 	})
 }
@@ -178,7 +178,7 @@ func TestH512_Hash(t *testing.T) {
 }
 
 func TestH512_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewH512(hash64), "0x010101020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304"}, //nolint:lll
 	})
 }

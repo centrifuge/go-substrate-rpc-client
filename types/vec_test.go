@@ -16,38 +16,57 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package state
+package types
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/types"
+	"fmt"
+	"reflect"
 )
 
-func (s *State) GetMetadata(blockHash types.Hash) (*types.Metadata, error) {
-	return s.getMetadata(&blockHash)
-}
+func ExampleVec_simple() {
+	ingredients := []string{"salt", "sugar"}
 
-func (s *State) GetMetadataLatest() (*types.Metadata, error) {
-	return s.getMetadata(nil)
-}
-
-func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
-	metadata := types.NewMetadata()
-
-	var res string
-	var err error
-	if blockHash == nil {
-		err = (*s.client).Call(&res, "state_getMetadata")
-	} else {
-		hexHash, err := types.Hex(*blockHash)
-		if err != nil {
-			return metadata, err
-		}
-		err = (*s.client).Call(&res, "state_getMetadata", hexHash)
-	}
+	encoded, err := EncodeToHexString(ingredients)
 	if err != nil {
-		return metadata, err
+		panic(err)
+	}
+	fmt.Println(encoded)
+
+	var decoded []string
+	err = DecodeFromHexString(encoded, &decoded)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(decoded)
+	// Output: 0x081073616c74147375676172
+	// [salt sugar]
+}
+
+func ExampleVec_struct() {
+	type Votes struct {
+		Options     [2]string
+		Yay         []string
+		Nay         []string
+		Outstanding []string
 	}
 
-	err = types.DecodeFromHexString(res, metadata)
-	return metadata, err
+	votes := Votes{
+		Options:     [2]string{"no deal", "muddle through"},
+		Yay:         []string{"Alice"},
+		Nay:         nil,
+		Outstanding: []string{"Bob", "Carol"},
+	}
+
+	encoded, err := EncodeToBytes(votes)
+	if err != nil {
+		panic(err)
+	}
+	var decoded Votes
+	err = DecodeFromBytes(encoded, &decoded)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(reflect.DeepEqual(votes, decoded))
+	// Output: true
 }

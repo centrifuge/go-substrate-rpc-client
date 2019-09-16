@@ -36,7 +36,11 @@ func (s *State) getRuntimeVersion(blockHash *types.Hash) (*types.RuntimeVersion,
 	if blockHash == nil {
 		err = (*s.client).Call(&runtimeVersion, "state_getRuntimeVersion")
 	} else {
-		err = (*s.client).Call(&runtimeVersion, "state_getRuntimeVersion", *blockHash)
+		hexHash, err := types.Hex(*blockHash)
+		if err != nil {
+			return &runtimeVersion, err
+		}
+		err = (*s.client).Call(&runtimeVersion, "state_getRuntimeVersion", hexHash)
 	}
 	if err != nil {
 		return &runtimeVersion, err

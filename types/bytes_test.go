@@ -55,7 +55,7 @@ func TestBytes_Hash(t *testing.T) {
 }
 
 func TestBytes_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewBytes([]byte{0, 0, 0}), "0x0c000000"},
 		{NewBytes([]byte{171, 18, 52}), "0x0cab1234"},
 		{NewBytes([]byte{0, 1}), "0x080001"},
@@ -113,7 +113,7 @@ func TestBytes8_Hash(t *testing.T) {
 }
 
 func TestBytes8_Hex(t *testing.T) {
-	assertHex(t, []hexAssert{
+	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewBytes8([8]byte{0, 0, 0}), "0x200000000000000000"},
 		{NewBytes8([8]byte{171, 18, 52}), "0x20ab12340000000000"},
 	})
