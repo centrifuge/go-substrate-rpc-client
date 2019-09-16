@@ -32,7 +32,7 @@ type SubstrateAPI struct {
 func NewSubstrateAPI(url string) (*SubstrateAPI, error) {
 	cl, err := client.Connect(url)
 	if err != nil {
-		return &SubstrateAPI{}, err
+		return nil, err
 	}
 
 	clPtr := &cl
