@@ -58,4 +58,4 @@ COPY . .
 
 RUN make install
 
-CMD ["make", "test"]
+CMD ["make", "test-cover"]

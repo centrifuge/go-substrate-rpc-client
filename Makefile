@@ -36,7 +36,8 @@ test: ## runs all tests in project
 	@go test -v ./...
 
 test-cover: ## runs all tests in project and report coverage
-	@go test -cover -count=1 ./...
+	@go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+	@mv coverage.txt shared
 
 test-dockerized: ## runs the tests in a docker container against the Substrate Default Docker image
 	@docker-compose build
