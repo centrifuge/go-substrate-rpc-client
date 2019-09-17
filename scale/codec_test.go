@@ -1,5 +1,3 @@
-// +build tests
-
 // Copyright 2018 Jsgenesis
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -98,6 +96,15 @@ func TestSliceOfInt16EncodedAsExpected(t *testing.T) {
 	assertEqual(t, hexify(encodeToBytes(t, value)), "1c 00 00 01 00 ff ff 02 00 fe ff 03 00 fd ff")
 }
 
+func TestStructFieldByFieldEncoding(t *testing.T) {
+	value := struct {
+		A string
+		B int16
+		C bool
+	}{"my", 3, true}
+	assertRoundtrip(t, value)
+}
+
 // OptionInt8 is an example implementation of an "Option" type, mirroring Option<u8> in Rust version.
 // Since Go does not support generics, one has to define such types manually.
 // See below for ParityEncode / ParityDecode implementations.
@@ -115,7 +122,7 @@ func (o *OptionInt8) Decode(decoder Decoder) error {
 }
 
 func TestSliceOfOptionInt8EncodedAsExpected(t *testing.T) {
-	value := []OptionInt8{OptionInt8{true, 1}, OptionInt8{true, -1}, OptionInt8{false, 0}}
+	value := []OptionInt8{{true, 1}, {true, -1}, {false, 0}}
 	assertRoundtrip(t, value)
 	assertEqual(t, hexify(encodeToBytes(t, value)), "0c 01 01 01 ff 00")
 }

@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math"
 	"reflect"
 )
@@ -203,7 +204,14 @@ func (pe Encoder) Encode(value interface{}) error {
 				return err
 			}
 		} else {
-			return fmt.Errorf("Type %s does not support Encodeable interface", t)
+			rv := reflect.ValueOf(value)
+			for i := 0; i < rv.NumField(); i++ {
+				err := pe.Encode(rv.Field(i).Interface())
+				if err != nil {
+					return fmt.Errorf("type %s does not support Encodeable interface and could not be "+
+						"encoded field by field, error: %v", t, err)
+				}
+			}
 		}
 
 	// Currently unsupported types
@@ -224,7 +232,7 @@ func (pe Encoder) Encode(value interface{}) error {
 	case reflect.Invalid:
 		return fmt.Errorf("Type %s cannot be encoded", t.Kind())
 	default:
-		fmt.Println("not captured")
+		log.Println("not captured")
 	}
 	return nil
 }
@@ -344,7 +352,13 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 	// If you want to replicate Option<T> behavior in Rust, see OptionBool and an
 	// example type OptionInt8 in tests.
 	case reflect.Ptr:
-		err := pd.DecodeIntoReflectValue(target.Elem())
+		isNil := target.IsNil()
+		if isNil {
+			// target.set
+			// return nil
+		}
+		ptr := target.Elem()
+		err := pd.DecodeIntoReflectValue(ptr)
 		if err != nil {
 			return err
 		}
@@ -404,7 +418,13 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 			}
 			target.Set(ptrVal.Elem())
 		} else {
-			return fmt.Errorf("Type %s does not support Decodeable interface", ptrType)
+			for i := 0; i < target.NumField(); i++ {
+				err := pd.DecodeIntoReflectValue(target.Field(i))
+				if err != nil {
+					return fmt.Errorf("type %s does not support Decodeable interface and could not be "+
+						"decoded field by field, error: %v", ptrType, err)
+				}
+			}
 		}
 
 	// Currently unsupported types

@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+  substrate:
+    image: parity/substrate:latest-v1.0
+    ports:
+      - 9933:9933
+      - 9944:9944
+      - 30333:30333
+    expose:
+      - 9933
+      - 9944
+      - 30333
+    networks:
+      centchain-network:
+        ipv4_address: 172.42.0.2
+    command: --dev --ws-external --rpc-external
+  rpc-client-tests:
+    build: .
+    networks:
+      centchain-network:
+        ipv4_address: 172.42.0.99
+    environment:
+      - RPC_URL=http://172.42.0.2:9933
+networks:
+  centchain-network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.42.0.0/16

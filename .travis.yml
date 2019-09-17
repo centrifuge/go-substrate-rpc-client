@@ -10,19 +10,18 @@ go:
 git:
   depth: 1
 
-# Skip the install step. Don't `go get` dependencies. Only build with the code
-# in vendor/
-install: true
-
 # Don't email me the results of the test runs.
 notifications:
   email: false
 
-before_script:
-  - make build
+go_import_path: github.com/centrifuge/go-substrate-rpc-client
 
-# script always runs to completion (set +e). If we have linter issues AND a
-# failing test, we want to see both. Configure golangci-lint with a
-# .golangci.yml file at the top level of your repo.
+services:
+  - docker
+
+install:
+  - make install
+
 script:
-  - go test -v -tags=tests -race ./...  # Run all the tests with the race detector enabled
+  - make lint
+  - make test-dockerized
