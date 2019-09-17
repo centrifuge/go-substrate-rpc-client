@@ -31,6 +31,7 @@ type Client interface {
 	Subscribe(ctx context.Context, namespace string, channel interface{}, args ...interface{}) (
 		*rpc.ClientSubscription, error)
 
+	GetURL() string
 	//MetaData(cache bool) (*MetadataVersioned, error)
 }
 
@@ -43,6 +44,11 @@ type client struct {
 	//metadataVersioned *MetadataVersioned
 
 	//metadataLock sync.RWMutex
+}
+
+// Returns the URL the client connects to
+func (c client) GetURL() string {
+	return c.URL
 }
 
 // TODO move to State struct
@@ -65,7 +71,7 @@ type client struct {
 //	return
 //}
 
-// Connect
+// Connect connects to the provided url
 func Connect(url string) (Client, error) {
 	log.Printf("Connecting to %v...", url)
 	c, err := rpc.Dial(url)
