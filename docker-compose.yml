@@ -21,6 +21,8 @@ services:
         ipv4_address: 172.42.0.99
     environment:
       - RPC_URL=http://172.42.0.2:9933
+    volumes:
+      - "$PWD/shared:/go/src/github.com/centrifuge/go-substrate-rpc-client/shared"
 networks:
   gsrpc-network:
     ipam:
