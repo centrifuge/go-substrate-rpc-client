@@ -36,6 +36,6 @@ func TestGetBlockHashAndVersion(t *testing.T) {
 	assert.NoError(t, err)
 
 	fmt.Printf("Connected to node %v | latest block hash: %v | authoringVersion: %v | specVersion: %v | "+
-		"implVersion: %v\n", (*api.Client).GetURL(), hash.Hex(), runtimeVersion.AuthoringVersion,
+		"implVersion: %v\n", (*api.Client).URL(), hash.Hex(), runtimeVersion.AuthoringVersion,
 		runtimeVersion.SpecVersion, runtimeVersion.ImplVersion)
 }

@@ -31,14 +31,14 @@ type Client interface {
 	Subscribe(ctx context.Context, namespace string, channel interface{}, args ...interface{}) (
 		*rpc.ClientSubscription, error)
 
-	GetURL() string
+	URL() string
 	//MetaData(cache bool) (*MetadataVersioned, error)
 }
 
 type client struct {
 	*rpc.Client
 
-	URL string
+	url string
 
 	// metadataVersioned is the metadata cache to prevent unnecessary requests
 	//metadataVersioned *MetadataVersioned
@@ -48,7 +48,7 @@ type client struct {
 
 // Returns the URL the client connects to
 func (c client) URL() string {
-	return c.URL
+	return c.url
 }
 
 // TODO move to State struct
