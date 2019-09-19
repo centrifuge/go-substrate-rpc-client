@@ -16,55 +16,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package gsrpc_test
+package teste2e
 
 import (
 	"fmt"
+	"testing"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/centrifuge/go-substrate-rpc-client/config"
+	"github.com/stretchr/testify/assert"
 )
 
-func Example_simpleConnect() {
+func TestGetBlockHashAndVersion(t *testing.T) {
 	api, err := gsrpc.NewSubstrateAPI(config.NewDefaultConfig().RPCURL)
-	if err != nil {
-		panic(err)
-	}
-
+	assert.NoError(t, err)
 	hash, err := api.RPC.Chain.GetBlockHashLatest()
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
+	runtimeVersion, err := api.RPC.State.GetRuntimeVersionLatest()
+	assert.NoError(t, err)
 
-	fmt.Println(hash.Hex())
+	fmt.Printf("Connected to node %v | latest block hash: %v | authoringVersion: %v | specVersion: %v | "+
+		"implVersion: %v\n", (*api.Client).GetURL(), hash.Hex(), runtimeVersion.AuthoringVersion,
+		runtimeVersion.SpecVersion, runtimeVersion.ImplVersion)
 }
-
-// TODO: add example for listening to new blocks
-// func Example_listenToNewBlocks() {
-// 	api, err := gsrpc.NewSubstrateAPI(config.NewDefaultConfig().RPCURL)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	heads, errs, close, err := api.RPC.System.SubscribeNewHead()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer close()
-
-// 	// see https://godoc.org/github.com/ethereum/go-ethereum/rpc for more details
-
-// 	count := 0
-
-// 	for {
-// 		select {
-// 		case head := <-heads:
-// 			fmt.Printf("#%v: Got header %v\n", count, head.Number)
-// 			count++
-// 		case err := <-errs:
-// 			fmt.Errorf("Got error: %v;", err)
-// 		}
-// 	}
-// }
-
-//// TODO: implement more: https://polkadot.js.org/api/examples/promise/03_listen_to_balance_change/

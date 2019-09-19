@@ -40,11 +40,3 @@
 [[constraint]]
   name = "github.com/stretchr/testify"
   version = "1.3.0"
-
-[[constraint]]
-  name = "github.com/pierrec/xxHash"
-  version = "0.1.5"
-
-[[constraint]]
-  branch = "development"
-  name = "github.com/ChainSafe/gossamer"
