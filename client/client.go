@@ -47,7 +47,7 @@ type client struct {
 }
 
 // Returns the URL the client connects to
-func (c client) GetURL() string {
+func (c client) URL() string {
 	return c.URL
 }
 
