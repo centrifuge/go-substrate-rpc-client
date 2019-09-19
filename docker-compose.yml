@@ -14,7 +14,7 @@ services:
       gsrpc-network:
         ipv4_address: 172.42.0.2
     command: --dev --ws-external --rpc-external
-  rpc-client-tests:
+  gsrpc-test:
     build: .
     networks:
       gsrpc-network:
