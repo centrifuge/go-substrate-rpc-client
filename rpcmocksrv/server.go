@@ -25,7 +25,8 @@ import (
 // }
 
 // func newStateService(metadata string) *stateService {
-// 	return &stateService{metadata: metadata, storageForBlock: make(map[string]map[string]string), storage: make(map[string]string)}
+// 	return &stateService{metadata: metadata, storageForBlock: make(map[string]map[string]string),
+//	  storage: make(map[string]string)}
 // }
 
 // func (s *stateService) GetMetadata(blocknum *string) string {

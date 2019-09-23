@@ -7,12 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	SubKeySign = "sign-blob"
+// const (
+// 	SubKeySign = "sign-blob"
 
-	// SubKeyCmd subkey command to create signatures
-	SubKeyCmd = "/Users/vimukthi/.cargo/bin/subkey"
-)
+// 	// SubKeyCmd subkey command to create signatures
+// 	SubKeyCmd = "/Users/vimukthi/.cargo/bin/subkey"
+// )
 
 // type AnchorParams struct {
 // 	AnchorIDPreimage [32]byte
