@@ -24,12 +24,30 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
+// GetStorage retreives the stored data and decodes them into the provided interface
+func (s *State) GetStorage(key types.StorageKey, target interface{}, blockHash types.Hash) error {
+	raw, err := s.getStorageRaw(key, &blockHash)
+	if err != nil {
+		return err
+	}
+	return types.DecodeFromBytes(*raw, target)
+}
+
+// GetStorageLatest retreives the stored data for the latest block height and decodes them into the provided interface
+func (s *State) GetStorageLatest(key types.StorageKey, target interface{}) error {
+	raw, err := s.getStorageRaw(key, nil)
+	if err != nil {
+		return err
+	}
+	return types.DecodeFromBytes(*raw, target)
+}
+
 // GetStorageRaw retreives the stored data as raw bytes, without decoding them
 func (s *State) GetStorageRaw(key types.StorageKey, blockHash types.Hash) (*types.StorageDataRaw, error) {
 	return s.getStorageRaw(key, &blockHash)
 }
 
-// GetStorageRaw retreives the stored data for the latest block height as raw bytes, without decoding them
+// GetStorageRawLatest retreives the stored data for the latest block height as raw bytes, without decoding them
 func (s *State) GetStorageRawLatest(key types.StorageKey) (*types.StorageDataRaw, error) {
 	return s.getStorageRaw(key, nil)
 }
