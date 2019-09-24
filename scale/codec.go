@@ -119,6 +119,17 @@ func (pe Encoder) EncodeUintCompact(v uint64) error {
 // Encode a value to the stream.
 func (pe Encoder) Encode(value interface{}) error {
 	t := reflect.TypeOf(value)
+
+	// If the type implements encodeable, use that implementation
+	encodeable := reflect.TypeOf((*Encodeable)(nil)).Elem()
+	if t.Implements(encodeable) {
+		err := value.(Encodeable).Encode(pe)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
 	tk := t.Kind()
 	switch tk {
 
@@ -197,20 +208,12 @@ func (pe Encoder) Encode(value interface{}) error {
 		}
 
 	case reflect.Struct:
-		encodeable := reflect.TypeOf((*Encodeable)(nil)).Elem()
-		if t.Implements(encodeable) {
-			err := value.(Encodeable).Encode(pe)
+		rv := reflect.ValueOf(value)
+		for i := 0; i < rv.NumField(); i++ {
+			err := pe.Encode(rv.Field(i).Interface())
 			if err != nil {
-				return err
-			}
-		} else {
-			rv := reflect.ValueOf(value)
-			for i := 0; i < rv.NumField(); i++ {
-				err := pe.Encode(rv.Field(i).Interface())
-				if err != nil {
-					return fmt.Errorf("type %s does not support Encodeable interface and could not be "+
-						"encoded field by field, error: %v", t, err)
-				}
+				return fmt.Errorf("type %s does not support Encodeable interface and could not be "+
+					"encoded field by field, error: %v", t, err)
 			}
 		}
 
@@ -307,6 +310,19 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 	t := target.Type()
 	if !target.CanSet() {
 		return fmt.Errorf("Unsettable value %v", t)
+	}
+
+	// If the type implements decodeable, use that implementation
+	encodeable := reflect.TypeOf((*Decodeable)(nil)).Elem()
+	ptrType := reflect.PtrTo(t)
+	if ptrType.Implements(encodeable) {
+		ptrVal := reflect.New(t)
+		err := ptrVal.Interface().(Decodeable).Decode(pd)
+		if err != nil {
+			return err
+		}
+		target.Set(ptrVal.Elem())
+		return nil
 	}
 
 	switch t.Kind() {
@@ -408,22 +424,11 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 		target.SetString(string(b))
 
 	case reflect.Struct:
-		encodeable := reflect.TypeOf((*Decodeable)(nil)).Elem()
-		ptrType := reflect.PtrTo(t)
-		if ptrType.Implements(encodeable) {
-			ptrVal := reflect.New(t)
-			err := ptrVal.Interface().(Decodeable).Decode(pd)
+		for i := 0; i < target.NumField(); i++ {
+			err := pd.DecodeIntoReflectValue(target.Field(i))
 			if err != nil {
-				return err
-			}
-			target.Set(ptrVal.Elem())
-		} else {
-			for i := 0; i < target.NumField(); i++ {
-				err := pd.DecodeIntoReflectValue(target.Field(i))
-				if err != nil {
-					return fmt.Errorf("type %s does not support Decodeable interface and could not be "+
-						"decoded field by field, error: %v", ptrType, err)
-				}
+				return fmt.Errorf("type %s does not support Decodeable interface and could not be "+
+					"decoded field by field, error: %v", ptrType, err)
 			}
 		}
 

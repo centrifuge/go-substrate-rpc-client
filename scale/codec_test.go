@@ -57,6 +57,50 @@ func assertRoundtrip(t *testing.T, value interface{}) {
 	assertEqual(t, target.Elem().Interface(), value)
 }
 
+type CustomBool bool
+
+func (c CustomBool) Encode(encoder Encoder) error {
+	var encoded byte
+	if c {
+		encoded = 0x05
+	} else {
+		encoded = 0x10
+	}
+	err := encoder.PushByte(encoded)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CustomBool) Decode(decoder Decoder) error {
+	b, _ := decoder.ReadOneByte()
+	switch b {
+	case 0x05:
+		*c = true
+	case 0x10:
+		*c = false
+	default:
+		return fmt.Errorf("unknown byte prefix for encoded CustomBool: %d", b)
+	}
+	return nil
+}
+
+func TestTypeImplementsEncodeableDecodeableEncodedAsExpected(t *testing.T) {
+	value := CustomBool(true)
+	assertRoundtrip(t, value)
+
+	var buffer = bytes.Buffer{}
+	err := Encoder{&buffer}.Encode(value)
+	assert.NoError(t, err)
+	assert.Equal(t, []byte{0x05}, buffer.Bytes())
+
+	var decoded CustomBool
+	err = Decoder{&buffer}.Decode(&decoded)
+	assert.NoError(t, err)
+	assert.Equal(t, CustomBool(true), decoded)
+}
+
 func TestSliceOfBytesEncodedAsExpected(t *testing.T) {
 	value := []byte{0, 1, 1, 2, 3, 5, 8, 13, 21, 34}
 	assertRoundtrip(t, value)
