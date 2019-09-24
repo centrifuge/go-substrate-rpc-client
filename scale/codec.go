@@ -313,15 +313,23 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 	}
 
 	// If the type implements decodeable, use that implementation
-	encodeable := reflect.TypeOf((*Decodeable)(nil)).Elem()
+	decodeable := reflect.TypeOf((*Decodeable)(nil)).Elem()
 	ptrType := reflect.PtrTo(t)
-	if ptrType.Implements(encodeable) {
-		ptrVal := reflect.New(t)
-		err := ptrVal.Interface().(Decodeable).Decode(pd)
+	if ptrType.Implements(decodeable) {
+		var holder reflect.Value
+		if t.Kind() == reflect.Slice || t.Kind() == reflect.Array {
+			slice := reflect.MakeSlice(t, target.Len(), target.Len())
+			holder = reflect.New(t)
+			holder.Elem().Set(slice)
+		} else {
+			holder = reflect.New(t)
+		}
+
+		err := holder.Interface().(Decodeable).Decode(pd)
 		if err != nil {
 			return err
 		}
-		target.Set(ptrVal.Elem())
+		target.Set(holder.Elem())
 		return nil
 	}
 

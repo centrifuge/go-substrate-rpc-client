@@ -101,6 +101,44 @@ func TestTypeImplementsEncodeableDecodeableEncodedAsExpected(t *testing.T) {
 	assert.Equal(t, CustomBool(true), decoded)
 }
 
+type CustomBytes []byte
+
+func (c CustomBytes) Encode(encoder Encoder) error {
+	for i := 0; i < len(c); i++ {
+		err := encoder.PushByte(^c[i])
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *CustomBytes) Decode(decoder Decoder) error {
+	for i := 0; i < len(*c); i++ {
+		b, err := decoder.ReadOneByte()
+		if err != nil {
+			return err
+		}
+		(*c)[i] = ^b
+	}
+	return nil
+}
+
+func TestTypeImplementsEncodeableDecodeableSliceEncodedAsExpected(t *testing.T) {
+	value := CustomBytes([]byte{0x01, 0x23, 0xf2})
+	// assertRoundtrip(t, value)
+
+	var buffer = bytes.Buffer{}
+	err := Encoder{&buffer}.Encode(value)
+	assert.NoError(t, err)
+	assert.Equal(t, []byte{0xfe, 0xdc, 0xd}, buffer.Bytes())
+
+	decoded := make(CustomBytes, len(value))
+	err = Decoder{&buffer}.Decode(&decoded)
+	assert.NoError(t, err)
+	assert.Equal(t, value, decoded)
+}
+
 func TestSliceOfBytesEncodedAsExpected(t *testing.T) {
 	value := []byte{0, 1, 1, 2, 3, 5, 8, 13, 21, 34}
 	assertRoundtrip(t, value)
