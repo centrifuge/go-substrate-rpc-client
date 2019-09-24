@@ -16,40 +16,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package state
+package testutils
 
-import (
-	"github.com/centrifuge/go-substrate-rpc-client/types"
-)
+import "encoding/hex"
 
-func (s *State) GetMetadata(blockHash types.Hash) (*types.Metadata, error) {
-	return s.getMetadata(&blockHash)
-}
-
-func (s *State) GetMetadataLatest() (*types.Metadata, error) {
-	return s.getMetadata(nil)
-}
-
-func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
-	var res string
-	var err error
-	if blockHash == nil {
-		err = (*s.client).Call(&res, "state_getMetadata")
-	} else {
-		hexHash, err := types.Hex(*blockHash)
-		if err != nil {
-			return nil, err
-		}
-		err = (*s.client).Call(&res, "state_getMetadata", hexHash)
-		if err != nil {
-			return nil, err
-		}
-	}
+// MustDecodeHexString panics if str cannot be decoded. Param str is expected to start with "0x"
+func MustDecodeHexString(str string) []byte {
+	bz, err := hex.DecodeString(str[2:])
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-
-	metadata := types.NewMetadata()
-	err = types.DecodeFromHexString(res, metadata)
-	return metadata, err
+	return bz
 }

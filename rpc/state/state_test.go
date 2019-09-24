@@ -52,6 +52,8 @@ type MockSrv struct {
 	metadataString  string
 	metadata        types.Metadata
 	runtimeVersion  types.RuntimeVersion
+	storageKeyHex   string
+	storageDataHex  string
 }
 
 func (s *MockSrv) GetMetadata(hash *string) string {
@@ -62,6 +64,13 @@ func (s *MockSrv) GetRuntimeVersion(hash *string) types.RuntimeVersion {
 	return mockSrv.runtimeVersion
 }
 
+func (s *MockSrv) GetStorage(key string, hash *string) string {
+	if key != s.storageKeyHex {
+		panic("key not found")
+	}
+	return mockSrv.storageDataHex
+}
+
 // mockSrv sets default data used in tests. This data might become stale when substrate is updated – just run the tests
 // against real servers and update the values stored here. To do that, replace s.URL with
 // config.NewDefaultConfig().RPCURL
@@ -70,4 +79,6 @@ var mockSrv = MockSrv{
 	metadata:        types.ExamplaryMetadataV4,
 	metadataString:  types.ExamplaryMetadataV4String,
 	runtimeVersion:  types.RuntimeVersion{APIs: []types.RuntimeVersionAPI{{APIID: "0xdf6acb689907609b", Version: 0x2}, {APIID: "0x37e397fc7c91f5e4", Version: 0x1}, {APIID: "0x40fe3ad401f8959a", Version: 0x3}, {APIID: "0xd2bc9897eed08f15", Version: 0x1}, {APIID: "0xf78b278be53f454c", Version: 0x1}, {APIID: "0xed99c5acb25eedf5", Version: 0x2}, {APIID: "0xdd718d5cc53262d4", Version: 0x1}, {APIID: "0x7801759919ee83e5", Version: 0x1}}, AuthoringVersion: 0xa, ImplName: "substrate-node", ImplVersion: 0x3e, SpecName: "node", SpecVersion: 0x3c}, //nolint:lll
+	storageKeyHex:   "0x0e4944cfd98d6f4cc374d16f5a4e3f9c",
+	storageDataHex:  "0xb82d895d00000000",
 }

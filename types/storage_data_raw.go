@@ -16,40 +16,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package state
+package types
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/types"
+	"fmt"
+
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
-func (s *State) GetMetadata(blockHash types.Hash) (*types.Metadata, error) {
-	return s.getMetadata(&blockHash)
+// StorageDataRaw contains raw bytes that are not decoded/encoded
+type StorageDataRaw []byte
+
+// NewStorageDataRaw creates a new StorageDataRaw type
+func NewStorageDataRaw(b []byte) StorageDataRaw {
+	return StorageDataRaw(b)
 }
 
-func (s *State) GetMetadataLatest() (*types.Metadata, error) {
-	return s.getMetadata(nil)
+// Encode implements encoding for StorageDataRaw, which just unwraps the bytes of StorageDataRaw
+func (s StorageDataRaw) Encode(encoder scale.Encoder) error {
+	return encoder.Write(s)
 }
 
-func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
-	var res string
-	var err error
-	if blockHash == nil {
-		err = (*s.client).Call(&res, "state_getMetadata")
-	} else {
-		hexHash, err := types.Hex(*blockHash)
-		if err != nil {
-			return nil, err
-		}
-		err = (*s.client).Call(&res, "state_getMetadata", hexHash)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if err != nil {
-		return nil, err
-	}
+// Decode implements decoding for StorageDataRaw, which just wraps the bytes in StorageDataRaw
+func (s *StorageDataRaw) Decode(decoder scale.Decoder) error {
+	return decoder.Read(*s)
+}
 
-	metadata := types.NewMetadata()
-	err = types.DecodeFromHexString(res, metadata)
-	return metadata, err
+// Hex returns a hex string representation of the value
+func (s StorageDataRaw) Hex() string {
+	return fmt.Sprintf("%#x", s)
 }

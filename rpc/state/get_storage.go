@@ -19,28 +19,32 @@
 package state
 
 import (
+	"encoding/hex"
+
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-func (s *State) GetMetadata(blockHash types.Hash) (*types.Metadata, error) {
-	return s.getMetadata(&blockHash)
+// GetStorageRaw retreives the stored data as raw bytes, without decoding them
+func (s *State) GetStorageRaw(key types.StorageKey, blockHash types.Hash) (*types.StorageDataRaw, error) {
+	return s.getStorageRaw(key, &blockHash)
 }
 
-func (s *State) GetMetadataLatest() (*types.Metadata, error) {
-	return s.getMetadata(nil)
+// GetStorageRaw retreives the stored data for the latest block height as raw bytes, without decoding them
+func (s *State) GetStorageRawLatest(key types.StorageKey) (*types.StorageDataRaw, error) {
+	return s.getStorageRaw(key, nil)
 }
 
-func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
+func (s *State) getStorageRaw(key types.StorageKey, blockHash *types.Hash) (*types.StorageDataRaw, error) {
 	var res string
 	var err error
 	if blockHash == nil {
-		err = (*s.client).Call(&res, "state_getMetadata")
+		err = (*s.client).Call(&res, "state_getStorage", key.Hex())
 	} else {
 		hexHash, err := types.Hex(*blockHash)
 		if err != nil {
 			return nil, err
 		}
-		err = (*s.client).Call(&res, "state_getMetadata", hexHash)
+		err = (*s.client).Call(&res, "state_getStorage", key.Hex(), hexHash)
 		if err != nil {
 			return nil, err
 		}
@@ -49,7 +53,11 @@ func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
 		return nil, err
 	}
 
-	metadata := types.NewMetadata()
-	err = types.DecodeFromHexString(res, metadata)
-	return metadata, err
+	bz, err := hex.DecodeString(res[2:])
+	if err != nil {
+		return nil, err
+	}
+
+	data := types.NewStorageDataRaw(bz)
+	return &data, nil
 }

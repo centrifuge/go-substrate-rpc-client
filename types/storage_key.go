@@ -22,12 +22,17 @@ import (
 	"fmt"
 	"hash"
 
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/pierrec/xxHash/xxHash64"
 )
 
 type StorageKey []byte
 
-func NewStorageKey(meta Metadata, module string, fn string, key []byte) (StorageKey, error) {
+func NewStorageKey(b []byte) StorageKey {
+	return b
+}
+
+func CreateStorageKey(meta Metadata, module string, fn string, key []byte) (StorageKey, error) {
 	var fnMeta *StorageFunctionMetadata
 	for _, m := range meta.Metadata.Modules {
 		if m.Prefix == module {
@@ -72,41 +77,20 @@ func NewStorageKey(meta Metadata, module string, fn string, key []byte) (Storage
 	return createMultiXxhash(append(afn), 2)
 }
 
+// Encode implements encoding for StorageKey, which just unwraps the bytes of StorageKey
+func (s StorageKey) Encode(encoder scale.Encoder) error {
+	return encoder.Write(s)
+}
+
+// Decode implements decoding for StorageKey, which just wraps the bytes in StorageKey
+func (s *StorageKey) Decode(decoder scale.Decoder) error {
+	return decoder.Read(*s)
+}
+
 // Hex returns a hex string representation of the value (not of the encoded value)
 func (s StorageKey) Hex() string {
 	return fmt.Sprintf("%#x", s)
 }
-
-// func (s StorageKey) Encode(encoder scale.Encoder) error {
-// 	return encoder.Encode(s)
-// }
-
-// type StorageData []byte
-
-// func (s StorageData) Decoder() *scale.Decoder {
-// 	buf := bytes.NewBuffer(s[:])
-// 	return scale.NewDecoder(buf)
-// }
-
-// func (s *State) Storage(key StorageKey, block []byte) (StorageData, error) {
-// 	var res string
-// 	var err error
-// 	if block != nil {
-// 		err = s.client.Call(&res, "state_getStorage", hexutil.Encode(key), hexutil.Encode(block))
-// 	} else {
-// 		err = s.client.Call(&res, "state_getStorage", hexutil.Encode(key))
-// 	}
-
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	if res == "" {
-// 		return nil, errors.New("empty result")
-// 	}
-
-// 	return hexutil.Decode(res)
-// }
 
 func createMultiXxhash(data []byte, rounds int) ([]byte, error) {
 	res := make([]byte, 0)

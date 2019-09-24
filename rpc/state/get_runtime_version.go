@@ -38,33 +38,15 @@ func (s *State) getRuntimeVersion(blockHash *types.Hash) (*types.RuntimeVersion,
 	} else {
 		hexHash, err := types.Hex(*blockHash)
 		if err != nil {
-			return &runtimeVersion, err
+			return nil, err
 		}
 		err = (*s.client).Call(&runtimeVersion, "state_getRuntimeVersion", hexHash)
 		if err != nil {
-			return &runtimeVersion, err
+			return nil, err
 		}
 	}
 	if err != nil {
-		return &runtimeVersion, err
+		return nil, err
 	}
 	return &runtimeVersion, err
 }
-
-//func (s *State) getRuntimeVersion(blockHash *types.Hash) (*types.RuntimeVersion, error) {
-//	runtimeVersion := types.NewRuntimeVersion()
-//
-//	var res string
-//	var err error
-//	if blockHash == nil {
-//		err = (*s.client).Call(&res, "state_getRuntimeVersion")
-//	} else {
-//		err = (*s.client).Call(&res, "state_getRuntimeVersion", *blockHash)
-//	}
-//	if err != nil {
-//		return runtimeVersion, err
-//	}
-//
-//	err = types.DecodeFromHexString(res, runtimeVersion)
-//	return runtimeVersion, err
-//}
