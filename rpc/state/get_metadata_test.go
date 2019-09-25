@@ -19,30 +19,19 @@
 package state
 
 import (
-	"strings"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestState_GetMetadataLatest(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping end-to-end test in short mode.")
-	}
-
-	metadata, err := state.GetMetadataLatest()
+	md, err := state.GetMetadataLatest()
 	assert.NoError(t, err)
-	assert.Equal(t, "system", strings.ToLower(metadata.Metadata.Modules[0].Name))
+	assert.Equal(t, &mockSrv.metadata, md)
 }
 
 func TestState_GetMetadata(t *testing.T) {
-	chain := chain.NewChain(state.client)
-
-	hash, err := chain.GetBlockHashLatest()
+	md, err := state.GetMetadata(mockSrv.blockHashLatest)
 	assert.NoError(t, err)
-
-	metadata, err := state.GetMetadata(hash)
-	assert.NoError(t, err)
-	assert.Equal(t, "system", strings.ToLower(metadata.Metadata.Modules[0].Name))
+	assert.Equal(t, &mockSrv.metadata, md)
 }

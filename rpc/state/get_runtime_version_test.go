@@ -21,27 +21,17 @@ package state
 import (
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestState_GetRuntimeVersionLatest(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping end-to-end test in short mode.")
-	}
-
-	runtimeVersion, err := state.GetRuntimeVersionLatest()
+	rv, err := state.GetRuntimeVersionLatest()
 	assert.NoError(t, err)
-	assert.Equal(t, "substrate-node", runtimeVersion.ImplName)
+	assert.Equal(t, &mockSrv.runtimeVersion, rv)
 }
 
 func TestState_GetRuntimeVersion(t *testing.T) {
-	chain := chain.NewChain(state.client)
-
-	hash, err := chain.GetBlockHashLatest()
+	rv, err := state.GetRuntimeVersion(mockSrv.blockHashLatest)
 	assert.NoError(t, err)
-
-	runtimeVersion, err := state.GetRuntimeVersion(hash)
-	assert.NoError(t, err)
-	assert.Equal(t, "substrate-node", runtimeVersion.ImplName)
+	assert.Equal(t, &mockSrv.runtimeVersion, rv)
 }

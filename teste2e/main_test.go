@@ -28,6 +28,10 @@ import (
 )
 
 func TestGetBlockHashAndVersion(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping end-to-end test in short mode.")
+	}
+
 	api, err := gsrpc.NewSubstrateAPI(config.NewDefaultConfig().RPCURL)
 	assert.NoError(t, err)
 	hash, err := api.RPC.Chain.GetBlockHashLatest()

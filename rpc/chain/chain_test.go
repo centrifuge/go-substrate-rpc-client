@@ -23,18 +23,44 @@ import (
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/config"
+	"github.com/centrifuge/go-substrate-rpc-client/rpcmocksrv"
 )
 
 var chain *Chain
 
 func TestMain(m *testing.M) {
-	cl, err := client.Connect(config.NewDefaultConfig().RPCURL)
+	s := rpcmocksrv.New()
+	err := s.RegisterName("chain", &mockSrv)
 	if err != nil {
 		panic(err)
 	}
 
+	cl, err := client.Connect(s.URL)
+	if err != nil {
+		panic(err)
+	}
 	chain = NewChain(&cl)
 
 	os.Exit(m.Run())
+}
+
+// MockSrv holds data and methods exposed by the RPC Mock Server used in integration tests
+type MockSrv struct {
+	blockHash       string
+	blockHashLatest string
+}
+
+func (s *MockSrv) GetBlockHash(height *uint64) string {
+	if height != nil {
+		return mockSrv.blockHash
+	}
+	return mockSrv.blockHashLatest
+}
+
+// mockSrv sets default data used in tests. This data might become stale when substrate is updated – just run the tests
+// against real servers and update the values stored here. To do that, replace s.URL with
+// config.NewDefaultConfig().RPCURL
+var mockSrv = MockSrv{
+	blockHash:       "0xc407ff9f28da7e8cedda956195d3e911c8615a2ecf0dbd6c25cf2667fb09a72a",
+	blockHashLatest: "0xc407ff9f28da7e8cedda956195d3e911c8615a2ecf0dbd6c25cf2667fb09a72b",
 }
