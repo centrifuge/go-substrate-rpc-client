@@ -16,35 +16,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package rpcmocksrv
+package types
 
 import (
-	"testing"
+	"fmt"
 
-	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/stretchr/testify/assert"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
-type TestService struct {
+// StorageDataRaw contains raw bytes that are not decoded/encoded
+type StorageDataRaw []byte
+
+// NewStorageDataRaw creates a new StorageDataRaw type
+func NewStorageDataRaw(b []byte) StorageDataRaw {
+	return StorageDataRaw(b)
 }
 
-func (ts *TestService) Ping(s string) string {
-	return s
+// Encode implements encoding for StorageDataRaw, which just unwraps the bytes of StorageDataRaw
+func (s StorageDataRaw) Encode(encoder scale.Encoder) error {
+	return encoder.Write(s)
 }
 
-func TestServer(t *testing.T) {
-	s := New()
+// Decode implements decoding for StorageDataRaw, which just wraps the bytes in StorageDataRaw
+func (s *StorageDataRaw) Decode(decoder scale.Decoder) error {
+	return decoder.Read(*s)
+}
 
-	ts := new(TestService)
-	err := s.RegisterName("testserv3", ts)
-	assert.NoError(t, err)
-
-	c, err := rpc.Dial(s.URL)
-	assert.NoError(t, err)
-
-	var res string
-	err = c.Call(&res, "testserv3_ping", "hello")
-	assert.NoError(t, err)
-
-	assert.Equal(t, "hello", res)
+// Hex returns a hex string representation of the value
+func (s StorageDataRaw) Hex() string {
+	return fmt.Sprintf("%#x", s)
 }

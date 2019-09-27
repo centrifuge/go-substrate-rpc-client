@@ -31,8 +31,6 @@ func (s *State) GetMetadataLatest() (*types.Metadata, error) {
 }
 
 func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
-	metadata := types.NewMetadata()
-
 	var res string
 	var err error
 	if blockHash == nil {
@@ -40,17 +38,18 @@ func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
 	} else {
 		hexHash, err := types.Hex(*blockHash)
 		if err != nil {
-			return metadata, err
+			return nil, err
 		}
 		err = (*s.client).Call(&res, "state_getMetadata", hexHash)
 		if err != nil {
-			return metadata, err
+			return nil, err
 		}
 	}
 	if err != nil {
-		return metadata, err
+		return nil, err
 	}
 
+	metadata := types.NewMetadata()
 	err = types.DecodeFromHexString(res, metadata)
 	return metadata, err
 }

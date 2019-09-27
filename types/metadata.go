@@ -19,9 +19,12 @@
 package types
 
 import (
+	"errors"
+	"hash"
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"golang.org/x/crypto/blake2b"
 )
 
 // Modelled after https://github.com/paritytech/substrate/blob/v1.0.0rc2/srml/metadata/src/lib.rs
@@ -264,22 +267,20 @@ type StorageFunctionMetadata struct {
 	Name          string
 	Modifier      uint8
 	Type          uint8
-	Plane         string
-	Map           TypMap
-	DMap          TypDoubleMap
+	Plane         string       // TODO: rename to: Plain         string
+	Map           TypMap       // TODO: rename to: Map           MapType
+	DMap          TypDoubleMap // TODO: rename to: DoubleMap     DoubleMapType
 	Fallback      []byte
 	Documentation []string
 }
 
-// TODO add again, write test
-//func (s StorageFunctionMetadata) isMap() bool {
-//	return s.Type == 1
-//}
+func (s StorageFunctionMetadata) isMap() bool {
+	return s.Type == 1
+}
 
-// TODO add again, write test
-//func (s StorageFunctionMetadata) isDMap() bool {
-//	return s.Type == 2
-//}
+func (s StorageFunctionMetadata) isDMap() bool {
+	return s.Type == 2
+}
 
 func (s *StorageFunctionMetadata) Decode(decoder scale.Decoder) error {
 	err := decoder.Decode(&s.Name)
@@ -468,30 +469,52 @@ type TypMap struct {
 	IsLinked bool
 }
 
-//func (t TypMap) HashFunc() (hash.Hash, error) {
-//	if t.Hasher == 1 {
-//		return blake2b.New(&blake2b.Config{Size: 32})
-//	}
-//	return hash.Hash{}, errors.New("hash function type not supported")
-//}
+func (t TypMap) HashFunc() (hash.Hash, error) {
+	// Blake2_128
+	// if t.Hasher == 0 {
+	// 	// TODO implement Blake2_128
+	// }
 
-func (m *TypMap) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&m.Hasher)
+	// Blake2_256
+	if t.Hasher == 1 {
+		return blake2b.New256(nil)
+	}
+
+	// Twox128
+	// if t.Hasher == 2 {
+	// 	// TODO implement Twox128
+	// }
+
+	// Twox256
+	// if t.Hasher == 3 {
+	// 	// TODO implement Twox256
+	// }
+
+	// Twox64Concat
+	// if t.Hasher == 4 {
+	// 	// TODO implement Twox64Concat
+	// }
+
+	return nil, errors.New("hash function type not yet supported")
+}
+
+func (t *TypMap) Decode(decoder scale.Decoder) error {
+	err := decoder.Decode(&t.Hasher)
 	if err != nil {
 		return err
 	}
 
-	err = decoder.Decode(&m.Key)
+	err = decoder.Decode(&t.Key)
 	if err != nil {
 		return err
 	}
 
-	err = decoder.Decode(&m.Value)
+	err = decoder.Decode(&t.Value)
 	if err != nil {
 		return err
 	}
 
-	err = decoder.Decode(&m.IsLinked)
+	err = decoder.Decode(&t.IsLinked)
 	if err != nil {
 		return err
 	}
@@ -499,23 +522,23 @@ func (m *TypMap) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (m TypMap) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(m.Hasher)
+func (t TypMap) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(t.Hasher)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(m.Key)
+	err = encoder.Encode(t.Key)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(m.Value)
+	err = encoder.Encode(t.Value)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(m.IsLinked)
+	err = encoder.Encode(t.IsLinked)
 	if err != nil {
 		return err
 	}
@@ -621,86 +644,3 @@ func (m FunctionArgumentMetadata) Encode(encoder scale.Encoder) error {
 
 	return nil
 }
-
-//type StorageKey []byte
-
-//func NewStorageKey(meta Metadata, module string, fn string, key []byte) (StorageKey, error) {
-//	var fnMeta *StorageFunctionMetadata
-//	for _, m := range meta.Metadata.Modules {
-//		if m.Prefix == module {
-//			for _, s := range m.Storage {
-//				if s.Name == fn {
-//					fnMeta = &s
-//					break
-//				}
-//			}
-//		}
-//	}
-//	if fnMeta == nil {
-//		return nil, fmt.Errorf("no meta data found for module %s function %s", module, fn)
-//	}
-//
-//	var hasher hash.Hash
-//	var err error
-//	if fnMeta.isMap() {
-//		hasher, err = fnMeta.Map.HashFunc()
-//		if err != nil {
-//			return nil, err
-//		}
-//	} else if fnMeta.isDMap() {
-//		// TODO define hashing for 2 keys
-//	}
-//
-//	afn := []byte(module + " " + fn)
-//	// TODO why is add length prefix step in JS client doesn't add anything to the hashed key?
-//	if hasher != nil {
-//		hasher.Write(append(afn, key...))
-//		return hasher.Sum(nil), nil
-//	} else {
-//		if key != nil {
-//			return createMultiXxhash(append(afn, key...), 2), nil
-//		}
-//		return createMultiXxhash(append(afn), 2), nil
-//	}
-//}
-
-//func (s StorageKey) Encode(encoder scale.Encoder) error {
-//	return encoder.Encode(s)
-//}
-//
-//type StorageData []byte
-//
-//func (s StorageData) Decoder() *scale.Decoder {
-//	buf := bytes.NewBuffer(s[:])
-//	return scale.NewDecoder(buf)
-//}
-//
-//func (s *State) Storage(key StorageKey, block []byte) (StorageData, error) {
-//	var res string
-//	var err error
-//	if block != nil {
-//		err = s.client.Call(&res, "state_getStorage", hexutil.Encode(key), hexutil.Encode(block))
-//	} else {
-//		err = s.client.Call(&res, "state_getStorage", hexutil.Encode(key))
-//	}
-//
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	if res == "" {
-//		return nil, errors.New("empty result")
-//	}
-//
-//	return hexutil.Decode(res)
-//}
-//
-//func createMultiXxhash(data []byte, rounds int) []byte {
-//	res := make([]byte, 0)
-//	for i := 0; i < rounds; i++ {
-//		h := xxHash64.New(uint64(i))
-//		h.Write(data)
-//		res = append(res, h.Sum(nil)...)
-//	}
-//	return res
-//}

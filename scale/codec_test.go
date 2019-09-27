@@ -57,6 +57,88 @@ func assertRoundtrip(t *testing.T, value interface{}) {
 	assertEqual(t, target.Elem().Interface(), value)
 }
 
+type CustomBool bool
+
+func (c CustomBool) Encode(encoder Encoder) error {
+	var encoded byte
+	if c {
+		encoded = 0x05
+	} else {
+		encoded = 0x10
+	}
+	err := encoder.PushByte(encoded)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CustomBool) Decode(decoder Decoder) error {
+	b, _ := decoder.ReadOneByte()
+	switch b {
+	case 0x05:
+		*c = true
+	case 0x10:
+		*c = false
+	default:
+		return fmt.Errorf("unknown byte prefix for encoded CustomBool: %d", b)
+	}
+	return nil
+}
+
+func TestTypeImplementsEncodeableDecodeableEncodedAsExpected(t *testing.T) {
+	value := CustomBool(true)
+	assertRoundtrip(t, value)
+
+	var buffer = bytes.Buffer{}
+	err := Encoder{&buffer}.Encode(value)
+	assert.NoError(t, err)
+	assert.Equal(t, []byte{0x05}, buffer.Bytes())
+
+	var decoded CustomBool
+	err = Decoder{&buffer}.Decode(&decoded)
+	assert.NoError(t, err)
+	assert.Equal(t, CustomBool(true), decoded)
+}
+
+type CustomBytes []byte
+
+func (c CustomBytes) Encode(encoder Encoder) error {
+	for i := 0; i < len(c); i++ {
+		err := encoder.PushByte(^c[i])
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *CustomBytes) Decode(decoder Decoder) error {
+	for i := 0; i < len(*c); i++ {
+		b, err := decoder.ReadOneByte()
+		if err != nil {
+			return err
+		}
+		(*c)[i] = ^b
+	}
+	return nil
+}
+
+func TestTypeImplementsEncodeableDecodeableSliceEncodedAsExpected(t *testing.T) {
+	value := CustomBytes([]byte{0x01, 0x23, 0xf2})
+	// assertRoundtrip(t, value)
+
+	var buffer = bytes.Buffer{}
+	err := Encoder{&buffer}.Encode(value)
+	assert.NoError(t, err)
+	assert.Equal(t, []byte{0xfe, 0xdc, 0xd}, buffer.Bytes())
+
+	decoded := make(CustomBytes, len(value))
+	err = Decoder{&buffer}.Decode(&decoded)
+	assert.NoError(t, err)
+	assert.Equal(t, value, decoded)
+}
+
 func TestSliceOfBytesEncodedAsExpected(t *testing.T) {
 	value := []byte{0, 1, 1, 2, 3, 5, 8, 13, 21, 34}
 	assertRoundtrip(t, value)

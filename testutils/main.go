@@ -16,35 +16,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package rpcmocksrv
+package testutils
 
-import (
-	"testing"
+import "encoding/hex"
 
-	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/stretchr/testify/assert"
-)
-
-type TestService struct {
-}
-
-func (ts *TestService) Ping(s string) string {
-	return s
-}
-
-func TestServer(t *testing.T) {
-	s := New()
-
-	ts := new(TestService)
-	err := s.RegisterName("testserv3", ts)
-	assert.NoError(t, err)
-
-	c, err := rpc.Dial(s.URL)
-	assert.NoError(t, err)
-
-	var res string
-	err = c.Call(&res, "testserv3_ping", "hello")
-	assert.NoError(t, err)
-
-	assert.Equal(t, "hello", res)
+// MustDecodeHexString panics if str cannot be decoded. Param str is expected to start with "0x"
+func MustDecodeHexString(str string) []byte {
+	bz, err := hex.DecodeString(str[2:])
+	if err != nil {
+		panic(err)
+	}
+	return bz
 }
