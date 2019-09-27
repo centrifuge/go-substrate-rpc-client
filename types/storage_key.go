@@ -62,7 +62,6 @@ func CreateStorageKey(meta Metadata, module string, fn string, key []byte) (Stor
 
 	afn := []byte(module + " " + fn)
 
-	// TODO why is add length prefix step in JS client doesn't add anything to the hashed key?
 	if hasher != nil {
 		_, err = hasher.Write(append(afn, key...))
 		if err != nil {
@@ -74,7 +73,7 @@ func CreateStorageKey(meta Metadata, module string, fn string, key []byte) (Stor
 	if key != nil {
 		return createMultiXxhash(append(afn, key...), 2)
 	}
-	return createMultiXxhash(append(afn), 2)
+	return createMultiXxhash(afn, 2)
 }
 
 // Encode implements encoding for StorageKey, which just unwraps the bytes of StorageKey
