@@ -18,10 +18,10 @@
 
 package types
 
-// AccountId represents a public key (an 32 byte array)
-type AccountId [32]byte
+// AccountID represents a public key (an 32 byte array)
+type AccountID [32]byte
 
-// NewAccountId creates a new AccountId type
-func NewAccountId(b [32]byte) AccountId {
-	return AccountId(b)
+// NewAccountID creates a new AccountID type
+func NewAccountID(b [32]byte) AccountID {
+	return AccountID(b)
 }
