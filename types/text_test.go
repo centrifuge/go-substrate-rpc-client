@@ -46,7 +46,8 @@ func TestString_Encode(t *testing.T) {
 func TestString_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
 		{NewText(""), mustDecodeHexString("0x03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314")},
-		{NewText("My nice string"), mustDecodeHexString("0x30f31ff5f82596c990e5afd2b656db0ca30e1a5a9cc7eb5f83ee18731eecd453")},
+		{NewText("My nice string"), mustDecodeHexString(
+			"0x30f31ff5f82596c990e5afd2b656db0ca30e1a5a9cc7eb5f83ee18731eecd453")},
 	})
 }
 

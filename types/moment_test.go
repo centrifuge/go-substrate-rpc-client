@@ -40,7 +40,8 @@ func TestMoment_Encode(t *testing.T) {
 
 func TestMoment_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewMoment(time.Unix(12345, 0)), mustDecodeHexString("0x3927a81b1d2d202b1cd21a1183123a4720b4ae7ecdf5eeed9f4026833b0e88ef")},
+		{NewMoment(time.Unix(12345, 0)), mustDecodeHexString(
+			"0x3927a81b1d2d202b1cd21a1183123a4720b4ae7ecdf5eeed9f4026833b0e88ef")},
 	})
 }
 
