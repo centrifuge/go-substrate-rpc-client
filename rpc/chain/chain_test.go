@@ -34,6 +34,7 @@ func TestMain(m *testing.M) {
 	}
 
 	cl, err := client.Connect(s.URL)
+	// cl, err := client.Connect(config.NewDefaultConfig().RPCURL)
 	if err != nil {
 		panic(err)
 	}
@@ -52,6 +53,10 @@ func (s *MockSrv) GetBlockHash(height *uint64) string {
 	if height != nil {
 		return mockSrv.blockHash
 	}
+	return mockSrv.blockHashLatest
+}
+
+func (s *MockSrv) GetFinalizedHead() string {
 	return mockSrv.blockHashLatest
 }
 
