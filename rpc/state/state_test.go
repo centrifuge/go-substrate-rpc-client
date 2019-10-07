@@ -54,6 +54,7 @@ type MockSrv struct {
 	storageKeyHex   string
 	storageDataHex  string
 	storageSize     types.U64
+	storageHashHex  string
 }
 
 func (s *MockSrv) GetMetadata(hash *string) string {
@@ -82,6 +83,10 @@ func (s *MockSrv) GetStorageSize(key string, hash *string) types.U64 {
 	return mockSrv.storageSize
 }
 
+func (s *MockSrv) GetStorageHash(key string, hash *string) string {
+	return mockSrv.storageHashHex
+}
+
 // mockSrv sets default data used in tests. This data might become stale when substrate is updated – just run the tests
 // against real servers and update the values stored here. To do that, replace s.URL with
 // config.NewDefaultConfig().RPCURL
@@ -93,4 +98,5 @@ var mockSrv = MockSrv{
 	storageKeyHex:   "0x0e4944cfd98d6f4cc374d16f5a4e3f9c",
 	storageDataHex:  "0xb82d895d00000000",
 	storageSize:     926778,
+	storageHashHex:  "0xdf0e877ee1cb973b9a566f53707d365b269d7131b55e65b9790994e4e63b95e1",
 }
