@@ -17,6 +17,7 @@
 package chain
 
 import (
+	"github.com/centrifuge/go-substrate-rpc-client/client"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
@@ -30,19 +31,7 @@ func (c *Chain) GetHeaderLatest() (*types.Header, error) {
 
 func (c *Chain) getHeader(blockHash *types.Hash) (*types.Header, error) {
 	var Header types.Header
-	var err error
-	if blockHash == nil {
-		err = (*c.client).Call(&Header, "chain_getHeader")
-	} else {
-		hexHash, err := types.Hex(*blockHash)
-		if err != nil {
-			return nil, err
-		}
-		err = (*c.client).Call(&Header, "chain_getHeader", hexHash)
-		if err != nil {
-			return nil, err
-		}
-	}
+	err := client.CallWithBlockHash(*c.client, &Header, "chain_getHeader", blockHash)
 	if err != nil {
 		return nil, err
 	}

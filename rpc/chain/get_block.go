@@ -17,6 +17,7 @@
 package chain
 
 import (
+	"github.com/centrifuge/go-substrate-rpc-client/client"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
@@ -30,19 +31,7 @@ func (c *Chain) GetBlockLatest() (*types.SignedBlock, error) {
 
 func (c *Chain) getBlock(blockHash *types.Hash) (*types.SignedBlock, error) {
 	var SignedBlock types.SignedBlock
-	var err error
-	if blockHash == nil {
-		err = (*c.client).Call(&SignedBlock, "chain_getBlock")
-	} else {
-		hexHash, err := types.Hex(*blockHash)
-		if err != nil {
-			return nil, err
-		}
-		err = (*c.client).Call(&SignedBlock, "chain_getBlock", hexHash)
-		if err != nil {
-			return nil, err
-		}
-	}
+	err := client.CallWithBlockHash(*c.client, &SignedBlock, "chain_getBlock", blockHash)
 	if err != nil {
 		return nil, err
 	}

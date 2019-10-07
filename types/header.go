@@ -128,25 +128,26 @@ func (m *DigestItem) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	if b == 0 {
+	switch b {
+	case 0:
 		m.IsOther = true
 		err = decoder.Decode(&m.AsOther)
-	} else if b == 1 {
+	case 1:
 		m.IsAuthoritiesChange = true
 		err = decoder.Decode(&m.AsAuthoritiesChange)
-	} else if b == 2 {
+	case 2:
 		m.IsChangesTrieRoot = true
 		err = decoder.Decode(&m.AsChangesTrieRoot)
-	} else if b == 3 {
+	case 3:
 		m.IsSealV0 = true
 		err = decoder.Decode(&m.AsSealV0)
-	} else if b == 4 {
+	case 4:
 		m.IsConsensus = true
 		err = decoder.Decode(&m.AsConsensus)
-	} else if b == 5 {
+	case 5:
 		m.IsSeal = true
 		err = decoder.Decode(&m.AsSeal)
-	} else if b == 6 {
+	case 6:
 		m.IsPreRuntime = true
 		err = decoder.Decode(&m.AsPreRuntime)
 	}
@@ -160,25 +161,26 @@ func (m *DigestItem) Decode(decoder scale.Decoder) error {
 
 func (m DigestItem) Encode(encoder scale.Encoder) error {
 	var err1, err2 error
-	if m.IsOther {
+	switch {
+	case m.IsOther:
 		err1 = encoder.PushByte(0)
 		err2 = encoder.Encode(m.AsOther)
-	} else if m.IsAuthoritiesChange {
+	case m.IsAuthoritiesChange:
 		err1 = encoder.PushByte(1)
 		err2 = encoder.Encode(m.AsAuthoritiesChange)
-	} else if m.IsChangesTrieRoot {
+	case m.IsChangesTrieRoot:
 		err1 = encoder.PushByte(2)
 		err2 = encoder.Encode(m.AsChangesTrieRoot)
-	} else if m.IsSealV0 {
+	case m.IsSealV0:
 		err1 = encoder.PushByte(3)
 		err2 = encoder.Encode(m.AsSealV0)
-	} else if m.IsConsensus {
+	case m.IsConsensus:
 		err1 = encoder.PushByte(4)
 		err2 = encoder.Encode(m.AsConsensus)
-	} else if m.IsSeal {
+	case m.IsSeal:
 		err1 = encoder.PushByte(5)
 		err2 = encoder.Encode(m.AsSeal)
-	} else if m.IsPreRuntime {
+	case m.IsPreRuntime:
 		err1 = encoder.PushByte(6)
 		err2 = encoder.Encode(m.AsPreRuntime)
 	}

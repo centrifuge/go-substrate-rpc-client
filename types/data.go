@@ -57,6 +57,6 @@ func (d *Data) Decode(decoder scale.Decoder) error {
 }
 
 // Hex returns a hex string representation of the value
-func (s Data) Hex() string {
-	return fmt.Sprintf("%#x", s)
+func (d Data) Hex() string {
+	return fmt.Sprintf("%#x", d)
 }

@@ -59,11 +59,11 @@ func (s *MockSrv) GetBlockHash(height *uint64) string {
 	return mockSrv.blockHashLatest.Hex()
 }
 
-func (s *MockSrv) GetBlock(height *uint64) types.SignedBlock {
+func (s *MockSrv) GetBlock(hash *string) types.SignedBlock {
 	return mockSrv.signedBlock
 }
 
-func (s *MockSrv) GetHeader(height *uint64) types.Header {
+func (s *MockSrv) GetHeader(hash *string) types.Header {
 	return mockSrv.header
 }
 

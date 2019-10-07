@@ -21,6 +21,7 @@ package state
 import (
 	"encoding/hex"
 
+	"github.com/centrifuge/go-substrate-rpc-client/client"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
@@ -54,19 +55,7 @@ func (s *State) GetStorageRawLatest(key types.StorageKey) (*types.StorageDataRaw
 
 func (s *State) getStorageRaw(key types.StorageKey, blockHash *types.Hash) (*types.StorageDataRaw, error) {
 	var res string
-	var err error
-	if blockHash == nil {
-		err = (*s.client).Call(&res, "state_getStorage", key.Hex())
-	} else {
-		hexHash, err := types.Hex(*blockHash)
-		if err != nil {
-			return nil, err
-		}
-		err = (*s.client).Call(&res, "state_getStorage", key.Hex(), hexHash)
-		if err != nil {
-			return nil, err
-		}
-	}
+	err := client.CallWithBlockHash(*s.client, &res, "state_getStorage", blockHash, key.Hex())
 	if err != nil {
 		return nil, err
 	}

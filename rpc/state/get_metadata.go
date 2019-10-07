@@ -17,6 +17,7 @@
 package state
 
 import (
+	"github.com/centrifuge/go-substrate-rpc-client/client"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
@@ -30,19 +31,7 @@ func (s *State) GetMetadataLatest() (*types.Metadata, error) {
 
 func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
 	var res string
-	var err error
-	if blockHash == nil {
-		err = (*s.client).Call(&res, "state_getMetadata")
-	} else {
-		hexHash, err := types.Hex(*blockHash)
-		if err != nil {
-			return nil, err
-		}
-		err = (*s.client).Call(&res, "state_getMetadata", hexHash)
-		if err != nil {
-			return nil, err
-		}
-	}
+	err := client.CallWithBlockHash(*s.client, &res, "state_getMetadata", blockHash)
 	if err != nil {
 		return nil, err
 	}

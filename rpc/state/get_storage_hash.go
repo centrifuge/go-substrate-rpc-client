@@ -19,6 +19,7 @@
 package state
 
 import (
+	"github.com/centrifuge/go-substrate-rpc-client/client"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
@@ -34,19 +35,7 @@ func (s *State) GetStorageHashLatest(key types.StorageKey) (types.Hash, error) {
 
 func (s *State) getStorageHash(key types.StorageKey, blockHash *types.Hash) (types.Hash, error) {
 	var res string
-	var err error
-	if blockHash == nil {
-		err = (*s.client).Call(&res, "state_getStorageHash", key.Hex())
-	} else {
-		hexHash, err := types.Hex(*blockHash)
-		if err != nil {
-			return types.Hash{}, err
-		}
-		err = (*s.client).Call(&res, "state_getStorageHash", key.Hex(), hexHash)
-		if err != nil {
-			return types.Hash{}, err
-		}
-	}
+	err := client.CallWithBlockHash(*s.client, &res, "state_getStorageHash", blockHash, key.Hex())
 	if err != nil {
 		return types.Hash{}, err
 	}
