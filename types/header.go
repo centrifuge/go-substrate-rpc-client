@@ -16,17 +16,39 @@
 
 package types
 
-import "github.com/centrifuge/go-substrate-rpc-client/scale"
+import (
+	"encoding/json"
+
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
+)
 
 type Header struct {
-	ParentHash     Hash
-	Number         BlockNumber
-	StateRoot      Hash
-	ExtrinsicsRoot Hash
-	Digest         Digest
+	ParentHash     Hash        `json:"parentHash"`
+	Number         BlockNumber `json:"-"` // `json:"number"` // TODO
+	StateRoot      Hash        `json:"stateRoot"`
+	ExtrinsicsRoot Hash        `json:"extrinsicsRoot"`
+	Digest         Digest      `json:"digest"`
 }
 
 type BlockNumber U32
+
+// UnmarshalJSON fills u with the JSON encoded byte array given by b
+func (b *BlockNumber) UnmarshalJSON(bz []byte) error {
+	var tmp string
+	if err := json.Unmarshal(bz, &tmp); err != nil {
+		return err
+	}
+	return DecodeFromHexString(tmp, b)
+}
+
+// MarshalJSON returns a JSON encoded byte array of u
+func (b BlockNumber) MarshalJSON() ([]byte, error) {
+	s, err := EncodeToHexString(b)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(s)
+}
 
 // Encode implements encoding for BlockNumber, which just unwraps the bytes of BlockNumber
 func (b BlockNumber) Encode(encoder scale.Encoder) error {
@@ -45,6 +67,41 @@ func (b *BlockNumber) Decode(decoder scale.Decoder) error {
 
 // Digest contains logs
 type Digest []DigestItem
+
+// UnmarshalJSON fills u with the JSON encoded byte array given by b
+func (d *Digest) UnmarshalJSON(bz []byte) error {
+	var tmp struct {
+		Logs []string `json:"logs"`
+	}
+	if err := json.Unmarshal(bz, &tmp); err != nil {
+		return err
+	}
+	*d = make([]DigestItem, len(tmp.Logs))
+	for i, log := range tmp.Logs {
+		err := DecodeFromHexString(log, &(*d)[i])
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// MarshalJSON returns a JSON encoded byte array of u
+func (d Digest) MarshalJSON() ([]byte, error) {
+	logs := make([]string, len(d))
+	var err error
+	for i, di := range d {
+		logs[i], err = EncodeToHexString(di)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return json.Marshal(struct {
+		Logs []string `json:"logs"`
+	}{
+		Logs: logs,
+	})
+}
 
 // DigestItem speciefies the item in the logs of a digest
 type DigestItem struct {

@@ -22,6 +22,7 @@ import (
 
 	"github.com/centrifuge/go-substrate-rpc-client/client"
 	"github.com/centrifuge/go-substrate-rpc-client/rpcmocksrv"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
 var chain *Chain
@@ -45,25 +46,31 @@ func TestMain(m *testing.M) {
 
 // MockSrv holds data and methods exposed by the RPC Mock Server used in integration tests
 type MockSrv struct {
-	blockHash       string
-	blockHashLatest string
+	blockHash       types.Hash
+	blockHashLatest types.Hash
+	header          types.Header
 }
 
 func (s *MockSrv) GetBlockHash(height *uint64) string {
 	if height != nil {
-		return mockSrv.blockHash
+		return mockSrv.blockHash.Hex()
 	}
-	return mockSrv.blockHashLatest
+	return mockSrv.blockHashLatest.Hex()
+}
+
+func (s *MockSrv) GetHeader(height *uint64) types.Header {
+	return mockSrv.header
 }
 
 func (s *MockSrv) GetFinalizedHead() string {
-	return mockSrv.blockHashLatest
+	return mockSrv.blockHashLatest.Hex()
 }
 
 // mockSrv sets default data used in tests. This data might become stale when substrate is updated – just run the tests
 // against real servers and update the values stored here. To do that, replace s.URL with
 // config.NewDefaultConfig().RPCURL
 var mockSrv = MockSrv{
-	blockHash:       "0xc407ff9f28da7e8cedda956195d3e911c8615a2ecf0dbd6c25cf2667fb09a72a",
-	blockHashLatest: "0xc407ff9f28da7e8cedda956195d3e911c8615a2ecf0dbd6c25cf2667fb09a72b",
+	blockHash:       types.Hash{0xc4, 0x07, 0xff, 0x9f, 0x28, 0xda, 0x7e, 0x8c, 0xed, 0xda, 0x95, 0x61, 0x95, 0xd3, 0xe9, 0x11, 0xc8, 0x61, 0x5a, 0x2e, 0xcf, 0x0d, 0xbd, 0x6c, 0x25, 0xcf, 0x26, 0x67, 0xfb, 0x09, 0xa7, 0x2a}, //nolint:lll
+	blockHashLatest: types.Hash{0xc4, 0x07, 0xff, 0x9f, 0x28, 0xda, 0x7e, 0x8c, 0xed, 0xda, 0x95, 0x61, 0x95, 0xd3, 0xe9, 0x11, 0xc8, 0x61, 0x5a, 0x2e, 0xcf, 0x0d, 0xbd, 0x6c, 0x25, 0xcf, 0x26, 0x67, 0xfb, 0x09, 0xa7, 0x2b}, //nolint:lll
+	header:          *types.ExamplaryHeader,
 }

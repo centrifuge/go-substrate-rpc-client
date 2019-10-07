@@ -17,16 +17,34 @@
 package chain
 
 import (
-	"testing"
-
 	"github.com/centrifuge/go-substrate-rpc-client/types"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestChain_GetFinalizedHead(t *testing.T) {
-	res, err := chain.GetFinalizedHead()
-	assert.NoError(t, err)
-	hex, err := types.Hex(res)
-	assert.NoError(t, err)
-	assert.Equal(t, mockSrv.blockHashLatest.Hex(), hex)
+func (c *Chain) GetHeader(blockHash types.Hash) (*types.Header, error) {
+	return c.getHeader(&blockHash)
+}
+
+func (c *Chain) GetHeaderLatest() (*types.Header, error) {
+	return c.getHeader(nil)
+}
+
+func (c *Chain) getHeader(blockHash *types.Hash) (*types.Header, error) {
+	var Header types.Header
+	var err error
+	if blockHash == nil {
+		err = (*c.client).Call(&Header, "chain_getHeader")
+	} else {
+		hexHash, err := types.Hex(*blockHash)
+		if err != nil {
+			return nil, err
+		}
+		err = (*c.client).Call(&Header, "chain_getHeader", hexHash)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &Header, err
 }
