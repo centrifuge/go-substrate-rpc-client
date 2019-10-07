@@ -18,6 +18,7 @@ package state
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/client"
@@ -60,6 +61,13 @@ func (s *MockSrv) GetMetadata(hash *string) string {
 
 func (s *MockSrv) GetRuntimeVersion(hash *string) types.RuntimeVersion {
 	return mockSrv.runtimeVersion
+}
+
+func (s *MockSrv) GetKeys(key string, hash *string) []string {
+	if !strings.HasPrefix(mockSrv.storageKeyHex, key) {
+		panic("key not found")
+	}
+	return []string{mockSrv.storageKeyHex}
 }
 
 func (s *MockSrv) GetStorage(key string, hash *string) string {
