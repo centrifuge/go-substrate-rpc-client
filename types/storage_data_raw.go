@@ -20,11 +20,15 @@ package types
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
-// StorageDataRaw contains raw bytes that are not decoded/encoded
+// StorageDataRaw contains raw bytes that are not decoded/encoded.
+// Be careful using this in your own structs – it only works as the last value in a struct since it will consume the
+// remainder of the encoded data. The reason for this is that it does not contain any length encoding, so it would
+// not know where to stop.
 type StorageDataRaw []byte
 
 // NewStorageDataRaw creates a new StorageDataRaw type
@@ -37,9 +41,19 @@ func (s StorageDataRaw) Encode(encoder scale.Encoder) error {
 	return encoder.Write(s)
 }
 
-// Decode implements decoding for StorageDataRaw, which just wraps the bytes in StorageDataRaw
+// Decode implements decoding for StorageDataRaw, which just reads all the remaining bytes into StorageDataRaw
 func (s *StorageDataRaw) Decode(decoder scale.Decoder) error {
-	return decoder.Read(*s)
+	for i := 0; true; i++ {
+		b, err := decoder.ReadOneByte()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		*s = append((*s)[:i], b)
+	}
+	return nil
 }
 
 // Hex returns a hex string representation of the value
