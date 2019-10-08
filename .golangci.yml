@@ -57,6 +57,12 @@ issues:
     - path: types/option_uint.go
       linters:
         - dupl
+    - path: types/data_test.go
+      linters:
+        - dupl
+    - path: types/storage_data_raw_test.go
+      linters:
+        - dupl
     - path: doc.go
       linters:
         - lll

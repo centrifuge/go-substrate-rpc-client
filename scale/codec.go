@@ -202,7 +202,8 @@ func (pe Encoder) Encode(value interface{}) error {
 
 	// Strings are encoded as UTF-8 byte slices, just as in Rust
 	case reflect.String:
-		err := pe.Encode([]byte(value.(string)))
+		s := reflect.ValueOf(value).String()
+		err := pe.Encode([]byte(s))
 		if err != nil {
 			return err
 		}
