@@ -22,7 +22,7 @@ import (
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-var hash20 = [20]byte{
+var hash20 = []byte{
 	1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
 }
 
@@ -66,7 +66,7 @@ func TestH160_Eq(t *testing.T) {
 	})
 }
 
-var hash32 = [32]byte{
+var hash32 = []byte{
 	1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
 	1, 2,
 }
@@ -151,7 +151,7 @@ func TestHash_Eq(t *testing.T) {
 	})
 }
 
-var hash64 = [64]byte{
+var hash64 = []byte{
 	1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
 	1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
 	1, 2, 3, 4,

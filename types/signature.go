@@ -22,8 +22,10 @@ import "fmt"
 type Signature H512
 
 // NewSignature creates a new Signature type
-func NewSignature(b [64]byte) Signature {
-	return Signature(b)
+func NewSignature(b []byte) Signature {
+	h := Signature{}
+	copy(h[:], b)
+	return h
 }
 
 // Hex returns a hex string representation of the value (not of the encoded value)

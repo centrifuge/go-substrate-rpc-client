@@ -26,8 +26,10 @@ import (
 type H160 [20]byte
 
 // NewH160 creates a new H160 type
-func NewH160(b [20]byte) H160 {
-	return H160(b)
+func NewH160(b []byte) H160 {
+	h := H160{}
+	copy(h[:], b)
+	return h
 }
 
 // Hex returns a hex string representation of the value (not of the encoded value)
@@ -39,8 +41,10 @@ func (h H160) Hex() string {
 type H256 [32]byte
 
 // NewH256 creates a new H256 type
-func NewH256(b [32]byte) H256 {
-	return H256(b)
+func NewH256(b []byte) H256 {
+	h := H256{}
+	copy(h[:], b)
+	return h
 }
 
 // Hex returns a hex string representation of the value (not of the encoded value)
@@ -52,8 +56,10 @@ func (h H256) Hex() string {
 type H512 [64]byte
 
 // NewH512 creates a new H512 type
-func NewH512(b [64]byte) H512 {
-	return H512(b)
+func NewH512(b []byte) H512 {
+	h := H512{}
+	copy(h[:], b)
+	return h
 }
 
 // Hex returns a hex string representation of the value (not of the encoded value)
@@ -65,8 +71,10 @@ func (h H512) Hex() string {
 type Hash H256
 
 // NewHash creates a new Hash type
-func NewHash(b [32]byte) Hash {
-	return Hash(b)
+func NewHash(b []byte) Hash {
+	h := Hash{}
+	copy(h[:], b)
+	return h
 }
 
 // NewHashFromHexString creates a new Hash type from a hex string
@@ -80,10 +88,7 @@ func NewHashFromHexString(s string) (Hash, error) {
 		return Hash{}, fmt.Errorf("required result to be 32 bytes, but got %v", len(bz))
 	}
 
-	var bz32 [32]byte
-	copy(bz32[:], bz)
-
-	return NewHash(bz32), nil
+	return NewHash(bz), nil
 }
 
 // Hex returns a hex string representation of the value (not of the encoded value)
