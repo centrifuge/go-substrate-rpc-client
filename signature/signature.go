@@ -24,6 +24,9 @@ import (
 	"strings"
 )
 
+// const subkeyCmd = "/Users/philipstanislaus/go/src/github.com/paritytech/substrate/target/debug/subkey"
+const subkeyCmd = "subkey"
+
 type KeyringPair struct {
 	// URI is the derivation path for the private key in subkey
 	URI string
@@ -43,13 +46,13 @@ var TestKeyringPairAlice = KeyringPair{
 // command to be in path
 func Sign(data []byte, privateKeyURI string) ([]byte, error) {
 	// use "subkey" command for signature
-	cmd := exec.Command("subkey", "sign", privateKeyURI)
+	cmd := exec.Command(subkeyCmd, "sign", privateKeyURI, "--hex")
 
 	// data to stdin
 	dataHex := hex.EncodeToString(data)
 	cmd.Stdin = strings.NewReader(dataHex)
 
-	log.Printf("echo \"%v\" | subkey sign %v", dataHex, privateKeyURI)
+	log.Printf("echo -n \"%v\" | %v sign %v --hex", dataHex, subkeyCmd, privateKeyURI)
 
 	// execute the command, get the output
 	out, err := cmd.Output()
@@ -76,13 +79,13 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 	sigHex := hex.EncodeToString(sig)
 
 	// use "subkey" command for signature
-	cmd := exec.Command("subkey", "verify", sigHex, privateKeyURI)
+	cmd := exec.Command(subkeyCmd, "verify", sigHex, privateKeyURI, "--hex")
 
 	// data to stdin
 	dataHex := hex.EncodeToString(data)
 	cmd.Stdin = strings.NewReader(dataHex)
 
-	log.Printf("echo \"%v\" | subkey verify %v %v", dataHex, sigHex, privateKeyURI)
+	log.Printf("echo -n \"%v\" | %v verify %v %v --hex", dataHex, subkeyCmd, sigHex, privateKeyURI)
 
 	// execute the command, get the output
 	out, err := cmd.Output()
