@@ -162,8 +162,8 @@ func ExampleExtrinsic() {
 	o := SignatureOptions{
 		BlockHash:   NewHash(mustDecodeHexString("0x223e3eb79416e6258d262b3a76e827aa0886b884a96bf96395cdd1c52d0eeb45")),
 		Era:         era,
-		GenesisHash: NewHash(mustDecodeHexString("0x81ad0bfe2a0bccd91d2e89852d79b7ff696d4714758e5f7c6f17ec7527e1f550")), // get with chain_getBlockHash, 0
-		Nonce:       1,                                                                                                  // use current one?
+		GenesisHash: NewHash(mustDecodeHexString("0x81ad0bfe2a0bccd91d2e89852d79b7ff696d4714758e5f7c6f17ec7527e1f550")), // get with chain_getBlockHash, 0 //nolint:lll
+		Nonce:       1,                                                                                                  // use current one? //nolint:lll
 		SpecVersion: 170,
 		Tip:         0,
 	}
@@ -181,8 +181,6 @@ func ExampleExtrinsic() {
 	}
 
 	fmt.Printf("%#v", extEnc)
-
-	// Output: abs
 }
 
 func TestCall(t *testing.T) {
