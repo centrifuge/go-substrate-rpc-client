@@ -179,9 +179,18 @@ func (pe Encoder) Encode(value interface{}) error {
 			}
 		}
 
-	// Arrays and slices: first compact-encode length, then each item individually
+	// Arrays: no compact-encoded length prefix
 	case reflect.Array:
-		fallthrough
+		rv := reflect.ValueOf(value)
+		l := rv.Len()
+		for i := 0; i < l; i++ {
+			err := pe.Encode(rv.Index(i).Interface())
+			if err != nil {
+				return err
+			}
+		}
+
+	// Slices: first compact-encode length, then each item individually
 	case reflect.Slice:
 		rv := reflect.ValueOf(value)
 		l := rv.Len()
@@ -388,9 +397,17 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 			return err
 		}
 
-	// Arrays and slices: first compact-encode length, then each item individually
+	// Arrays: derive the length from the array length
 	case reflect.Array:
-		fallthrough
+		targetLen := target.Len()
+		for i := 0; i < targetLen; i++ {
+			err := pd.DecodeIntoReflectValue(target.Index(i))
+			if err != nil {
+				return err
+			}
+		}
+
+	// Slices: first compact-encode length, then each item individually
 	case reflect.Slice:
 		codedLen64, _ := pd.DecodeUintCompact()
 		if codedLen64 > math.MaxUint32 {
@@ -402,18 +419,11 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 		codedLen := int(codedLen64)
 		targetLen := target.Len()
 		if codedLen != targetLen {
-			if t.Kind() == reflect.Array {
-				return fmt.Errorf(
-					"We want to decode an array of length %d, but the encoded length is %d",
-					target.Len(), codedLen)
-			}
-			if t.Kind() == reflect.Slice {
-				if int(codedLen) > target.Cap() {
-					newSlice := reflect.MakeSlice(t, int(codedLen), int(codedLen))
-					target.Set(newSlice)
-				} else {
-					target.SetLen(int(codedLen))
-				}
+			if int(codedLen) > target.Cap() {
+				newSlice := reflect.MakeSlice(t, int(codedLen), int(codedLen))
+				target.Set(newSlice)
+			} else {
+				target.SetLen(int(codedLen))
 			}
 		}
 		for i := 0; i < codedLen; i++ {
