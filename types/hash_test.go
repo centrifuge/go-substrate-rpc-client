@@ -61,7 +61,7 @@ func TestH160_String(t *testing.T) {
 func TestH160_Eq(t *testing.T) {
 	assertEq(t, []eqAssert{
 		{NewH160(hash20), NewH160(hash20), true},
-		{NewH160(hash20), NewBytes(hash20[:]), false},
+		{NewH160(hash20), NewBytes(hash20), false},
 		{NewH160(hash20), NewBool(false), false},
 	})
 }
@@ -106,7 +106,7 @@ func TestH256_String(t *testing.T) {
 func TestH256_Eq(t *testing.T) {
 	assertEq(t, []eqAssert{
 		{NewH256(hash32), NewH256(hash32), true},
-		{NewH256(hash32), NewBytes(hash32[:]), false},
+		{NewH256(hash32), NewBytes(hash32), false},
 		{NewH256(hash32), NewBool(false), false},
 	})
 }
@@ -146,7 +146,7 @@ func TestHash_String(t *testing.T) {
 func TestHash_Eq(t *testing.T) {
 	assertEq(t, []eqAssert{
 		{NewHash(hash32), NewHash(hash32), true},
-		{NewHash(hash32), NewBytes(hash32[:]), false},
+		{NewHash(hash32), NewBytes(hash32), false},
 		{NewHash(hash32), NewBool(false), false},
 	})
 }
@@ -192,7 +192,7 @@ func TestH512_String(t *testing.T) {
 func TestH512_Eq(t *testing.T) {
 	assertEq(t, []eqAssert{
 		{NewH512(hash64), NewH512(hash64), true},
-		{NewH512(hash64), NewBytes(hash64[:]), false},
+		{NewH512(hash64), NewBytes(hash64), false},
 		{NewH512(hash64), NewBool(false), false},
 	})
 }

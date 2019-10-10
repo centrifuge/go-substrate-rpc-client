@@ -103,7 +103,8 @@ func TestExtrinsic_Sign(t *testing.T) {
 	// "83"+ // version
 	// "ff"+
 	// "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"+ // signer address
-	// "6667a2afe5272b327c3886036d2906ceac90fe959377a2d47fa92b6ebe345318379fff37e48a4e8fd552221796dd6329d028f80237ebc0abb229ca2235778308"+ // signature //nolint:lll
+	// "6667a2afe5272b327c3886036d2906ceac90fe959377a2d47fa92b6ebe345318379fff37e48a4e8fd552221796dd6329d028f80237"+
+	// 		"ebc0abb229ca2235778308"+ // signature
 	// "000408"+ // era, nonce, tip
 	// "0300" + // call index (section index and method index)
 	// "ff"+
@@ -162,8 +163,8 @@ func ExampleExtrinsic() {
 	o := SignatureOptions{
 		BlockHash:   NewHash(mustDecodeHexString("0x223e3eb79416e6258d262b3a76e827aa0886b884a96bf96395cdd1c52d0eeb45")),
 		Era:         era,
-		GenesisHash: NewHash(mustDecodeHexString("0x81ad0bfe2a0bccd91d2e89852d79b7ff696d4714758e5f7c6f17ec7527e1f550")), // get with chain_getBlockHash, 0 //nolint:lll
-		Nonce:       1,                                                                                                  // use current one? //nolint:lll
+		GenesisHash: NewHash(mustDecodeHexString("0x81ad0bfe2a0bccd91d2e89852d79b7ff696d4714758e5f7c6f17ec7527e1f550")),
+		Nonce:       1,
 		SpecVersion: 170,
 		Tip:         0,
 	}

@@ -57,7 +57,7 @@ func TestSignature_String(t *testing.T) {
 func TestSignature_Eq(t *testing.T) {
 	assertEq(t, []eqAssert{
 		{NewSignature(hash64), NewSignature(hash64), true},
-		{NewSignature(hash64), NewBytes(hash64[:]), false},
+		{NewSignature(hash64), NewBytes(hash64), false},
 		{NewSignature(hash64), NewBool(false), false},
 	})
 }

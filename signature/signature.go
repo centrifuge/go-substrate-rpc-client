@@ -57,7 +57,7 @@ func Sign(data []byte, privateKeyURI string) ([]byte, error) {
 	// execute the command, get the output
 	out, err := cmd.Output()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to sign with subkey: %v", err.Error())
+		return nil, fmt.Errorf("failed to sign with subkey: %v", err.Error())
 	}
 
 	// remove line feed

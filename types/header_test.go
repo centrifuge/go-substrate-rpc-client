@@ -73,7 +73,7 @@ func TestHeader_String(t *testing.T) {
 func TestHeader_Eq(t *testing.T) {
 	assertEq(t, []eqAssert{
 		{exampleHeader, exampleHeader, true},
-		{exampleHeader, NewBytes(hash64[:]), false},
+		{exampleHeader, NewBytes(hash64), false},
 		{exampleHeader, NewBool(false), false},
 	})
 }

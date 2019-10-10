@@ -17,8 +17,8 @@
 package signature_test
 
 import (
+	"crypto/rand"
 	"testing"
-	"math/rand"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/signature"
 	"github.com/stretchr/testify/assert"
@@ -38,7 +38,8 @@ func TestSignAndVerify(t *testing.T) {
 
 func TestSignAndVerifyLong(t *testing.T) {
 	data := make([]byte, 258)
-    rand.Read(data)
+	_, err := rand.Read(data)
+	assert.NoError(t, err)
 
 	sig, err := Sign(data, TestKeyringPairAlice.URI)
 	assert.NoError(t, err)

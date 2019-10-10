@@ -156,7 +156,8 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(), e.Type())
 	}
 
-	// create a temporary buffer that will receive the plain encoded transaction (version, signature (optional), method/call)
+	// create a temporary buffer that will receive the plain encoded transaction (version, signature (optional),
+	// method/call)
 	var bb = bytes.Buffer{}
 	tempEnc := scale.NewEncoder(&bb)
 
