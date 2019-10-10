@@ -24,20 +24,32 @@ import (
 	"strings"
 )
 
-const (
-	Alice = "//Alice"
-)
+type KeyringPair struct {
+	// URI is the derivation path for the private key in subkey
+	URI string
+	// Address is an SS58 address
+	Address string
+	// PublicKey
+	PublicKey []byte
+}
 
-// Sign signs data, returning the signature. Requires the subkey command to be in path
-func Sign(data []byte) ([]byte, error) {
+var TestKeyringPairAlice = KeyringPair{
+	URI:       "//Alice",
+	PublicKey: []byte{0xd4, 0x35, 0x93, 0xc7, 0x15, 0xfd, 0xd3, 0x1c, 0x61, 0x14, 0x1a, 0xbd, 0x4, 0xa9, 0x9f, 0xd6, 0x82, 0x2c, 0x85, 0x58, 0x85, 0x4c, 0xcd, 0xe3, 0x9a, 0x56, 0x84, 0xe7, 0xa5, 0x6d, 0xa2, 0x7d}, //nolint:lll
+	Address:   "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+}
+
+// Sign signs data with the private key under the given derivation path, returning the signature. Requires the subkey
+// command to be in path
+func Sign(data []byte, privateKeyURI string) ([]byte, error) {
 	// use "subkey" command for signature
-	cmd := exec.Command("subkey", "sign", Alice)
+	cmd := exec.Command("subkey", "sign", privateKeyURI)
 
 	// data to stdin
 	dataHex := hex.EncodeToString(data)
 	cmd.Stdin = strings.NewReader(dataHex)
 
-	log.Printf("echo \"%v\" | subkey sign %v", dataHex, Alice)
+	log.Printf("echo \"%v\" | subkey sign %v", dataHex, privateKeyURI)
 
 	// execute the command, get the output
 	out, err := cmd.Output()
@@ -57,19 +69,20 @@ func Sign(data []byte) ([]byte, error) {
 	return dec, err
 }
 
-// Verify verifies data using the provided signature. Requires the subkey command to be in path
-func Verify(data []byte, sig []byte) (bool, error) {
+// Verify verifies data using the provided signature and the key under the derivation path. Requires the subkey
+// command to be in path
+func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 	// hexify the sig
 	sigHex := hex.EncodeToString(sig)
 
 	// use "subkey" command for signature
-	cmd := exec.Command("subkey", "verify", sigHex, Alice)
+	cmd := exec.Command("subkey", "verify", sigHex, privateKeyURI)
 
 	// data to stdin
 	dataHex := hex.EncodeToString(data)
 	cmd.Stdin = strings.NewReader(dataHex)
 
-	log.Printf("echo \"%v\" | subkey verify %v %v", dataHex, sigHex, Alice)
+	log.Printf("echo \"%v\" | subkey verify %v %v", dataHex, sigHex, privateKeyURI)
 
 	// execute the command, get the output
 	out, err := cmd.Output()

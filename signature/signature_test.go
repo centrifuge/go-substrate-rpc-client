@@ -26,10 +26,10 @@ import (
 func TestSignAndVerify(t *testing.T) {
 	data := []byte{253, 1, 0, 42}
 
-	sig, err := Sign(data)
+	sig, err := Sign(data, TestKeyringPairAlice.URI)
 	assert.NoError(t, err)
 
-	ok, err := Verify(data, sig)
+	ok, err := Verify(data, sig, TestKeyringPairAlice.URI)
 	assert.NoError(t, err)
 
 	assert.True(t, ok)
