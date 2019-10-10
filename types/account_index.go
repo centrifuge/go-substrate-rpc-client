@@ -25,8 +25,3 @@ type AccountIndex uint32
 func NewAccountIndex(i uint32) AccountIndex {
 	return AccountIndex(i)
 }
-
-// TODO
-// func NewAccountIndexFromAccount() AccountIndex {
-
-// }

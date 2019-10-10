@@ -22,6 +22,8 @@ package types
 type AccountID [32]byte
 
 // NewAccountID creates a new AccountID type
-func NewAccountID(b [32]byte) AccountID {
-	return AccountID(b)
+func NewAccountID(b []byte) AccountID {
+	a := AccountID{}
+	copy(a[:], b)
+	return a
 }
