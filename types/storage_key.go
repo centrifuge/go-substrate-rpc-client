@@ -21,17 +21,25 @@ package types
 import (
 	"fmt"
 	"hash"
+	"io"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/pierrec/xxHash/xxHash64"
 )
 
+// StorageKey represents typically hashed storage keys of the system.
+// Be careful using this in your own structs – it only works as the last value in a struct since it will consume the
+// remainder of the encoded data. The reason for this is that it does not contain any length encoding, so it would
+// not know where to stop.
 type StorageKey []byte
 
+// NewStorageKey creates a new StorageKey type
 func NewStorageKey(b []byte) StorageKey {
 	return b
 }
 
+// CreateStorageKey uses the given metadata and to derive the right hashing of module, fn names and keys to create a
+// hashed StorageKey
 func CreateStorageKey(meta Metadata, module string, fn string, key []byte) (StorageKey, error) {
 	var fnMeta *StorageFunctionMetadata
 	for _, m := range meta.Metadata.Modules {
@@ -81,9 +89,19 @@ func (s StorageKey) Encode(encoder scale.Encoder) error {
 	return encoder.Write(s)
 }
 
-// Decode implements decoding for StorageKey, which just wraps the bytes in StorageKey
+// Decode implements decoding for StorageKey, which just reads all the remaining bytes into StorageKey
 func (s *StorageKey) Decode(decoder scale.Decoder) error {
-	return decoder.Read(*s)
+	for i := 0; true; i++ {
+		b, err := decoder.ReadOneByte()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		*s = append((*s)[:i], b)
+	}
+	return nil
 }
 
 // Hex returns a hex string representation of the value (not of the encoded value)

@@ -28,7 +28,7 @@ func TestChain_GetBlockHash(t *testing.T) {
 	assert.NoError(t, err)
 	hex, err := types.Hex(res)
 	assert.NoError(t, err)
-	assert.Equal(t, mockSrv.blockHash, hex)
+	assert.Equal(t, mockSrv.blockHash.Hex(), hex)
 }
 
 func TestChain_GetBlockHashLatest(t *testing.T) {
@@ -36,5 +36,5 @@ func TestChain_GetBlockHashLatest(t *testing.T) {
 	assert.NoError(t, err)
 	hex, err := types.Hex(res)
 	assert.NoError(t, err)
-	assert.Equal(t, mockSrv.blockHashLatest, hex)
+	assert.Equal(t, mockSrv.blockHashLatest.Hex(), hex)
 }

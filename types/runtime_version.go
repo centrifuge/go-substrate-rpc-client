@@ -121,7 +121,7 @@ func (r *RuntimeVersionAPI) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (r *RuntimeVersionAPI) MarshalJSON() ([]byte, error) {
+func (r RuntimeVersionAPI) MarshalJSON() ([]byte, error) {
 	tmp := []interface{}{r.APIID, r.Version}
 	return json.Marshal(tmp)
 }

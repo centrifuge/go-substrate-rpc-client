@@ -14,29 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package state
+package chain
 
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/client"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-func (s *State) GetMetadata(blockHash types.Hash) (*types.Metadata, error) {
-	return s.getMetadata(&blockHash)
+func (c *Chain) GetHeader(blockHash types.Hash) (*types.Header, error) {
+	return c.getHeader(&blockHash)
 }
 
-func (s *State) GetMetadataLatest() (*types.Metadata, error) {
-	return s.getMetadata(nil)
+func (c *Chain) GetHeaderLatest() (*types.Header, error) {
+	return c.getHeader(nil)
 }
 
-func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
-	var res string
-	err := client.CallWithBlockHash(*s.client, &res, "state_getMetadata", blockHash)
+func (c *Chain) getHeader(blockHash *types.Hash) (*types.Header, error) {
+	var Header types.Header
+	err := client.CallWithBlockHash(*c.client, &Header, "chain_getHeader", blockHash)
 	if err != nil {
 		return nil, err
 	}
-
-	metadata := types.NewMetadata()
-	err = types.DecodeFromHexString(res, metadata)
-	return metadata, err
+	return &Header, err
 }

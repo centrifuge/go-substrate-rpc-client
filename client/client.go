@@ -20,6 +20,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -78,4 +79,24 @@ func Connect(url string) (Client, error) {
 	}
 	cc := client{c, url}
 	return &cc, nil
+}
+
+func CallWithBlockHash(c Client, target interface{}, method string, blockHash *types.Hash, args ...interface{}) error {
+	if blockHash == nil {
+		err := c.Call(target, method, args...)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	hexHash, err := types.Hex(*blockHash)
+	if err != nil {
+		return err
+	}
+	hargs := append(args, hexHash)
+	err = c.Call(target, method, hargs...)
+	if err != nil {
+		return err
+	}
+	return nil
 }

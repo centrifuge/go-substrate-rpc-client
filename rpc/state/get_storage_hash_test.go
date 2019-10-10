@@ -17,26 +17,27 @@
 package state
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/client"
+	"testing"
+
+	"github.com/centrifuge/go-substrate-rpc-client/testutils"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
+	"github.com/stretchr/testify/assert"
 )
 
-func (s *State) GetMetadata(blockHash types.Hash) (*types.Metadata, error) {
-	return s.getMetadata(&blockHash)
+func TestState_GetStorageHashLatest(t *testing.T) {
+	key := types.NewStorageKey(testutils.MustDecodeHexString("0x3a636f6465"))
+	hash, err := state.GetStorageHashLatest(key)
+	assert.NoError(t, err)
+	var expected types.Hash
+	copy(expected[:], testutils.MustDecodeHexString(mockSrv.storageHashHex))
+	assert.Equal(t, expected, hash)
 }
 
-func (s *State) GetMetadataLatest() (*types.Metadata, error) {
-	return s.getMetadata(nil)
-}
-
-func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
-	var res string
-	err := client.CallWithBlockHash(*s.client, &res, "state_getMetadata", blockHash)
-	if err != nil {
-		return nil, err
-	}
-
-	metadata := types.NewMetadata()
-	err = types.DecodeFromHexString(res, metadata)
-	return metadata, err
+func TestState_GetStorageHash(t *testing.T) {
+	key := types.NewStorageKey(testutils.MustDecodeHexString("0x3a636f6465"))
+	hash, err := state.GetStorageHash(key, mockSrv.blockHashLatest)
+	assert.NoError(t, err)
+	var expected types.Hash
+	copy(expected[:], testutils.MustDecodeHexString(mockSrv.storageHashHex))
+	assert.Equal(t, expected, hash)
 }

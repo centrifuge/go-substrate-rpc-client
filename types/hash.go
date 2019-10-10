@@ -16,7 +16,11 @@
 
 package types
 
-import "fmt"
+import (
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+)
 
 // H160 is a hash containing 160 bits (20 bytes), typically used in blocks, extrinsics and as a sane default
 type H160 [20]byte
@@ -65,7 +69,40 @@ func NewHash(b [32]byte) Hash {
 	return Hash(b)
 }
 
+// NewHashFromHexString creates a new Hash type from a hex string
+func NewHashFromHexString(s string) (Hash, error) {
+	bz, err := hex.DecodeString(s[2:])
+	if err != nil {
+		return Hash{}, err
+	}
+
+	if len(bz) != 32 {
+		return Hash{}, fmt.Errorf("required result to be 32 bytes, but got %v", len(bz))
+	}
+
+	var bz32 [32]byte
+	copy(bz32[:], bz)
+
+	return NewHash(bz32), nil
+}
+
 // Hex returns a hex string representation of the value (not of the encoded value)
 func (h Hash) Hex() string {
 	return fmt.Sprintf("%#x", h[:])
+}
+
+// UnmarshalJSON fills h with the JSON encoded byte array given by b
+func (h *Hash) UnmarshalJSON(b []byte) error {
+	var tmp string
+	err := json.Unmarshal(b, &tmp)
+	if err != nil {
+		return err
+	}
+	*h, err = NewHashFromHexString(tmp)
+	return err
+}
+
+// MarshalJSON returns a JSON encoded byte array of h
+func (h Hash) MarshalJSON() ([]byte, error) {
+	return json.Marshal(h.Hex())
 }

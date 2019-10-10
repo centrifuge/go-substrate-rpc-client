@@ -14,29 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package state
+package types
 
-import (
-	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/types"
-)
-
-func (s *State) GetMetadata(blockHash types.Hash) (*types.Metadata, error) {
-	return s.getMetadata(&blockHash)
+type SignedBlock struct {
+	Block         Block         `json:"block"`
+	Justification Justification `json:"justification"`
 }
 
-func (s *State) GetMetadataLatest() (*types.Metadata, error) {
-	return s.getMetadata(nil)
+// Block encoded with header and extrinsics
+type Block struct {
+	Header     Header
+	Extrinsics []Extrinsic
 }
 
-func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
-	var res string
-	err := client.CallWithBlockHash(*s.client, &res, "state_getMetadata", blockHash)
-	if err != nil {
-		return nil, err
-	}
+type Extrinsic string // TODO
 
-	metadata := types.NewMetadata()
-	err = types.DecodeFromHexString(res, metadata)
-	return metadata, err
-}
+type Justification Bytes

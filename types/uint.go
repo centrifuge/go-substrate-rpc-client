@@ -39,8 +39,8 @@ func (u *U8) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON returns a JSON encoded byte array of u
-func (u *U8) MarshalJSON() ([]byte, error) {
-	return json.Marshal(uint8(*u))
+func (u U8) MarshalJSON() ([]byte, error) {
+	return json.Marshal(uint8(u))
 }
 
 // U16 is an unsigned 16-bit integer
@@ -62,8 +62,8 @@ func (u *U16) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON returns a JSON encoded byte array of u
-func (u *U16) MarshalJSON() ([]byte, error) {
-	return json.Marshal(uint16(*u))
+func (u U16) MarshalJSON() ([]byte, error) {
+	return json.Marshal(uint16(u))
 }
 
 // U32 is an unsigned 32-bit integer
@@ -85,8 +85,8 @@ func (u *U32) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON returns a JSON encoded byte array of u
-func (u *U32) MarshalJSON() ([]byte, error) {
-	return json.Marshal(uint32(*u))
+func (u U32) MarshalJSON() ([]byte, error) {
+	return json.Marshal(uint32(u))
 }
 
 // U64 is an unsigned 64-bit integer
@@ -108,6 +108,6 @@ func (u *U64) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON returns a JSON encoded byte array of u
-func (u *U64) MarshalJSON() ([]byte, error) {
-	return json.Marshal(uint64(*u))
+func (u U64) MarshalJSON() ([]byte, error) {
+	return json.Marshal(uint64(u))
 }

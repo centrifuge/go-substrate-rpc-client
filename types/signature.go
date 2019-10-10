@@ -14,29 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package state
+package types
 
-import (
-	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/types"
-)
+import "fmt"
 
-func (s *State) GetMetadata(blockHash types.Hash) (*types.Metadata, error) {
-	return s.getMetadata(&blockHash)
+// Signature is a H512
+type Signature H512
+
+// NewSignature creates a new Signature type
+func NewSignature(b [64]byte) Signature {
+	return Signature(b)
 }
 
-func (s *State) GetMetadataLatest() (*types.Metadata, error) {
-	return s.getMetadata(nil)
-}
-
-func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
-	var res string
-	err := client.CallWithBlockHash(*s.client, &res, "state_getMetadata", blockHash)
-	if err != nil {
-		return nil, err
-	}
-
-	metadata := types.NewMetadata()
-	err = types.DecodeFromHexString(res, metadata)
-	return metadata, err
+// Hex returns a hex string representation of the value (not of the encoded value)
+func (h Signature) Hex() string {
+	return fmt.Sprintf("%#x", h[:])
 }

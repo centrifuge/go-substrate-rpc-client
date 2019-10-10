@@ -52,7 +52,10 @@ test-e2e-deployed: 		## runs only end-to-end (e2e) tests against a deployed test
 run-substrate-docker: 		## runs the Substrate Default Docker image, this can be used to run the tests
 	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:latest-v1.0 --dev --rpc-external --ws-external
 
+run-substrate-docker-v2: 	## runs the Substrate Default Docker image, this can be used to run the tests
+	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:latest --dev --rpc-external --ws-external
+
 help: 				## shows this help
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
 
-.PHONY: clean install lint lint-fix test test-dockerized run-substrate-docker
+.PHONY: clean install lint lint-fix test test-dockerized run-substrate-docker run-substrate-docker-v2

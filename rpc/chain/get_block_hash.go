@@ -17,9 +17,6 @@
 package chain
 
 import (
-	"encoding/hex"
-	"fmt"
-
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
@@ -45,19 +42,5 @@ func (c *Chain) getBlockHash(blockNumber *uint64) (types.Hash, error) {
 		return types.Hash{}, err
 	}
 
-	bz, err := hex.DecodeString(res[2:])
-	if err != nil {
-		return types.Hash{}, err
-	}
-
-	if len(bz) != 32 {
-		return types.Hash{}, fmt.Errorf("required result to be 32 bytes, but got %v", len(bz))
-	}
-
-	var bz32 [32]byte
-	copy(bz32[:], bz)
-
-	hash := types.NewHash(bz32)
-
-	return hash, nil
+	return types.NewHashFromHexString(res)
 }

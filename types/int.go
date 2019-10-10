@@ -39,8 +39,8 @@ func (i *I8) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON returns a JSON encoded byte array of i
-func (i *I8) MarshalJSON() ([]byte, error) {
-	return json.Marshal(int8(*i))
+func (i I8) MarshalJSON() ([]byte, error) {
+	return json.Marshal(int8(i))
 }
 
 // I16 is a signed 16-bit integer
@@ -62,8 +62,8 @@ func (i *I16) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON returns a JSON encoded byte array of i
-func (i *I16) MarshalJSON() ([]byte, error) {
-	return json.Marshal(int16(*i))
+func (i I16) MarshalJSON() ([]byte, error) {
+	return json.Marshal(int16(i))
 }
 
 // I32 is a signed 32-bit integer
@@ -85,8 +85,8 @@ func (i *I32) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON returns a JSON encoded byte array of i
-func (i *I32) MarshalJSON() ([]byte, error) {
-	return json.Marshal(int32(*i))
+func (i I32) MarshalJSON() ([]byte, error) {
+	return json.Marshal(int32(i))
 }
 
 // I64 is a signed 64-bit integer
@@ -108,6 +108,6 @@ func (i *I64) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON returns a JSON encoded byte array of i
-func (i *I64) MarshalJSON() ([]byte, error) {
-	return json.Marshal(int64(*i))
+func (i I64) MarshalJSON() ([]byte, error) {
+	return json.Marshal(int64(i))
 }
