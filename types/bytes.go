@@ -22,7 +22,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
-// Bytes represents byte slices
+// Bytes represents byte slices. Bytes has a variable length, it is encoded with a scale prefix
 type Bytes []byte
 
 // NewBytes creates a new Bytes type

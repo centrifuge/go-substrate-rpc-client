@@ -91,31 +91,31 @@ func TestBytes8_EncodeDecode(t *testing.T) {
 
 func TestBytes8_EncodedLength(t *testing.T) {
 	assertEncodedLength(t, []encodedLengthAssert{
-		{NewBytes8([8]byte{}), 9},
-		{NewBytes8([8]byte{7, 6, 5, 4, 3, 2, 1, 0}), 9},
+		{NewBytes8([8]byte{}), 8},
+		{NewBytes8([8]byte{7, 6, 5, 4, 3, 2, 1, 0}), 8},
 	})
 }
 
 func TestBytes8_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewBytes8([8]byte{0, 0, 0}), mustDecodeHexString("0x200000000000000000")},
-		{NewBytes8([8]byte{171, 18, 52}), mustDecodeHexString("0x20ab12340000000000")},
+		{NewBytes8([8]byte{0, 0, 0}), mustDecodeHexString("0x0000000000000000")},
+		{NewBytes8([8]byte{171, 18, 52}), mustDecodeHexString("0xab12340000000000")},
 	})
 }
 
 func TestBytes8_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
 		{NewBytes8([8]byte{0, 42, 254}), mustDecodeHexString(
-			"0xaaafe19720d6258bc2186e1b127f35471b4c53257ca648367674887aa5abd19f")},
+			"0xb327a728de8af3187dd7eaeb74bfff9e9c37eda8c472c7459d51e1fc450faf74")},
 		{NewBytes8([8]byte{0, 0}), mustDecodeHexString(
-			"0xf4630e4005914ba92fa80ad507cacdf1f7df5dc3bccb0ec4eba7fed3e257a000")},
+			"0x81e47a19e6b29b0a65b9591762ce5143ed30d0261e5d24a3201752506b20f15c")},
 	})
 }
 
 func TestBytes8_Hex(t *testing.T) {
 	assertEncodeToHex(t, []encodeToHexAssert{
-		{NewBytes8([8]byte{0, 0, 0}), "0x200000000000000000"},
-		{NewBytes8([8]byte{171, 18, 52}), "0x20ab12340000000000"},
+		{NewBytes8([8]byte{0, 0, 0}), "0x0000000000000000"},
+		{NewBytes8([8]byte{171, 18, 52}), "0xab12340000000000"},
 	})
 }
 

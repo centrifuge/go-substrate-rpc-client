@@ -27,24 +27,24 @@ func TestSignature_EncodeDecode(t *testing.T) {
 }
 
 func TestSignature_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{{NewSignature(hash64), 66}})
+	assertEncodedLength(t, []encodedLengthAssert{{NewSignature(hash64), 64}})
 }
 
 func TestSignature_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewSignature(hash64), mustDecodeHexString("0x010101020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304")}, //nolint:lll
+		{NewSignature(hash64), mustDecodeHexString("0x01020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304")}, //nolint:lll
 	})
 }
 
 func TestSignature_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewSignature(hash64), mustDecodeHexString("0x0926d23398a248b1c7723651a5ad05a5626cc8f9450512d6c3b5b2156615bcd5")},
+		{NewSignature(hash64), mustDecodeHexString("0x893a41fa8d4e6447fe2d74a3ae529b1f1a13f3ac5a194907bf19e78e084a0ef6")},
 	})
 }
 
 func TestSignature_Hex(t *testing.T) {
 	assertEncodeToHex(t, []encodeToHexAssert{
-		{NewSignature(hash64), "0x010101020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304"}, //nolint:lll
+		{NewSignature(hash64), "0x01020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304"}, //nolint:lll
 	})
 }
 
