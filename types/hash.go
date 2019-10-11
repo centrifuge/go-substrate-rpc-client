@@ -17,7 +17,6 @@
 package types
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 )
@@ -79,7 +78,7 @@ func NewHash(b []byte) Hash {
 
 // NewHashFromHexString creates a new Hash type from a hex string
 func NewHashFromHexString(s string) (Hash, error) {
-	bz, err := hex.DecodeString(s[2:])
+	bz, err := HexDecodeString(s)
 	if err != nil {
 		return Hash{}, err
 	}

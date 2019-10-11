@@ -33,13 +33,13 @@ func TestU8_EncodedLength(t *testing.T) {
 
 func TestU8_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewU8(29), mustDecodeHexString("0x1d")},
+		{NewU8(29), MustHexDecodeString("0x1d")},
 	})
 }
 
 func TestU8_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewU8(29), mustDecodeHexString("0x6a9843ae0195ae1e6f95c7fbd34a42414c77e243aa18a959b5912a1f0f391b54")},
+		{NewU8(29), MustHexDecodeString("0x6a9843ae0195ae1e6f95c7fbd34a42414c77e243aa18a959b5912a1f0f391b54")},
 	})
 }
 
@@ -73,13 +73,13 @@ func TestU16_EncodedLength(t *testing.T) {
 
 func TestU16_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewU16(29), mustDecodeHexString("0x1d00")},
+		{NewU16(29), MustHexDecodeString("0x1d00")},
 	})
 }
 
 func TestU16_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewU16(29), mustDecodeHexString("0x4e59f743a8e19ecb3022652bdef4343e62793d1f7378a688a82741b5d029d3d5")},
+		{NewU16(29), MustHexDecodeString("0x4e59f743a8e19ecb3022652bdef4343e62793d1f7378a688a82741b5d029d3d5")},
 	})
 }
 
@@ -113,13 +113,13 @@ func TestU32_EncodedLength(t *testing.T) {
 
 func TestU32_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewU32(29), mustDecodeHexString("0x1d000000")},
+		{NewU32(29), MustHexDecodeString("0x1d000000")},
 	})
 }
 
 func TestU32_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewU32(29), mustDecodeHexString("0x60ebb66f09bc7fdd21772ab1ed0efb1fd1208e3f5cd20d2d9a29a2a79b6f953f")},
+		{NewU32(29), MustHexDecodeString("0x60ebb66f09bc7fdd21772ab1ed0efb1fd1208e3f5cd20d2d9a29a2a79b6f953f")},
 	})
 }
 
@@ -153,13 +153,13 @@ func TestU64_EncodedLength(t *testing.T) {
 
 func TestU64_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewU64(29), mustDecodeHexString("0x1d00000000000000")},
+		{NewU64(29), MustHexDecodeString("0x1d00000000000000")},
 	})
 }
 
 func TestU64_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewU64(29), mustDecodeHexString("0x83e168a13a013e6d47b0778f046aaa05d6c01d6857d044d9e9b658a6d85eb865")},
+		{NewU64(29), MustHexDecodeString("0x83e168a13a013e6d47b0778f046aaa05d6c01d6857d044d9e9b658a6d85eb865")},
 	})
 }
 

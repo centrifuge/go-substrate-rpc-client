@@ -83,16 +83,16 @@ func TestCreateStorageKey_MetadataV4(t *testing.T) {
 
 func TestStorageKey_EncodedLength(t *testing.T) {
 	assertEncodedLength(t, []encodedLengthAssert{
-		{NewStorageKey(mustDecodeHexString("0x00")), 1},
-		{NewStorageKey(mustDecodeHexString("0xab1234")), 3},
-		{NewStorageKey(mustDecodeHexString("0x0001")), 2},
+		{NewStorageKey(MustHexDecodeString("0x00")), 1},
+		{NewStorageKey(MustHexDecodeString("0xab1234")), 3},
+		{NewStorageKey(MustHexDecodeString("0x0001")), 2},
 	})
 }
 
 func TestStorageKey_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewStorageKey([]byte{171, 18, 52}), mustDecodeHexString("0xab1234")},
-		{NewStorageKey([]byte{}), mustDecodeHexString("0x")},
+		{NewStorageKey([]byte{171, 18, 52}), MustHexDecodeString("0xab1234")},
+		{NewStorageKey([]byte{}), MustHexDecodeString("0x")},
 	})
 }
 
@@ -106,9 +106,9 @@ func TestStorageKey_Decode(t *testing.T) {
 
 func TestStorageKey_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewStorageKey([]byte{0, 42, 254}), mustDecodeHexString(
+		{NewStorageKey([]byte{0, 42, 254}), MustHexDecodeString(
 			"0x537db36f5b5970b679a28a3df8d219317d658014fb9c3d409c0c799d8ecf149d")},
-		{NewStorageKey([]byte{0, 0}), mustDecodeHexString(
+		{NewStorageKey([]byte{0, 0}), MustHexDecodeString(
 			"0x9ee6dfb61a2fb903df487c401663825643bb825d41695e63df8af6162ab145a6")},
 	})
 }

@@ -19,25 +19,24 @@ package state
 import (
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/testutils"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestState_GetStorageHashLatest(t *testing.T) {
-	key := types.NewStorageKey(testutils.MustDecodeHexString("0x3a636f6465"))
+	key := types.NewStorageKey(types.MustHexDecodeString("0x3a636f6465"))
 	hash, err := state.GetStorageHashLatest(key)
 	assert.NoError(t, err)
 	var expected types.Hash
-	copy(expected[:], testutils.MustDecodeHexString(mockSrv.storageHashHex))
+	copy(expected[:], types.MustHexDecodeString(mockSrv.storageHashHex))
 	assert.Equal(t, expected, hash)
 }
 
 func TestState_GetStorageHash(t *testing.T) {
-	key := types.NewStorageKey(testutils.MustDecodeHexString("0x3a636f6465"))
+	key := types.NewStorageKey(types.MustHexDecodeString("0x3a636f6465"))
 	hash, err := state.GetStorageHash(key, mockSrv.blockHashLatest)
 	assert.NoError(t, err)
 	var expected types.Hash
-	copy(expected[:], testutils.MustDecodeHexString(mockSrv.storageHashHex))
+	copy(expected[:], types.MustHexDecodeString(mockSrv.storageHashHex))
 	assert.Equal(t, expected, hash)
 }

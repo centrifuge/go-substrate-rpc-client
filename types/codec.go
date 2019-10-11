@@ -21,6 +21,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"golang.org/x/crypto/blake2b"
@@ -58,7 +59,7 @@ func DecodeFromBytes(bz []byte, target interface{}) error { // TODO rename to De
 
 // DecodeFromHexString decodes `str` with the scale codec into `target`. `target` should be a pointer.
 func DecodeFromHexString(str string, target interface{}) error { // TODO rename to DecodeFromHex
-	bz, err := hex.DecodeString(str[2:])
+	bz, err := HexDecodeString(str)
 	if err != nil {
 		return err
 	}
@@ -87,6 +88,38 @@ func GetHash(value interface{}) (Hash, error) {
 // Eq compares the value of the input to see if there is a match
 func Eq(one, other interface{}) bool {
 	return reflect.DeepEqual(one, other)
+}
+
+// HexDecodeString decodes bytes from a hex string. Contrary to hex.DecodeString, this function does not error if "0x"
+// is prefixed, and adds an extra 0 if the hex string has an odd length.
+func HexDecodeString(s string) ([]byte, error) {
+	s = strings.TrimPrefix(s, "0x")
+
+	if len(s)%2 != 0 {
+		s = "0" + s
+	}
+
+	b, err := hex.DecodeString(s)
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
+}
+
+// MustHexDecodeString panics if str cannot be decoded
+func MustHexDecodeString(str string) []byte {
+	bz, err := HexDecodeString(str)
+	if err != nil {
+		panic(err)
+	}
+	return bz
+}
+
+// HexEncode encodes bytes to a hex string. Contrary to hex.EncodeToString, this function prefixes the hex string
+// with "0x"
+func HexEncodeToString(b []byte) string {
+	return "0x" + hex.EncodeToString(b)
 }
 
 // Hex returns a hex string representation of the value (not of the encoded value)

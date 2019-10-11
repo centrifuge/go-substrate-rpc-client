@@ -18,7 +18,6 @@ package types_test
 
 import (
 	"bytes"
-	"encoding/hex"
 	"fmt"
 	"reflect"
 	"testing"
@@ -156,13 +155,4 @@ func assertEq(t *testing.T, eqAsserts []eqAssert) {
 			t.Errorf("Fail, input %v, other %v, expected %v, result %v\n", test.input, test.other, test.expected, result)
 		}
 	}
-}
-
-// mustDecodeHexString panics if str cannot be decoded. Param str is expected to start with "0x"
-func mustDecodeHexString(str string) []byte {
-	bz, err := hex.DecodeString(str[2:])
-	if err != nil {
-		panic(err)
-	}
-	return bz
 }

@@ -23,33 +23,33 @@ import (
 )
 
 func TestBytes_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewBytes(mustDecodeHexString("0x00")))
-	assertRoundtrip(t, NewBytes(mustDecodeHexString("0xab1234")))
-	assertRoundtrip(t, NewBytes(mustDecodeHexString("0x0001")))
+	assertRoundtrip(t, NewBytes(MustHexDecodeString("0x00")))
+	assertRoundtrip(t, NewBytes(MustHexDecodeString("0xab1234")))
+	assertRoundtrip(t, NewBytes(MustHexDecodeString("0x0001")))
 }
 
 func TestBytes_EncodedLength(t *testing.T) {
 	assertEncodedLength(t, []encodedLengthAssert{
-		{NewBytes(mustDecodeHexString("0x00")), 2},
-		{NewBytes(mustDecodeHexString("0xab1234")), 4},
-		{NewBytes(mustDecodeHexString("0x0001")), 3},
+		{NewBytes(MustHexDecodeString("0x00")), 2},
+		{NewBytes(MustHexDecodeString("0xab1234")), 4},
+		{NewBytes(MustHexDecodeString("0x0001")), 3},
 	})
 }
 
 func TestBytes_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewBytes([]byte{0, 0, 0}), mustDecodeHexString("0x0c000000")},
-		{NewBytes([]byte{171, 18, 52}), mustDecodeHexString("0x0cab1234")},
-		{NewBytes([]byte{0, 1}), mustDecodeHexString("0x080001")},
-		{NewBytes([]byte{18, 52, 86}), mustDecodeHexString("0x0c123456")},
+		{NewBytes([]byte{0, 0, 0}), MustHexDecodeString("0x0c000000")},
+		{NewBytes([]byte{171, 18, 52}), MustHexDecodeString("0x0cab1234")},
+		{NewBytes([]byte{0, 1}), MustHexDecodeString("0x080001")},
+		{NewBytes([]byte{18, 52, 86}), MustHexDecodeString("0x0c123456")},
 	})
 }
 
 func TestBytes_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewBytes([]byte{0, 42, 254}), mustDecodeHexString(
+		{NewBytes([]byte{0, 42, 254}), MustHexDecodeString(
 			"0xabf7fe6eb94e0816bf2db57abb296d012f7cb9ddfe59ebf52f9c2770f49a0a46")},
-		{NewBytes([]byte{0, 0}), mustDecodeHexString(
+		{NewBytes([]byte{0, 0}), MustHexDecodeString(
 			"0xd1200120e01c48b4bbf7e1cd7ebab20087b34ea11e1e9e4ebc2f207aea77139d")},
 	})
 }
@@ -98,16 +98,16 @@ func TestBytes8_EncodedLength(t *testing.T) {
 
 func TestBytes8_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewBytes8([8]byte{0, 0, 0}), mustDecodeHexString("0x0000000000000000")},
-		{NewBytes8([8]byte{171, 18, 52}), mustDecodeHexString("0xab12340000000000")},
+		{NewBytes8([8]byte{0, 0, 0}), MustHexDecodeString("0x0000000000000000")},
+		{NewBytes8([8]byte{171, 18, 52}), MustHexDecodeString("0xab12340000000000")},
 	})
 }
 
 func TestBytes8_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewBytes8([8]byte{0, 42, 254}), mustDecodeHexString(
+		{NewBytes8([8]byte{0, 42, 254}), MustHexDecodeString(
 			"0xb327a728de8af3187dd7eaeb74bfff9e9c37eda8c472c7459d51e1fc450faf74")},
-		{NewBytes8([8]byte{0, 0}), mustDecodeHexString(
+		{NewBytes8([8]byte{0, 0}), MustHexDecodeString(
 			"0x81e47a19e6b29b0a65b9591762ce5143ed30d0261e5d24a3201752506b20f15c")},
 	})
 }

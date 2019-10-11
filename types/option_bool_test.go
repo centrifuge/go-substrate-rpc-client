@@ -40,19 +40,19 @@ func TestOptionBool_EncodedLength(t *testing.T) {
 
 func TestOptionBool_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewOptionBool(NewBool(false)), mustDecodeHexString("0x02")},
-		{NewOptionBool(NewBool(true)), mustDecodeHexString("0x01")},
-		{NewOptionBoolEmpty(), mustDecodeHexString("0x00")},
+		{NewOptionBool(NewBool(false)), MustHexDecodeString("0x02")},
+		{NewOptionBool(NewBool(true)), MustHexDecodeString("0x01")},
+		{NewOptionBoolEmpty(), MustHexDecodeString("0x00")},
 	})
 }
 
 func TestOptionBool_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewOptionBool(NewBool(true)), mustDecodeHexString(
+		{NewOptionBool(NewBool(true)), MustHexDecodeString(
 			"0xee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25")},
-		{NewOptionBool(NewBool(false)), mustDecodeHexString(
+		{NewOptionBool(NewBool(false)), MustHexDecodeString(
 			"0xbb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa")},
-		{NewOptionBoolEmpty(), mustDecodeHexString(
+		{NewOptionBoolEmpty(), MustHexDecodeString(
 			"0x03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314")},
 	})
 }

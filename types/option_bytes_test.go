@@ -40,19 +40,19 @@ func TestOptionBytes8_EncodedLength(t *testing.T) {
 
 func TestOptionBytes8_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewOptionBytes8(NewBytes8([8]byte{0, 0, 0})), mustDecodeHexString("0x010000000000000000")},
-		{NewOptionBytes8(NewBytes8([8]byte{171, 18, 52})), mustDecodeHexString("0x01ab12340000000000")},
-		{NewOptionBytes8Empty(), mustDecodeHexString("0x00")},
+		{NewOptionBytes8(NewBytes8([8]byte{0, 0, 0})), MustHexDecodeString("0x010000000000000000")},
+		{NewOptionBytes8(NewBytes8([8]byte{171, 18, 52})), MustHexDecodeString("0x01ab12340000000000")},
+		{NewOptionBytes8Empty(), MustHexDecodeString("0x00")},
 	})
 }
 
 func TestOptionBytes8_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewOptionBytes8(NewBytes8([8]byte{0, 42, 254})), mustDecodeHexString(
+		{NewOptionBytes8(NewBytes8([8]byte{0, 42, 254})), MustHexDecodeString(
 			"0x80c0970f2247ec2333c8f805187dcb036be18aa08ab8a738debaefa8d8f78a52")},
-		{NewOptionBytes8(NewBytes8([8]byte{0, 0})), mustDecodeHexString(
+		{NewOptionBytes8(NewBytes8([8]byte{0, 0})), MustHexDecodeString(
 			"0xf7b1ba7f9618366193ada7cf4bb9904c175eab3003dea721d245fd0136b45eee")},
-		{NewOptionBytes8Empty(), mustDecodeHexString(
+		{NewOptionBytes8Empty(), MustHexDecodeString(
 			"0x03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314")},
 	})
 }
@@ -94,17 +94,17 @@ func TestOptionBytes_EncodeDecode(t *testing.T) {
 
 func TestOptionBytes_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewOptionBytes(NewBytes([]byte{0, 0, 0})), mustDecodeHexString("0x010c000000")},
-		{NewOptionBytes(NewBytes([]byte{171, 1, 52})), mustDecodeHexString("0x010cab0134")},
-		{NewOptionBytesEmpty(), mustDecodeHexString("0x00")},
+		{NewOptionBytes(NewBytes([]byte{0, 0, 0})), MustHexDecodeString("0x010c000000")},
+		{NewOptionBytes(NewBytes([]byte{171, 1, 52})), MustHexDecodeString("0x010cab0134")},
+		{NewOptionBytesEmpty(), MustHexDecodeString("0x00")},
 	})
 }
 
 func TestOptionBytes_Decode(t *testing.T) {
 	assertDecode(t, []decodingAssert{
-		{mustDecodeHexString("0x010c000000"), NewOptionBytes(NewBytes([]byte{0, 0, 0}))},
-		{mustDecodeHexString("0x010cab0134"), NewOptionBytes(NewBytes([]byte{171, 1, 52}))},
-		{mustDecodeHexString("0x00"), NewOptionBytesEmpty()},
+		{MustHexDecodeString("0x010c000000"), NewOptionBytes(NewBytes([]byte{0, 0, 0}))},
+		{MustHexDecodeString("0x010cab0134"), NewOptionBytes(NewBytes([]byte{171, 1, 52}))},
+		{MustHexDecodeString("0x00"), NewOptionBytesEmpty()},
 	})
 }
 

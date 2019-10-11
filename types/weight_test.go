@@ -33,13 +33,13 @@ func TestWeight_EncodedLength(t *testing.T) {
 
 func TestWeight_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewWeight(29), mustDecodeHexString("0x1d000000")},
+		{NewWeight(29), MustHexDecodeString("0x1d000000")},
 	})
 }
 
 func TestWeight_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewWeight(29), mustDecodeHexString("0x60ebb66f09bc7fdd21772ab1ed0efb1fd1208e3f5cd20d2d9a29a2a79b6f953f")},
+		{NewWeight(29), MustHexDecodeString("0x60ebb66f09bc7fdd21772ab1ed0efb1fd1208e3f5cd20d2d9a29a2a79b6f953f")},
 	})
 }
 

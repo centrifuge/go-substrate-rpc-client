@@ -93,7 +93,7 @@ var exampleFunctionArgumentMetadata = FunctionArgumentMetadata{Name: "myFunction
 func TestMetadata_Decode(t *testing.T) {
 	metadata := NewMetadata()
 
-	err := DecodeFromBytes(mustDecodeHexString(ExamplaryMetadataV4String), metadata)
+	err := DecodeFromBytes(MustHexDecodeString(ExamplaryMetadataV4String), metadata)
 	assert.NoError(t, err)
 
 	assert.Equal(t, ExamplaryMetadataV4, *metadata)

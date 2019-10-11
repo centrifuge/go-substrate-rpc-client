@@ -36,13 +36,13 @@ func TestH160_EncodedLength(t *testing.T) {
 
 func TestH160_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewH160(hash20), mustDecodeHexString("0x0102030405060708090001020304050607080900")},
+		{NewH160(hash20), MustHexDecodeString("0x0102030405060708090001020304050607080900")},
 	})
 }
 
 func TestH160_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewH160(hash20), mustDecodeHexString("0xdb34a42220dae1c95e29ee2e97d09995887790554cb1ac302680934ffc636b82")},
+		{NewH160(hash20), MustHexDecodeString("0xdb34a42220dae1c95e29ee2e97d09995887790554cb1ac302680934ffc636b82")},
 	})
 }
 
@@ -81,13 +81,13 @@ func TestH256_EncodedLength(t *testing.T) {
 
 func TestH256_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewH256(hash32), mustDecodeHexString("0x0102030405060708090001020304050607080900010203040506070809000102")},
+		{NewH256(hash32), MustHexDecodeString("0x0102030405060708090001020304050607080900010203040506070809000102")},
 	})
 }
 
 func TestH256_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewH256(hash32), mustDecodeHexString("0x95248da71ae3de701a70523b32a1e5a982de1e49dcf9891e188748e8f9189a2c")},
+		{NewH256(hash32), MustHexDecodeString("0x95248da71ae3de701a70523b32a1e5a982de1e49dcf9891e188748e8f9189a2c")},
 	})
 }
 
@@ -121,13 +121,13 @@ func TestHash_EncodedLength(t *testing.T) {
 
 func TestHash_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewHash(hash32), mustDecodeHexString("0x0102030405060708090001020304050607080900010203040506070809000102")},
+		{NewHash(hash32), MustHexDecodeString("0x0102030405060708090001020304050607080900010203040506070809000102")},
 	})
 }
 
 func TestHash_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewHash(hash32), mustDecodeHexString("0x95248da71ae3de701a70523b32a1e5a982de1e49dcf9891e188748e8f9189a2c")},
+		{NewHash(hash32), MustHexDecodeString("0x95248da71ae3de701a70523b32a1e5a982de1e49dcf9891e188748e8f9189a2c")},
 	})
 }
 
@@ -167,13 +167,13 @@ func TestH512_EncodedLength(t *testing.T) {
 
 func TestH512_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewH512(hash64), mustDecodeHexString("0x01020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304")}, //nolint:lll
+		{NewH512(hash64), MustHexDecodeString("0x01020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304")}, //nolint:lll
 	})
 }
 
 func TestH512_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewH512(hash64), mustDecodeHexString("0x893a41fa8d4e6447fe2d74a3ae529b1f1a13f3ac5a194907bf19e78e084a0ef6")},
+		{NewH512(hash64), MustHexDecodeString("0x893a41fa8d4e6447fe2d74a3ae529b1f1a13f3ac5a194907bf19e78e084a0ef6")},
 	})
 }
 

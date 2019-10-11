@@ -38,16 +38,16 @@ func TestAccountID_EncodedLength(t *testing.T) {
 
 func TestAccountID_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewAccountID([]byte{0, 0, 0}), mustDecodeHexString("0x0000000000000000000000000000000000000000000000000000000000000000")},     //nolint:lll
-		{NewAccountID([]byte{171, 18, 52}), mustDecodeHexString("0xab12340000000000000000000000000000000000000000000000000000000000")}, //nolint:lll
+		{NewAccountID([]byte{0, 0, 0}), MustHexDecodeString("0x0000000000000000000000000000000000000000000000000000000000000000")},     //nolint:lll
+		{NewAccountID([]byte{171, 18, 52}), MustHexDecodeString("0xab12340000000000000000000000000000000000000000000000000000000000")}, //nolint:lll
 	})
 }
 
 func TestAccountID_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewAccountID([]byte{0, 42, 254}), mustDecodeHexString(
+		{NewAccountID([]byte{0, 42, 254}), MustHexDecodeString(
 			"0x7834db8eb04aefe8272c32d8160ce4fa3cb31fc95882e5bd53860715731c8198")},
-		{NewAccountID([]byte{0, 0}), mustDecodeHexString(
+		{NewAccountID([]byte{0, 0}), MustHexDecodeString(
 			"0x89eb0d6a8a691dae2cd15ed0369931ce0a949ecafa5c3f93f8121833646e15c3")},
 	})
 }

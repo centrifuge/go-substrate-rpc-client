@@ -50,9 +50,9 @@ func TestData_Decode(t *testing.T) {
 
 func TestData_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{Data([]byte{0, 42, 254}), mustDecodeHexString(
+		{Data([]byte{0, 42, 254}), MustHexDecodeString(
 			"0x537db36f5b5970b679a28a3df8d219317d658014fb9c3d409c0c799d8ecf149d")},
-		{Data([]byte{}), mustDecodeHexString(
+		{Data([]byte{}), MustHexDecodeString(
 			"0x0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8")},
 	})
 }
