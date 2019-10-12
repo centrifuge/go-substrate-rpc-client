@@ -25,13 +25,13 @@ import (
 )
 
 func TestChain_GetHeaderLatest(t *testing.T) {
-	rv, err := chain.GetHeaderLatest()
+	header, err := chain.GetHeaderLatest()
 	assert.NoError(t, err)
-	assert.Equal(t, &mockSrv.header, rv)
+	assert.Equal(t, &mockSrv.header, header)
 }
 
 func TestChain_GetHeader(t *testing.T) {
-	rv, err := chain.GetHeader(mockSrv.blockHashLatest)
+	header, err := chain.GetHeader(mockSrv.blockHashLatest)
 	assert.NoError(t, err)
-	assert.Equal(t, &mockSrv.header, rv)
+	assert.Equal(t, &mockSrv.header, header)
 }

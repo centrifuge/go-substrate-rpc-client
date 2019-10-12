@@ -24,7 +24,7 @@ import (
 
 type Header struct {
 	ParentHash     Hash        `json:"parentHash"`
-	Number         BlockNumber `json:"-"` // `json:"number"` // TODO
+	Number         BlockNumber `json:"number"`
 	StateRoot      Hash        `json:"stateRoot"`
 	ExtrinsicsRoot Hash        `json:"extrinsicsRoot"`
 	Digest         Digest      `json:"digest"`
