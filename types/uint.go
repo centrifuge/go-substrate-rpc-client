@@ -136,7 +136,7 @@ func (i *U128) Decode(decoder scale.Decoder) error {
 	// reverse bytes, scale uses little-endian encoding, big.int's bytes are expected in big-endian
 	reverse(bs)
 
-	b, err := IntBytesToBigInt(bs)
+	b, err := UintBytesToBigInt(bs)
 	if err != nil {
 		return err
 	}
@@ -153,7 +153,7 @@ func (i *U128) Decode(decoder scale.Decoder) error {
 
 // Encode implements encoding as per the Scale specification
 func (i U128) Encode(encoder scale.Encoder) error {
-	b, err := BigIntToIntBytes(i.Int, 16)
+	b, err := BigIntToUintBytes(i.Int, 16)
 	if err != nil {
 		return err
 	}
@@ -184,7 +184,7 @@ func (i *U256) Decode(decoder scale.Decoder) error {
 	// reverse bytes, scale uses little-endian encoding, big.int's bytes are expected in big-endian
 	reverse(bs)
 
-	b, err := IntBytesToBigInt(bs)
+	b, err := UintBytesToBigInt(bs)
 	if err != nil {
 		return err
 	}
@@ -201,7 +201,7 @@ func (i *U256) Decode(decoder scale.Decoder) error {
 
 // Encode implements encoding as per the Scale specification
 func (i U256) Encode(encoder scale.Encoder) error {
-	b, err := BigIntToIntBytes(i.Int, 32)
+	b, err := BigIntToUintBytes(i.Int, 32)
 	if err != nil {
 		return err
 	}
@@ -212,69 +212,32 @@ func (i U256) Encode(encoder scale.Encoder) error {
 	return encoder.Write(b)
 }
 
-// BigIntToIntBytes encodes the given big.Int to a big endian encoded integer byte slice of the given byte length,
-// using a two's complement if the big.Int is negative and returning an error if the given big.Int would be bigger
-// than the maximum positive (negative) numbers the byte slice of the given length could hold
-func BigIntToIntBytes(i *big.Int, bytelen int) ([]byte, error) {
+// BigIntToUintBytes encodes the given big.Int to a big endian encoded unsigned integer byte slice of the given byte
+// length, returning an error if the given big.Int would be bigger than the maximum number the byte slice of the given
+// length could hold
+func BigIntToUintBytes(i *big.Int, bytelen int) ([]byte, error) {
+	if i.Sign() < 0 {
+		return nil, fmt.Errorf("cannot encode a negative big.Int into an unsigned integer")
+	}
+
+	max := big.NewInt(0).Exp(big.NewInt(2), big.NewInt(int64(bytelen*8)), nil)
+	if i.CmpAbs(max) > 0 {
+		return nil, fmt.Errorf("cannot encode big.Int to []byte: given big.Int exceeds highest number "+
+			"%v for an uint with %v bits", max, bytelen*8)
+	}
+
 	res := make([]byte, bytelen)
 
-	maxNeg := big.NewInt(0).Exp(big.NewInt(2), big.NewInt(int64(bytelen*8-1)), nil)
-	maxPos := big.NewInt(0).Sub(maxNeg, big.NewInt(1))
-
-	if i.Sign() >= 0 {
-		if i.CmpAbs(maxPos) > 0 {
-			return nil, fmt.Errorf("cannot encode big.Int to []byte: given big.Int exceeds highest positive number "+
-				"%v for an int with %v bits", maxPos, bytelen*8)
-		}
-
-		bs := i.Bytes()
-		copy(res[len(res)-len(bs):], bs)
-		return res, nil
-	}
-
-	// negative, two's complement
-
-	if i.CmpAbs(maxNeg) > 0 {
-		return nil, fmt.Errorf("cannot encode big.Int to []byte: given big.Int exceeds highest negative number -"+
-			"%v for an int with %v bits", maxNeg, bytelen*8)
-	}
-
-	i = big.NewInt(0).Add(i, big.NewInt(1))
 	bs := i.Bytes()
 	copy(res[len(res)-len(bs):], bs)
-
-	// apply not to every byte
-	for j, b := range res {
-		res[j] = ^b
-	}
-
 	return res, nil
 }
 
-// IntBytesToBigInt decodes the given byte slice containing a big endian encoded integer to a big.Int, using a two's
-// complement if the most significant bit is 1
-func IntBytesToBigInt(b []byte) (*big.Int, error) {
+// UintBytesToBigInt decodes the given byte slice containing a big endian encoded unsigned integer to a big.Int
+func UintBytesToBigInt(b []byte) (*big.Int, error) {
 	if len(b) == 0 {
 		return nil, fmt.Errorf("cannot decode an empty byte slice")
 	}
 
-	if b[0]&0x80 == 0x00 {
-		// positive
-		return big.NewInt(0).SetBytes(b), nil
-	}
-
-	// negative, two's complement
-	t := make([]byte, len(b))
-	copy(t, b)
-
-	// apply not to every byte
-	for j, b := range b {
-		t[j] = ^b
-	}
-
-	res := big.NewInt(0).SetBytes(t)
-	res = res.Add(res, big.NewInt(1))
-	res = res.Neg(res)
-
-	return res, nil
+	return big.NewInt(0).SetBytes(b), nil
 }

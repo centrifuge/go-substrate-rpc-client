@@ -219,9 +219,9 @@ func reverse(b []byte) {
 	}
 }
 
-// BigIntToIntBytes encodes the given big.Int to a big endian encoded integer byte slice of the given byte length,
-// using a two's complement if the big.Int is negative and returning an error if the given big.Int would be bigger
-// than the maximum positive (negative) numbers the byte slice of the given length could hold
+// BigIntToIntBytes encodes the given big.Int to a big endian encoded signed integer byte slice of the given byte
+// length, using a two's complement if the big.Int is negative and returning an error if the given big.Int would be
+// bigger than the maximum positive (negative) numbers the byte slice of the given length could hold
 func BigIntToIntBytes(i *big.Int, bytelen int) ([]byte, error) {
 	res := make([]byte, bytelen)
 
@@ -258,8 +258,8 @@ func BigIntToIntBytes(i *big.Int, bytelen int) ([]byte, error) {
 	return res, nil
 }
 
-// IntBytesToBigInt decodes the given byte slice containing a big endian encoded integer to a big.Int, using a two's
-// complement if the most significant bit is 1
+// IntBytesToBigInt decodes the given byte slice containing a big endian encoded signed integer to a big.Int, using a
+// two's complement if the most significant bit is 1
 func IntBytesToBigInt(b []byte) (*big.Int, error) {
 	if len(b) == 0 {
 		return nil, fmt.Errorf("cannot decode an empty byte slice")
