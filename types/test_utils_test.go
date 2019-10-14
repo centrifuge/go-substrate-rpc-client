@@ -36,7 +36,7 @@ func assertEqual(t *testing.T, a interface{}, b interface{}) {
 	if reflect.DeepEqual(a, b) {
 		return
 	}
-	t.Errorf("Received %v (type %v), expected %v (type %v)", a, reflect.TypeOf(a), b, reflect.TypeOf(b))
+	t.Errorf("Received %#v (type %v), expected %#v (type %v)", a, reflect.TypeOf(a), b, reflect.TypeOf(b))
 }
 
 func assertRoundtrip(t *testing.T, value interface{}) {

@@ -24,6 +24,7 @@ type Config struct {
 
 // NewDefaultConfig returns a new config with default values. Default values can be overwritten with env variables,
 // most importantly RPC_URL for a custom endpoint.
+// TODO: rewrite as init function
 func NewDefaultConfig() Config {
 	c := Config{}
 	c.ExtractDefaultRPCURL()

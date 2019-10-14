@@ -18,6 +18,10 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
+	"math/big"
+
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
 // I8 is a signed 8-bit integer
@@ -46,7 +50,7 @@ func (i I8) MarshalJSON() ([]byte, error) {
 // I16 is a signed 16-bit integer
 type I16 int16
 
-// NewI16 creates a new 16 type
+// NewI16 creates a new I16 type
 func NewI16(i int16) I16 {
 	return I16(i)
 }
@@ -69,7 +73,7 @@ func (i I16) MarshalJSON() ([]byte, error) {
 // I32 is a signed 32-bit integer
 type I32 int32
 
-// NewI32 creates a new 32 type
+// NewI32 creates a new I32 type
 func NewI32(i int32) I32 {
 	return I32(i)
 }
@@ -92,7 +96,7 @@ func (i I32) MarshalJSON() ([]byte, error) {
 // I64 is a signed 64-bit integer
 type I64 int64
 
-// NewI64 creates a new 64 type
+// NewI64 creates a new I64 type
 func NewI64(i int64) I64 {
 	return I64(i)
 }
@@ -110,4 +114,174 @@ func (i *I64) UnmarshalJSON(b []byte) error {
 // MarshalJSON returns a JSON encoded byte array of i
 func (i I64) MarshalJSON() ([]byte, error) {
 	return json.Marshal(int64(i))
+}
+
+// I128 is a signed 128-bit integer, it is represented as a big.Int in Go.
+type I128 struct {
+	*big.Int
+}
+
+// NewI128 creates a new I128 type
+func NewI128(i big.Int) I128 {
+	return I128{&i}
+}
+
+// Decode implements decoding as per the Scale specification
+func (i *I128) Decode(decoder scale.Decoder) error {
+	bs := make([]byte, 16)
+	err := decoder.Read(bs)
+	if err != nil {
+		return err
+	}
+	// reverse bytes, scale uses little-endian encoding, big.int's bytes are expected in big-endian
+	reverse(bs)
+
+	b, err := IntBytesToBigInt(bs)
+	if err != nil {
+		return err
+	}
+
+	// deal with zero differently to get a nil representation (this is how big.Int deals with 0)
+	if b.Sign() == 0 {
+		*i = I128{big.NewInt(0)}
+		return nil
+	}
+
+	*i = I128{b}
+	return nil
+}
+
+// Encode implements encoding as per the Scale specification
+func (i I128) Encode(encoder scale.Encoder) error {
+	b, err := BigIntToIntBytes(i.Int, 16)
+	if err != nil {
+		return err
+	}
+
+	// reverse bytes, scale uses little-endian encoding, big.int's bytes are expected in big-endian
+	reverse(b)
+
+	return encoder.Write(b)
+}
+
+// I256 is a signed 256-bit integer, it is represented as a big.Int in Go.
+type I256 struct {
+	*big.Int
+}
+
+// NewI256 creates a new I256 type
+func NewI256(i big.Int) I256 {
+	return I256{&i}
+}
+
+// Decode implements decoding as per the Scale specification
+func (i *I256) Decode(decoder scale.Decoder) error {
+	bs := make([]byte, 32)
+	err := decoder.Read(bs)
+	if err != nil {
+		return err
+	}
+	// reverse bytes, scale uses little-endian encoding, big.int's bytes are expected in big-endian
+	reverse(bs)
+
+	b, err := IntBytesToBigInt(bs)
+	if err != nil {
+		return err
+	}
+
+	// deal with zero differently to get a nil representation (this is how big.Int deals with 0)
+	if b.Sign() == 0 {
+		*i = I256{big.NewInt(0)}
+		return nil
+	}
+
+	*i = I256{b}
+	return nil
+}
+
+// Encode implements encoding as per the Scale specification
+func (i I256) Encode(encoder scale.Encoder) error {
+	b, err := BigIntToIntBytes(i.Int, 32)
+	if err != nil {
+		return err
+	}
+
+	// reverse bytes, scale uses little-endian encoding, big.int's bytes are expected in big-endian
+	reverse(b)
+
+	return encoder.Write(b)
+}
+
+// reverse reverses bytes in place (manipulates the underlying array)
+func reverse(b []byte) {
+	for i, j := 0, len(b)-1; i < j; i, j = i+1, j-1 {
+		b[i], b[j] = b[j], b[i]
+	}
+}
+
+// BigIntToIntBytes encodes the given big.Int to a big endian encoded integer byte slice of the given byte length,
+// using a two's complement if the big.Int is negative and returning an error if the given big.Int would be bigger
+// than the maximum positive (negative) numbers the byte slice of the given length could hold
+func BigIntToIntBytes(i *big.Int, bytelen int) ([]byte, error) {
+	res := make([]byte, bytelen)
+
+	maxNeg := big.NewInt(0).Exp(big.NewInt(2), big.NewInt(int64(bytelen*8-1)), nil)
+	maxPos := big.NewInt(0).Sub(maxNeg, big.NewInt(1))
+
+	if i.Sign() >= 0 {
+		if i.CmpAbs(maxPos) > 0 {
+			return nil, fmt.Errorf("cannot encode big.Int to []byte: given big.Int exceeds highest positive number "+
+				"%v for an int with %v bits", maxPos, bytelen*8)
+		}
+
+		bs := i.Bytes()
+		copy(res[len(res)-len(bs):], bs)
+		return res, nil
+	}
+
+	// negative, two's complement
+
+	if i.CmpAbs(maxNeg) > 0 {
+		return nil, fmt.Errorf("cannot encode big.Int to []byte: given big.Int exceeds highest negative number -"+
+			"%v for an int with %v bits", maxNeg, bytelen*8)
+	}
+
+	i = big.NewInt(0).Add(i, big.NewInt(1))
+	bs := i.Bytes()
+	copy(res[len(res)-len(bs):], bs)
+
+	// apply not to every byte
+	for j, b := range res {
+		res[j] = ^b
+	}
+
+	return res, nil
+}
+
+// IntBytesToBigInt decodes the given byte slice containing a big endian encoded integer to a big.Int, using a two's
+// complement if the most significant bit is 1
+func IntBytesToBigInt(b []byte) (*big.Int, error) {
+	if len(b) == 0 {
+		return nil, fmt.Errorf("cannot decode an empty byte slice")
+	}
+
+	if b[0]&0x80 == 0x00 {
+		// positive
+		return big.NewInt(0).SetBytes(b), nil
+	}
+
+	// negative, two's complement
+	t := make([]byte, len(b))
+	copy(t, b)
+
+	// apply not to every byte
+	for j, b := range b {
+		t[j] = ^b
+	}
+
+	res := big.NewInt(0).SetBytes(t)
+	res = res.Add(res, big.NewInt(1))
+	res = res.Neg(res)
+
+	return res, nil
 }
