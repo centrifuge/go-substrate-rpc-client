@@ -34,7 +34,7 @@ var exampleRuntimeMetadataV4 = RuntimeMetadataV4{
 	Modules: []ModuleMetadata{exampleModuleMetadata},
 }
 
-var exampleMethodIDX = MethodIDX{
+var exampleCallIndex = CallIndex{
 	SectionIndex: 123,
 	MethodIndex:  234,
 }
@@ -108,8 +108,8 @@ func TestRuntimeMetadataV4_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, exampleRuntimeMetadataV4)
 }
 
-func TestMethodIDX_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleMethodIDX)
+func TestCallIndex_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleCallIndex)
 }
 
 func TestModuleMetadata_EncodeDecode(t *testing.T) {

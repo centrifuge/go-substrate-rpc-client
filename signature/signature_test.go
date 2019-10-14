@@ -14,21 +14,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package types
+package signature_test
 
-import "fmt"
+import (
+	"crypto/rand"
+	"testing"
 
-// Signature is a H512
-type Signature H512
+	. "github.com/centrifuge/go-substrate-rpc-client/signature"
+	"github.com/stretchr/testify/assert"
+)
 
-// NewSignature creates a new Signature type
-func NewSignature(b []byte) Signature {
-	h := Signature{}
-	copy(h[:], b)
-	return h
+func TestSignAndVerify(t *testing.T) {
+	data := []byte("hello!")
+
+	sig, err := Sign(data, TestKeyringPairAlice.URI)
+	assert.NoError(t, err)
+
+	ok, err := Verify(data, sig, TestKeyringPairAlice.URI)
+	assert.NoError(t, err)
+
+	assert.True(t, ok)
 }
 
-// Hex returns a hex string representation of the value (not of the encoded value)
-func (h Signature) Hex() string {
-	return fmt.Sprintf("%#x", h[:])
+func TestSignAndVerifyLong(t *testing.T) {
+	data := make([]byte, 258)
+	_, err := rand.Read(data)
+	assert.NoError(t, err)
+
+	sig, err := Sign(data, TestKeyringPairAlice.URI)
+	assert.NoError(t, err)
+
+	ok, err := Verify(data, sig, TestKeyringPairAlice.URI)
+	assert.NoError(t, err)
+
+	assert.True(t, ok)
 }

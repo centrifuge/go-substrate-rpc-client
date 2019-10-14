@@ -14,21 +14,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package types
+package types_test
 
-import "fmt"
+import (
+	"testing"
 
-// Signature is a H512
-type Signature H512
+	. "github.com/centrifuge/go-substrate-rpc-client/types"
+	"github.com/stretchr/testify/assert"
+)
 
-// NewSignature creates a new Signature type
-func NewSignature(b []byte) Signature {
-	h := Signature{}
-	copy(h[:], b)
-	return h
+func TestExtrinsicEra_Immortal(t *testing.T) {
+	var e ExtrinsicEra
+	err := DecodeFromHexString("0x00", &e)
+	assert.NoError(t, err)
+	assert.Equal(t, ExtrinsicEra{IsImmortalEra: true}, e)
 }
 
-// Hex returns a hex string representation of the value (not of the encoded value)
-func (h Signature) Hex() string {
-	return fmt.Sprintf("%#x", h[:])
+func TestExtrinsicEra_Mortal(t *testing.T) {
+	var e ExtrinsicEra
+	err := DecodeFromHexString("0x4e9c", &e)
+	assert.NoError(t, err)
+	assert.Equal(t, ExtrinsicEra{
+		IsMortalEra: true, AsMortalEra: MortalEra{78, 156},
+	}, e)
+}
+
+func TestExtrinsicEra_EncodeDecode(t *testing.T) {
+	var e ExtrinsicEra
+	err := DecodeFromHexString("0x4e9c", &e)
+	assert.NoError(t, err)
+	assertRoundtrip(t, e)
 }

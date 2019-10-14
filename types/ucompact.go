@@ -18,10 +18,27 @@
 
 package types
 
-// AccountIndex is a shortened, variable-length encoding for an Account
-type AccountIndex uint32
+import (
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
+)
 
-// NewAccountIndex creates a new AccountIndex type
-func NewAccountIndex(i uint32) AccountIndex {
-	return AccountIndex(i)
+// TODO adjust to use U256 or even big ints instead, needs to adopt codec though
+type UCompact uint64
+
+func (u *UCompact) Decode(decoder scale.Decoder) error {
+	ui, err := decoder.DecodeUintCompact()
+	if err != nil {
+		return err
+	}
+
+	*u = UCompact(ui)
+	return nil
+}
+
+func (u UCompact) Encode(encoder scale.Encoder) error {
+	err := encoder.EncodeUintCompact(uint64(u))
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -19,7 +19,6 @@ package types
 import (
 	"errors"
 	"hash"
-	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"golang.org/x/crypto/blake2b"
@@ -92,63 +91,6 @@ func (m RuntimeMetadataV4) Encode(encoder scale.Encoder) error {
 	if err != nil {
 		return err
 	}
-	return nil
-}
-
-func (m *RuntimeMetadataV4) MethodIndex(method string) MethodIDX {
-	s := strings.Split(method, ".")
-	var sIDX, mIDX uint8 = 0, 0
-	// section index
-	var sCounter = 0
-
-	for _, n := range m.Modules {
-		if n.HasCalls {
-			if n.Name == s[0] {
-				sIDX = uint8(sCounter)
-				for j, f := range n.Calls {
-					if f.Name == s[1] {
-						mIDX = uint8(j)
-					}
-				}
-			}
-			sCounter++
-		}
-	}
-
-	return MethodIDX{sIDX, mIDX}
-}
-
-// MethodIDX [sectionIndex, methodIndex] 16bits
-type MethodIDX struct {
-	SectionIndex uint8
-	MethodIndex  uint8
-}
-
-func (m *MethodIDX) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&m.SectionIndex)
-	if err != nil {
-		return err
-	}
-
-	err = decoder.Decode(&m.MethodIndex)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m MethodIDX) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(m.SectionIndex)
-	if err != nil {
-		return err
-	}
-
-	err = encoder.Encode(m.MethodIndex)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 

@@ -16,12 +16,33 @@
 
 package types
 
-// Bytes represents byte slices
+import (
+	"fmt"
+
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
+)
+
+// Bytes represents byte slices. Bytes has a variable length, it is encoded with a scale prefix
 type Bytes []byte
 
 // NewBytes creates a new Bytes type
 func NewBytes(b []byte) Bytes {
 	return Bytes(b)
+}
+
+// BytesBare represents byte slices that will be encoded bare, i. e. without a compact length prefix. This makes it
+// impossible to decode the bytes, but is used as the payload for signing.
+type BytesBare []byte
+
+// Encode implements encoding for BytesBare, which just unwraps the bytes of BytesBare without adding a compact
+// length prefix
+func (b BytesBare) Encode(encoder scale.Encoder) error {
+	return encoder.Write(b)
+}
+
+// Decode does nothing and always returns an error. BytesBare is only used for encoding, not for decoding
+func (b *BytesBare) Decode(decoder scale.Decoder) error {
+	return fmt.Errorf("decoding of BytesBare is not supported")
 }
 
 // Bytes8 represents an 8 byte array

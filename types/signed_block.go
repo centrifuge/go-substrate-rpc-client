@@ -26,7 +26,3 @@ type Block struct {
 	Header     Header
 	Extrinsics []Extrinsic
 }
-
-type Extrinsic string // TODO
-
-type Justification Bytes

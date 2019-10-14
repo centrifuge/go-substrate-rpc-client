@@ -148,23 +148,25 @@ func TestSliceOfBytesEncodedAsExpected(t *testing.T) {
 func TestArrayOfBytesEncodedAsExpected(t *testing.T) {
 	value := [10]byte{0, 1, 1, 2, 3, 5, 8, 13, 21, 34}
 	assertRoundtrip(t, value)
-	assertEqual(t, hexify(encodeToBytes(t, value)), "28 00 01 01 02 03 05 08 0d 15 22")
+	assertEqual(t, hexify(encodeToBytes(t, value)), "00 01 01 02 03 05 08 0d 15 22")
 }
 
 func TestArrayCannotBeDecodedIntoIncompatible(t *testing.T) {
-	value := [3]byte{1, 2, 3}
+	value := [3]byte{255, 254, 253}
 	value2 := [5]byte{1, 2, 3, 4, 5}
 	value3 := [1]byte{42}
 	var buffer = bytes.Buffer{}
 	err := Encoder{&buffer}.Encode(value)
 	assert.NoError(t, err)
 	err = Decoder{&buffer}.Decode(&value2)
-	assert.Error(t, err)
+	assert.NoError(t, err)
+	assert.Equal(t, [5]byte{255, 254, 253, 0, 0}, value2)
 	buffer.Reset()
 	err = Encoder{&buffer}.Encode(value)
 	assert.NoError(t, err)
 	err = Decoder{&buffer}.Decode(&value3)
-	assert.Error(t, err)
+	assert.NoError(t, err)
+	assert.Equal(t, [1]byte{255}, value3)
 	buffer.Reset()
 	err = Encoder{&buffer}.Encode(value)
 	assert.NoError(t, err)
