@@ -1,0 +1,72 @@
+// Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
+//
+// Copyright 2019 Centrifuge GmbH
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package types_test
+
+import (
+	"testing"
+
+	. "github.com/centrifuge/go-substrate-rpc-client/types"
+)
+
+var exampleMetadataV7 = Metadata{
+	MagicNumber:  0x6174656d,
+	Version:      7,
+	IsMetadataV7: true,
+	AsMetadataV7: exampleRuntimeMetadataV7,
+}
+
+var exampleRuntimeMetadataV7 = MetadataV7{
+	Modules: []ModuleMetadataV7{exampleModuleMetadataV7},
+}
+
+var exampleModuleMetadataV7 = ModuleMetadataV7{
+	Name:       "myModule",
+	HasStorage: true,
+	Storage:    exampleStorageMetadata,
+	HasCalls:   true,
+	Calls:      []FunctionMetadataV4{exampleFunctionMetadataV4},
+	HasEvents:  true,
+	Events:     []EventMetadataV4{exampleEventMetadataV4},
+	Constants:  []ModuleConstantMetadataV6{exampleModuleConstantMetadataV6},
+}
+
+var exampleStorageFunctionMetadataV5 = StorageFunctionMetadataV5{
+	Name:          "myStorageFunc",
+	Modifier:      StorageFunctionModifierV0{IsOptional: true},
+	Type:          StorageFunctionTypeV5{IsDoubleMap: true, AsDoubleMap: exampleDoubleMapTypeV5},
+	Fallback:      []byte{23, 14},
+	Documentation: []Text{"My", "storage func", "doc"},
+}
+
+var exampleDoubleMapTypeV5 = DoubleMapTypeV5{
+	Hasher:     StorageHasher{IsBlake2_256: true},
+	Key1:       "myKey",
+	Key2:       "otherKey",
+	Value:      "and a value",
+	Key2Hasher: StorageHasher{IsTwox256: true},
+}
+
+var exampleModuleConstantMetadataV6 = ModuleConstantMetadataV6{
+	Name:          Text("My name"),
+	Type:          Type("My Type"),
+	Value:         Bytes{123, 23},
+	Documentation: []Text{"Doca", "Docb"},
+}
+
+func TestMetadataV7_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleMetadataV7)
+}

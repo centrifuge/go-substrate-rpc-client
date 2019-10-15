@@ -203,7 +203,7 @@ type Call struct {
 	Args      Args
 }
 
-func NewCall(m RuntimeMetadataV4, call string, args ...interface{}) (Call, error) {
+func NewCall(m *Metadata, call string, args ...interface{}) (Call, error) {
 	c, err := FindCallIndex(m, call)
 	if err != nil {
 		return Call{}, err
@@ -221,23 +221,41 @@ func NewCall(m RuntimeMetadataV4, call string, args ...interface{}) (Call, error
 	return Call{c, a}, nil
 }
 
-func FindCallIndex(m RuntimeMetadataV4, call string) (CallIndex, error) {
+func FindCallIndex(m *Metadata, call string) (CallIndex, error) {
 	s := strings.Split(call, ".")
 	// section index, method index
 	var sIndex uint8 = 0
 
-	for _, n := range m.Modules {
-		if n.HasCalls {
-			if n.Name == s[0] {
-				for j, f := range n.Calls {
-					if f.Name == s[1] {
-						mIndex := uint8(j)
-						return CallIndex{sIndex, mIndex}, nil
+	if m.IsMetadataV4 {
+		for _, n := range m.AsMetadataV4.Modules {
+			if n.HasCalls {
+				if string(n.Name) == s[0] {
+					for j, f := range n.Calls {
+						if string(f.Name) == s[1] {
+							mIndex := uint8(j)
+							return CallIndex{sIndex, mIndex}, nil
+						}
 					}
 				}
+				sIndex++
 			}
-			sIndex++
 		}
+	} else if m.IsMetadataV7 {
+		for _, n := range m.AsMetadataV7.Modules {
+			if n.HasCalls {
+				if string(n.Name) == s[0] {
+					for j, f := range n.Calls {
+						if string(f.Name) == s[1] {
+							mIndex := uint8(j)
+							return CallIndex{sIndex, mIndex}, nil
+						}
+					}
+				}
+				sIndex++
+			}
+		}
+	} else {
+		return CallIndex{}, fmt.Errorf("valid metadata expected, got %#v", m)
 	}
 
 	return CallIndex{}, fmt.Errorf("could not find CallIndex for call %v in metadata", call)
