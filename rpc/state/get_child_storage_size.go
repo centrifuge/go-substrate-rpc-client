@@ -23,22 +23,22 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-// GetStorageHash retreives the storage hash for the given key
-func (s *State) GetStorageHash(key types.StorageKey, blockHash types.Hash) (types.Hash, error) {
-	return s.getStorageHash(key, &blockHash)
+// GetChildStorageSize retreives the child storage size for the given key
+func (s *State) GetChildStorageSize(childStorageKey, key types.StorageKey, blockHash types.Hash) (types.U64, error) {
+	return s.getChildStorageSize(childStorageKey, key, &blockHash)
 }
 
-// GetStorageHashLatest retreives the storage hash for the given key for the latest block height
-func (s *State) GetStorageHashLatest(key types.StorageKey) (types.Hash, error) {
-	return s.getStorageHash(key, nil)
+// GetChildStorageSizeLatest retreives the child storage size for the given key for the latest block height
+func (s *State) GetChildStorageSizeLatest(childStorageKey, key types.StorageKey) (types.U64, error) {
+	return s.getChildStorageSize(childStorageKey, key, nil)
 }
 
-func (s *State) getStorageHash(key types.StorageKey, blockHash *types.Hash) (types.Hash, error) {
-	var res string
-	err := client.CallWithBlockHash(*s.client, &res, "state_getStorageHash", blockHash, key.Hex())
+func (s *State) getChildStorageSize(childStorageKey, key types.StorageKey, blockHash *types.Hash) (types.U64, error) {
+	var res types.U64
+	err := client.CallWithBlockHash(*s.client, &res, "state_getChildStorageSize", blockHash, childStorageKey.Hex(),
+		key.Hex())
 	if err != nil {
-		return types.Hash{}, err
+		return 0, err
 	}
-
-	return types.NewHashFromHexString(res)
+	return res, err
 }

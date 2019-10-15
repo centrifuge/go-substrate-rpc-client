@@ -23,12 +23,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-// GetStorageSize retreives the keys with the given key
+// GetStorageSize retreives the storage size for the given key
 func (s *State) GetStorageSize(key types.StorageKey, blockHash types.Hash) (types.U64, error) {
 	return s.getStorageSize(key, &blockHash)
 }
 
-// GetStorageSizeLatest retreives the keys with the given key for the latest block height
+// GetStorageSizeLatest retreives the storage size for the given key for the latest block height
 func (s *State) GetStorageSizeLatest(key types.StorageKey) (types.U64, error) {
 	return s.getStorageSize(key, nil)
 }
