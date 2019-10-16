@@ -18,6 +18,9 @@ package types
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
+	"reflect"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
@@ -38,6 +41,7 @@ type EventSystemExtrinsicSuccess struct{}
 type EventSystemExtrinsicFailed struct {
 	DispatchError DispatchError // TODO only for V8
 }
+
 type EventBalancesTransfer struct {
 	From  AccountID
 	To    AccountID
@@ -71,37 +75,26 @@ type EventRecords struct {
 
 // DecodeEvents can be used to decode the events from an EventRecordRaw into a target t using the given Metadata m
 func (e EventRecordsRaw) Decode(m *Metadata, t interface{}) error {
-	type Target1 struct {
-		// EventID EventID
-		Phase  Phase
-		Event  EventSystemExtrinsicSuccess
-		Topics []Hash
+	// ensure t is a pointer
+	ttyp := reflect.TypeOf(t)
+	if ttyp.Kind() != reflect.Ptr {
+		return errors.New("target must be a pointer, but is " + fmt.Sprint(ttyp))
 	}
-	t1 := Target1{}
-
-	type Target2 struct {
-		// EventID EventID
-		Phase  Phase
-		Event  EventSystemExtrinsicFailed
-		Topics []Hash
+	// ensure t is not a nil pointer
+	tval := reflect.ValueOf(t)
+	if tval.IsNil() {
+		return errors.New("target is a nil pointer")
 	}
-	t2 := Target2{}
-
-	type Target3 struct {
-		// EventID EventID
-		Phase  Phase
-		Event  EventBalancesTransfer
-		Topics []Hash
+	val := tval.Elem()
+	typ := val.Type()
+	// ensure val can be set
+	if !val.CanSet() {
+		return fmt.Errorf("unsettable value %v", typ)
 	}
-	t3 := Target3{}
-
-	type Target4 struct {
-		// EventID EventID
-		Phase  Phase
-		Event  EventIndicesNewAccountIndex
-		Topics []Hash
+	// ensure val points to a struct
+	if val.Kind() != reflect.Struct {
+		return fmt.Errorf("target must point to a struct, but is " + fmt.Sprint(typ))
 	}
-	t4 := Target4{}
 
 	decoder := scale.NewDecoder(bytes.NewReader(e))
 
@@ -111,29 +104,40 @@ func (e EventRecordsRaw) Decode(m *Metadata, t interface{}) error {
 		return err
 	}
 
-	// tar := make([]Target, n)
-
 	// iterate over events
 	for i := uint64(0); i < n; i++ {
 		// decode EventID
 		id := EventID{}
 		err := decoder.Decode(&id)
 		if err != nil {
-			return err
+			return fmt.Errorf("unable to decode EventID for event #%v: %v", i, err)
 		}
 
-		if i == 0 {
-			err = decoder.Decode(&t1)
-		} else if i == 1 {
-			err = decoder.Decode(&t2)
-		} else if i == 2 {
-			err = decoder.Decode(&t3)
-		} else if i == 3 {
-			err = decoder.Decode(&t4)
-		}
+		// ask metadata for method & event name for event
+		moduleName, eventName, err := m.FindEventNamesForEventID(id)
+		// moduleName, eventName, err := "System", "ExtrinsicSuccess", nil
 		if err != nil {
-			return err
+			return fmt.Errorf("unable to find event with EventID %v in metadata for event #%v", id, i)
 		}
+
+		// check whether name for eventID exists in t
+		field := val.FieldByName(fmt.Sprintf("%v_%v", moduleName, eventName))
+		if !field.IsValid() {
+			return fmt.Errorf("unable to find field %v_%v for event #%v with EventID %v", moduleName, eventName, i, id)
+		}
+
+		// create a pointer to with the correct type that will hold the decoded event
+		holder := reflect.New(field.Type().Elem())
+		err = decoder.Decode(holder.Interface())
+		if err != nil {
+			return fmt.Errorf("unable to decode event #%v with EventID %v, field %v_%v: %v", i, id, moduleName,
+				eventName, err)
+		}
+
+		// add the decoded event to the slice
+		field.Set(reflect.Append(field, holder.Elem()))
+
+		// fmt.Println("Slice type", field.Type().Elem())
 	}
 	return nil
 }

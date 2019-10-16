@@ -161,20 +161,12 @@ import (
 func ExampleEventRecordsRaw_Decode() {
 	e := EventRecordsRaw(MustHexDecodeString("0x100000000000000000000100000000000000020000000302d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48266d00000000000000000000000000000010a5d4e80000000000000000000000000002000000000000")) //nolint:lll
 
-	type TransferEvent struct {
-		From  AccountID
-		To    AccountID
-		Value U128
-		Fees  U128
-	}
+	events := EventRecords{}
 
-	type EventResponses struct {
-		Balances_Transfer []TransferEvent
-	}
-
-	events := EventResponses{}
-	err := e.Decode(NewMetadataV7(), &events)
+	err := e.Decode(ExamplaryMetadataV8, &events)
 	fmt.Println(err)
+
+	fmt.Printf("%#v\n", events)
 
 	// Output: "abc"
 }
