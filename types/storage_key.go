@@ -77,7 +77,22 @@ func CreateStorageKey(meta *Metadata, module string, fn string, key []byte) (Sto
 				}
 			}
 		}
-
+	} else if meta.IsMetadataV8 {
+		for _, m := range meta.AsMetadataV8.Modules {
+			if string(m.Storage.Prefix) == module {
+				for _, s := range m.Storage.Items {
+					if string(s.Name) == fn {
+						if s.Type.IsMap {
+							hasher, err = s.Type.AsMap.Hasher.HashFunc()
+						} else if s.Type.IsDoubleMap {
+							hasher, err = s.Type.AsDoubleMap.Hasher.HashFunc()
+						}
+						found = true
+						break
+					}
+				}
+			}
+		}
 	}
 
 	if !found {

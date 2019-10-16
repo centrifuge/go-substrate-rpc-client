@@ -255,6 +255,20 @@ func FindCallIndex(m *Metadata, call string) (CallIndex, error) {
 				sIndex++
 			}
 		}
+	case m.IsMetadataV8:
+		for _, n := range m.AsMetadataV8.Modules {
+			if n.HasCalls {
+				if string(n.Name) == s[0] {
+					for j, f := range n.Calls {
+						if string(f.Name) == s[1] {
+							mIndex := uint8(j)
+							return CallIndex{sIndex, mIndex}, nil
+						}
+					}
+				}
+				sIndex++
+			}
+		}
 	default:
 		return CallIndex{}, fmt.Errorf("valid metadata expected, got %#v", m)
 	}

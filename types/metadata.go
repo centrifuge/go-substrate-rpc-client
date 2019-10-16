@@ -33,6 +33,8 @@ type Metadata struct {
 	AsMetadataV4 MetadataV4
 	IsMetadataV7 bool
 	AsMetadataV7 MetadataV7
+	IsMetadataV8 bool
+	AsMetadataV8 MetadataV8
 }
 
 func NewMetadataV4() *Metadata {
@@ -41,6 +43,10 @@ func NewMetadataV4() *Metadata {
 
 func NewMetadataV7() *Metadata {
 	return &Metadata{Version: 7, IsMetadataV7: true, AsMetadataV7: MetadataV7{make([]ModuleMetadataV7, 0)}}
+}
+
+func NewMetadataV8() *Metadata {
+	return &Metadata{Version: 8, IsMetadataV8: true, AsMetadataV8: MetadataV8{make([]ModuleMetadataV8, 0)}}
 }
 
 func (m *Metadata) Decode(decoder scale.Decoder) error {
@@ -61,20 +67,17 @@ func (m *Metadata) Decode(decoder scale.Decoder) error {
 	case 4:
 		m.IsMetadataV4 = true
 		err = decoder.Decode(&m.AsMetadataV4)
-		if err != nil {
-			return err
-		}
 	case 7:
 		m.IsMetadataV7 = true
 		err = decoder.Decode(&m.AsMetadataV7)
-		if err != nil {
-			return err
-		}
+	case 8:
+		m.IsMetadataV8 = true
+		err = decoder.Decode(&m.AsMetadataV8)
 	default:
 		return fmt.Errorf("unsupported metadata version %v", m.Version)
 	}
 
-	return nil
+	return err
 }
 
 func (m Metadata) Encode(encoder scale.Encoder) error {
@@ -91,17 +94,74 @@ func (m Metadata) Encode(encoder scale.Encoder) error {
 	switch m.Version {
 	case 4:
 		err = encoder.Encode(m.AsMetadataV4)
-		if err != nil {
-			return err
-		}
 	case 7:
 		err = encoder.Encode(m.AsMetadataV7)
-		if err != nil {
-			return err
-		}
+	case 8:
+		err = encoder.Encode(m.AsMetadataV8)
 	default:
 		return fmt.Errorf("unsupported metadata version %v", m.Version)
 	}
 
-	return nil
+	return err
+}
+
+func (m *Metadata) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
+	if m.IsMetadataV4 {
+		return m.AsMetadataV4.FindEventNamesForEventID(eventID)
+	}
+	if m.IsMetadataV7 {
+		return m.AsMetadataV7.FindEventNamesForEventID(eventID)
+	}
+	if m.IsMetadataV8 {
+		return m.AsMetadataV8.FindEventNamesForEventID(eventID)
+	}
+	return "", "", fmt.Errorf("unsupported metadata version")
+}
+
+func (m *MetadataV4) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
+	if int(eventID[0]) >= len(m.Modules) {
+		return "", "", fmt.Errorf("module index %v out of range", eventID[0])
+	}
+	module := m.Modules[eventID[0]]
+	if !module.HasEvents {
+		return "", "", fmt.Errorf("no events for module %v found", module.Name)
+	}
+	if int(eventID[1]) >= len(m.Modules) {
+		return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], module.Name)
+	}
+	event := module.Events[eventID[1]]
+
+	return module.Name, event.Name, nil
+}
+
+func (m *MetadataV7) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
+	if int(eventID[0]) >= len(m.Modules) {
+		return "", "", fmt.Errorf("module index %v out of range", eventID[0])
+	}
+	module := m.Modules[eventID[0]]
+	if !module.HasEvents {
+		return "", "", fmt.Errorf("no events for module %v found", module.Name)
+	}
+	if int(eventID[1]) >= len(m.Modules) {
+		return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], module.Name)
+	}
+	event := module.Events[eventID[1]]
+
+	return module.Name, event.Name, nil
+}
+
+func (m *MetadataV8) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
+	if int(eventID[0]) >= len(m.Modules) {
+		return "", "", fmt.Errorf("module index %v out of range", eventID[0])
+	}
+	module := m.Modules[eventID[0]]
+	if !module.HasEvents {
+		return "", "", fmt.Errorf("no events for module %v found", module.Name)
+	}
+	if int(eventID[1]) >= len(m.Modules) {
+		return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], module.Name)
+	}
+	event := module.Events[eventID[1]]
+
+	return module.Name, event.Name, nil
 }
