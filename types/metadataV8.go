@@ -18,6 +18,7 @@ package types
 
 import (
 	"fmt"
+	"hash"
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"

@@ -40,7 +40,7 @@ func TestExtrinsic_Unsigned_EncodeDecode(t *testing.T) {
 	assert.Equal(t, "0x"+
 		"98"+ // length prefix, compact
 		"03"+ // version
-		"0300"+ // call index (section index and method index)
+		"0200"+ // call index (section index and method index)
 		"ff"+
 		"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"+ // target address
 		"e56c", // amount, compact
@@ -202,7 +202,7 @@ func TestNewCall_V4(t *testing.T) {
 	enc, err := EncodeToHexString(c)
 	assert.NoError(t, err)
 
-	assert.Equal(t, "0x0300ff8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48a10f", enc)
+	assert.Equal(t, "0x0200ff8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48a10f", enc)
 }
 
 func TestNewCall_V7(t *testing.T) {
