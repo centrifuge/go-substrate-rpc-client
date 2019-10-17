@@ -59,7 +59,7 @@ func NewExtrinsic(c Call) Extrinsic {
 }
 
 // UnmarshalJSON fills Extrinsic with the JSON encoded byte array given by bz
-func (b *Extrinsic) UnmarshalJSON(bz []byte) error {
+func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
 	var tmp string
 	if err := json.Unmarshal(bz, &tmp); err != nil {
 		return err
@@ -81,20 +81,26 @@ func (b *Extrinsic) UnmarshalJSON(bz []byte) error {
 
 	// determine whether length prefix is there
 	if strings.HasPrefix(tmp, prefix) {
-		return DecodeFromHexString(tmp, b)
+		return DecodeFromHexString(tmp, e)
 	}
 
 	// not there, prepend with compact encoded length prefix
 	dec, err := HexDecodeString(tmp)
+	if err != nil {
+		return err
+	}
 	length := UCompact(len(dec))
 	bprefix, err := EncodeToBytes(length)
+	if err != nil {
+		return err
+	}
 	prefixed := append(bprefix, dec...)
-	return DecodeFromBytes(prefixed, b)
+	return DecodeFromBytes(prefixed, e)
 }
 
 // MarshalJSON returns a JSON encoded byte array of Extrinsic
-func (b Extrinsic) MarshalJSON() ([]byte, error) {
-	s, err := EncodeToHexString(b)
+func (e Extrinsic) MarshalJSON() ([]byte, error) {
+	s, err := EncodeToHexString(e)
 	if err != nil {
 		return nil, err
 	}
