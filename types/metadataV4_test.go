@@ -51,11 +51,6 @@ var exampleModuleMetadataV4 = ModuleMetadataV4{
 	Events:     []EventMetadataV4{exampleEventMetadataV4},
 }
 
-var exampleStorageMetadata = StorageMetadata{
-	Prefix: "myStoragePrefix",
-	Items:  []StorageFunctionMetadataV5{exampleStorageFunctionMetadataV5},
-}
-
 var exampleStorageFunctionMetadataV4 = StorageFunctionMetadataV4{
 	Name:          "myStorageFunc",
 	Modifier:      StorageFunctionModifierV0{IsOptional: true},

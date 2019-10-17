@@ -44,8 +44,29 @@ var exampleModuleMetadataV7 = ModuleMetadataV7{
 	Constants:  []ModuleConstantMetadataV6{exampleModuleConstantMetadataV6},
 }
 
-var exampleStorageFunctionMetadataV5 = StorageFunctionMetadataV5{
+var exampleStorageMetadata = StorageMetadata{
+	Prefix: "myStoragePrefix",
+	Items:  []StorageFunctionMetadataV5{exampleStorageFunctionMetadataV5_Type, exampleStorageFunctionMetadataV5_Map, exampleStorageFunctionMetadataV5_DoubleMap},
+}
+
+var exampleStorageFunctionMetadataV5_Type = StorageFunctionMetadataV5{
 	Name:          "myStorageFunc",
+	Modifier:      StorageFunctionModifierV0{IsOptional: true},
+	Type:          StorageFunctionTypeV5{IsType: true, AsType: "U8"},
+	Fallback:      []byte{23, 14},
+	Documentation: []Text{"My", "storage func", "doc"},
+}
+
+var exampleStorageFunctionMetadataV5_Map = StorageFunctionMetadataV5{
+	Name:          "myStorageFunc2",
+	Modifier:      StorageFunctionModifierV0{IsOptional: true},
+	Type:          StorageFunctionTypeV5{IsMap: true, AsMap: exampleMapTypeV4},
+	Fallback:      []byte{23, 14},
+	Documentation: []Text{"My", "storage func", "doc"},
+}
+
+var exampleStorageFunctionMetadataV5_DoubleMap = StorageFunctionMetadataV5{
+	Name:          "myStorageFunc2",
 	Modifier:      StorageFunctionModifierV0{IsOptional: true},
 	Type:          StorageFunctionTypeV5{IsDoubleMap: true, AsDoubleMap: exampleDoubleMapTypeV5},
 	Fallback:      []byte{23, 14},

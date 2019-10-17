@@ -333,24 +333,3 @@ type SignaturePayload struct {
 	Tip            UCompact
 	Version        uint8
 }
-
-func (e SignaturePayload) Encode(encoder scale.Encoder) error {
-	// err := encoder.EncodeUintCompact(e.Nonce)
-	// if err != nil {
-	// 	return err
-	// }
-	// err = encoder.Encode(e.Method)
-	// if err != nil {
-	// 	return err
-	// }
-	// err = encoder.Encode(e.Era)
-	// if err != nil {
-	// 	return err
-	// }
-	// // encoder.Encode(e.ImmortalEra) // always immortal
-	// err = encoder.Write(e.PriorBlock[:])
-	// if err != nil {
-	// 	return err
-	// }
-	return nil
-}
