@@ -226,7 +226,8 @@ func FindCallIndex(m *Metadata, call string) (CallIndex, error) {
 	// section index, method index
 	var sIndex uint8 = 0
 
-	if m.IsMetadataV4 {
+	switch {
+	case m.IsMetadataV4:
 		for _, n := range m.AsMetadataV4.Modules {
 			if n.HasCalls {
 				if string(n.Name) == s[0] {
@@ -240,7 +241,7 @@ func FindCallIndex(m *Metadata, call string) (CallIndex, error) {
 				sIndex++
 			}
 		}
-	} else if m.IsMetadataV7 {
+	case m.IsMetadataV7:
 		for _, n := range m.AsMetadataV7.Modules {
 			if n.HasCalls {
 				if string(n.Name) == s[0] {
@@ -254,7 +255,7 @@ func FindCallIndex(m *Metadata, call string) (CallIndex, error) {
 				sIndex++
 			}
 		}
-	} else {
+	default:
 		return CallIndex{}, fmt.Errorf("valid metadata expected, got %#v", m)
 	}
 

@@ -24,54 +24,50 @@ import (
 
 func TestType_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, Type(""))
-	assertRoundtrip(t, Type("My nice type"))
+	assertRoundtrip(t, Type("Custom Type"))
 }
 
 func TestType_EncodedLength(t *testing.T) {
 	assertEncodedLength(t, []encodedLengthAssert{
 		{Type(""), 1},
-		{Type("My nice type"), 13},
-		{Type("ښ"), 3},
+		{Type("Custom Type"), 12},
 	})
 }
 
 func TestType_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
 		{Type(""), MustHexDecodeString("0x00")},
-		{Type("My nice type"), MustHexDecodeString("0x304d79206e6963652074797065")},
-		{Type("ښ"), MustHexDecodeString("0x08da9a")},
+		{Type("Custom Type"), MustHexDecodeString("0x2c437573746f6d2054797065")},
 	})
 }
 
 func TestType_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
 		{Type(""), MustHexDecodeString("0x03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314")},
-		{Type("My nice type"), MustHexDecodeString(
-			"0x21b1f717069b923d0d6dbbcef60497b18e45443d9d4b42b06b168c3b5c914646")},
+		{Type("Custom Type"), MustHexDecodeString(
+			"0x7c2996c160a91b8479eae96ade3ad8b287edc22997bf209b7bc0ca04d3bc0725")},
 	})
 }
 
 func TestType_Hex(t *testing.T) {
 	assertEncodeToHex(t, []encodeToHexAssert{
 		{Type(""), "0x00"},
-		{Type("My nice type"), "0x304d79206e6963652074797065"},
-		{Type("ښ"), "0x08da9a"},
+		{Type("Custom Type"), "0x2c437573746f6d2054797065"},
 	})
 }
 
 func TestType_Type(t *testing.T) {
 	assertString(t, []stringAssert{
 		{Type(""), ""},
-		{Type("My nice type"), "My nice type"},
-		{Type("ښ"), "ښ"},
+		{Type("Custom Type"), "Custom Type"},
 	})
 }
 
 func TestType_Eq(t *testing.T) {
 	assertEq(t, []eqAssert{
-		{Type("My nice type"), Type("My nice type"), true},
+		{Type("Custom Type"), Type("Custom Type"), true},
 		{Type(""), Type("23"), false},
-		{Type("My nice type"), NewU8(23), false},
-		{Type("My nice type"), NewBool(false), false},
+		{Type("Custom Type"), NewU8(23), false},
+		{Type("Custom Type"), NewBool(false), false},
 	})
 }
