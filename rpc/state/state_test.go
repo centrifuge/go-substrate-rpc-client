@@ -37,6 +37,7 @@ func TestMain(m *testing.M) {
 
 	cl, err := client.Connect(s.URL)
 	// cl, err := client.Connect(config.NewDefaultConfig().RPCURL)
+	// cl, err := client.Connect("ws://35.246.140.178:9944")
 	if err != nil {
 		panic(err)
 	}
@@ -49,7 +50,7 @@ func TestMain(m *testing.M) {
 type MockSrv struct {
 	blockHashLatest types.Hash
 	metadataString  string
-	metadata        types.Metadata
+	metadata        *types.Metadata
 	runtimeVersion  types.RuntimeVersion
 	storageKeyHex   string
 	storageDataHex  string

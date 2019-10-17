@@ -29,7 +29,7 @@ func TestExtrinsic_Unsigned_EncodeDecode(t *testing.T) {
 	addr, err := NewAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
 	assert.NoError(t, err)
 
-	c, err := NewCall(ExamplaryMetadataV4.Metadata, "balances.transfer", addr, UCompact(6969))
+	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", addr, UCompact(6969))
 	assert.NoError(t, err)
 
 	ext := NewExtrinsic(c)
@@ -67,7 +67,7 @@ func TestExtrinsic_Signed_EncodeDecode(t *testing.T) {
 }
 
 func TestExtrinsic_Sign(t *testing.T) {
-	c, err := NewCall(ExamplaryMetadataV4.Metadata,
+	c, err := NewCall(ExamplaryMetadataV4,
 		"balances.transfer", NewAddressFromAccountID(MustHexDecodeString(
 			"0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")),
 		UCompact(6969))
@@ -145,7 +145,7 @@ func ExampleExtrinsic() {
 		panic(err)
 	}
 
-	c, err := NewCall(ExamplaryMetadataV4.Metadata, "balances.transfer", bob, UCompact(6969))
+	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", bob, UCompact(6969))
 	if err != nil {
 		panic(err)
 	}
@@ -192,15 +192,25 @@ func TestCall(t *testing.T) {
 	assert.Equal(t, "0x0601000000", enc)
 }
 
-func TestNewCall(t *testing.T) {
+func TestNewCall_V4(t *testing.T) {
 	addr, err := NewAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
 	assert.NoError(t, err)
 
-	c, err := NewCall(ExamplaryMetadataV4.Metadata, "balances.transfer", addr, UCompact(1000))
+	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", addr, UCompact(1000))
 	assert.NoError(t, err)
 
 	enc, err := EncodeToHexString(c)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x0300ff8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48a10f", enc)
+}
+
+func TestNewCall_V7(t *testing.T) {
+	c, err := NewCall(&exampleMetadataV7, "myModule.my function", U8(3))
+	assert.NoError(t, err)
+
+	enc, err := EncodeToHexString(c)
+	assert.NoError(t, err)
+
+	assert.Equal(t, "0x000003", enc)
 }

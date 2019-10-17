@@ -14,29 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package state
+package types
 
-import (
-	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/types"
-)
-
-func (s *State) GetMetadata(blockHash types.Hash) (*types.Metadata, error) {
-	return s.getMetadata(&blockHash)
-}
-
-func (s *State) GetMetadataLatest() (*types.Metadata, error) {
-	return s.getMetadata(nil)
-}
-
-func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
-	var res string
-	err := client.CallWithBlockHash(*s.client, &res, "state_getMetadata", blockHash)
-	if err != nil {
-		return nil, err
-	}
-
-	var metadata types.Metadata
-	err = types.DecodeFromHexString(res, &metadata)
-	return &metadata, err
-}
+// Type is a string, specifically to handle types
+type Type string

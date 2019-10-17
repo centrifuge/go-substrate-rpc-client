@@ -23,22 +23,31 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-// GetStorageHash retreives the storage hash for the given key
-func (s *State) GetStorageHash(key types.StorageKey, blockHash types.Hash) (types.Hash, error) {
-	return s.getStorageHash(key, &blockHash)
+// GetChildKeys retreives the keys with the given prefix of a specific child storage
+func (s *State) GetChildKeys(childStorageKey, prefix types.StorageKey, blockHash types.Hash) (
+	[]types.StorageKey, error) {
+	return s.getChildKeys(childStorageKey, prefix, &blockHash)
 }
 
-// GetStorageHashLatest retreives the storage hash for the given key for the latest block height
-func (s *State) GetStorageHashLatest(key types.StorageKey) (types.Hash, error) {
-	return s.getStorageHash(key, nil)
+// GetChildKeysLatest retreives the keys with the given prefix of a specific child storage for the latest block height
+func (s *State) GetChildKeysLatest(childStorageKey, prefix types.StorageKey) ([]types.StorageKey, error) {
+	return s.getChildKeys(childStorageKey, prefix, nil)
 }
 
-func (s *State) getStorageHash(key types.StorageKey, blockHash *types.Hash) (types.Hash, error) {
-	var res string
-	err := client.CallWithBlockHash(*s.client, &res, "state_getStorageHash", blockHash, key.Hex())
+func (s *State) getChildKeys(childStorageKey, prefix types.StorageKey, blockHash *types.Hash) (
+	[]types.StorageKey, error) {
+	var res []string
+	err := client.CallWithBlockHash(*s.client, &res, "state_getChildKeys", blockHash, childStorageKey.Hex(), prefix.Hex())
 	if err != nil {
-		return types.Hash{}, err
+		return nil, err
 	}
 
-	return types.NewHashFromHexString(res)
+	keys := make([]types.StorageKey, len(res))
+	for i, r := range res {
+		err = types.DecodeFromHexString(r, &keys[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return keys, err
 }

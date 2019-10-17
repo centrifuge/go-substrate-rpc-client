@@ -25,11 +25,11 @@ import (
 func TestState_GetMetadataLatest(t *testing.T) {
 	md, err := state.GetMetadataLatest()
 	assert.NoError(t, err)
-	assert.Equal(t, &mockSrv.metadata, md)
+	assert.Equal(t, *mockSrv.metadata, *md)
 }
 
 func TestState_GetMetadata(t *testing.T) {
 	md, err := state.GetMetadata(mockSrv.blockHashLatest)
 	assert.NoError(t, err)
-	assert.Equal(t, &mockSrv.metadata, md)
+	assert.Equal(t, *mockSrv.metadata, *md)
 }

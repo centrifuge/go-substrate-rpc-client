@@ -40,32 +40,52 @@ func NewStorageKey(b []byte) StorageKey {
 
 // CreateStorageKey uses the given metadata and to derive the right hashing of module, fn names and keys to create a
 // hashed StorageKey
-func CreateStorageKey(meta Metadata, module string, fn string, key []byte) (StorageKey, error) {
-	var fnMeta *StorageFunctionMetadata
-	for _, m := range meta.Metadata.Modules {
-		if m.Prefix == module {
-			for _, s := range m.Storage {
-				if s.Name == fn {
-					fnMeta = &s //nolint:scopelint
-					break
+func CreateStorageKey(meta *Metadata, module string, fn string, key []byte) (StorageKey, error) {
+	var hasher hash.Hash
+	var err error
+
+	var found bool
+	if meta.IsMetadataV4 {
+		for _, m := range meta.AsMetadataV4.Modules {
+			if string(m.Prefix) == module {
+				for _, s := range m.Storage {
+					if string(s.Name) == fn {
+						if s.Type.IsMap {
+							hasher, err = s.Type.AsMap.Hasher.HashFunc()
+						} else if s.Type.IsDoubleMap {
+							hasher, err = s.Type.AsDoubleMap.Hasher.HashFunc()
+						}
+						found = true
+						break
+					}
 				}
 			}
 		}
+	} else if meta.IsMetadataV7 {
+		for _, m := range meta.AsMetadataV7.Modules {
+			if string(m.Storage.Prefix) == module {
+				for _, s := range m.Storage.Items {
+					if string(s.Name) == fn {
+						if s.Type.IsMap {
+							hasher, err = s.Type.AsMap.Hasher.HashFunc()
+						} else if s.Type.IsDoubleMap {
+							hasher, err = s.Type.AsDoubleMap.Hasher.HashFunc()
+						}
+						found = true
+						break
+					}
+				}
+			}
+		}
+
 	}
-	if fnMeta == nil {
+
+	if !found {
 		return nil, fmt.Errorf("no metadata found for module %s function %s", module, fn)
 	}
 
-	var hasher hash.Hash
-	var err error
-	if fnMeta.isMap() {
-		hasher, err = fnMeta.Map.HashFunc()
-		if err != nil {
-			return nil, err
-		}
-	} else if fnMeta.isDMap() {
-		// TODO define hashing for 2 keys
-		return nil, fmt.Errorf("double map storage keys are not yet implemented")
+	if err != nil {
+		return nil, err
 	}
 
 	afn := []byte(module + " " + fn)

@@ -1,0 +1,134 @@
+// Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
+//
+// Copyright 2019 Centrifuge GmbH
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package types_test
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	. "github.com/centrifuge/go-substrate-rpc-client/types"
+)
+
+var exampleMetadataV4 = Metadata{
+	MagicNumber:  0x6174656d,
+	Version:      4,
+	IsMetadataV4: true,
+	AsMetadataV4: exampleRuntimeMetadataV4,
+}
+
+var exampleRuntimeMetadataV4 = MetadataV4{
+	Modules: []ModuleMetadataV4{exampleModuleMetadataV4},
+}
+
+var exampleCallIndex = CallIndex{
+	SectionIndex: 123,
+	MethodIndex:  234,
+}
+
+var exampleModuleMetadataV4 = ModuleMetadataV4{
+	Name:       "myModule",
+	Prefix:     "modulePrefix",
+	HasStorage: true,
+	Storage:    []StorageFunctionMetadataV4{exampleStorageFunctionMetadataV4},
+	HasCalls:   true,
+	Calls:      []FunctionMetadataV4{exampleFunctionMetadataV4},
+	HasEvents:  true,
+	Events:     []EventMetadataV4{exampleEventMetadataV4},
+}
+
+var exampleStorageFunctionMetadataV4 = StorageFunctionMetadataV4{
+	Name:          "myStorageFunc",
+	Modifier:      StorageFunctionModifierV0{IsOptional: true},
+	Type:          StorageFunctionTypeV4{IsDoubleMap: true, AsDoubleMap: exampleDoubleMapTypeV4},
+	Fallback:      []byte{23, 14},
+	Documentation: []Text{"My", "storage func", "doc"},
+}
+
+var exampleFunctionMetadataV4 = FunctionMetadataV4{
+	Name:          "my function",
+	Args:          []FunctionArgumentMetadata{exampleFunctionArgumentMetadata},
+	Documentation: []Text{"My", "doc"},
+}
+
+var exampleEventMetadataV4 = EventMetadataV4{
+	Name:          "myEvent",
+	Args:          []Type{"arg1", "arg2"},
+	Documentation: []Text{"My", "doc"},
+}
+
+var exampleMapTypeV4 = MapTypeV4{
+	Hasher: StorageHasher{IsBlake2_256: true},
+	Key:    "my key",
+	Value:  "and my value",
+	Linked: false,
+}
+
+var exampleDoubleMapTypeV4 = DoubleMapTypeV4{
+	Hasher:     StorageHasher{IsBlake2_256: true},
+	Key1:       "myKey",
+	Key2:       "otherKey",
+	Value:      "and a value",
+	Key2Hasher: "and a hasher",
+}
+
+var exampleFunctionArgumentMetadata = FunctionArgumentMetadata{Name: "myFunctionName", Type: "myType"}
+
+func TestMetadataV4_Decode(t *testing.T) {
+	metadata := NewMetadataV4()
+
+	err := DecodeFromBytes(MustHexDecodeString(ExamplaryMetadataV4String), metadata)
+	assert.NoError(t, err)
+
+	assert.Equal(t, *ExamplaryMetadataV4, *metadata)
+}
+
+func TestMetadataV4_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleMetadataV4)
+}
+
+func TestCallIndex_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleCallIndex)
+}
+
+func TestModuleMetadataV4_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleModuleMetadataV4)
+}
+
+func TestStorageFunctionMetadataV4_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleStorageFunctionMetadataV4)
+}
+
+func TestFunctionMetadataV4_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleFunctionMetadataV4)
+}
+
+func TestEventMetadataV4_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleEventMetadataV4)
+}
+
+func TestMapTypeV4_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleMapTypeV4)
+}
+
+func TestDoubleMapTypeV4_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleDoubleMapTypeV4)
+}
+
+func TestFunctionArgumentMetadata_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleFunctionArgumentMetadata)
+}
