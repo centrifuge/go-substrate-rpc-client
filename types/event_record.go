@@ -25,55 +25,65 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
-// EventRecord is a record for an Event (as specified by Metadata) with the specific Phase of application
-// type EventRecord struct {
-// 	Phase  Phase
-// 	Event  Event
-// 	Topics []Hash
-// }
-
 // EventRecordsRaw is a raw record for a set of events, represented as the raw bytes. It exists since
 // decoding of events can only be done with metadata, so events can't follow the static way of decoding
 // other types do. It exposes functions to decode events using metadata and targets.
 type EventRecordsRaw []byte
 
-type EventSystemExtrinsicSuccess struct{}
+type EventSystemExtrinsicSuccess struct {
+	Phase  Phase
+	Topics []Hash
+}
 type EventSystemExtrinsicFailed struct {
-	DispatchError DispatchError // TODO only for V8
+	Phase         Phase
+	DispatchError DispatchError
+	Topics        []Hash
 }
 
 type EventBalancesTransfer struct {
-	From  AccountID
-	To    AccountID
-	Value U128
-	Fees  U128
+	Phase  Phase
+	From   AccountID
+	To     AccountID
+	Value  U128
+	Fees   U128
+	Topics []Hash
 }
 type EventIndicesNewAccountIndex struct {
+	Phase        Phase
 	AccountID    AccountID
 	AccountIndex AccountIndex
+	Topics       []Hash
 }
 type EventBalancesNewAccount struct {
+	Phase     Phase
 	AccountID AccountID
 	Balance   U128
+	Topics    []Hash
 }
 type EventBalancesReapedAccount struct {
+	Phase     Phase
 	AccountID AccountID
+	Topics    []Hash
 }
 type EventSessionNewSession struct {
+	Phase        Phase
 	SessionIndex U32
+	Topics       []Hash
 }
 
+// EventRecords is a default set of possible event records that can be used as a target for
+// `func (e EventRecordsRaw) Decode(...`
 type EventRecords struct {
-	System_ExtrinsicSuccess []EventSystemExtrinsicSuccess // 00 in MetadataV8
-	System_ExtrinsicFailed  []EventSystemExtrinsicFailed  // 01 in MetadataV8
-	Indices_NewAccountIndex []EventIndicesNewAccountIndex // 20 in MetadataV8
-	Balances_NewAccount     []EventBalancesNewAccount     // 30 in MetadataV8
-	Balances_ReapedAccount  []EventBalancesReapedAccount  // 31 in MetadataV8
-	Balances_Transfer       []EventBalancesTransfer       // 32 in MetadataV8
-	Session_NewSession      []EventSessionNewSession
+	System_ExtrinsicSuccess []EventSystemExtrinsicSuccess //nolint:stylecheck,golint
+	System_ExtrinsicFailed  []EventSystemExtrinsicFailed  //nolint:stylecheck,golint
+	Indices_NewAccountIndex []EventIndicesNewAccountIndex //nolint:stylecheck,golint
+	Balances_NewAccount     []EventBalancesNewAccount     //nolint:stylecheck,golint
+	Balances_ReapedAccount  []EventBalancesReapedAccount  //nolint:stylecheck,golint
+	Balances_Transfer       []EventBalancesTransfer       //nolint:stylecheck,golint
+	Session_NewSession      []EventSessionNewSession      //nolint:stylecheck,golint
 }
 
-// DecodeEvents can be used to decode the events from an EventRecordRaw into a target t using the given Metadata m
+// Decode decodes the events from an EventRecordRaw into a target t using the given Metadata m
 func (e EventRecordsRaw) Decode(m *Metadata, t interface{}) error {
 	// ensure t is a pointer
 	ttyp := reflect.TypeOf(t)
@@ -188,7 +198,7 @@ func (p Phase) Encode(encoder scale.Encoder) error {
 	return nil
 }
 
-// DispatchError is an error occuring during extrinsic dispatch
+// DispatchError is an error occurring during extrinsic dispatch
 type DispatchError struct {
 	HasModule bool
 	Module    uint8
@@ -231,48 +241,4 @@ func (d DispatchError) Encode(encoder scale.Encoder) error {
 	return encoder.Encode(&d.Error)
 }
 
-// type EventAndTopicsRaw struct {
-// 	EventID       EventID
-// 	DataAndTopics Data
-// }
-
-// type Event struct {
-// 	EventID       EventID
-// 	DataAndTopics Data
-// }
-
 type EventID [2]byte
-
-// // Decode implements decoding for EventAndTopicsRaw, which just reads all the remaining bytes into EventAndTopicsRaw
-// func (e *EventAndTopicsRaw) Decode(decoder scale.Decoder) error {
-// 	for {
-// 		b, err := decoder.ReadOneByte()
-// 		if err == io.EOF {
-// 			// fmt.Println(err)
-// 			break
-// 		}
-// 		if err != nil {
-// 			return err
-// 		}
-// 		*e = append(*e, b)
-// 	}
-// 	return nil
-// }
-
-// // Encode implements encoding for Data, which just unwraps the bytes of Data
-// func (e EventAndTopicsRaw) Encode(encoder scale.Encoder) error {
-// 	return encoder.Write(e)
-// }
-
-// type Event struct {
-// 	// Section string
-// 	// Method  string
-// 	// TypeDef []string
-// 	Index EventID
-// 	// Data  []byte
-// 	// Data interface{}
-// }
-
-// type EventID [2]byte
-
-// type EventData []byte

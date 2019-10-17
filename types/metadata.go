@@ -119,49 +119,55 @@ func (m *Metadata) FindEventNamesForEventID(eventID EventID) (Text, Text, error)
 }
 
 func (m *MetadataV4) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
-	if int(eventID[0]) >= len(m.Modules) {
-		return "", "", fmt.Errorf("module index %v out of range", eventID[0])
+	i := uint8(0)
+	for _, n := range m.Modules {
+		if !n.HasEvents {
+			continue
+		}
+		if i != eventID[0] {
+			i++
+			continue
+		}
+		if int(eventID[1]) >= len(n.Events) {
+			return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], n.Name)
+		}
+		return n.Name, n.Events[eventID[1]].Name, nil
 	}
-	module := m.Modules[eventID[0]]
-	if !module.HasEvents {
-		return "", "", fmt.Errorf("no events for module %v found", module.Name)
-	}
-	if int(eventID[1]) >= len(m.Modules) {
-		return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], module.Name)
-	}
-	event := module.Events[eventID[1]]
-
-	return module.Name, event.Name, nil
+	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
 }
 
 func (m *MetadataV7) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
-	if int(eventID[0]) >= len(m.Modules) {
-		return "", "", fmt.Errorf("module index %v out of range", eventID[0])
+	i := uint8(0)
+	for _, n := range m.Modules {
+		if !n.HasEvents {
+			continue
+		}
+		if i != eventID[0] {
+			i++
+			continue
+		}
+		if int(eventID[1]) >= len(n.Events) {
+			return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], n.Name)
+		}
+		return n.Name, n.Events[eventID[1]].Name, nil
 	}
-	module := m.Modules[eventID[0]]
-	if !module.HasEvents {
-		return "", "", fmt.Errorf("no events for module %v found", module.Name)
-	}
-	if int(eventID[1]) >= len(m.Modules) {
-		return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], module.Name)
-	}
-	event := module.Events[eventID[1]]
-
-	return module.Name, event.Name, nil
+	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
 }
 
 func (m *MetadataV8) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
-	if int(eventID[0]) >= len(m.Modules) {
-		return "", "", fmt.Errorf("module index %v out of range", eventID[0])
+	i := uint8(0)
+	for _, n := range m.Modules {
+		if !n.HasEvents {
+			continue
+		}
+		if i != eventID[0] {
+			i++
+			continue
+		}
+		if int(eventID[1]) >= len(n.Events) {
+			return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], n.Name)
+		}
+		return n.Name, n.Events[eventID[1]].Name, nil
 	}
-	module := m.Modules[eventID[0]]
-	if !module.HasEvents {
-		return "", "", fmt.Errorf("no events for module %v found", module.Name)
-	}
-	if int(eventID[1]) >= len(m.Modules) {
-		return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], module.Name)
-	}
-	event := module.Events[eventID[1]]
-
-	return module.Name, event.Name, nil
+	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
 }

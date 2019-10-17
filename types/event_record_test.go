@@ -20,153 +20,79 @@ package types_test
 
 import (
 	"fmt"
+	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
+	"github.com/stretchr/testify/assert"
 )
 
-// var examplePhaseApp = Phase{
-// 	IsApplyExtrinsic: true,
-// 	AsApplyExtrinsic: 42,
-// }
+var examplePhaseApp = Phase{
+	IsApplyExtrinsic: true,
+	AsApplyExtrinsic: 42,
+}
 
-// var examplePhaseFin = Phase{
-// 	IsFinalization: true,
-// }
+var examplePhaseFin = Phase{
+	IsFinalization: true,
+}
 
-// var exampleEvent = Event{
-// 	Index: EventID{1, 2},
-// 	// Data:  Data{0x03, 0x04, 0x05},
-// }
+var exampleEventApp = EventSystemExtrinsicSuccess{
+	Phase:  examplePhaseApp,
+	Topics: []Hash{{1, 2}},
+}
 
-// var exampleEventRecordApp = EventRecord{
-// 	Phase:  examplePhaseApp,
-// 	Event:  exampleEvent,
-// 	Topics: []Hash{{1, 2}},
-// }
+var exampleEventFin = EventSystemExtrinsicSuccess{
+	Phase:  examplePhaseFin,
+	Topics: []Hash{{1, 2}},
+}
 
-// var exampleEventRecordFin = EventRecord{
-// 	Phase:  examplePhaseFin,
-// 	Event:  exampleEvent,
-// 	Topics: []Hash{{1, 2}},
-// }
+var exampleEventFinEnc = []byte{0x1, 0x4, 0x1, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} //nolint:lll
 
-// var exampleEventRecordFinEnc = []byte{0x1, 0x8, 0x1, 0x2, 0x3, 0x4, 0x5, 0x4, 0x80, 0x1, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}
+func TestEventSystemExtrinsicSuccess_EncodedLength(t *testing.T) {
+	assertEncodedLength(t, []encodedLengthAssert{
+		{exampleEventApp, 38},
+		{exampleEventFin, 34},
+	})
+}
 
-// var exampleEventRecordRawApp = EventRecordRaw{
-// 	Phase:             examplePhaseApp,
-// 	EventAndTopicsRaw: []byte{1, 2, 3},
-// }
+func TestEventSystemExtrinsicSuccess_Encode(t *testing.T) {
+	encoded, err := EncodeToBytes(exampleEventFin)
+	assert.NoError(t, err)
+	assert.Equal(t, exampleEventFinEnc, encoded)
+}
 
-// var exampleEventRecordRawFin = EventRecordRaw{
-// 	Phase:             examplePhaseFin,
-// 	EventAndTopicsRaw: []byte{1, 2, 3},
-// }
+func TestEventSystemExtrinsicSuccess_Decode(t *testing.T) {
+	decoded := EventSystemExtrinsicSuccess{}
+	err := DecodeFromBytes(exampleEventFinEnc, &decoded)
+	assert.NoError(t, err)
+	assert.Equal(t, exampleEventFin, decoded)
+}
 
-// var exampleEventRecordRawFinEnc = []byte{0x1, 0x1, 0x2, 0x3}
-
-// func TestEventRecord_EncodedLength(t *testing.T) {
-// 	assertEncodedLength(t, []encodedLengthAssert{
-// 		{exampleEventRecordApp, 45},
-// 		{exampleEventRecordFin, 41},
-// 	})
-// }
-
-// func TestEventRecord_Encode(t *testing.T) {
-// 	encoded, err := EncodeToBytes(exampleEventRecordFin)
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, exampleEventRecordFinEnc, encoded)
-// }
-
-// func TestEventRecord_Decode(t *testing.T) {
-// 	decoded := EventRecord{}
-// 	err := DecodeFromBytes(exampleEventRecordFinEnc, &decoded)
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, exampleEventRecordFin, decoded)
-// }
-
-// func TestEventRecord_Hash(t *testing.T) {
-// 	assertHash(t, []hashAssert{
-// 		{exampleEventRecordFin, mustDecodeHexString(
-// 			"0xc5b3444e6d277f1cc07246a16fe1ff5aa54d4aee174ca0c963b0aad28e1cb765")},
-// 	})
-// }
-
-// func TestEventRecord_Hex(t *testing.T) {
-// 	assertEncodeToHex(t, []encodeToHexAssert{
-// 		{exampleEventRecordFin, "0x0108010203040504800102000000000000000000000000000000000000000000000000000000000000"},
-// 	})
-// }
-
-// func TestEventRecord_String(t *testing.T) {
-// 	assertString(t, []stringAssert{
-// 		{exampleEventRecordFin, "{{false 0 true} {[1 2] [3 4 5]} [[1 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]]}"},
-// 	})
-// }
-
-// func TestEventRecord_Eq(t *testing.T) {
-// 	assertEq(t, []eqAssert{
-// 		{exampleEventRecordFin, exampleEventRecordFin, true},
-// 		{exampleEventRecordApp, exampleEventRecordFin, false},
-// 		{exampleEventRecordApp, NewBool(true), false},
-// 	})
-// }
-
-// func TestEventRecord_EncodedLength(t *testing.T) {
-// 	assertEncodedLength(t, []encodedLengthAssert{
-// 		{exampleEventRecordRawApp, 45},
-// 		{exampleEventRecordRawFin, 41},
-// 	})
-// }
-
-// func TestEventRecordRaw_Encode(t *testing.T) {
-// 	encoded, err := EncodeToBytes(exampleEventRecordRawFin)
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, exampleEventRecordRawFinEnc, encoded)
-// }
-
-// func TestEventRecordRaw_Decode(t *testing.T) {
-// 	decoded := EventRecordRaw{}
-// 	err := DecodeFromBytes(exampleEventRecordRawFinEnc, &decoded)
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, exampleEventRecordRawFin, decoded)
-// }
-
-// func TestEventRecordRaw_Hash(t *testing.T) {
-// 	assertHash(t, []hashAssert{
-// 		{exampleEventRecordRawFin, mustDecodeHexString(
-// 			"0xc5b3444e6d277f1cc07246a16fe1ff5aa54d4aee174ca0c963b0aad28e1cb765")},
-// 	})
-// }
-
-// func TestEventRecordRaw_Hex(t *testing.T) {
-// 	assertEncodeToHex(t, []encodeToHexAssert{
-// 		{exampleEventRecordRawFin, "0x0108010203040504800102000000000000000000000000000000000000000000000000000000000000"},
-// 	})
-// }
-
-// func TestEventRecordRaw_String(t *testing.T) {
-// 	assertString(t, []stringAssert{
-// 		{exampleEventRecordRawFin, "{{false 0 true} {[1 2] [3 4 5]} [[1 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]]}"},
-// 	})
-// }
-
-// func TestEventRecordRaw_Eq(t *testing.T) {
-// 	assertEq(t, []eqAssert{
-// 		{exampleEventRecordRawFin, exampleEventRecordRawFin, true},
-// 		{exampleEventRecordRawApp, exampleEventRecordRawFin, false},
-// 		{exampleEventRecordRawApp, NewBool(true), false},
-// 	})
-// }
+func TestEventSystemExtrinsicSuccess_Hash(t *testing.T) {
+	assertHash(t, []hashAssert{
+		{exampleEventFin, MustHexDecodeString(
+			"0xfb1a0568e74c9e2ed9ec6a7cca8b680a24ca442e5cf391ca6d863e3b35a4c962")},
+	})
+}
 
 func ExampleEventRecordsRaw_Decode() {
 	e := EventRecordsRaw(MustHexDecodeString("0x100000000000000000000100000000000000020000000302d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48266d00000000000000000000000000000010a5d4e80000000000000000000000000002000000000000")) //nolint:lll
 
 	events := EventRecords{}
-
 	err := e.Decode(ExamplaryMetadataV8, &events)
-	fmt.Println(err)
+	if err != nil {
+		panic(err)
+	}
 
-	fmt.Printf("%#v\n", events)
+	fmt.Printf("Got %v System_ExtrinsicSuccess events\n", len(events.System_ExtrinsicSuccess))
+	fmt.Printf("Got %v System_ExtrinsicFailed events\n", len(events.System_ExtrinsicFailed))
+	fmt.Printf("Got %v Indices_NewAccountIndex events\n", len(events.Indices_NewAccountIndex))
+	fmt.Printf("Got %v Balances_Transfer events\n", len(events.Balances_Transfer))
+	t := events.Balances_Transfer[0]
+	fmt.Printf("Transfer: %v tokens from %#x to %#x with a fee of %v", t.Value, t.From, t.To, t.Fees)
 
-	// Output: "abc"
+	// Output: Got 1 System_ExtrinsicSuccess events
+	// Got 1 System_ExtrinsicFailed events
+	// Got 1 Indices_NewAccountIndex events
+	// Got 1 Balances_Transfer events
+	// Transfer: 109 tokens from 0x3593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d8e to 0xaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a4826 with a fee of 3906250000
 }
