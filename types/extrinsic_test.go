@@ -192,7 +192,7 @@ func TestCall(t *testing.T) {
 	assert.Equal(t, "0x0601000000", enc)
 }
 
-func TestNewCall_V4(t *testing.T) {
+func TestNewCallV4(t *testing.T) {
 	addr, err := NewAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
 	assert.NoError(t, err)
 
@@ -205,7 +205,7 @@ func TestNewCall_V4(t *testing.T) {
 	assert.Equal(t, "0x0200ff8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48a10f", enc)
 }
 
-func TestNewCall_V7(t *testing.T) {
+func TestNewCallV7(t *testing.T) {
 	c, err := NewCall(&exampleMetadataV7, "myModule.my function", U8(3))
 	assert.NoError(t, err)
 
@@ -215,8 +215,8 @@ func TestNewCall_V7(t *testing.T) {
 	assert.Equal(t, "0x000003", enc)
 }
 
-func TestNewCall_V7(t *testing.T) {
-	c, err := NewCall(&exampleMetadataV7, "myModule.my function", U8(3))
+func TestNewCallV8(t *testing.T) {
+	c, err := NewCall(&exampleMetadataV8, "myModule.my function", U8(3))
 	assert.NoError(t, err)
 
 	enc, err := EncodeToHexString(c)
