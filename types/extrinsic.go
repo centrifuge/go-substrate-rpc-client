@@ -151,8 +151,6 @@ func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error
 		Tip:       o.Tip,
 	}
 
-	// fmt.Println(extSig)
-
 	e.Signature = extSig
 
 	// mark the extrinsic as signed
