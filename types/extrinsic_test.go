@@ -214,3 +214,13 @@ func TestNewCall_V7(t *testing.T) {
 
 	assert.Equal(t, "0x000003", enc)
 }
+
+func TestNewCall_V7(t *testing.T) {
+	c, err := NewCall(&exampleMetadataV7, "myModule.my function", U8(3))
+	assert.NoError(t, err)
+
+	enc, err := EncodeToHexString(c)
+	assert.NoError(t, err)
+
+	assert.Equal(t, "0x000003", enc)
+}
