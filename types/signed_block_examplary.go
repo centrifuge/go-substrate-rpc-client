@@ -18,4 +18,4 @@
 
 package types
 
-var ExamplarySignedBlock = SignedBlock{Block: Block{Header: ExamplaryHeader, Extrinsics: []Extrinsic{}}, Justification: Justification{0xc1, 0x13}} //nolint:lll
+var ExamplarySignedBlock = SignedBlock{Block: Block{Header: ExamplaryHeader, Extrinsics: nil}, Justification: Justification{0xc1, 0x13}} //nolint:lll
