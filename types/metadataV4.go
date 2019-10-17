@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"hash"
+	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"golang.org/x/crypto/blake2b"
@@ -44,6 +45,70 @@ func (m MetadataV4) Encode(encoder scale.Encoder) error {
 		return err
 	}
 	return nil
+}
+
+func (m *MetadataV4) FindCallIndex(call string) (CallIndex, error) {
+	s := strings.Split(call, ".")
+	mi := uint8(0)
+	for _, mod := range m.Modules {
+		if !mod.HasEvents {
+			continue
+		}
+		if string(mod.Name) != s[0] {
+			mi++
+			continue
+		}
+		for ci, f := range mod.Calls {
+			if string(f.Name) == s[1] {
+				return CallIndex{mi, uint8(ci)}, nil
+			}
+		}
+		return CallIndex{}, fmt.Errorf("method %v not found within module %v for call %v", s[1], mod.Name, call)
+	}
+	return CallIndex{}, fmt.Errorf("module %v not found in metadata for call %v", s[0], call)
+}
+
+func (m *MetadataV4) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
+	mi := uint8(0)
+	for _, mod := range m.Modules {
+		if !mod.HasEvents {
+			continue
+		}
+		if mi != eventID[0] {
+			mi++
+			continue
+		}
+		if int(eventID[1]) >= len(mod.Events) {
+			return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], mod.Name)
+		}
+		return mod.Name, mod.Events[eventID[1]].Name, nil
+	}
+	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
+}
+
+func (m *MetadataV4) FindStorageKeyHasher(module string, fn string) (hash.Hash, error) {
+	for _, mod := range m.Modules {
+		if !mod.HasStorage {
+			continue
+		}
+		if string(mod.Prefix) != module {
+			continue
+		}
+		for _, s := range mod.Storage {
+			if string(s.Name) != fn {
+				continue
+			}
+			if s.Type.IsMap {
+				return s.Type.AsMap.Hasher.HashFunc()
+			}
+			if s.Type.IsDoubleMap {
+				return s.Type.AsDoubleMap.Hasher.HashFunc()
+			}
+			return nil, nil
+		}
+		return nil, fmt.Errorf("storage %v not found within module %v", fn, module)
+	}
+	return nil, fmt.Errorf("module %v not found in metadata", module)
 }
 
 type ModuleMetadataV4 struct {

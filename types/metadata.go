@@ -18,6 +18,7 @@ package types
 
 import (
 	"fmt"
+	"hash"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
@@ -105,69 +106,41 @@ func (m Metadata) Encode(encoder scale.Encoder) error {
 	return err
 }
 
+func (m *Metadata) FindCallIndex(call string) (CallIndex, error) {
+	switch {
+	case m.IsMetadataV4:
+		return m.AsMetadataV4.FindCallIndex(call)
+	case m.IsMetadataV7:
+		return m.AsMetadataV7.FindCallIndex(call)
+	case m.IsMetadataV8:
+		return m.AsMetadataV8.FindCallIndex(call)
+	default:
+		return CallIndex{}, fmt.Errorf("unsupported metadata version")
+	}
+}
+
 func (m *Metadata) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
-	if m.IsMetadataV4 {
+	switch {
+	case m.IsMetadataV4:
 		return m.AsMetadataV4.FindEventNamesForEventID(eventID)
-	}
-	if m.IsMetadataV7 {
+	case m.IsMetadataV7:
 		return m.AsMetadataV7.FindEventNamesForEventID(eventID)
-	}
-	if m.IsMetadataV8 {
+	case m.IsMetadataV8:
 		return m.AsMetadataV8.FindEventNamesForEventID(eventID)
+	default:
+		return "", "", fmt.Errorf("unsupported metadata version")
 	}
-	return "", "", fmt.Errorf("unsupported metadata version")
 }
 
-func (m *MetadataV4) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
-	i := uint8(0)
-	for _, n := range m.Modules {
-		if !n.HasEvents {
-			continue
-		}
-		if i != eventID[0] {
-			i++
-			continue
-		}
-		if int(eventID[1]) >= len(n.Events) {
-			return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], n.Name)
-		}
-		return n.Name, n.Events[eventID[1]].Name, nil
+func (m *Metadata) FindStorageKeyHasher(module string, fn string) (hash.Hash, error) {
+	switch {
+	case m.IsMetadataV4:
+		return m.AsMetadataV4.FindStorageKeyHasher(module, fn)
+	case m.IsMetadataV7:
+		return m.AsMetadataV7.FindStorageKeyHasher(module, fn)
+	case m.IsMetadataV8:
+		return m.AsMetadataV8.FindStorageKeyHasher(module, fn)
+	default:
+		return nil, fmt.Errorf("unsupported metadata version")
 	}
-	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
-}
-
-func (m *MetadataV7) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
-	i := uint8(0)
-	for _, n := range m.Modules {
-		if !n.HasEvents {
-			continue
-		}
-		if i != eventID[0] {
-			i++
-			continue
-		}
-		if int(eventID[1]) >= len(n.Events) {
-			return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], n.Name)
-		}
-		return n.Name, n.Events[eventID[1]].Name, nil
-	}
-	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
-}
-
-func (m *MetadataV8) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
-	i := uint8(0)
-	for _, n := range m.Modules {
-		if !n.HasEvents {
-			continue
-		}
-		if i != eventID[0] {
-			i++
-			continue
-		}
-		if int(eventID[1]) >= len(n.Events) {
-			return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], n.Name)
-		}
-		return n.Name, n.Events[eventID[1]].Name, nil
-	}
-	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
 }

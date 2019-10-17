@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/signature"
@@ -204,7 +203,7 @@ type Call struct {
 }
 
 func NewCall(m *Metadata, call string, args ...interface{}) (Call, error) {
-	c, err := FindCallIndex(m, call)
+	c, err := m.FindCallIndex(call)
 	if err != nil {
 		return Call{}, err
 	}
@@ -219,61 +218,6 @@ func NewCall(m *Metadata, call string, args ...interface{}) (Call, error) {
 	}
 
 	return Call{c, a}, nil
-}
-
-func FindCallIndex(m *Metadata, call string) (CallIndex, error) {
-	s := strings.Split(call, ".")
-	// section index, method index
-	var sIndex uint8 = 0
-
-	switch {
-	case m.IsMetadataV4:
-		for _, n := range m.AsMetadataV4.Modules {
-			if n.HasCalls {
-				if string(n.Name) == s[0] {
-					for j, f := range n.Calls {
-						if string(f.Name) == s[1] {
-							mIndex := uint8(j)
-							return CallIndex{sIndex, mIndex}, nil
-						}
-					}
-				}
-				sIndex++
-			}
-		}
-	case m.IsMetadataV7:
-		for _, n := range m.AsMetadataV7.Modules {
-			if n.HasCalls {
-				if string(n.Name) == s[0] {
-					for j, f := range n.Calls {
-						if string(f.Name) == s[1] {
-							mIndex := uint8(j)
-							return CallIndex{sIndex, mIndex}, nil
-						}
-					}
-				}
-				sIndex++
-			}
-		}
-	case m.IsMetadataV8:
-		for _, n := range m.AsMetadataV8.Modules {
-			if n.HasCalls {
-				if string(n.Name) == s[0] {
-					for j, f := range n.Calls {
-						if string(f.Name) == s[1] {
-							mIndex := uint8(j)
-							return CallIndex{sIndex, mIndex}, nil
-						}
-					}
-				}
-				sIndex++
-			}
-		}
-	default:
-		return CallIndex{}, fmt.Errorf("valid metadata expected, got %#v", m)
-	}
-
-	return CallIndex{}, fmt.Errorf("could not find CallIndex for call %v in metadata", call)
 }
 
 // Callindex is a 16 bit wrapper around the `[sectionIndex, methodIndex]` value that uniquely identifies a method
