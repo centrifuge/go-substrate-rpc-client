@@ -18,6 +18,8 @@ package types
 
 import (
 	"encoding/json"
+	"strconv"
+	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
@@ -32,16 +34,21 @@ type Header struct {
 
 type BlockNumber U32
 
-// UnmarshalJSON fills u with the JSON encoded byte array given by b
+// UnmarshalJSON fills BlockNumber with the JSON encoded byte array given by bz
 func (b *BlockNumber) UnmarshalJSON(bz []byte) error {
 	var tmp string
 	if err := json.Unmarshal(bz, &tmp); err != nil {
 		return err
 	}
-	return DecodeFromHexString(tmp, b)
+
+	s := strings.TrimPrefix(tmp, "0x")
+
+	p, err := strconv.ParseUint(s, 16, 32)
+	*b = BlockNumber(p)
+	return err
 }
 
-// MarshalJSON returns a JSON encoded byte array of u
+// MarshalJSON returns a JSON encoded byte array of BlockNumber
 func (b BlockNumber) MarshalJSON() ([]byte, error) {
 	s, err := EncodeToHexString(b)
 	if err != nil {

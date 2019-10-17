@@ -44,8 +44,8 @@ test-dockerized: 		## runs all tests in a docker container against the Substrate
 	@docker-compose build
 	@docker-compose up --abort-on-container-exit
 
-test-e2e-deployed: export RPC_URL?=wss://poc3-rpc.polkadot.io
-test-e2e-deployed: 		## runs only end-to-end (e2e) tests against a deployed testnet (defaults to Alexander (wss://poc3-rpc.polkadot.io) if RPC_URL is not set)
+test-e2e-deployed: export RPC_URL?=wss://serinus-5.kusama.network
+test-e2e-deployed: 		## runs only end-to-end (e2e) tests against a deployed testnet (defaults to Kusama CC2 (wss://serinus-5.kusama.network) if RPC_URL is not set)
 	@docker build . -t gsrpc-test
 	@docker run --rm -e RPC_URL gsrpc-test go test -v github.com/centrifuge/go-substrate-rpc-client/teste2e
 
