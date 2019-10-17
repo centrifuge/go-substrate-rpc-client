@@ -88,11 +88,12 @@ func ExampleEventRecordsRaw_Decode() {
 	fmt.Printf("Got %v Indices_NewAccountIndex events\n", len(events.Indices_NewAccountIndex))
 	fmt.Printf("Got %v Balances_Transfer events\n", len(events.Balances_Transfer))
 	t := events.Balances_Transfer[0]
-	fmt.Printf("Transfer: %v tokens from %#x to %#x with a fee of %v", t.Value, t.From, t.To, t.Fees)
+	fmt.Printf("Transfer: %v tokens from %#x to\n%#x with a fee of %v", t.Value, t.From, t.To, t.Fees)
 
 	// Output: Got 1 System_ExtrinsicSuccess events
 	// Got 1 System_ExtrinsicFailed events
 	// Got 1 Indices_NewAccountIndex events
 	// Got 1 Balances_Transfer events
-	// Transfer: 109 tokens from 0x3593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d8e to 0xaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a4826 with a fee of 3906250000
+	// Transfer: 109 tokens from 0x3593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d8e to
+	// 0xaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a4826 with a fee of 3906250000
 }
