@@ -50,10 +50,7 @@ func (b *BlockNumber) UnmarshalJSON(bz []byte) error {
 
 // MarshalJSON returns a JSON encoded byte array of BlockNumber
 func (b BlockNumber) MarshalJSON() ([]byte, error) {
-	s, err := EncodeToHexString(b)
-	if err != nil {
-		return nil, err
-	}
+	s := strconv.FormatUint(uint64(b), 16)
 	return json.Marshal(s)
 }
 
