@@ -36,13 +36,13 @@ func TestAccountIndex_EncodedLength(t *testing.T) {
 
 func TestAccountIndex_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewAccountIndex(336794129), mustDecodeHexString("0x11121314")},
+		{NewAccountIndex(336794129), MustHexDecodeString("0x11121314")},
 	})
 }
 
 func TestAccountIndex_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewAccountIndex(336794129), mustDecodeHexString(
+		{NewAccountIndex(336794129), MustHexDecodeString(
 			"0xa6730c0d3a95e0ff2068fa9a6ecf82c42c494c8c2cdd65379c898a4b88dd7138")},
 	})
 }

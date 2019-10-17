@@ -34,13 +34,13 @@ func TestWeightMultiplier_EncodedLength(t *testing.T) {
 
 func TestWeightMultiplier_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewWeightMultiplier(-29), mustDecodeHexString("0xe3ffffffffffffff")},
+		{NewWeightMultiplier(-29), MustHexDecodeString("0xe3ffffffffffffff")},
 	})
 }
 
 func TestWeightMultiplier_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewWeightMultiplier(-29), mustDecodeHexString("0x4d42db2aa4a23bde81a3ad3705220affaa457c56a0135080c71db7783fec8f44")},
+		{NewWeightMultiplier(-29), MustHexDecodeString("0x4d42db2aa4a23bde81a3ad3705220affaa457c56a0135080c71db7783fec8f44")},
 	})
 }
 

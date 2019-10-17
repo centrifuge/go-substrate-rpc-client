@@ -40,13 +40,13 @@ func TestOrigin_EncodedLength(t *testing.T) {
 
 func TestOrigin_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{newOrigin(), mustDecodeHexString("0x")},
+		{newOrigin(), MustHexDecodeString("0x")},
 	})
 }
 
 func TestOrigin_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{newOrigin(), mustDecodeHexString(
+		{newOrigin(), MustHexDecodeString(
 			"0x0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8")},
 	})
 }

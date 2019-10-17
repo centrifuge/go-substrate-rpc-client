@@ -18,7 +18,6 @@ package types_test
 
 import (
 	"bytes"
-	"encoding/hex"
 	"fmt"
 	"reflect"
 	"testing"
@@ -37,7 +36,7 @@ func assertEqual(t *testing.T, a interface{}, b interface{}) {
 	if reflect.DeepEqual(a, b) {
 		return
 	}
-	t.Errorf("Received %v (type %v), expected %v (type %v)", a, reflect.TypeOf(a), b, reflect.TypeOf(b))
+	t.Errorf("Received %#v (type %v), expected %#v (type %v)", a, reflect.TypeOf(a), b, reflect.TypeOf(b))
 }
 
 func assertRoundtrip(t *testing.T, value interface{}) {
@@ -156,13 +155,4 @@ func assertEq(t *testing.T, eqAsserts []eqAssert) {
 			t.Errorf("Fail, input %v, other %v, expected %v, result %v\n", test.input, test.other, test.expected, result)
 		}
 	}
-}
-
-// mustDecodeHexString panics if str cannot be decoded. Param str is expected to start with "0x"
-func mustDecodeHexString(str string) []byte {
-	bz, err := hex.DecodeString(str[2:])
-	if err != nil {
-		panic(err)
-	}
-	return bz
 }

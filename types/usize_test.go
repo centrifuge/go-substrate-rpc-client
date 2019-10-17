@@ -22,42 +22,42 @@ import (
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-func TestWeight_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewWeight(0))
-	assertRoundtrip(t, NewWeight(12))
+func TestUSize_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, USize(0))
+	assertRoundtrip(t, USize(12))
 }
 
-func TestWeight_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{{NewWeight(13), 4}})
+func TestUSize_EncodedLength(t *testing.T) {
+	assertEncodedLength(t, []encodedLengthAssert{{USize(13), 4}})
 }
 
-func TestWeight_Encode(t *testing.T) {
+func TestUSize_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewWeight(29), MustHexDecodeString("0x1d000000")},
+		{USize(29), MustHexDecodeString("0x1d000000")},
 	})
 }
 
-func TestWeight_Hash(t *testing.T) {
+func TestUSize_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewWeight(29), MustHexDecodeString("0x60ebb66f09bc7fdd21772ab1ed0efb1fd1208e3f5cd20d2d9a29a2a79b6f953f")},
+		{USize(29), MustHexDecodeString("0x60ebb66f09bc7fdd21772ab1ed0efb1fd1208e3f5cd20d2d9a29a2a79b6f953f")},
 	})
 }
 
-func TestWeight_Hex(t *testing.T) {
+func TestUSize_Hex(t *testing.T) {
 	assertEncodeToHex(t, []encodeToHexAssert{
-		{NewWeight(29), "0x1d000000"},
+		{USize(29), "0x1d000000"},
 	})
 }
 
-func TestWeight_String(t *testing.T) {
+func TestUSize_String(t *testing.T) {
 	assertString(t, []stringAssert{
-		{NewWeight(29), "29"},
+		{USize(29), "29"},
 	})
 }
 
-func TestWeight_Eq(t *testing.T) {
+func TestUSize_Eq(t *testing.T) {
 	assertEq(t, []eqAssert{
-		{NewWeight(23), NewWeight(23), true},
-		{NewWeight(23), NewBool(false), false},
+		{USize(23), USize(23), true},
+		{USize(23), NewBool(false), false},
 	})
 }

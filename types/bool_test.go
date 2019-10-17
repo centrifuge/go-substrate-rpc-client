@@ -50,8 +50,8 @@ func TestBool_Decode(t *testing.T) {
 
 func TestBool_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewBool(true), mustDecodeHexString("0xee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25")},
-		{NewBool(false), mustDecodeHexString("0x03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314")},
+		{NewBool(true), MustHexDecodeString("0xee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25")},
+		{NewBool(false), MustHexDecodeString("0x03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314")},
 	})
 }
 

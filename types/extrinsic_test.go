@@ -68,7 +68,7 @@ func TestExtrinsic_Signed_EncodeDecode(t *testing.T) {
 
 func TestExtrinsic_Sign(t *testing.T) {
 	c, err := NewCall(ExamplaryMetadataV4.Metadata,
-		"balances.transfer", NewAddressFromAccountID(mustDecodeHexString(
+		"balances.transfer", NewAddressFromAccountID(MustHexDecodeString(
 			"0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")),
 		UCompact(6969))
 	assert.NoError(t, err)
@@ -76,9 +76,9 @@ func TestExtrinsic_Sign(t *testing.T) {
 	ext := NewExtrinsic(c)
 
 	o := SignatureOptions{
-		BlockHash: NewHash(mustDecodeHexString("0xec7afaf1cca720ce88c1d1b689d81f0583cc15a97d621cf046dd9abf605ef22f")),
+		BlockHash: NewHash(MustHexDecodeString("0xec7afaf1cca720ce88c1d1b689d81f0583cc15a97d621cf046dd9abf605ef22f")),
 		// Era: ExtrinsicEra{IsImmortalEra: true},
-		GenesisHash: NewHash(mustDecodeHexString("0xdcd1346701ca8396496e52aa2785b1748deb6db09551b72159dcb3e08991025b")),
+		GenesisHash: NewHash(MustHexDecodeString("0xdcd1346701ca8396496e52aa2785b1748deb6db09551b72159dcb3e08991025b")),
 		Nonce:       1,
 		SpecVersion: 123,
 		Tip:         2,
@@ -161,9 +161,9 @@ func ExampleExtrinsic() {
 	era := ExtrinsicEra{IsMortalEra: true, AsMortalEra: MortalEra{0x95, 0x00}}
 
 	o := SignatureOptions{
-		BlockHash:   NewHash(mustDecodeHexString("0x223e3eb79416e6258d262b3a76e827aa0886b884a96bf96395cdd1c52d0eeb45")),
+		BlockHash:   NewHash(MustHexDecodeString("0x223e3eb79416e6258d262b3a76e827aa0886b884a96bf96395cdd1c52d0eeb45")),
 		Era:         era,
-		GenesisHash: NewHash(mustDecodeHexString("0x81ad0bfe2a0bccd91d2e89852d79b7ff696d4714758e5f7c6f17ec7527e1f550")),
+		GenesisHash: NewHash(MustHexDecodeString("0x81ad0bfe2a0bccd91d2e89852d79b7ff696d4714758e5f7c6f17ec7527e1f550")),
 		Nonce:       1,
 		SpecVersion: 170,
 		Tip:         0,

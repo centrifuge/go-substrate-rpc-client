@@ -14,25 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package state
+package types
 
 import (
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestState_GetKeysLatest(t *testing.T) {
-	prefix := types.NewStorageKey(types.MustHexDecodeString(mockSrv.storageKeyHex))[:8]
-	keys, err := state.GetKeysLatest(prefix)
-	assert.NoError(t, err)
-	assert.Equal(t, []types.StorageKey{types.MustHexDecodeString(mockSrv.storageKeyHex)}, keys)
-}
+func TestHexDecodeString(t *testing.T) {
+	s := HexEncodeToString([]byte{0, 128, 255})
+	assert.Equal(t, "0x0080ff", s)
 
-func TestState_GetKeys(t *testing.T) {
-	prefix := types.NewStorageKey(types.MustHexDecodeString(mockSrv.storageKeyHex))[:8]
-	keys, err := state.GetKeys(prefix, mockSrv.blockHashLatest)
+	b, err := HexDecodeString(s)
 	assert.NoError(t, err)
-	assert.Equal(t, []types.StorageKey{types.MustHexDecodeString(mockSrv.storageKeyHex)}, keys)
+	assert.Equal(t, []byte{0, 128, 255}, b)
+
+	b, err = HexDecodeString("0xa")
+	assert.NoError(t, err)
+	assert.Equal(t, []byte{10}, b)
+
+	b, err = HexDecodeString("f")
+	assert.NoError(t, err)
+	assert.Equal(t, []byte{15}, b)
 }

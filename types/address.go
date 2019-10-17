@@ -19,7 +19,6 @@
 package types
 
 import (
-	"encoding/hex"
 	"fmt"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
@@ -44,7 +43,7 @@ func NewAddressFromAccountID(b []byte) Address {
 
 // NewAddressFromHexAccountID creates an Address from the given hex string that contains an AccountID (public key)
 func NewAddressFromHexAccountID(str string) (Address, error) {
-	b, err := hex.DecodeString(str[2:])
+	b, err := HexDecodeString(str)
 	if err != nil {
 		return Address{}, err
 	}

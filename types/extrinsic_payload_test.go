@@ -32,14 +32,14 @@ func TestExtrinsicPayload(t *testing.T) {
 	assert.NoError(t, err)
 
 	p := ExtrinsicPayloadV3{
-		Method: mustDecodeHexString(
+		Method: MustHexDecodeString(
 			"0x0600ffd7568e5f0a7eda67a82691ff379ac4bba4f9c9b859fe779b5d46363b61ad2db9e56c"),
 		Era:         era,
 		Nonce:       4660,
 		Tip:         22136,
 		SpecVersion: 123,
-		GenesisHash: NewHash(mustDecodeHexString("0xdcd1346701ca8396496e52aa2785b1748deb6db09551b72159dcb3e08991025b")),
-		BlockHash:   NewHash(mustDecodeHexString("0xde8f69eeb5e065e18c6950ff708d7e551f68dc9bf59a07c52367c0280f805ec7")),
+		GenesisHash: NewHash(MustHexDecodeString("0xdcd1346701ca8396496e52aa2785b1748deb6db09551b72159dcb3e08991025b")),
+		BlockHash:   NewHash(MustHexDecodeString("0xde8f69eeb5e065e18c6950ff708d7e551f68dc9bf59a07c52367c0280f805ec7")),
 	}
 
 	assert.Equal(t, examplaryExtrinsicPayload, p)
@@ -59,7 +59,7 @@ func TestExtrinsicPayload(t *testing.T) {
 		"de8f69eeb5e065e18c6950ff708d7e551f68dc9bf59a07c52367c0280f805ec7", // BlockHash
 		enc)
 
-	// b := bytes.NewBuffer(mustDecodeHexString())
+	// b := bytes.NewBuffer(MustHexDecodeString())
 
 	var dec ExtrinsicPayloadV3
 	err = DecodeFromHexString(enc, &dec)
