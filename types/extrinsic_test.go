@@ -206,21 +206,21 @@ func TestNewCallV4(t *testing.T) {
 }
 
 func TestNewCallV7(t *testing.T) {
-	c, err := NewCall(&exampleMetadataV7, "myModule.my function", U8(3))
+	c, err := NewCall(&exampleMetadataV7, "Module2.my function", U8(3))
 	assert.NoError(t, err)
 
 	enc, err := EncodeToHexString(c)
 	assert.NoError(t, err)
 
-	assert.Equal(t, "0x000003", enc)
+	assert.Equal(t, "0x010003", enc)
 }
 
 func TestNewCallV8(t *testing.T) {
-	c, err := NewCall(&exampleMetadataV8, "myModule.my function", U8(3))
+	c, err := NewCall(&exampleMetadataV8, "Module2.my function", U8(3))
 	assert.NoError(t, err)
 
 	enc, err := EncodeToHexString(c)
 	assert.NoError(t, err)
 
-	assert.Equal(t, "0x000003", enc)
+	assert.Equal(t, "0x010003", enc)
 }

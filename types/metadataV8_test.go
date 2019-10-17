@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
+	"github.com/stretchr/testify/assert"
 )
 
 var exampleMetadataV8 = Metadata{
@@ -30,11 +31,35 @@ var exampleMetadataV8 = Metadata{
 }
 
 var exampleRuntimeMetadataV8 = MetadataV8{
-	Modules: []ModuleMetadataV8{exampleModuleMetadataV8},
+	Modules: []ModuleMetadataV8{exampleModuleMetadataV8Empty, exampleModuleMetadataV81, exampleModuleMetadataV82},
 }
 
-var exampleModuleMetadataV8 = ModuleMetadataV8{
-	Name:       "myModule",
+var exampleModuleMetadataV8Empty = ModuleMetadataV8{
+	Name:       "EmptyModule",
+	HasStorage: false,
+	Storage:    StorageMetadata{},
+	HasCalls:   false,
+	Calls:      nil,
+	HasEvents:  false,
+	Events:     nil,
+	Constants:  nil,
+	Errors:     nil,
+}
+
+var exampleModuleMetadataV81 = ModuleMetadataV8{
+	Name:       "Module1",
+	HasStorage: true,
+	Storage:    exampleStorageMetadata,
+	HasCalls:   true,
+	Calls:      []FunctionMetadataV4{exampleFunctionMetadataV4},
+	HasEvents:  true,
+	Events:     []EventMetadataV4{exampleEventMetadataV4},
+	Constants:  []ModuleConstantMetadataV6{exampleModuleConstantMetadataV6},
+	Errors:     []ErrorMetadataV8{exampleErrorMetadataV8},
+}
+
+var exampleModuleMetadataV82 = ModuleMetadataV8{
+	Name:       "Module2",
 	HasStorage: true,
 	Storage:    exampleStorageMetadata,
 	HasCalls:   true,
@@ -52,4 +77,17 @@ var exampleErrorMetadataV8 = ErrorMetadataV8{
 
 func TestMetadataV8_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, exampleMetadataV8)
+}
+
+func TestFindEventNamesForEventIDV8(t *testing.T) {
+	module, event, err := exampleMetadataV8.FindEventNamesForEventID(EventID([2]byte{1, 0}))
+
+	assert.NoError(t, err)
+	assert.Equal(t, exampleModuleMetadataV82.Name, module)
+	assert.Equal(t, exampleEventMetadataV4.Name, event)
+}
+
+func TestFindStorageKeyHasherV8(t *testing.T) {
+	_, err := exampleMetadataV8.FindStorageKeyHasher("myStoragePrefix", "myStorageFunc2")
+	assert.NoError(t, err)
 }

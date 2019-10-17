@@ -97,3 +97,8 @@ func ExampleEventRecordsRaw_Decode() {
 	// Transfer: 109 tokens from 0x3593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d8e to
 	// 0xaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a4826 with a fee of 3906250000
 }
+
+func TestDispatchError(t *testing.T) {
+	assertRoundtrip(t, DispatchError{HasModule: true, Module: 0xf1, Error: 0xa2})
+	assertRoundtrip(t, DispatchError{HasModule: false, Error: 0xa2})
+}
