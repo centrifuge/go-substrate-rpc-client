@@ -32,7 +32,7 @@ var exampleMetadataV4 = Metadata{
 }
 
 var exampleRuntimeMetadataV4 = MetadataV4{
-	Modules: []ModuleMetadataV4{exampleModuleMetadataV4},
+	Modules: []ModuleMetadataV4{exampleModuleMetadataV4Empty, exampleModuleMetadataV41, exampleModuleMetadataV42},
 }
 
 var exampleCallIndex = CallIndex{
@@ -40,19 +40,57 @@ var exampleCallIndex = CallIndex{
 	MethodIndex:  234,
 }
 
-var exampleModuleMetadataV4 = ModuleMetadataV4{
-	Name:       "myModule",
-	Prefix:     "modulePrefix",
+var exampleModuleMetadataV4Empty = ModuleMetadataV4{
+	Name:       "EmptyModule",
+	Prefix:     "EmptyModule",
+	HasStorage: false,
+	Storage:    nil,
+	HasCalls:   false,
+	Calls:      nil,
+	HasEvents:  false,
+	Events:     nil,
+}
+
+var exampleModuleMetadataV41 = ModuleMetadataV4{
+	Name:       "Module1",
+	Prefix:     "Module1",
 	HasStorage: true,
-	Storage:    []StorageFunctionMetadataV4{exampleStorageFunctionMetadataV4},
+	Storage:    []StorageFunctionMetadataV4{exampleStorageFunctionMetadataV4DoubleMap},
 	HasCalls:   true,
 	Calls:      []FunctionMetadataV4{exampleFunctionMetadataV4},
 	HasEvents:  true,
 	Events:     []EventMetadataV4{exampleEventMetadataV4},
 }
 
-var exampleStorageFunctionMetadataV4 = StorageFunctionMetadataV4{
+var exampleModuleMetadataV42 = ModuleMetadataV4{
+	Name:       "Module2",
+	Prefix:     "Module2",
+	HasStorage: true,
+	Storage:    []StorageFunctionMetadataV4{exampleStorageFunctionMetadataV4DoubleMap},
+	HasCalls:   true,
+	Calls:      []FunctionMetadataV4{exampleFunctionMetadataV4},
+	HasEvents:  true,
+	Events:     []EventMetadataV4{exampleEventMetadataV4},
+}
+
+var exampleStorageFunctionMetadataV4Type = StorageFunctionMetadataV4{
 	Name:          "myStorageFunc",
+	Modifier:      StorageFunctionModifierV0{IsOptional: true},
+	Type:          StorageFunctionTypeV4{IsType: true, AsType: "U8"},
+	Fallback:      []byte{23, 14},
+	Documentation: []Text{"My", "storage func", "doc"},
+}
+
+var exampleStorageFunctionMetadataV4Map = StorageFunctionMetadataV4{
+	Name:          "myStorageFunc2",
+	Modifier:      StorageFunctionModifierV0{IsOptional: true},
+	Type:          StorageFunctionTypeV4{IsMap: true, AsMap: exampleMapTypeV4},
+	Fallback:      []byte{23, 14},
+	Documentation: []Text{"My", "storage func", "doc"},
+}
+
+var exampleStorageFunctionMetadataV4DoubleMap = StorageFunctionMetadataV4{
+	Name:          "myStorageFunc3",
 	Modifier:      StorageFunctionModifierV0{IsOptional: true},
 	Type:          StorageFunctionTypeV4{IsDoubleMap: true, AsDoubleMap: exampleDoubleMapTypeV4},
 	Fallback:      []byte{23, 14},
@@ -106,11 +144,19 @@ func TestCallIndex_EncodeDecode(t *testing.T) {
 }
 
 func TestModuleMetadataV4_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleModuleMetadataV4)
+	assertRoundtrip(t, exampleModuleMetadataV42)
 }
 
-func TestStorageFunctionMetadataV4_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleStorageFunctionMetadataV4)
+func TestStorageFunctionMetadataV4Type_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleStorageFunctionMetadataV4Type)
+}
+
+func TestStorageFunctionMetadataV4Map_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleStorageFunctionMetadataV4Map)
+}
+
+func TestStorageFunctionMetadataV4DoubleMap_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, exampleStorageFunctionMetadataV4DoubleMap)
 }
 
 func TestFunctionMetadataV4_EncodeDecode(t *testing.T) {
@@ -131,4 +177,12 @@ func TestDoubleMapTypeV4_EncodeDecode(t *testing.T) {
 
 func TestFunctionArgumentMetadata_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, exampleFunctionArgumentMetadata)
+}
+
+func TestFindEventNamesForEventIDV4(t *testing.T) {
+	module, event, err := exampleMetadataV4.FindEventNamesForEventID(EventID([2]byte{1, 0}))
+
+	assert.NoError(t, err)
+	assert.Equal(t, exampleModuleMetadataV42.Name, module)
+	assert.Equal(t, exampleEventMetadataV4.Name, event)
 }

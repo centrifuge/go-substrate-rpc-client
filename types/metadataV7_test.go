@@ -19,6 +19,8 @@ package types_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
@@ -30,11 +32,33 @@ var exampleMetadataV7 = Metadata{
 }
 
 var exampleRuntimeMetadataV7 = MetadataV7{
-	Modules: []ModuleMetadataV7{exampleModuleMetadataV7},
+	Modules: []ModuleMetadataV7{exampleModuleMetadataV7Empty, exampleModuleMetadataV71, exampleModuleMetadataV72},
 }
 
-var exampleModuleMetadataV7 = ModuleMetadataV7{
-	Name:       "myModule",
+var exampleModuleMetadataV7Empty = ModuleMetadataV7{
+	Name:       "EmptyModule",
+	HasStorage: false,
+	Storage:    StorageMetadata{},
+	HasCalls:   false,
+	Calls:      nil,
+	HasEvents:  false,
+	Events:     nil,
+	Constants:  nil,
+}
+
+var exampleModuleMetadataV71 = ModuleMetadataV7{
+	Name:       "Module1",
+	HasStorage: true,
+	Storage:    exampleStorageMetadata,
+	HasCalls:   true,
+	Calls:      []FunctionMetadataV4{exampleFunctionMetadataV4},
+	HasEvents:  true,
+	Events:     []EventMetadataV4{exampleEventMetadataV4},
+	Constants:  []ModuleConstantMetadataV6{exampleModuleConstantMetadataV6},
+}
+
+var exampleModuleMetadataV72 = ModuleMetadataV7{
+	Name:       "Module2",
 	HasStorage: true,
 	Storage:    exampleStorageMetadata,
 	HasCalls:   true,
@@ -67,7 +91,7 @@ var exampleStorageFunctionMetadataV5Map = StorageFunctionMetadataV5{
 }
 
 var exampleStorageFunctionMetadataV5DoubleMap = StorageFunctionMetadataV5{
-	Name:          "myStorageFunc2",
+	Name:          "myStorageFunc3",
 	Modifier:      StorageFunctionModifierV0{IsOptional: true},
 	Type:          StorageFunctionTypeV5{IsDoubleMap: true, AsDoubleMap: exampleDoubleMapTypeV5},
 	Fallback:      []byte{23, 14},
@@ -91,4 +115,17 @@ var exampleModuleConstantMetadataV6 = ModuleConstantMetadataV6{
 
 func TestMetadataV7_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, exampleMetadataV7)
+}
+
+func TestFindEventNamesForEventIDV7(t *testing.T) {
+	module, event, err := exampleMetadataV7.FindEventNamesForEventID(EventID([2]byte{1, 0}))
+
+	assert.NoError(t, err)
+	assert.Equal(t, exampleModuleMetadataV72.Name, module)
+	assert.Equal(t, exampleEventMetadataV4.Name, event)
+}
+
+func TestFindStorageKeyHasherV7(t *testing.T) {
+	_, err := exampleMetadataV7.FindStorageKeyHasher("myStoragePrefix", "myStorageFunc2")
+	assert.NoError(t, err)
 }
