@@ -146,8 +146,6 @@ func (e EventRecordsRaw) Decode(m *Metadata, t interface{}) error {
 
 		// add the decoded event to the slice
 		field.Set(reflect.Append(field, holder.Elem()))
-
-		// fmt.Println("Slice type", field.Type().Elem())
 	}
 	return nil
 }

@@ -14,22 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package state
+package types_test
 
 import (
 	"testing"
 
+	. "github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestState_GetRuntimeVersionLatest(t *testing.T) {
-	rv, err := state.GetRuntimeVersionLatest()
+func TestBlock_EncodeDecode(t *testing.T) {
+	enc, err := EncodeToHexString(ExamplarySignedBlock)
 	assert.NoError(t, err)
-	assert.Equal(t, &mockSrv.runtimeVersion, rv)
-}
 
-func TestState_GetRuntimeVersion(t *testing.T) {
-	rv, err := state.GetRuntimeVersion(mockSrv.blockHashLatest)
+	var dec SignedBlock
+	err = DecodeFromHexString(enc, &dec)
 	assert.NoError(t, err)
-	assert.Equal(t, &mockSrv.runtimeVersion, rv)
+
+	assert.Equal(t, ExamplarySignedBlock, dec)
 }

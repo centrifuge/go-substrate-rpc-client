@@ -1,20 +1,18 @@
 # Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
-# Copyright (C) 2019  Centrifuge GmbH
 #
-# This file is part of Go Substrate RPC Client (GSRPC).
+# Copyright 2019 Centrifuge GmbH
 #
-# GSRPC is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# GSRPC is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 clean: 				##clean vendor folder. Should be run before a make install
 	@echo 'cleaning previous /vendor folder'
@@ -44,8 +42,8 @@ test-dockerized: 		## runs all tests in a docker container against the Substrate
 	@docker-compose build
 	@docker-compose up --abort-on-container-exit
 
-test-e2e-deployed: export RPC_URL?=wss://poc3-rpc.polkadot.io
-test-e2e-deployed: 		## runs only end-to-end (e2e) tests against a deployed testnet (defaults to Alexander (wss://poc3-rpc.polkadot.io) if RPC_URL is not set)
+test-e2e-deployed: export RPC_URL?=wss://serinus-5.kusama.network
+test-e2e-deployed: 		## runs only end-to-end (e2e) tests against a deployed testnet (defaults to Kusama CC2 (wss://serinus-5.kusama.network) if RPC_URL is not set)
 	@docker build . -t gsrpc-test
 	@docker run --rm -e RPC_URL gsrpc-test go test -v github.com/centrifuge/go-substrate-rpc-client/teste2e
 

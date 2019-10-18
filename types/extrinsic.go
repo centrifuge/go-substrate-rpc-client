@@ -18,8 +18,10 @@ package types
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/signature"
@@ -54,6 +56,55 @@ func NewExtrinsic(c Call) Extrinsic {
 		Version: ExtrinsicVersion3,
 		Method:  c,
 	}
+}
+
+// UnmarshalJSON fills Extrinsic with the JSON encoded byte array given by bz
+func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
+	var tmp string
+	if err := json.Unmarshal(bz, &tmp); err != nil {
+		return err
+	}
+
+	// HACK 11 Jan 2019 - before https://github.com/paritytech/substrate/pull/1388
+	// extrinsics didn't have the length, cater for both approaches. This is very
+	// inconsistent with any other `Vec<u8>` implementation
+	var l UCompact
+	err := DecodeFromHexString(tmp, &l)
+	if err != nil {
+		return err
+	}
+
+	prefix, err := EncodeToHexString(l)
+	if err != nil {
+		return err
+	}
+
+	// determine whether length prefix is there
+	if strings.HasPrefix(tmp, prefix) {
+		return DecodeFromHexString(tmp, e)
+	}
+
+	// not there, prepend with compact encoded length prefix
+	dec, err := HexDecodeString(tmp)
+	if err != nil {
+		return err
+	}
+	length := UCompact(len(dec))
+	bprefix, err := EncodeToBytes(length)
+	if err != nil {
+		return err
+	}
+	prefixed := append(bprefix, dec...)
+	return DecodeFromBytes(prefixed, e)
+}
+
+// MarshalJSON returns a JSON encoded byte array of Extrinsic
+func (e Extrinsic) MarshalJSON() ([]byte, error) {
+	s, err := EncodeToHexString(e)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(s)
 }
 
 // IsSigned returns true if the extrinsic is signed
@@ -106,8 +157,6 @@ func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error
 		Tip:       o.Tip,
 	}
 
-	// fmt.Println(extSig)
-
 	e.Signature = extSig
 
 	// mark the extrinsic as signed
@@ -117,7 +166,7 @@ func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error
 }
 
 func (e *Extrinsic) Decode(decoder scale.Decoder) error {
-	// compact length encoding (1, 2, or 4 bytes) (may not be there for Extrinsics older than Jan 11 2019, see )
+	// compact length encoding (1, 2, or 4 bytes) (may not be there for Extrinsics older than Jan 11 2019)
 	_, err := decoder.DecodeUintCompact()
 	if err != nil {
 		return err
@@ -129,12 +178,13 @@ func (e *Extrinsic) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	if e.Type() != ExtrinsicVersion3 {
-		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(), e.Type())
-	}
-
 	// signature
 	if e.IsSigned() {
+		if e.Type() != ExtrinsicVersion3 {
+			return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(),
+				e.Type())
+		}
+
 		err = decoder.Decode(&e.Signature)
 		if err != nil {
 			return err
@@ -152,7 +202,8 @@ func (e *Extrinsic) Decode(decoder scale.Decoder) error {
 
 func (e Extrinsic) Encode(encoder scale.Encoder) error {
 	if e.Type() != ExtrinsicVersion3 {
-		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(), e.Type())
+		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(),
+			e.Type())
 	}
 
 	// create a temporary buffer that will receive the plain encoded transaction (version, signature (optional),
