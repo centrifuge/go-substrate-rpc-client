@@ -37,7 +37,6 @@ func TestMain(m *testing.M) {
 
 	cl, err := client.Connect(s.URL)
 	// cl, err := client.Connect(config.NewDefaultConfig().RPCURL)
-	// cl, err := client.Connect("ws://35.246.140.178:9944")
 	if err != nil {
 		panic(err)
 	}
@@ -48,14 +47,20 @@ func TestMain(m *testing.M) {
 
 // MockSrv holds data and methods exposed by the RPC Mock Server used in integration tests
 type MockSrv struct {
-	blockHashLatest types.Hash
-	metadataString  string
-	metadata        *types.Metadata
-	runtimeVersion  types.RuntimeVersion
-	storageKeyHex   string
-	storageDataHex  string
-	storageSize     types.U64
-	storageHashHex  string
+	blockHashLatest          types.Hash
+	metadataString           string
+	metadata                 *types.Metadata
+	runtimeVersion           types.RuntimeVersion
+	storageKeyHex            string
+	storageDataHex           string
+	storageSize              types.U64
+	storageHashHex           string
+	childStorageKeyHex       string // the key pointing to the child storage trie
+	childStorageTrieKeyHex   string // a key within the child storage trie
+	childStorageTrieValueHex string // a value stored int he child storage trie
+	childStorageTrieValue    ChildStorageTrieTestVal
+	childStorageTrieSize     types.U64
+	childStorageTrieHashHex  string
 }
 
 func (s *MockSrv) GetMetadata(hash *string) string {
@@ -88,16 +93,72 @@ func (s *MockSrv) GetStorageHash(key string, hash *string) string {
 	return mockSrv.storageHashHex
 }
 
+func (s *MockSrv) GetChildKeys(childStorageKey, prefix string, hash *string) []string {
+	if childStorageKey != mockSrv.childStorageKeyHex {
+		panic("childStorageKey not found")
+	}
+	if !strings.HasPrefix(mockSrv.childStorageTrieKeyHex, prefix) {
+		panic("no keys for prefix found")
+	}
+	return []string{mockSrv.childStorageTrieKeyHex}
+}
+
+func (s *MockSrv) GetChildStorage(childStorageKey, key string, hash *string) string {
+	if childStorageKey != mockSrv.childStorageKeyHex {
+		panic("childStorageKey not found")
+	}
+	if key != mockSrv.childStorageTrieKeyHex {
+		panic("key not found")
+	}
+	return mockSrv.childStorageTrieValueHex
+}
+
+func (s *MockSrv) GetChildStorageSize(childStorageKey, key string, hash *string) types.U64 {
+	if childStorageKey != mockSrv.childStorageKeyHex {
+		panic("childStorageKey not found")
+	}
+	if key != mockSrv.childStorageTrieKeyHex {
+		panic("key not found")
+	}
+	return mockSrv.childStorageTrieSize
+}
+
+func (s *MockSrv) GetChildStorageHash(childStorageKey, key string, hash *string) string {
+	if childStorageKey != mockSrv.childStorageKeyHex {
+		panic("childStorageKey not found")
+	}
+	if key != mockSrv.childStorageTrieKeyHex {
+		panic("key not found")
+	}
+	return mockSrv.childStorageTrieHashHex
+}
+
+type ChildStorageTrieTestVal struct {
+	Key     types.Hash
+	OtherId types.Hash
+	Value   types.U32
+}
+
 // mockSrv sets default data used in tests. This data might become stale when substrate is updated – just run the tests
 // against real servers and update the values stored here. To do that, replace s.URL with
 // config.NewDefaultConfig().RPCURL
 var mockSrv = MockSrv{
-	blockHashLatest: types.Hash{1, 2, 3},
-	metadata:        types.ExamplaryMetadataV4,
-	metadataString:  types.ExamplaryMetadataV4String,
-	runtimeVersion:  types.RuntimeVersion{APIs: []types.RuntimeVersionAPI{{APIID: "0xdf6acb689907609b", Version: 0x2}, {APIID: "0x37e397fc7c91f5e4", Version: 0x1}, {APIID: "0x40fe3ad401f8959a", Version: 0x3}, {APIID: "0xd2bc9897eed08f15", Version: 0x1}, {APIID: "0xf78b278be53f454c", Version: 0x1}, {APIID: "0xed99c5acb25eedf5", Version: 0x2}, {APIID: "0xdd718d5cc53262d4", Version: 0x1}, {APIID: "0x7801759919ee83e5", Version: 0x1}}, AuthoringVersion: 0xa, ImplName: "substrate-node", ImplVersion: 0x3e, SpecName: "node", SpecVersion: 0x3c}, //nolint:lll
-	storageKeyHex:   "0x0e4944cfd98d6f4cc374d16f5a4e3f9c",
-	storageDataHex:  "0xb82d895d00000000",
-	storageSize:     926778,
-	storageHashHex:  "0xdf0e877ee1cb973b9a566f53707d365b269d7131b55e65b9790994e4e63b95e1",
+	blockHashLatest:          types.Hash{1, 2, 3},
+	metadata:                 types.ExamplaryMetadataV4,
+	metadataString:           types.ExamplaryMetadataV4String,
+	runtimeVersion:           types.RuntimeVersion{APIs: []types.RuntimeVersionAPI{{APIID: "0xdf6acb689907609b", Version: 0x2}, {APIID: "0x37e397fc7c91f5e4", Version: 0x1}, {APIID: "0x40fe3ad401f8959a", Version: 0x3}, {APIID: "0xd2bc9897eed08f15", Version: 0x1}, {APIID: "0xf78b278be53f454c", Version: 0x1}, {APIID: "0xed99c5acb25eedf5", Version: 0x2}, {APIID: "0xdd718d5cc53262d4", Version: 0x1}, {APIID: "0x7801759919ee83e5", Version: 0x1}}, AuthoringVersion: 0xa, ImplName: "substrate-node", ImplVersion: 0x3e, SpecName: "node", SpecVersion: 0x3c}, //nolint:lll
+	storageKeyHex:            "0x0e4944cfd98d6f4cc374d16f5a4e3f9c",
+	storageDataHex:           "0xb82d895d00000000",
+	storageSize:              926778,
+	storageHashHex:           "0xdf0e877ee1cb973b9a566f53707d365b269d7131b55e65b9790994e4e63b95e1",
+	childStorageKeyHex:       "0x3a6368696c645f73746f726167653a64656661756c743a05470000", //nolint:lll beginning with hex encoded `:child_storage:` as per https://github.com/paritytech/substrate/blob/master/core/primitives/storage/src/lib.rs#L71
+	childStorageTrieKeyHex:   "0x81914b11321c39f8728981888024196b616142cc0369234775b20b539aaf29d0",
+	childStorageTrieValueHex: "0x81914b11321c39f8728981888024196b616142cc0369234775b20b539aaf29d09c1705d98d059a2d7f5faa89277ee5d0a38cc455f8b5fdf38fda471e988cb8a921000000", //nolint:lll
+	childStorageTrieValue: ChildStorageTrieTestVal{
+		Key:     types.NewHash(types.MustHexDecodeString("0x81914b11321c39f8728981888024196b616142cc0369234775b20b539aaf29d0")),
+		OtherId: types.NewHash(types.MustHexDecodeString("0x9c1705d98d059a2d7f5faa89277ee5d0a38cc455f8b5fdf38fda471e988cb8a9")),
+		Value:   types.NewU32(0x21),
+	}, //nolint:lll
+	childStorageTrieSize:    68,
+	childStorageTrieHashHex: "0x20e3fc48a91087d091c17de08a5c470de53ccdaebd361025b0e5b7c65b9a0d30", //nolint:lll
 }
