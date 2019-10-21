@@ -135,7 +135,7 @@ func (s *MockSrv) GetChildStorageHash(childStorageKey, key string, hash *string)
 
 type ChildStorageTrieTestVal struct {
 	Key     types.Hash
-	OtherId types.Hash
+	OtherID types.Hash
 	Value   types.U32
 }
 
@@ -155,10 +155,10 @@ var mockSrv = MockSrv{
 	childStorageTrieKeyHex:   "0x81914b11321c39f8728981888024196b616142cc0369234775b20b539aaf29d0",
 	childStorageTrieValueHex: "0x81914b11321c39f8728981888024196b616142cc0369234775b20b539aaf29d09c1705d98d059a2d7f5faa89277ee5d0a38cc455f8b5fdf38fda471e988cb8a921000000", //nolint:lll
 	childStorageTrieValue: ChildStorageTrieTestVal{
-		Key:     types.NewHash(types.MustHexDecodeString("0x81914b11321c39f8728981888024196b616142cc0369234775b20b539aaf29d0")),
-		OtherId: types.NewHash(types.MustHexDecodeString("0x9c1705d98d059a2d7f5faa89277ee5d0a38cc455f8b5fdf38fda471e988cb8a9")),
+		Key:     types.NewHash(types.MustHexDecodeString("0x81914b11321c39f8728981888024196b616142cc0369234775b20b539aaf29d0")), //nolint:lll
+		OtherID: types.NewHash(types.MustHexDecodeString("0x9c1705d98d059a2d7f5faa89277ee5d0a38cc455f8b5fdf38fda471e988cb8a9")), //nolint:lll
 		Value:   types.NewU32(0x21),
-	}, //nolint:lll
+	},
 	childStorageTrieSize:    68,
 	childStorageTrieHashHex: "0x20e3fc48a91087d091c17de08a5c470de53ccdaebd361025b0e5b7c65b9a0d30", //nolint:lll
 }
