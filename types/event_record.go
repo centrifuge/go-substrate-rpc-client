@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"reflect"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
@@ -28,7 +29,30 @@ import (
 // EventRecordsRaw is a raw record for a set of events, represented as the raw bytes. It exists since
 // decoding of events can only be done with metadata, so events can't follow the static way of decoding
 // other types do. It exposes functions to decode events using metadata and targets.
+// Be careful using this in your own structs – it only works as the last value in a struct since it will consume the
+// remainder of the encoded data. The reason for this is that it does not contain any length encoding, so it would
+// not know where to stop.
 type EventRecordsRaw []byte
+
+// Encode implements encoding for Data, which just unwraps the bytes of Data
+func (e EventRecordsRaw) Encode(encoder scale.Encoder) error {
+	return encoder.Write(e)
+}
+
+// Decode implements decoding for Data, which just reads all the remaining bytes into Data
+func (e *EventRecordsRaw) Decode(decoder scale.Decoder) error {
+	for i := 0; true; i++ {
+		b, err := decoder.ReadOneByte()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		*e = append((*e)[:i], b)
+	}
+	return nil
+}
 
 type EventSystemExtrinsicSuccess struct {
 	Phase  Phase
@@ -83,8 +107,8 @@ type EventRecords struct {
 	Session_NewSession      []EventSessionNewSession      //nolint:stylecheck,golint
 }
 
-// Decode decodes the events from an EventRecordRaw into a target t using the given Metadata m
-func (e EventRecordsRaw) Decode(m *Metadata, t interface{}) error {
+// DecodeEventRecords decodes the events records from an EventRecordRaw into a target t using the given Metadata m
+func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
 	// ensure t is a pointer
 	ttyp := reflect.TypeOf(t)
 	if ttyp.Kind() != reflect.Ptr {

@@ -151,7 +151,7 @@ var mockSrv = MockSrv{
 	storageDataHex:           "0xb82d895d00000000",
 	storageSize:              926778,
 	storageHashHex:           "0xdf0e877ee1cb973b9a566f53707d365b269d7131b55e65b9790994e4e63b95e1",
-	childStorageKeyHex:       "0x3a6368696c645f73746f726167653a64656661756c743a05470000", //nolint:lll beginning with hex encoded `:child_storage:` as per https://github.com/paritytech/substrate/blob/master/core/primitives/storage/src/lib.rs#L71
+	childStorageKeyHex:       "0x3a6368696c645f73746f726167653a64656661756c743a05470000", //nolint:lll // beginning with hex encoded `:child_storage:` as per https://github.com/paritytech/substrate/blob/master/core/primitives/storage/src/lib.rs#L71
 	childStorageTrieKeyHex:   "0x81914b11321c39f8728981888024196b616142cc0369234775b20b539aaf29d0",
 	childStorageTrieValueHex: "0x81914b11321c39f8728981888024196b616142cc0369234775b20b539aaf29d09c1705d98d059a2d7f5faa89277ee5d0a38cc455f8b5fdf38fda471e988cb8a921000000", //nolint:lll
 	childStorageTrieValue: ChildStorageTrieTestVal{
