@@ -87,15 +87,24 @@ func TestEnd2end(t *testing.T) {
 	fmt.Println()
 }
 
-func TestSubscribeEvents(t *testing.T) {
+func TestState_SubscribeStorage(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping end-to-end test in short mode.")
 	}
 
 	api, err := gsrpc.NewSubstrateAPI(config.NewDefaultConfig().RPCURL)
 	assert.NoError(t, err)
-	_, err = api.RPC.State.SubscribeStorageRawLatest()
+
+	key := types.NewStorageKey(types.MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95c"))
+
+	c := make(chan types.StorageChangeSet)
+
+	_, err = api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key}, c)
 	assert.NoError(t, err)
+
+	for {
+		fmt.Printf("%#v\n", <-c)
+	}
 	// runtimeVersion, err := api.RPC.State.GetRuntimeVersionLatest()
 	// assert.NoError(t, err)
 
