@@ -19,6 +19,7 @@ package client
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -36,6 +37,8 @@ type Client interface {
 
 type client struct {
 	*rpc.Client
+
+	ctx context.Context
 
 	url string
 
@@ -73,11 +76,14 @@ func (c client) URL() string {
 // Connect connects to the provided url
 func Connect(url string) (Client, error) {
 	log.Printf("Connecting to %v...", url)
-	c, err := rpc.Dial(url)
+
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+
+	c, err := rpc.DialContext(ctx, url)
 	if err != nil {
 		return nil, err
 	}
-	cc := client{c, url}
+	cc := client{c, ctx, url}
 	return &cc, nil
 }
 

@@ -86,3 +86,46 @@ func TestEnd2end(t *testing.T) {
 	}
 	fmt.Println()
 }
+
+func TestSubscribeEvents(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping end-to-end test in short mode.")
+	}
+
+	api, err := gsrpc.NewSubstrateAPI(config.NewDefaultConfig().RPCURL)
+	assert.NoError(t, err)
+	_, err = api.RPC.State.SubscribeStorageRawLatest()
+	assert.NoError(t, err)
+	// runtimeVersion, err := api.RPC.State.GetRuntimeVersionLatest()
+	// assert.NoError(t, err)
+
+	// fmt.Printf("Connected to node %v | latest block hash: %v | authoringVersion: %v | specVersion: %v | "+
+	// 	"implVersion: %v\n", (*api.Client).URL(), hash.Hex(), runtimeVersion.AuthoringVersion,
+	// 	runtimeVersion.SpecVersion, runtimeVersion.ImplVersion)
+}
+
+// func TestGetEventsStorage(t *testing.T) {
+// 	if testing.Short() {
+// 		t.Skip("skipping end-to-end test in short mode.")
+// 	}
+
+// 	api, err := gsrpc.NewSubstrateAPI(config.NewDefaultConfig().RPCURL)
+// 	assert.NoError(t, err)
+
+// 	meta, err := api.RPC.State.GetMetadataLatest()
+// 	assert.NoError(t, err)
+
+// 	key, err := types.CreateStorageKey(*meta, "System", "Events", nil)
+// 	assert.NoError(t, err)
+
+// 	fmt.Println(key.Hex())
+
+// 	hash, err := api.RPC.State.GetStorageRawLatest(key)
+// 	assert.NoError(t, err)
+// 	runtimeVersion, err := api.RPC.State.GetRuntimeVersionLatest()
+// 	assert.NoError(t, err)
+
+// 	fmt.Printf("Connected to node %v | latest block hash: %v | authoringVersion: %v | specVersion: %v | "+
+// 		"implVersion: %v\n", (*api.Client).URL(), hash.Hex(), runtimeVersion.AuthoringVersion,
+// 		runtimeVersion.SpecVersion, runtimeVersion.ImplVersion)
+// }
