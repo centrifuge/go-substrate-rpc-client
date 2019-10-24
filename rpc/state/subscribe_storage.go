@@ -26,25 +26,17 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
-// // GetStorageLatest retreives the stored data for the latest block height and decodes them into the provided interface
-// func (s *State) GetStorageLatest(key types.StorageKey, target interface{}) error {
-// 	raw, err := s.getStorageRaw(key, nil)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return types.DecodeFromBytes(*raw, target)
-// }
+// SubscribeStorageRaw subscribes the storage for the given keys, returning a subscription and a channel that will
+// receive server notifications containing the storage change sets.
+//
+// Slow subscribers will be dropped eventually. Client buffers up to 20000 notifications before considering the
+// subscriber dead. The subscription Err channel will receive ErrSubscriptionQueueOverflow. Use a sufficiently
+// large buffer on the channel or ensure that the channel usually has at least one reader to prevent this issue.
+func (s *State) SubscribeStorageRaw(keys []types.StorageKey) (
+	*rpc.ClientSubscription, <-chan types.StorageChangeSet, error) {
+	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
 
-// SubscribeStorageRaw subscribes the storage for the given keys, returning a subscription. Server notifications are
-// sent to the given channel. The element type of the channel must match the expected type of content returned by the subscription.
-//
-// The context argument cancels the RPC request that sets up the subscription but has no effect on the subscription after Subscribe has returned.
-//
-// Slow subscribers will be dropped eventually. Client buffers up to 20000 notifications before considering the subscriber dead. The subscription Err channel will receive ErrSubscriptionQueueOverflow. Use a sufficiently large buffer on the channel or ensure that the channel usually has at least one reader to prevent this issue.
-func (s *State) SubscribeStorageRaw(keys []types.StorageKey, c chan<- types.StorageChangeSet) (
-	*rpc.ClientSubscription, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
-	defer cancel()
+	c := make(chan types.StorageChangeSet)
 
 	keyss := make([]string, len(keys))
 	for i := range keys {
@@ -53,7 +45,8 @@ func (s *State) SubscribeStorageRaw(keys []types.StorageKey, c chan<- types.Stor
 
 	sub, err := (*s.client).Subscribe(ctx, "state", c, keyss)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return sub, nil
+
+	return sub, c, nil
 }

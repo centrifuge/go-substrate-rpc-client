@@ -97,44 +97,43 @@ func TestState_SubscribeStorage(t *testing.T) {
 
 	key := types.NewStorageKey(types.MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95c"))
 
-	c := make(chan types.StorageChangeSet)
-
-	_, err = api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key}, c)
+	_, c, err := api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key})
 	assert.NoError(t, err)
 
 	for {
 		fmt.Printf("%#v\n", <-c)
 	}
-	// runtimeVersion, err := api.RPC.State.GetRuntimeVersionLatest()
-	// assert.NoError(t, err)
-
-	// fmt.Printf("Connected to node %v | latest block hash: %v | authoringVersion: %v | specVersion: %v | "+
-	// 	"implVersion: %v\n", (*api.Client).URL(), hash.Hex(), runtimeVersion.AuthoringVersion,
-	// 	runtimeVersion.SpecVersion, runtimeVersion.ImplVersion)
 }
 
-// func TestGetEventsStorage(t *testing.T) {
-// 	if testing.Short() {
-// 		t.Skip("skipping end-to-end test in short mode.")
-// 	}
+func TestState_SubscribeStorage_Events(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping end-to-end test in short mode.")
+	}
 
-// 	api, err := gsrpc.NewSubstrateAPI(config.NewDefaultConfig().RPCURL)
-// 	assert.NoError(t, err)
+	api, err := gsrpc.NewSubstrateAPI(config.NewDefaultConfig().RPCURL)
+	assert.NoError(t, err)
 
-// 	meta, err := api.RPC.State.GetMetadataLatest()
-// 	assert.NoError(t, err)
+	meta, err := api.RPC.State.GetMetadataLatest()
+	assert.NoError(t, err)
 
-// 	key, err := types.CreateStorageKey(*meta, "System", "Events", nil)
-// 	assert.NoError(t, err)
+	key, err := types.CreateStorageKey(meta, "System", "Events", nil)
+	assert.NoError(t, err)
 
-// 	fmt.Println(key.Hex())
+	_, c, err := api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key})
+	assert.NoError(t, err)
 
-// 	hash, err := api.RPC.State.GetStorageRawLatest(key)
-// 	assert.NoError(t, err)
-// 	runtimeVersion, err := api.RPC.State.GetRuntimeVersionLatest()
-// 	assert.NoError(t, err)
+	for {
+		set := <-c
+		for _, chng := range set.Changes {
+			if !types.Eq(chng.StorageKey, key) || !chng.HasStorageData {
+				// skip, we are only interested in events with content
+				continue
+			}
+			events := types.EventRecords{}
+			err = types.EventRecordsRaw(chng.StorageData).DecodeEventRecords(meta, &events)
+			assert.NoError(t, err)
 
-// 	fmt.Printf("Connected to node %v | latest block hash: %v | authoringVersion: %v | specVersion: %v | "+
-// 		"implVersion: %v\n", (*api.Client).URL(), hash.Hex(), runtimeVersion.AuthoringVersion,
-// 		runtimeVersion.SpecVersion, runtimeVersion.ImplVersion)
-// }
+			fmt.Printf("%#v\n", events)
+		}
+	}
+}
