@@ -36,7 +36,7 @@ func TestMain(m *testing.M) {
 	}
 
 	cl, err := client.Connect(s.URL)
-	// cl, err := client.Connect(config.NewDefaultConfig().RPCURL)
+	// cl, err := client.Connect(config.Get().RPCURL)
 	// cl, err := client.Connect("ws://127.0.0.1:9944")
 	if err != nil {
 		panic(err)
@@ -146,7 +146,7 @@ type ChildStorageTrieTestVal struct {
 
 // mockSrv sets default data used in tests. This data might become stale when substrate is updated – just run the tests
 // against real servers and update the values stored here. To do that, replace s.URL with
-// config.NewDefaultConfig().RPCURL
+// config.Get().RPCURL
 var mockSrv = MockSrv{
 	blockHashLatest:          types.Hash{1, 2, 3},
 	metadata:                 types.ExamplaryMetadataV4,

@@ -19,9 +19,9 @@ package state
 import (
 	"context"
 	"sync"
-	"time"
 
 	gethrpc "github.com/centrifuge/go-substrate-rpc-client/gethrpc"
+	"github.com/centrifuge/go-substrate-rpc-client/config"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
@@ -68,7 +68,7 @@ func (s *Subscription) Unsubscribe() {
 // large buffer on the channel or ensure that the channel usually has at least one reader to prevent this issue.
 func (s *State) SubscribeStorageRaw(keys []types.StorageKey) (
 	*Subscription, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), config.Get().SubscribeTimeout)
 	defer cancel()
 
 	c := make(chan types.StorageChangeSet)
