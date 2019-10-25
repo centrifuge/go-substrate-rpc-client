@@ -18,6 +18,7 @@ package config
 
 import (
 	"os"
+	"sync"
 	"time"
 )
 
@@ -30,10 +31,18 @@ type Config struct {
 }
 
 var config *Config = nil
+var lock sync.Mutex
 
 // Get returns the current config. If it is called the first time, it populates the config with default values.
 // Default values can be overwritten with env variables, most importantly RPC_URL for a custom endpoint.
 func Get() Config {
+	if config != nil {
+		return *config
+	}
+
+	lock.Lock()
+	defer lock.Unlock()
+
 	if config != nil {
 		return *config
 	}
