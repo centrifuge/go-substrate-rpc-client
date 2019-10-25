@@ -22,12 +22,12 @@ import (
 	"time"
 
 	"github.com/centrifuge/go-substrate-rpc-client/types"
-	"github.com/ethereum/go-ethereum/rpc"
+	gethrpc "github.com/centrifuge/go-substrate-rpc-client/gethrpc"
 )
 
 // Subscription is a subscription established through one of the Client's subscribe methods.
 type Subscription struct {
-	sub      *rpc.ClientSubscription
+	sub      *gethrpc.ClientSubscription
 	channel  chan types.StorageChangeSet
 	quitOnce sync.Once // ensures quit is closed once
 }

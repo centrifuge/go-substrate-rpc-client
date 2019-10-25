@@ -16,31 +16,24 @@
 
 package state
 
-import (
-	"testing"
+// func TestState_SubscribeStorage(t *testing.T) {
+// 	meta, err := state.GetMetadataLatest()
+// 	assert.NoError(t, err)
 
-	"github.com/centrifuge/go-substrate-rpc-client/types"
-	"github.com/stretchr/testify/assert"
-)
+// 	key, err := types.CreateStorageKey(meta, "System", "Events", nil)
+// 	assert.NoError(t, err)
 
-func TestState_SubscribeStorage(t *testing.T) {
-	meta, err := state.GetMetadataLatest()
-	assert.NoError(t, err)
+// 	_, err = state.SubscribeStorageRaw([]types.StorageKey{key})
+// 	assert.NoError(t, err)
 
-	key, err := types.CreateStorageKey(meta, "System", "Events", nil)
-	assert.NoError(t, err)
+// 	// TODO
+// 	// sub.Unsubscribe()
 
-	_, err = state.SubscribeStorageRaw([]types.StorageKey{key})
-	assert.NoError(t, err)
+// 	// test channel is closed
+// 	// _, ok := <-sub.Chan()
 
-	// TODO
-	// sub.Unsubscribe()
+// 	// assert.True(t, ok)
 
-	// test channel is closed
-	// _, ok := <-sub.Chan()
-
-	// assert.True(t, ok)
-
-	// assert.Equal(t, )
-	// fmt.Printf("%#v\n", <-c)
-}
+// 	// assert.Equal(t, )
+// 	// fmt.Printf("%#v\n", <-c)
+// }
