@@ -19,6 +19,7 @@ package teste2e
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/centrifuge/go-substrate-rpc-client/config"
@@ -87,7 +88,7 @@ func TestEnd2end(t *testing.T) {
 	fmt.Println()
 }
 
-func TestState_SubscribeStorage(t *testing.T) {
+func TestState_SubscribeStorage_EventsRaw(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping end-to-end test in short mode.")
 	}
@@ -97,11 +98,18 @@ func TestState_SubscribeStorage(t *testing.T) {
 
 	key := types.NewStorageKey(types.MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95c"))
 
-	_, c, err := api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key})
+	sub, err := api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key})
 	assert.NoError(t, err)
 
+	timeout := time.After(10 * time.Second)
+
 	for {
-		fmt.Printf("%#v\n", <-c)
+		select {
+		case set := <-sub.Chan():
+			fmt.Printf("%#v\n", set)
+		case <-timeout:
+			return // TODO unsubscribe/cleanup
+		}
 	}
 }
 
@@ -119,21 +127,28 @@ func TestState_SubscribeStorage_Events(t *testing.T) {
 	key, err := types.CreateStorageKey(meta, "System", "Events", nil)
 	assert.NoError(t, err)
 
-	_, c, err := api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key})
+	sub, err := api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key})
 	assert.NoError(t, err)
 
-	for {
-		set := <-c
-		for _, chng := range set.Changes {
-			if !types.Eq(chng.StorageKey, key) || !chng.HasStorageData {
-				// skip, we are only interested in events with content
-				continue
-			}
-			events := types.EventRecords{}
-			err = types.EventRecordsRaw(chng.StorageData).DecodeEventRecords(meta, &events)
-			assert.NoError(t, err)
+	timeout := time.After(10 * time.Second)
 
-			fmt.Printf("%#v\n", events)
+	for {
+		select {
+		case set := <-sub.Chan():
+			fmt.Printf("%#v\n", set)
+			for _, chng := range set.Changes {
+				if !types.Eq(chng.StorageKey, key) || !chng.HasStorageData {
+					// skip, we are only interested in events with content
+					continue
+				}
+				events := types.EventRecords{}
+				err = types.EventRecordsRaw(chng.StorageData).DecodeEventRecords(meta, &events)
+				assert.NoError(t, err)
+
+				fmt.Printf("%#v\n", events)
+			}
+		case <-timeout:
+			return // TODO unsubscribe/cleanup
 		}
 	}
 }

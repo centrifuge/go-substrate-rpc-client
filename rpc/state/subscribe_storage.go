@@ -1,30 +1,64 @@
 // Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
-// Copyright (C) 2019  Centrifuge GmbH
 //
-// This file is part of Go Substrate RPC Client (GSRPC).
+// Copyright 2019 Centrifuge GmbH
 //
-// GSRPC is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// GSRPC is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package state
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/ethereum/go-ethereum/rpc"
 )
+
+// Subscription is a subscription established through one of the Client's subscribe methods.
+type Subscription struct {
+	sub      *rpc.ClientSubscription
+	channel  chan types.StorageChangeSet
+	quitOnce sync.Once // ensures quit is closed once
+}
+
+// Chan returns the subscription channel.
+//
+// The channel is closed when Unsubscribe is called on the subscription.
+func (s *Subscription) Chan() <-chan types.StorageChangeSet {
+	return s.channel
+}
+
+// Err returns the subscription error channel. The intended use of Err is to schedule
+// resubscription when the client connection is closed unexpectedly.
+//
+// The error channel receives a value when the subscription has ended due
+// to an error. The received error is nil if Close has been called
+// on the underlying client and no other error has occurred.
+//
+// The error channel is closed when Unsubscribe is called on the subscription.
+func (s *Subscription) Err() <-chan error {
+	return s.Err()
+}
+
+// Unsubscribe unsubscribes the notification and closes the error channel.
+// It can safely be called more than once.
+func (s *Subscription) Unsubscribe() {
+	s.sub.Unsubscribe()
+	s.quitOnce.Do(func() {
+		close(s.channel)
+	})
+}
 
 // SubscribeStorageRaw subscribes the storage for the given keys, returning a subscription and a channel that will
 // receive server notifications containing the storage change sets.
@@ -33,7 +67,7 @@ import (
 // subscriber dead. The subscription Err channel will receive ErrSubscriptionQueueOverflow. Use a sufficiently
 // large buffer on the channel or ensure that the channel usually has at least one reader to prevent this issue.
 func (s *State) SubscribeStorageRaw(keys []types.StorageKey) (
-	*rpc.ClientSubscription, <-chan types.StorageChangeSet, error) {
+	*Subscription, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
 
 	c := make(chan types.StorageChangeSet)
@@ -45,8 +79,8 @@ func (s *State) SubscribeStorageRaw(keys []types.StorageKey) (
 
 	sub, err := (*s.client).Subscribe(ctx, "state", c, keyss)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return sub, c, nil
+	return &Subscription{sub: sub, channel: c}, nil
 }
