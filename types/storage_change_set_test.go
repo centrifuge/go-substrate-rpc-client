@@ -35,12 +35,12 @@ func TestStorageChangeSet_UnmarshalMarshalJSON(t *testing.T) {
 	assert.Equal(t, StorageChangeSet{
 		Block: NewHash([]byte{0xa2, 0x30, 0xd0, 0xb6, 0xdc, 0x75, 0x86, 0x82, 0x37, 0xb0, 0x8d, 0x71, 0x61, 0x8f, 0x3d, 0x19, 0x52, 0x6b, 0x8a, 0xa3, 0x46, 0xd9, 0x4c, 0x79, 0x2a, 0x4f, 0xce, 0xa, 0x94, 0x5b, 0x1e, 0x3f}), //nolint:lll
 		Changes: []KeyValueOption{
-			KeyValueOption{
+			{
 				StorageKey:     MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95c"),
 				HasStorageData: true,
 				StorageData:    MustHexDecodeString("0x0800000000000000000001000000000000"),
 			},
-			KeyValueOption{
+			{
 				StorageKey:     MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95d"),
 				HasStorageData: false,
 			},

@@ -21,8 +21,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/centrifuge/go-substrate-rpc-client/types"
 	gethrpc "github.com/centrifuge/go-substrate-rpc-client/gethrpc"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
 // Subscription is a subscription established through one of the Client's subscribe methods.
@@ -48,7 +48,7 @@ func (s *Subscription) Chan() <-chan types.StorageChangeSet {
 //
 // The error channel is closed when Unsubscribe is called on the subscription.
 func (s *Subscription) Err() <-chan error {
-	return s.Err()
+	return s.sub.Err()
 }
 
 // Unsubscribe unsubscribes the notification and closes the error channel.
@@ -68,7 +68,8 @@ func (s *Subscription) Unsubscribe() {
 // large buffer on the channel or ensure that the channel usually has at least one reader to prevent this issue.
 func (s *State) SubscribeStorageRaw(keys []types.StorageKey) (
 	*Subscription, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
+	defer cancel()
 
 	c := make(chan types.StorageChangeSet)
 

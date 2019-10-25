@@ -21,8 +21,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/centrifuge/go-substrate-rpc-client/types"
 	gethrpc "github.com/centrifuge/go-substrate-rpc-client/gethrpc"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
 type Client interface {
@@ -77,7 +77,8 @@ func (c client) URL() string {
 func Connect(url string) (Client, error) {
 	log.Printf("Connecting to %v...", url)
 
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
 	c, err := gethrpc.DialContext(ctx, url)
 	if err != nil {
