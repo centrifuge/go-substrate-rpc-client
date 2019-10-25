@@ -35,8 +35,9 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	cl, err := client.Connect(s.URL)
+	// cl, err := client.Connect(s.URL)
 	// cl, err := client.Connect(config.NewDefaultConfig().RPCURL)
+	cl, err := client.Connect("ws://127.0.0.1:9944")
 	if err != nil {
 		panic(err)
 	}
@@ -132,6 +133,10 @@ func (s *MockSrv) GetChildStorageHash(childStorageKey, key string, hash *string)
 	}
 	return mockSrv.childStorageTrieHashHex
 }
+
+// func (s *MockSrv) SubscribeStorage(args []string) {
+// 	fmt.Println("Hit")
+// }
 
 type ChildStorageTrieTestVal struct {
 	Key     types.Hash
