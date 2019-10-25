@@ -32,9 +32,9 @@ import (
 const (
 	vsn                      = "2.0"
 	serviceMethodSeparator   = "_"
-	subscribeMethodSuffix    = "_subscribe"
-	unsubscribeMethodSuffix  = "_unsubscribe"
-	notificationMethodSuffix = "_subscription"
+	subscribeMethodSuffix    = "_subscribeStorage"
+	unsubscribeMethodSuffix  = "_unsubscribe" // TODO
+	notificationMethodSuffix = "_storage"
 
 	defaultWriteTimeout = 10 * time.Second // used if context has no deadline
 )
@@ -42,7 +42,7 @@ const (
 var null = json.RawMessage("null")
 
 type subscriptionResult struct {
-	ID     string          `json:"subscription"`
+	ID     int             `json:"subscription"`
 	Result json.RawMessage `json:"result,omitempty"`
 }
 

@@ -19,6 +19,7 @@ package rpc
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -254,8 +255,9 @@ func (h *handler) handleSubscriptionResult(msg *jsonrpcMessage) {
 		h.log.Debug("Dropping invalid subscription message")
 		return
 	}
-	if h.clientSubs[result.ID] != nil {
-		h.clientSubs[result.ID].deliver(result.Result)
+	resultID := fmt.Sprint(result.ID)
+	if h.clientSubs[resultID] != nil {
+		h.clientSubs[resultID].deliver(result.Result)
 	}
 }
 
@@ -280,7 +282,9 @@ func (h *handler) handleResponse(msg *jsonrpcMessage) {
 		op.err = msg.Error
 		return
 	}
-	if op.err = json.Unmarshal(msg.Result, &op.sub.subid); op.err == nil {
+	var subid int
+	if op.err = json.Unmarshal(msg.Result, &subid); op.err == nil {
+		op.sub.subid = fmt.Sprintf("%v", subid)
 		go op.sub.start()
 		h.clientSubs[op.sub.subid] = op.sub
 	}
