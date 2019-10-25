@@ -20,8 +20,8 @@ import (
 	"context"
 	"sync"
 
-	gethrpc "github.com/centrifuge/go-substrate-rpc-client/gethrpc"
 	"github.com/centrifuge/go-substrate-rpc-client/config"
+	gethrpc "github.com/centrifuge/go-substrate-rpc-client/gethrpc"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
