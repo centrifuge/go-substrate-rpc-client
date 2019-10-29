@@ -50,7 +50,7 @@ func Example_simpleConnect() {
 // 	}
 // 	defer close()
 
-// 	// see https://godoc.org/github.com/ethereum/go-ethereum/rpc for more details
+// 	// see gethrpc for more details
 
 // 	count := 0
 
