@@ -31,7 +31,7 @@ func (c *Chain) GetHeaderLatest() (*types.Header, error) {
 
 func (c *Chain) getHeader(blockHash *types.Hash) (*types.Header, error) {
 	var Header types.Header
-	err := client.CallWithBlockHash(*c.client, &Header, "chain_getHeader", blockHash)
+	err := client.CallWithBlockHash(c.client, &Header, "chain_getHeader", blockHash)
 	if err != nil {
 		return nil, err
 	}

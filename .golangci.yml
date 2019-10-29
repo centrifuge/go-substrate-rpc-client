@@ -63,6 +63,10 @@ issues:
     - path: types/storage_data_raw_test.go
       linters:
         - dupl
+    - path: types/metadata_examplary.go
+      linters:
+        - dupl
+        - golint
     - path: doc.go
       linters:
         - lll

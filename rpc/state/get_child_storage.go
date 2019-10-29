@@ -55,7 +55,7 @@ func (s *State) GetChildStorageRawLatest(childStorageKey, key types.StorageKey) 
 func (s *State) getChildStorageRaw(childStorageKey, key types.StorageKey, blockHash *types.Hash) (
 	*types.StorageDataRaw, error) {
 	var res string
-	err := client.CallWithBlockHash(*s.client, &res, "state_getChildStorage", blockHash, childStorageKey.Hex(),
+	err := client.CallWithBlockHash(s.client, &res, "state_getChildStorage", blockHash, childStorageKey.Hex(),
 		key.Hex())
 	if err != nil {
 		return nil, err

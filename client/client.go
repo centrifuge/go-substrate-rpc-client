@@ -20,22 +20,25 @@ import (
 	"context"
 	"log"
 
+	"github.com/centrifuge/go-substrate-rpc-client/config"
+	gethrpc "github.com/centrifuge/go-substrate-rpc-client/gethrpc"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
-	"github.com/ethereum/go-ethereum/rpc"
 )
 
 type Client interface {
 	Call(result interface{}, method string, args ...interface{}) error
 
 	Subscribe(ctx context.Context, namespace string, channel interface{}, args ...interface{}) (
-		*rpc.ClientSubscription, error)
+		*gethrpc.ClientSubscription, error)
 
 	URL() string
 	//MetaData(cache bool) (*MetadataVersioned, error)
 }
 
 type client struct {
-	*rpc.Client
+	gethrpc.Client
+
+	ctx context.Context
 
 	url string
 
@@ -73,11 +76,15 @@ func (c client) URL() string {
 // Connect connects to the provided url
 func Connect(url string) (Client, error) {
 	log.Printf("Connecting to %v...", url)
-	c, err := rpc.Dial(url)
+
+	ctx, cancel := context.WithTimeout(context.Background(), config.Default().DialTimeout)
+	defer cancel()
+
+	c, err := gethrpc.DialContext(ctx, url)
 	if err != nil {
 		return nil, err
 	}
-	cc := client{c, url}
+	cc := client{*c, ctx, url}
 	return &cc, nil
 }
 

@@ -19,7 +19,7 @@ package rpcmocksrv
 import (
 	"testing"
 
-	"github.com/ethereum/go-ethereum/rpc"
+	gethrpc "github.com/centrifuge/go-substrate-rpc-client/gethrpc"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -37,7 +37,7 @@ func TestServer(t *testing.T) {
 	err := s.RegisterName("testserv3", ts)
 	assert.NoError(t, err)
 
-	c, err := rpc.Dial(s.URL)
+	c, err := gethrpc.Dial(s.URL)
 	assert.NoError(t, err)
 
 	var res string

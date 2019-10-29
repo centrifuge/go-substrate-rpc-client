@@ -33,7 +33,7 @@ func (s *State) GetStorageHashLatest(key types.StorageKey) (types.Hash, error) {
 
 func (s *State) getStorageHash(key types.StorageKey, blockHash *types.Hash) (types.Hash, error) {
 	var res string
-	err := client.CallWithBlockHash(*s.client, &res, "state_getStorageHash", blockHash, key.Hex())
+	err := client.CallWithBlockHash(s.client, &res, "state_getStorageHash", blockHash, key.Hex())
 	if err != nil {
 		return types.Hash{}, err
 	}

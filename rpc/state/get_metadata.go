@@ -31,7 +31,7 @@ func (s *State) GetMetadataLatest() (*types.Metadata, error) {
 
 func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
 	var res string
-	err := client.CallWithBlockHash(*s.client, &res, "state_getMetadata", blockHash)
+	err := client.CallWithBlockHash(s.client, &res, "state_getMetadata", blockHash)
 	if err != nil {
 		return nil, err
 	}

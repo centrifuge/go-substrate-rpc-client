@@ -33,7 +33,7 @@ func (s *State) GetStorageSizeLatest(key types.StorageKey) (types.U64, error) {
 
 func (s *State) getStorageSize(key types.StorageKey, blockHash *types.Hash) (types.U64, error) {
 	var res types.U64
-	err := client.CallWithBlockHash(*s.client, &res, "state_getStorageSize", blockHash, key.Hex())
+	err := client.CallWithBlockHash(s.client, &res, "state_getStorageSize", blockHash, key.Hex())
 	if err != nil {
 		return 0, err
 	}

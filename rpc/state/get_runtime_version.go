@@ -31,7 +31,7 @@ func (s *State) GetRuntimeVersionLatest() (*types.RuntimeVersion, error) {
 
 func (s *State) getRuntimeVersion(blockHash *types.Hash) (*types.RuntimeVersion, error) {
 	var runtimeVersion types.RuntimeVersion
-	err := client.CallWithBlockHash(*s.client, &runtimeVersion, "state_getRuntimeVersion", blockHash)
+	err := client.CallWithBlockHash(s.client, &runtimeVersion, "state_getRuntimeVersion", blockHash)
 	if err != nil {
 		return nil, err
 	}

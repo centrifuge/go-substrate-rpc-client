@@ -14,24 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rpc
+package state
 
-import (
-	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/state"
-)
+// func TestState_SubscribeStorage(t *testing.T) {
+// 	meta, err := state.GetMetadataLatest()
+// 	assert.NoError(t, err)
 
-type RPC struct {
-	Chain  *chain.Chain
-	State  *state.State
-	client client.Client
-}
+// 	key, err := types.CreateStorageKey(meta, "System", "Events", nil)
+// 	assert.NoError(t, err)
 
-func NewRPC(cl client.Client) *RPC {
-	return &RPC{
-		Chain:  chain.NewChain(cl),
-		State:  state.NewState(cl),
-		client: cl,
-	}
-}
+// 	_, err = state.SubscribeStorageRaw([]types.StorageKey{key})
+// 	assert.NoError(t, err)
+
+// 	// TODO
+// 	// sub.Unsubscribe()
+
+// 	// test channel is closed
+// 	// _, ok := <-sub.Chan()
+
+// 	// assert.True(t, ok)
+
+// 	// assert.Equal(t, )
+// 	// fmt.Printf("%#v\n", <-c)
+// }

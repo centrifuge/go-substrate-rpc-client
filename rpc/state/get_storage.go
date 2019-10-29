@@ -51,7 +51,7 @@ func (s *State) GetStorageRawLatest(key types.StorageKey) (*types.StorageDataRaw
 
 func (s *State) getStorageRaw(key types.StorageKey, blockHash *types.Hash) (*types.StorageDataRaw, error) {
 	var res string
-	err := client.CallWithBlockHash(*s.client, &res, "state_getStorage", blockHash, key.Hex())
+	err := client.CallWithBlockHash(s.client, &res, "state_getStorage", blockHash, key.Hex())
 	if err != nil {
 		return nil, err
 	}

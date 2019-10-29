@@ -21,11 +21,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ethereum/go-ethereum/rpc"
+	gethrpc "github.com/centrifuge/go-substrate-rpc-client/gethrpc"
 )
 
 type Server struct {
-	*rpc.Server
+	*gethrpc.Server
 	// Host consists of hostname and port
 	Host string
 	// URL consists of protocol, hostname and port
@@ -37,7 +37,7 @@ func New() *Server {
 	port := randomPort()
 	host := "localhost:" + strconv.Itoa(port)
 
-	_, rpcServ, err := rpc.StartWSEndpoint(host, []rpc.API{}, []string{}, []string{"*"}, true)
+	_, rpcServ, err := gethrpc.StartWSEndpoint(host, []gethrpc.API{}, []string{}, []string{"*"}, true)
 	if err != nil {
 		panic(err)
 	}

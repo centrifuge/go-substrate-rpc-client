@@ -104,7 +104,7 @@ func TestSubscriptions(t *testing.T) {
 		case confirmation := <-successes: // subscription created
 			subids[namespaces[confirmation.reqid]] = string(confirmation.subid)
 		case notification := <-notifications:
-			count[notification.ID]++
+			count[fmt.Sprint(notification.ID)]++
 		case err := <-errors:
 			t.Fatal(err)
 		case <-timeout:

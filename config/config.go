@@ -16,29 +16,36 @@
 
 package config
 
-import "os"
+import (
+	"os"
+	"time"
+)
 
 type Config struct {
 	RPCURL string
+
+	// Timeouts
+	DialTimeout      time.Duration
+	SubscribeTimeout time.Duration
 }
 
-// NewDefaultConfig returns a new config with default values. Default values can be overwritten with env variables,
-// most importantly RPC_URL for a custom endpoint.
-// TODO: rewrite as init function
-func NewDefaultConfig() Config {
-	c := Config{}
-	c.ExtractDefaultRPCURL()
-	return c
+// DefaultConfig returns the default config. Default values can be overwritten with env variables, most importantly
+// RPC_URL for a custom RPC endpoint.
+func Default() Config {
+	return Config{
+		RPCURL:           extractDefaultRPCURL(),
+		DialTimeout:      10 * time.Second,
+		SubscribeTimeout: 5 * time.Second,
+	}
 }
 
-// ExtractDefaultRPCURL reads the env variable RPC_URL and sets it in the config. If that variable is unset or empty,
+// ExtractDefaultRPCURL reads the env variable RPC_URL and returns it. If that variable is unset or empty,
 // it will fallback to "http://127.0.0.1:9933"
-func (c *Config) ExtractDefaultRPCURL() {
+func extractDefaultRPCURL() string {
 	if url, ok := os.LookupEnv("RPC_URL"); ok {
-		c.RPCURL = url
-		return
+		return url
 	}
 
 	// Fallback
-	c.RPCURL = "ws://127.0.0.1:9944"
+	return "ws://127.0.0.1:9944"
 }

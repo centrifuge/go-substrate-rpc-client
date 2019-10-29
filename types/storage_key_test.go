@@ -20,7 +20,6 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -39,7 +38,7 @@ func TestCreateStorageKey(t *testing.T) {
 }
 
 func TestCreateStorageKey2(t *testing.T) {
-	b, _ := hexutil.Decode(AlicePubKey)
+	b := MustHexDecodeString(AlicePubKey)
 	m := ExamplaryMetadataV4
 	key, err := CreateStorageKey(m, "System", "AccountNonce", b)
 	assert.NoError(t, err)
@@ -49,7 +48,7 @@ func TestCreateStorageKey2(t *testing.T) {
 }
 
 func TestCreateStorageKey_MetadataV4(t *testing.T) {
-	b, _ := hexutil.Decode(AlicePubKey)
+	b := MustHexDecodeString(AlicePubKey)
 	m := ExamplaryMetadataV4
 	key, err := CreateStorageKey(m, "Balances", "FreeBalance", b)
 	assert.NoError(t, err)
