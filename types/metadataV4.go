@@ -51,7 +51,7 @@ func (m *MetadataV4) FindCallIndex(call string) (CallIndex, error) {
 	s := strings.Split(call, ".")
 	mi := uint8(0)
 	for _, mod := range m.Modules {
-		if !mod.HasEvents {
+		if !mod.HasCalls {
 			continue
 		}
 		if string(mod.Name) != s[0] {
@@ -81,7 +81,7 @@ func (m *MetadataV4) FindEventNamesForEventID(eventID EventID) (Text, Text, erro
 		if int(eventID[1]) >= len(mod.Events) {
 			return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], mod.Name)
 		}
-		return mod.Name, mod.Events[eventID[1]].Name, nil
+		return mod.Prefix, mod.Events[eventID[1]].Name, nil
 	}
 	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
 }

@@ -49,7 +49,7 @@ func (m *MetadataV8) FindCallIndex(call string) (CallIndex, error) {
 	s := strings.Split(call, ".")
 	mi := uint8(0)
 	for _, mod := range m.Modules {
-		if !mod.HasEvents {
+		if !mod.HasCalls {
 			continue
 		}
 		if string(mod.Name) != s[0] {

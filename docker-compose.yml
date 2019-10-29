@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   substrate:
-    image: parity/substrate:latest
+    image: parity/substrate:2.0.0-0b2606e91
     ports:
       - 9933:9933
       - 9944:9944
