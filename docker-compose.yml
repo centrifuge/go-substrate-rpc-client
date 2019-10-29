@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   substrate:
-    image: parity/substrate:latest-v1.0
+    image: parity/substrate:latest
     ports:
       - 9933:9933
       - 9944:9944
@@ -13,14 +13,14 @@ services:
     networks:
       gsrpc-network:
         ipv4_address: 172.42.0.2
-    command: --dev --ws-external --rpc-external
+    command: --dev --rpc-external --ws-external
   gsrpc-test:
     build: .
     networks:
       gsrpc-network:
         ipv4_address: 172.42.0.99
     environment:
-      - RPC_URL=http://172.42.0.2:9933
+      - RPC_URL=ws://172.42.0.2:9944
     volumes:
       - "$PWD/shared:/go/src/github.com/centrifuge/go-substrate-rpc-client/shared"
 networks:
