@@ -77,7 +77,7 @@ func (c client) URL() string {
 func Connect(url string) (Client, error) {
 	log.Printf("Connecting to %v...", url)
 
-	ctx, cancel := context.WithTimeout(context.Background(), config.Get().DialTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), config.Default().DialTimeout)
 	defer cancel()
 
 	c, err := gethrpc.DialContext(ctx, url)

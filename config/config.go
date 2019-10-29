@@ -18,7 +18,6 @@ package config
 
 import (
 	"os"
-	"sync"
 	"time"
 )
 
@@ -30,34 +29,19 @@ type Config struct {
 	SubscribeTimeout time.Duration
 }
 
-var config *Config = nil
-var lock sync.Mutex
-
-// Get returns the current config. If it is called the first time, it populates the config with default values.
-// Default values can be overwritten with env variables, most importantly RPC_URL for a custom endpoint.
-func Get() Config {
-	if config != nil {
-		return *config
-	}
-
-	lock.Lock()
-	defer lock.Unlock()
-
-	if config != nil {
-		return *config
-	}
-
-	config = &Config{
-		RPCURL:           ExtractDefaultRPCURL(),
+// DefaultConfig returns the default config. Default values can be overwritten with env variables, most importantly
+// RPC_URL for a custom RPC endpoint.
+func Default() Config {
+	return Config{
+		RPCURL:           extractDefaultRPCURL(),
 		DialTimeout:      10 * time.Second,
 		SubscribeTimeout: 5 * time.Second,
 	}
-	return *config
 }
 
 // ExtractDefaultRPCURL reads the env variable RPC_URL and returns it. If that variable is unset or empty,
 // it will fallback to "http://127.0.0.1:9933"
-func ExtractDefaultRPCURL() string {
+func extractDefaultRPCURL() string {
 	if url, ok := os.LookupEnv("RPC_URL"); ok {
 		return url
 	}

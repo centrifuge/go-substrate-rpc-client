@@ -24,7 +24,7 @@ import (
 )
 
 func Example_simpleConnect() {
-	api, err := gsrpc.NewSubstrateAPI(config.Get().RPCURL)
+	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
 	if err != nil {
 		panic(err)
 	}
@@ -39,7 +39,7 @@ func Example_simpleConnect() {
 
 // TODO: add example for listening to new blocks
 // func Example_listenToNewBlocks() {
-// 	api, err := gsrpc.NewSubstrateAPI(config.Get().RPCURL)
+// 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
 // 	if err != nil {
 // 		panic(err)
 // 	}
