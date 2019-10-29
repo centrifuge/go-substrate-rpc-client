@@ -26,12 +26,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-func TestState_SubscribeExtrinsic(t *testing.T) {
+func TestChain_SubmitExtrinsic(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping end-to-end test in short mode.")
 	}
 
-	api, err := gsrpc.NewSubstrateAPI(config.Get().RPCURL)
+	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
 	if err != nil {
 		panic(err)
 	}
