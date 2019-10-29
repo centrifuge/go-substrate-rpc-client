@@ -33,9 +33,9 @@ func (c *Chain) getBlockHash(blockNumber *uint64) (types.Hash, error) {
 	var err error
 
 	if blockNumber == nil {
-		err = (*c.client).Call(&res, "chain_getBlockHash")
+		err = c.client.Call(&res, "chain_getBlockHash")
 	} else {
-		err = (*c.client).Call(&res, "chain_getBlockHash", *blockNumber)
+		err = c.client.Call(&res, "chain_getBlockHash", *blockNumber)
 	}
 
 	if err != nil {

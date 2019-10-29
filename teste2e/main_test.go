@@ -36,7 +36,7 @@ func TestEnd2end(t *testing.T) {
 	assert.NoError(t, err)
 
 	fmt.Println()
-	fmt.Printf("Connected to node: %v\n", (*api.Client).URL())
+	fmt.Printf("Connected to node: %v\n", api.Client.URL())
 	fmt.Println()
 
 	runtimeVersion, err := api.RPC.State.GetRuntimeVersionLatest()

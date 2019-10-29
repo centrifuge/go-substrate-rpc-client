@@ -41,7 +41,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	state = NewState(&cl)
+	state = NewState(cl)
 
 	os.Exit(m.Run())
 }

@@ -33,7 +33,7 @@ func (s *State) GetKeysLatest(prefix types.StorageKey) ([]types.StorageKey, erro
 
 func (s *State) getKeys(prefix types.StorageKey, blockHash *types.Hash) ([]types.StorageKey, error) {
 	var res []string
-	err := client.CallWithBlockHash(*s.client, &res, "state_getKeys", blockHash, prefix.Hex())
+	err := client.CallWithBlockHash(s.client, &res, "state_getKeys", blockHash, prefix.Hex())
 	if err != nil {
 		return nil, err
 	}

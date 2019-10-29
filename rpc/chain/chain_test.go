@@ -39,7 +39,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	chain = NewChain(&cl)
+	chain = NewChain(cl)
 
 	os.Exit(m.Run())
 }

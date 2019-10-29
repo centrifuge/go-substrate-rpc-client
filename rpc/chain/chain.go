@@ -21,9 +21,9 @@ import (
 )
 
 type Chain struct {
-	client *client.Client
+	client client.Client
 }
 
-func NewChain(cl *client.Client) *Chain {
+func NewChain(cl client.Client) *Chain {
 	return &Chain{cl}
 }

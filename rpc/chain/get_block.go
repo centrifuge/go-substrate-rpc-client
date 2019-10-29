@@ -31,7 +31,7 @@ func (c *Chain) GetBlockLatest() (*types.SignedBlock, error) {
 
 func (c *Chain) getBlock(blockHash *types.Hash) (*types.SignedBlock, error) {
 	var SignedBlock types.SignedBlock
-	err := client.CallWithBlockHash(*c.client, &SignedBlock, "chain_getBlock", blockHash)
+	err := client.CallWithBlockHash(c.client, &SignedBlock, "chain_getBlock", blockHash)
 	if err != nil {
 		return nil, err
 	}

@@ -23,7 +23,7 @@ import (
 func (c *Chain) GetFinalizedHead() (types.Hash, error) {
 	var res string
 
-	err := (*c.client).Call(&res, "chain_getFinalizedHead")
+	err := c.client.Call(&res, "chain_getFinalizedHead")
 	if err != nil {
 		return types.Hash{}, err
 	}

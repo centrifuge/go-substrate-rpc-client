@@ -23,7 +23,7 @@ import (
 
 type SubstrateAPI struct {
 	RPC    *rpc.RPC
-	Client *client.Client
+	Client client.Client
 }
 
 func NewSubstrateAPI(url string) (*SubstrateAPI, error) {
@@ -32,10 +32,8 @@ func NewSubstrateAPI(url string) (*SubstrateAPI, error) {
 		return nil, err
 	}
 
-	clPtr := &cl
-
 	return &SubstrateAPI{
-		RPC:    rpc.NewRPC(clPtr),
-		Client: clPtr,
+		RPC:    rpc.NewRPC(cl),
+		Client: cl,
 	}, nil
 }

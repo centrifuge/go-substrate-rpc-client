@@ -36,7 +36,7 @@ type Client interface {
 }
 
 type client struct {
-	*gethrpc.Client
+	gethrpc.Client
 
 	ctx context.Context
 
@@ -84,7 +84,7 @@ func Connect(url string) (Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	cc := client{c, ctx, url}
+	cc := client{*c, ctx, url}
 	return &cc, nil
 }
 

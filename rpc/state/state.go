@@ -21,9 +21,9 @@ import (
 )
 
 type State struct {
-	client *client.Client
+	client client.Client
 }
 
-func NewState(c *client.Client) *State {
+func NewState(c client.Client) *State {
 	return &State{c}
 }
