@@ -33,7 +33,7 @@ const (
 	vsn                      = "2.0"
 	serviceMethodSeparator   = "_"
 	subscribeMethodSuffix    = "_subscribeStorage"
-	unsubscribeMethodSuffix  = "_unsubscribe" // TODO
+	unsubscribeMethodSuffix  = "_unsubscribeStorage"
 	notificationMethodSuffix = "_storage"
 
 	defaultWriteTimeout = 10 * time.Second // used if context has no deadline

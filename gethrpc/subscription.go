@@ -170,7 +170,7 @@ func (n *Notifier) activate() error {
 }
 
 func (n *Notifier) send(sub *Subscription, data json.RawMessage) error {
-	params, _ := json.Marshal(&subscriptionResult{ID: 1, Result: data}) // TODO
+	params, _ := json.Marshal(&subscriptionResult{ID: 1, Result: data}) // TODO use sub.ID instead
 	ctx := context.Background()
 	return n.h.conn.Write(ctx, &jsonrpcMessage{
 		Version: vsn,
