@@ -69,3 +69,5 @@ issues:
     - path: types/example_tuple_test.go
       linters:
         - lll
+    - path: gethrpc
+      text: ".*"

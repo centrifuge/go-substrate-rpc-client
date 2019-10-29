@@ -30,12 +30,12 @@ lint: 				## runs linters on go code
 lint-fix: 			## runs linters on go code and automatically fixes issues
 	@golangci-lint run --fix
 
-test: 				## runs all tests in project against the RPC URL specified in the RPC_URL env variable or localhost
-	@go test -v -race ./...
+test: 				## runs all tests in project against the RPC URL specified in the RPC_URL env variable or localhost while excluding gethrpc
+	@go test -v -race `go list ./... | grep -v '/gethrpc'`
 
 test-cover: 			## runs all tests in project against the RPC URL specified in the RPC_URL env variable
                                 ## or localhost and report coverage
-	@go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+	@go test -v -race -coverprofile=coverage.txt -covermode=atomic `go list ./... | grep -v '/gethrpc'`
 	@mv coverage.txt shared
 
 test-dockerized: 		## runs all tests in a docker container against the Substrate Default Docker image
