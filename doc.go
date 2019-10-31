@@ -30,6 +30,10 @@ and run any of the provided RPC methods from the api:
 
 Further examples can be found below.
 
+Signing extrinsics
+
+In order to sign extrinsics, you need to have [subkey](https://github.com/paritytech/substrate/tree/master/subkey) installed. Please make sure that you use subkey in the version of your relay chain.
+
 Types
 
 The package [types](https://godoc.org/github.com/centrifuge/go-substrate-rpc-client/types/) exports a number

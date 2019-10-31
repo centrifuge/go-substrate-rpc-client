@@ -14,28 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package chain
+package author
 
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-// GetHeader retrieves the header for the specific block
-func (c *Chain) GetHeader(blockHash types.Hash) (*types.Header, error) {
-	return c.getHeader(&blockHash)
+// Author exposes methods for authoring of network items
+type Author struct {
+	client client.Client
 }
 
-// GetHeaderLatest retrieves the header of the latest block
-func (c *Chain) GetHeaderLatest() (*types.Header, error) {
-	return c.getHeader(nil)
-}
-
-func (c *Chain) getHeader(blockHash *types.Hash) (*types.Header, error) {
-	var Header types.Header
-	err := client.CallWithBlockHash(c.client, &Header, "chain_getHeader", blockHash)
-	if err != nil {
-		return nil, err
-	}
-	return &Header, err
+// NewAuthor creates a new Author struct
+func NewAuthor(cl client.Client) *Author {
+	return &Author{cl}
 }

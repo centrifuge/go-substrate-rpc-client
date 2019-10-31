@@ -21,10 +21,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
+// GetMetadata returns the metadata at the given block
 func (s *State) GetMetadata(blockHash types.Hash) (*types.Metadata, error) {
 	return s.getMetadata(&blockHash)
 }
 
+// GetMetadataLatest returns the latest metadata
 func (s *State) GetMetadataLatest() (*types.Metadata, error) {
 	return s.getMetadata(nil)
 }

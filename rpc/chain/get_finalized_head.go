@@ -20,6 +20,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
+// GetFinalizedHead returns the hash of the last finalized block in the canon chain
 func (c *Chain) GetFinalizedHead() (types.Hash, error) {
 	var res string
 

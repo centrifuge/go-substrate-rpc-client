@@ -20,10 +20,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/client"
 )
 
+// Chain exposes methods for retrieval of chain data
 type Chain struct {
 	client client.Client
 }
 
+// NewChain creates a new Chain struct
 func NewChain(cl client.Client) *Chain {
 	return &Chain{cl}
 }
