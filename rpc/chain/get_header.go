@@ -21,10 +21,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
+// GetHeader retrieves the header for the specific block
 func (c *Chain) GetHeader(blockHash types.Hash) (*types.Header, error) {
 	return c.getHeader(&blockHash)
 }
 
+// GetHeaderLatest retrieves the header of the latest block
 func (c *Chain) GetHeaderLatest() (*types.Header, error) {
 	return c.getHeader(nil)
 }

@@ -21,10 +21,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
+// GetBlock returns the header and body of the relay chain block with the given hash
 func (c *Chain) GetBlock(blockHash types.Hash) (*types.SignedBlock, error) {
 	return c.getBlock(&blockHash)
 }
 
+// GetBlockLatest returns the header and body of the latest relay chain block
 func (c *Chain) GetBlockLatest() (*types.SignedBlock, error) {
 	return c.getBlock(nil)
 }

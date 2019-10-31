@@ -20,10 +20,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/client"
 )
 
+// Author exposes methods for authoring of network items
 type Author struct {
 	client client.Client
 }
 
+// NewAuthor creates a new Author struct
 func NewAuthor(cl client.Client) *Author {
 	return &Author{cl}
 }

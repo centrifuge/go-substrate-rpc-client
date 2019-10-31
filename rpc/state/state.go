@@ -20,10 +20,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/client"
 )
 
+// State exposes methods for querying state
 type State struct {
 	client client.Client
 }
 
+// NewState creates a new State struct
 func NewState(c client.Client) *State {
 	return &State{c}
 }

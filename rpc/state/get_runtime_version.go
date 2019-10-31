@@ -21,10 +21,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
+// GetRuntimeVersion returns the runtime version at the given block
 func (s *State) GetRuntimeVersion(blockHash types.Hash) (*types.RuntimeVersion, error) {
 	return s.getRuntimeVersion(&blockHash)
 }
 
+// GetRuntimeVersionLatest returns the latest runtime version
 func (s *State) GetRuntimeVersionLatest() (*types.RuntimeVersion, error) {
 	return s.getRuntimeVersion(nil)
 }
