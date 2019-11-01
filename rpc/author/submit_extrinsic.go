@@ -24,12 +24,11 @@ import (
 func (a *Author) SubmitExtrinsic(xt types.Extrinsic) (types.Hash, error) {
 	enc, err := types.EncodeToHexString(xt)
 	if err != nil {
-		panic(err)
+		return types.Hash{}, err
 	}
 
 	var res string
 	err = a.client.Call(&res, "author_submitExtrinsic", enc)
-
 	if err != nil {
 		return types.Hash{}, err
 	}
