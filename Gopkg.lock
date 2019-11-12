@@ -2,17 +2,6 @@
 
 
 [[projects]]
-  branch = "development"
-  digest = "1:6629b801b53ee73333cd75da2125a636338a2d3cc4ebf602b8e996f64abe7275"
-  name = "github.com/ChainSafe/gossamer"
-  packages = [
-    "codec",
-    "common",
-  ]
-  pruneopts = "UT"
-  revision = "0f0fdaf27982a5abd935a131016d9fda3dae279d"
-
-[[projects]]
   branch = "master"
   digest = "1:7d191fd0c54ff370eaf6116a14dafe2a328df487baea280699f597aae858d00d"
   name = "github.com/aristanetworks/goarista"
@@ -37,10 +26,12 @@
   version = "v1.7.1"
 
 [[projects]]
-  digest = "1:ce3573a68e13583911e3c1edb08d00987c2270aacc10631a0cdfc3eff6cbc180"
+  digest = "1:958b46677ec82d6a7c8ac3d40822c465871b7a4ebb7e74ceac00d5dd47d7e8cb"
   name = "github.com/ethereum/go-ethereum"
   packages = [
+    "common",
     "common/hexutil",
+    "common/math",
     "common/mclock",
     "log",
     "p2p/netutil",
@@ -99,10 +90,12 @@
   version = "v1.3.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:73f9bd0a36bd49a7a46061dd5d6370fbf7c7afcd92a31dcb18661497610672aa"
+  digest = "1:7fa4c2d99cb1ce84ad811966727f8ba6af139c4af20310a9c051cb88a1d27e3d"
   name = "golang.org/x/crypto"
-  packages = ["blake2b"]
+  packages = [
+    "blake2b",
+    "sha3",
+  ]
   pruneopts = "UT"
   revision = "4def268fd1a49955bfb3dda92fe3db4f924f2285"
 
@@ -126,11 +119,20 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/ChainSafe/gossamer/codec",
+    "github.com/davecgh/go-spew/spew",
+    "github.com/deckarep/golang-set",
+    "github.com/ethereum/go-ethereum/common",
+    "github.com/ethereum/go-ethereum/common/hexutil",
+    "github.com/ethereum/go-ethereum/common/math",
+    "github.com/ethereum/go-ethereum/log",
+    "github.com/ethereum/go-ethereum/p2p/netutil",
     "github.com/ethereum/go-ethereum/rpc",
+    "github.com/gorilla/websocket",
     "github.com/pierrec/xxHash/xxHash64",
+    "github.com/rs/cors",
     "github.com/stretchr/testify/assert",
     "golang.org/x/crypto/blake2b",
+    "gopkg.in/natefinch/npipe.v2",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

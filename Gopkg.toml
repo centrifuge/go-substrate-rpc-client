@@ -34,7 +34,7 @@
   unused-packages = true
 
 [[constraint]]
-  branch = "master"
+  revision = "4def268fd1a49955bfb3dda92fe3db4f924f2285"
   name = "golang.org/x/crypto"
 
 [[constraint]]
