@@ -54,16 +54,22 @@ func (e *EventRecordsRaw) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-type EventSystemExtrinsicSuccess struct {
-	Phase  Phase
-	Topics []Hash
-}
-type EventSystemExtrinsicFailed struct {
-	Phase         Phase
-	DispatchError DispatchError
-	Topics        []Hash
+// EventBalancesNewAccount is emitted when a new account was created
+type EventBalancesNewAccount struct {
+	Phase     Phase
+	AccountID AccountID
+	Balance   U128
+	Topics    []Hash
 }
 
+// EventBalancesReapedAccount is emitted when an account was reaped
+type EventBalancesReapedAccount struct {
+	Phase     Phase
+	AccountID AccountID
+	Topics    []Hash
+}
+
+// EventBalancesTransfer is emitted when a transfer succeeded (from, to, value, fees)
 type EventBalancesTransfer struct {
 	Phase  Phase
 	From   AccountID
@@ -72,39 +78,116 @@ type EventBalancesTransfer struct {
 	Fees   U128
 	Topics []Hash
 }
+
+// EventGrandpaNewAuthorities is emitted when a new authority set has been applied
+type EventGrandpaNewAuthorities struct {
+	Phase          Phase
+	NewAuthorities []struct {
+		AuthorityID     AuthorityID
+		AuthorityWeight U64
+	}
+	Topics []Hash
+}
+
+// EventGrandpaPaused is emitted when the current authority set has been paused
+type EventGrandpaPaused struct {
+	Phase  Phase
+	Topics []Hash
+}
+
+// EventGrandpaResumed is emitted when the current authority set has been resumed
+type EventGrandpaResumed struct {
+	Phase  Phase
+	Topics []Hash
+}
+
+// EventImOnlineHeartbeatReceived is emitted when a new heartbeat was received from AuthorityId
+type EventImOnlineHeartbeatReceived struct {
+	Phase       Phase
+	AuthorityID AuthorityID
+	Topics      []Hash
+}
+
+// EventIndicesNewAccountIndex is emitted when a new account index was assigned. This event is not triggered
+// when an existing index is reassigned to another AccountId
 type EventIndicesNewAccountIndex struct {
 	Phase        Phase
 	AccountID    AccountID
 	AccountIndex AccountIndex
 	Topics       []Hash
 }
-type EventBalancesNewAccount struct {
-	Phase     Phase
-	AccountID AccountID
-	Balance   U128
-	Topics    []Hash
+
+// EventOffencesOffence is emitted when there is an offence reported of the given kind happened at the session_index
+// and (kind-specific) time slot. This event is not deposited for duplicate slashes
+type EventOffencesOffence struct {
+	Phase          Phase
+	Kind           Bytes16
+	OpaqueTimeSlot Bytes
+	Topics         []Hash
 }
-type EventBalancesReapedAccount struct {
-	Phase     Phase
-	AccountID AccountID
-	Topics    []Hash
-}
+
+// EventSessionNewSession is emitted when a new session has happened. Note that the argument is the session index,
+// not the block number as the type might suggest
 type EventSessionNewSession struct {
 	Phase        Phase
 	SessionIndex U32
 	Topics       []Hash
 }
 
+// EventStakingOldSlashingReportDiscarded is emitted when an old slashing report from a prior era was discarded because
+// it could not be processed
+type EventStakingOldSlashingReportDiscarded struct {
+	Phase        Phase
+	SessionIndex U32
+	Topics       []Hash
+}
+
+// EventStakingReward is emitted when all validators have been rewarded by the given balance
+type EventStakingReward struct {
+	Phase   Phase
+	Balance U128
+	Topics  []Hash
+}
+
+// EventStakingSlash is emitted when one validator (and its nominators) has been slashed by the given amount
+type EventStakingSlash struct {
+	Phase     Phase
+	AccountID AccountID
+	Balance   U128
+	Topics    []Hash
+}
+
+// EventSystemExtrinsicSuccess is emitted when an extrinsic completed successfully
+type EventSystemExtrinsicSuccess struct {
+	Phase  Phase
+	Topics []Hash
+}
+
+// EventSystemExtrinsicFailed is emitted when an extrinsic failed
+type EventSystemExtrinsicFailed struct {
+	Phase         Phase
+	DispatchError DispatchError
+	Topics        []Hash
+}
+
 // EventRecords is a default set of possible event records that can be used as a target for
 // `func (e EventRecordsRaw) Decode(...`
 type EventRecords struct {
-	System_ExtrinsicSuccess []EventSystemExtrinsicSuccess //nolint:stylecheck,golint
-	System_ExtrinsicFailed  []EventSystemExtrinsicFailed  //nolint:stylecheck,golint
-	Indices_NewAccountIndex []EventIndicesNewAccountIndex //nolint:stylecheck,golint
-	Balances_NewAccount     []EventBalancesNewAccount     //nolint:stylecheck,golint
-	Balances_ReapedAccount  []EventBalancesReapedAccount  //nolint:stylecheck,golint
-	Balances_Transfer       []EventBalancesTransfer       //nolint:stylecheck,golint
-	Session_NewSession      []EventSessionNewSession      //nolint:stylecheck,golint
+	Balances_NewAccount                []EventBalancesNewAccount                //nolint:stylecheck,golint
+	Balances_ReapedAccount             []EventBalancesReapedAccount             //nolint:stylecheck,golint
+	Balances_Transfer                  []EventBalancesTransfer                  //nolint:stylecheck,golint
+	Grandpa_NewAuthorities             []EventGrandpaNewAuthorities             //nolint:stylecheck,golint
+	Grandpa_Paused                     []EventGrandpaPaused                     //nolint:stylecheck,golint
+	Grandpa_Resumed                    []EventGrandpaResumed                    //nolint:stylecheck,golint
+	ImOnline_HeartbeatReceived         []EventImOnlineHeartbeatReceived         //nolint:stylecheck,golint
+	Indices_NewAccountIndex            []EventIndicesNewAccountIndex            //nolint:stylecheck,golint
+	Offences_Offence                   []EventOffencesOffence                   //nolint:stylecheck,golint
+	Session_NewSession                 []EventSessionNewSession                 //nolint:stylecheck,golint
+	Staking_OldSlashingReportDiscarded []EventStakingOldSlashingReportDiscarded //nolint:stylecheck,golint
+	Staking_Reward                     []EventStakingReward                     //nolint:stylecheck,golint
+	Staking_Slash                      []EventStakingSlash                      //nolint:stylecheck,golint
+	System_ExtrinsicSuccess            []EventSystemExtrinsicSuccess            //nolint:stylecheck,golint
+	System_ExtrinsicFailed             []EventSystemExtrinsicFailed             //nolint:stylecheck,golint
 }
 
 // DecodeEventRecords decodes the events records from an EventRecordRaw into a target t using the given Metadata m
