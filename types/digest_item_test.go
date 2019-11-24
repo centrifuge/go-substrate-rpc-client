@@ -23,7 +23,7 @@ import (
 )
 
 var testDigestItem1 = DigestItem{IsOther: true, AsOther: NewBytes([]byte{0xab})}
-var testDigestItem2 = DigestItem{IsAuthoritiesChange: true, AsAuthoritiesChange: []AuthorityID{NewAuthorityID([32]byte{0xab}), NewAuthorityID([32]byte{0xcd})}}
+var testDigestItem2 = DigestItem{IsAuthoritiesChange: true, AsAuthoritiesChange: []AuthorityID{NewAuthorityID([32]byte{0xab}), NewAuthorityID([32]byte{0xcd})}} //nolint:lll
 var testDigestItem3 = DigestItem{IsChangesTrieRoot: true, AsChangesTrieRoot: NewHash([]byte{0x01, 0x02, 0x03})}
 
 func TestDigestItem_EncodeDecode(t *testing.T) {

@@ -104,5 +104,26 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
-	fmt.Printf("%#v\n", extEnc)
+	fmt.Printf("Extrinsic: %#v\n", extEnc)
+
+	_, err = api.RPC.Author.SubmitExtrinsic(ext)
+	if err != nil {
+		panic(err)
+	}
+
+	xts, err := api.RPC.Author.PendingExtrinsics()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Pending extrinsics: %#v\n", xts)
+
+	// time.Sleep(10 * time.Second)
+
+	// xts, err = api.RPC.Author.PendingExtrinsics()
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// fmt.Printf("Pending extrinsics: %#v\n", xts)
 }

@@ -14,27 +14,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rpc
+package author
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/author"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/state"
+	"fmt"
+
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-type RPC struct {
-	Author  *author.Author
-	Chain  *chain.Chain
-	State  *state.State
-	client client.Client
-}
-
-func NewRPC(cl client.Client) *RPC {
-	return &RPC{
-		Author:  author.NewAuthor(cl),
-		Chain:  chain.NewChain(cl),
-		State:  state.NewState(cl),
-		client: cl,
+// PendingExtrinsics returns all pending extrinsics, potentially grouped by sender
+func (a *Author) PendingExtrinsics() ([]types.Extrinsic, error) {
+	var res []string
+	err := a.client.Call(&res, "author_pendingExtrinsics")
+	if err != nil {
+		return nil, err
 	}
+
+	fmt.Println(res)
+
+	xts := make([]types.Extrinsic, len(res))
+
+	for i, re := range res {
+		err = types.DecodeFromHexString(re, &xts[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return xts, err
 }
