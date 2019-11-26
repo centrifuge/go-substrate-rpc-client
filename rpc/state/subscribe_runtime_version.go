@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package author
+package state
 
 import (
 	"context"
@@ -25,17 +25,17 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-// ExtrinsicStatusSubscription is a subscription established through one of the Client's subscribe methods.
-type ExtrinsicStatusSubscription struct {
+// RuntimeVersionSubscription is a subscription established through one of the Client's subscribe methods.
+type RuntimeVersionSubscription struct {
 	sub      *gethrpc.ClientSubscription
-	channel  chan types.ExtrinsicStatus
+	channel  chan types.RuntimeVersion
 	quitOnce sync.Once // ensures quit is closed once
 }
 
 // Chan returns the subscription channel.
 //
 // The channel is closed when Unsubscribe is called on the subscription.
-func (s *ExtrinsicStatusSubscription) Chan() <-chan types.ExtrinsicStatus {
+func (s *RuntimeVersionSubscription) Chan() <-chan types.RuntimeVersion {
 	return s.channel
 }
 
@@ -47,37 +47,33 @@ func (s *ExtrinsicStatusSubscription) Chan() <-chan types.ExtrinsicStatus {
 // on the underlying client and no other error has occurred.
 //
 // The error channel is closed when Unsubscribe is called on the subscription.
-func (s *ExtrinsicStatusSubscription) Err() <-chan error {
+func (s *RuntimeVersionSubscription) Err() <-chan error {
 	return s.sub.Err()
 }
 
 // Unsubscribe unsubscribes the notification and closes the error channel.
 // It can safely be called more than once.
-func (s *ExtrinsicStatusSubscription) Unsubscribe() {
+func (s *RuntimeVersionSubscription) Unsubscribe() {
 	s.sub.Unsubscribe()
 	s.quitOnce.Do(func() {
 		close(s.channel)
 	})
 }
 
-// SubmitAndWatchExtrinsic will submit and subscribe to watch an extrinsic until unsubscribed, returning a subscription
-// that will receive server notifications containing the extrinsic status updates.
-func (a *Author) SubmitAndWatchExtrinsic(xt types.Extrinsic) (*ExtrinsicStatusSubscription, error) {
+// SubscribeRuntimeVersion subscribes the runtime version, returning a subscription that will
+// receive server notifications containing the RuntimeVersion.
+func (s *State) SubscribeRuntimeVersion() (
+	*RuntimeVersionSubscription, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
-	defer cancel() // TODO move into subscribe function?
+	defer cancel()
 
-	c := make(chan types.ExtrinsicStatus)
+	c := make(chan types.RuntimeVersion)
 
-	enc, err := types.EncodeToHexString(xt)
+	sub, err := s.client.Subscribe(ctx, "state", "subscribeRuntimeVersion", "unsubscribeRuntimeVersion",
+		"runtimeVersion", c)
 	if err != nil {
 		return nil, err
 	}
 
-	sub, err := a.client.Subscribe(ctx, "author", "submitAndWatchExtrinsic", "unwatchExtrinsic", "extrinsicUpdate",
-		c, enc)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ExtrinsicStatusSubscription{sub: sub, channel: c}, nil
+	return &RuntimeVersionSubscription{sub: sub, channel: c}, nil
 }

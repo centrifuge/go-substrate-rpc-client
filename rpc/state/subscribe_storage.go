@@ -60,7 +60,7 @@ func (s *StorageSubscription) Unsubscribe() {
 	})
 }
 
-// SubscribeStorageRaw subscribes the storage for the given keys, returning a subscription and a channel that will
+// SubscribeStorageRaw subscribes the storage for the given keys, returning a subscription that will
 // receive server notifications containing the storage change sets.
 //
 // Slow subscribers will be dropped eventually. Client buffers up to 20000 notifications before considering the
