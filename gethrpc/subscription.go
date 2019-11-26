@@ -22,12 +22,10 @@ import (
 	"context"
 	crand "crypto/rand"
 	"encoding/binary"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"math/rand"
 	"reflect"
-	"strings"
 	"sync"
 	"time"
 )
@@ -42,7 +40,7 @@ var (
 var globalGen = randomIDGenerator()
 
 // ID defines a pseudo random number that is used to identify RPC subscriptions.
-type ID string
+type ID uint32
 
 // NewID returns a new, random ID.
 func NewID() ID {
@@ -62,19 +60,14 @@ func randomIDGenerator() func() ID {
 	return func() ID {
 		mu.Lock()
 		defer mu.Unlock()
-		id := make([]byte, 16)
+		id := make([]byte, 4)
 		rng.Read(id)
 		return encodeID(id)
 	}
 }
 
 func encodeID(b []byte) ID {
-	id := hex.EncodeToString(b)
-	id = strings.TrimLeft(id, "0")
-	if id == "" {
-		id = "0" // ID's are RPC quantities, no leading zero's and 0 is 0x0.
-	}
-	return ID("0x" + id)
+	return ID(uint32(b[0])<<24 | uint32(b[1])<<16 | uint32(b[2])<<8 | uint32(b[3]))
 }
 
 type notifierKey struct{}
@@ -175,7 +168,7 @@ func (n *Notifier) activate() error {
 }
 
 func (n *Notifier) send(sub *Subscription, data json.RawMessage) error {
-	params, _ := json.Marshal(&subscriptionResult{ID: 1, Result: data}) // TODO use sub.ID instead
+	params, _ := json.Marshal(&subscriptionResult{ID: int(sub.ID), Result: data})
 	ctx := context.Background()
 	return n.h.conn.Write(ctx, &jsonrpcMessage{
 		Version: vsn,
