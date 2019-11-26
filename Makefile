@@ -33,8 +33,7 @@ lint-fix: 			## runs linters on go code and automatically fixes issues
 test: 				## runs all tests in project against the RPC URL specified in the RPC_URL env variable or localhost while excluding gethrpc
 	@go test -v -race `go list ./... | grep -v '/gethrpc'`
 
-test-cover: 			## runs all tests in project against the RPC URL specified in the RPC_URL env variable
-                                ## or localhost and report coverage
+test-cover: 			## runs all tests in project against the RPC URL specified in the RPC_URL env variable or localhost and report coverage
 	@go test -v -race -coverprofile=coverage.txt -covermode=atomic `go list ./... | grep -v '/gethrpc'`
 	@mv coverage.txt shared
 
