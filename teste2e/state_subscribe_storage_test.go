@@ -43,6 +43,7 @@ func TestState_SubscribeStorage_EventsRaw(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	defer sub.Unsubscribe()
 
 	timeout := time.After(10 * time.Second)
 	received := 0
@@ -54,11 +55,9 @@ func TestState_SubscribeStorage_EventsRaw(t *testing.T) {
 			received++
 
 			if received >= 2 {
-				sub.Unsubscribe()
 				return
 			}
 		case <-timeout:
-			sub.Unsubscribe()
 			assert.FailNow(t, "timeout reached without getting 2 notifications from subscription")
 			return
 		}
@@ -89,6 +88,7 @@ func TestState_SubscribeStorage_Events(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	defer sub.Unsubscribe()
 
 	timeout := time.After(10 * time.Second)
 	received := 0
@@ -114,11 +114,9 @@ func TestState_SubscribeStorage_Events(t *testing.T) {
 			received++
 
 			if received >= 2 {
-				sub.Unsubscribe()
 				return
 			}
 		case <-timeout:
-			sub.Unsubscribe()
 			assert.FailNow(t, "timeout reached without getting 2 notifications from subscription")
 			return
 		}

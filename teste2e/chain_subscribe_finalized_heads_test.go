@@ -26,7 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestState_SubscribeRuntimeVersion(t *testing.T) {
+func TestChain_SubscribeFinalizedHeads(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping end-to-end test in short mode.")
 	}
@@ -36,19 +36,24 @@ func TestState_SubscribeRuntimeVersion(t *testing.T) {
 		panic(err)
 	}
 
-	sub, err := api.RPC.State.SubscribeRuntimeVersion()
+	sub, err := api.RPC.Chain.SubscribeFinalizedHeads()
 	if err != nil {
 		panic(err)
 	}
 	defer sub.Unsubscribe()
 
 	timeout := time.After(10 * time.Second)
+	received := 0
 
 	for {
 		select {
-		case rv := <-sub.Chan():
-			fmt.Printf("%#v\n", rv)
-			return
+		case head := <-sub.Chan():
+			fmt.Printf("%#v\n", head)
+			received++
+
+			if received >= 2 {
+				return
+			}
 		case <-timeout:
 			assert.FailNow(t, "timeout reached without getting 2 notifications from subscription")
 			return
