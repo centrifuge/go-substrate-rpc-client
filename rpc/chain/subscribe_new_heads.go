@@ -25,8 +25,8 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-// FinalizedHeadsSubscription is a subscription established through one of the Client's subscribe methods.
-type FinalizedHeadsSubscription struct {
+// NewHeadsSubscription is a subscription established through one of the Client's subscribe methods.
+type NewHeadsSubscription struct {
 	sub      *gethrpc.ClientSubscription
 	channel  chan types.Header
 	quitOnce sync.Once // ensures quit is closed once
@@ -35,7 +35,7 @@ type FinalizedHeadsSubscription struct {
 // Chan returns the subscription channel.
 //
 // The channel is closed when Unsubscribe is called on the subscription.
-func (s *FinalizedHeadsSubscription) Chan() <-chan types.Header {
+func (s *NewHeadsSubscription) Chan() <-chan types.Header {
 	return s.channel
 }
 
@@ -47,32 +47,31 @@ func (s *FinalizedHeadsSubscription) Chan() <-chan types.Header {
 // on the underlying client and no other error has occurred.
 //
 // The error channel is closed when Unsubscribe is called on the subscription.
-func (s *FinalizedHeadsSubscription) Err() <-chan error {
+func (s *NewHeadsSubscription) Err() <-chan error {
 	return s.sub.Err()
 }
 
 // Unsubscribe unsubscribes the notification and closes the error channel.
 // It can safely be called more than once.
-func (s *FinalizedHeadsSubscription) Unsubscribe() {
+func (s *NewHeadsSubscription) Unsubscribe() {
 	s.sub.Unsubscribe()
 	s.quitOnce.Do(func() {
 		close(s.channel)
 	})
 }
 
-// SubscribeFinalizedHeads subscribes the best finalized headers, returning a subscription that will
+// SubscribeNewHeads subscribes the best headers, returning a subscription that will
 // receive server notifications containing the Header.
-func (c *Chain) SubscribeFinalizedHeads() (*FinalizedHeadsSubscription, error) {
+func (c *Chain) SubscribeNewHeads() (*NewHeadsSubscription, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
 	defer cancel()
 
 	ch := make(chan types.Header)
 
-	sub, err := c.client.Subscribe(ctx, "chain", "subscribeFinalizedHeads", "unsubscribeFinalizedHeads",
-		"finalizedHead", ch)
+	sub, err := c.client.Subscribe(ctx, "chain", "subscribeNewHead", "unsubscribeNewHead", "newHead", ch)
 	if err != nil {
 		return nil, err
 	}
 
-	return &FinalizedHeadsSubscription{sub: sub, channel: ch}, nil
+	return &NewHeadsSubscription{sub: sub, channel: ch}, nil
 }
