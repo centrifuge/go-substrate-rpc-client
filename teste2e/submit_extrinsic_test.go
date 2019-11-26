@@ -19,6 +19,7 @@ package teste2e
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/centrifuge/go-substrate-rpc-client/config"
@@ -84,46 +85,45 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
-	o := types.SignatureOptions{
-		// BlockHash:   blockHash,
-		BlockHash:   genesisHash, // BlockHash needs to == GenesisHash if era is immortal. // TODO: add an error?
-		Era:         era,
-		GenesisHash: genesisHash,
-		Nonce:       types.UCompact(nonce),
-		SpecVersion: rv.SpecVersion,
-		Tip:         0,
+	for i := uint32(0); i < 4; i++ {
+		o := types.SignatureOptions{
+			// BlockHash:   blockHash,
+			BlockHash:   genesisHash, // BlockHash needs to == GenesisHash if era is immortal. // TODO: add an error?
+			Era:         era,
+			GenesisHash: genesisHash,
+			Nonce:       types.UCompact(nonce + i),
+			SpecVersion: rv.SpecVersion,
+			Tip:         0,
+		}
+
+		extI := ext
+
+		err = extI.Sign(signature.TestKeyringPairAlice, o)
+		if err != nil {
+			panic(err)
+		}
+
+		extEnc, err := types.EncodeToHexString(extI)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("Extrinsic: %#v\n", extEnc)
+
+		_, err = api.RPC.Author.SubmitExtrinsic(extI)
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	err = ext.Sign(signature.TestKeyringPairAlice, o)
-	if err != nil {
-		panic(err)
+	for i := 0; i < 30; i++ {
+		xts, err := api.RPC.Author.PendingExtrinsics()
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("Pending extrinsics: %#v\n", xts)
+
+		time.Sleep(1 * time.Second)
 	}
-
-	extEnc, err := types.EncodeToHexString(ext)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("Extrinsic: %#v\n", extEnc)
-
-	_, err = api.RPC.Author.SubmitExtrinsic(ext)
-	if err != nil {
-		panic(err)
-	}
-
-	xts, err := api.RPC.Author.PendingExtrinsics()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("Pending extrinsics: %#v\n", xts)
-
-	// time.Sleep(10 * time.Second)
-
-	// xts, err = api.RPC.Author.PendingExtrinsics()
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// fmt.Printf("Pending extrinsics: %#v\n", xts)
 }

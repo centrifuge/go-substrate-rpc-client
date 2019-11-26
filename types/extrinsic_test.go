@@ -39,7 +39,7 @@ func TestExtrinsic_Unsigned_EncodeDecode(t *testing.T) {
 
 	assert.Equal(t, "0x"+
 		"98"+ // length prefix, compact
-		"03"+ // version
+		"04"+ // version
 		"0300"+ // call index (section index and method index)
 		"ff"+
 		"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"+ // target address
@@ -113,7 +113,7 @@ func TestExtrinsic_Sign(t *testing.T) {
 	err = DecodeFromHexString(extEnc, &extDec)
 	assert.NoError(t, err)
 
-	assert.Equal(t, uint8(ExtrinsicVersion3), extDec.Type())
+	assert.Equal(t, uint8(ExtrinsicVersion4), extDec.Type())
 	assert.Equal(t, signature.TestKeyringPairAlice.PublicKey, extDec.Signature.Signer.AsAccountID[:])
 
 	mb, err := EncodeToBytes(extDec.Method)
@@ -132,7 +132,7 @@ func TestExtrinsic_Sign(t *testing.T) {
 	// verify sig
 	b, err := EncodeToBytes(verifyPayload)
 	assert.NoError(t, err)
-	ok, err := signature.Verify(b, extDec.Signature.Signature[:], signature.TestKeyringPairAlice.URI)
+	ok, err := signature.Verify(b, extDec.Signature.Signature.AsSr25519[:], signature.TestKeyringPairAlice.URI)
 	assert.NoError(t, err)
 	assert.True(t, ok)
 }
