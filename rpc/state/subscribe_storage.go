@@ -78,7 +78,7 @@ func (s *State) SubscribeStorageRaw(keys []types.StorageKey) (
 		keyss[i] = keys[i].Hex()
 	}
 
-	sub, err := s.client.Subscribe(ctx, "state", c, keyss)
+	sub, err := s.client.Subscribe(ctx, "state", "subscribeStorage", "unsubscribeStorage", "storage", c, keyss)
 	if err != nil {
 		return nil, err
 	}

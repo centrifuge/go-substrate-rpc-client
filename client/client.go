@@ -28,7 +28,8 @@ import (
 type Client interface {
 	Call(result interface{}, method string, args ...interface{}) error
 
-	Subscribe(ctx context.Context, namespace string, channel interface{}, args ...interface{}) (
+	Subscribe(ctx context.Context, namespace, subscribeMethodSuffix, unsubscribeMethodSuffix,
+		notificationMethodSuffix string, channel interface{}, args ...interface{}) (
 		*gethrpc.ClientSubscription, error)
 
 	URL() string

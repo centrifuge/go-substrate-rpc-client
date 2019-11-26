@@ -30,11 +30,8 @@ import (
 )
 
 const (
-	vsn                      = "2.0"
-	serviceMethodSeparator   = "_"
-	subscribeMethodSuffix    = "_subscribeStorage"
-	unsubscribeMethodSuffix  = "_unsubscribeStorage"
-	notificationMethodSuffix = "_storage"
+	vsn                    = "2.0"
+	serviceMethodSeparator = "_"
 
 	defaultWriteTimeout = 10 * time.Second // used if context has no deadline
 )
@@ -71,14 +68,6 @@ func (msg *jsonrpcMessage) isResponse() bool {
 
 func (msg *jsonrpcMessage) hasValidID() bool {
 	return len(msg.ID) > 0 && msg.ID[0] != '{' && msg.ID[0] != '['
-}
-
-func (msg *jsonrpcMessage) isSubscribe() bool {
-	return strings.HasSuffix(msg.Method, subscribeMethodSuffix)
-}
-
-func (msg *jsonrpcMessage) isUnsubscribe() bool {
-	return strings.HasSuffix(msg.Method, unsubscribeMethodSuffix)
 }
 
 func (msg *jsonrpcMessage) namespace() string {
