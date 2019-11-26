@@ -16,7 +16,13 @@
 
 package types
 
-import "github.com/centrifuge/go-substrate-rpc-client/scale"
+import (
+	"encoding/json"
+	"fmt"
+	"strings"
+
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
+)
 
 // ExtrinsicStatus is an enum containing the result of an extrinsic submission
 type ExtrinsicStatus struct {
@@ -26,7 +32,7 @@ type ExtrinsicStatus struct {
 	AsFinalized Hash
 	IsUsurped   bool // 3:: Usurped(Hash)
 	AsUsurped   Hash
-	IsBroadcast bool // 4:: Broadcast(Vec<Text)
+	IsBroadcast bool // 4:: Broadcast(Vec<Text>)
 	AsBroadcast []Text
 	IsDropped   bool // 5:: Dropped
 	IsInvalid   bool // 6:: Invalid
@@ -96,4 +102,85 @@ func (e ExtrinsicStatus) Encode(encoder scale.Encoder) error {
 	}
 
 	return nil
+}
+
+func (e *ExtrinsicStatus) UnmarshalJSON(b []byte) error {
+	input := strings.TrimSpace(string(b))
+	if len(input) >= 2 && input[0] == '"' && input[len(input)-1] == '"' {
+		input = input[1 : len(input)-1]
+	}
+
+	switch {
+	case input == "future":
+		e.IsFuture = true
+		return nil
+	case input == "ready":
+		e.IsReady = true
+		return nil
+	case input == "dropped":
+		e.IsDropped = true
+		return nil
+	case input == "invalid":
+		e.IsInvalid = true
+		return nil
+	}
+
+	// no simple case, decode into helper
+	var tmp struct {
+		AsFinalized Hash   `json:"finalized"`
+		AsUsurped   Hash   `json:"usurped"`
+		AsBroadcast []Text `json:"broadcast"`
+	}
+	if err := json.Unmarshal(b, &tmp); err != nil {
+		return err
+	}
+
+	switch {
+	case strings.HasPrefix(input, "{\"finalized\""):
+		e.IsFinalized = true
+		e.AsFinalized = tmp.AsFinalized
+		return nil
+	case strings.HasPrefix(input, "{\"usurped\""):
+		e.IsUsurped = true
+		e.AsUsurped = tmp.AsUsurped
+		return nil
+	case strings.HasPrefix(input, "{\"broadcast\""):
+		e.IsBroadcast = true
+		e.AsBroadcast = tmp.AsBroadcast
+		return nil
+	}
+
+	return fmt.Errorf("unexpected JSON for ExtrinsicStatus, got %v", string(b))
+}
+
+func (e ExtrinsicStatus) MarshalJSON() ([]byte, error) {
+	switch {
+	case e.IsFuture:
+		return []byte("\"future\""), nil
+	case e.IsReady:
+		return []byte("\"ready\""), nil
+	case e.IsDropped:
+		return []byte("\"dropped\""), nil
+	case e.IsInvalid:
+		return []byte("\"invalid\""), nil
+	case e.IsFinalized:
+		var tmp struct {
+			AsFinalized Hash `json:"finalized"`
+		}
+		tmp.AsFinalized = e.AsFinalized
+		return json.Marshal(tmp)
+	case e.IsUsurped:
+		var tmp struct {
+			AsUsurped Hash `json:"usurped"`
+		}
+		tmp.AsUsurped = e.AsUsurped
+		return json.Marshal(tmp)
+	case e.IsBroadcast:
+		var tmp struct {
+			AsBroadcast []Text `json:"broadcast"`
+		}
+		tmp.AsBroadcast = e.AsBroadcast
+		return json.Marshal(tmp)
+	}
+	return nil, fmt.Errorf("cannot marshal ExtrinsicStatus, got %#v", e)
 }

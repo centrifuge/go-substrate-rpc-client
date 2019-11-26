@@ -17,21 +17,67 @@
 package author
 
 import (
+	"context"
+	"sync"
+
+	"github.com/centrifuge/go-substrate-rpc-client/config"
+	gethrpc "github.com/centrifuge/go-substrate-rpc-client/gethrpc"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-// SubmitAndWatchExtrinsic will submit and subscribe to watch an extrinsic until unsubscribed
-func (a *Author) SubmitAndWatchExtrinsic(xt types.Extrinsic) (types.Hash, error) {
+// Subscription is a subscription established through one of the Client's subscribe methods.
+type Subscription struct {
+	sub      *gethrpc.ClientSubscription
+	channel  chan types.ExtrinsicStatus
+	quitOnce sync.Once // ensures quit is closed once
+}
+
+// Chan returns the subscription channel.
+//
+// The channel is closed when Unsubscribe is called on the subscription.
+func (s *Subscription) Chan() <-chan types.ExtrinsicStatus {
+	return s.channel
+}
+
+// Err returns the subscription error channel. The intended use of Err is to schedule
+// resubscription when the client connection is closed unexpectedly.
+//
+// The error channel receives a value when the subscription has ended due
+// to an error. The received error is nil if Close has been called
+// on the underlying client and no other error has occurred.
+//
+// The error channel is closed when Unsubscribe is called on the subscription.
+func (s *Subscription) Err() <-chan error {
+	return s.sub.Err()
+}
+
+// Unsubscribe unsubscribes the notification and closes the error channel.
+// It can safely be called more than once.
+func (s *Subscription) Unsubscribe() {
+	s.sub.Unsubscribe()
+	s.quitOnce.Do(func() {
+		close(s.channel)
+	})
+}
+
+// SubmitAndWatchExtrinsic will submit and subscribe to watch an extrinsic until unsubscribed, returning a subscription
+// and a channel that will receive server notifications containing the extrinsic status updates.
+func (a *Author) SubmitAndWatchExtrinsic(xt types.Extrinsic) (*Subscription, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
+	defer cancel() // TODO move into subscribe function?
+
+	c := make(chan types.ExtrinsicStatus)
+
 	enc, err := types.EncodeToHexString(xt)
 	if err != nil {
-		return types.Hash{}, err
+		return nil, err
 	}
 
-	var res string
-	err = a.client.Call(&res, "author_submitExtrinsic", enc) // TODO
+	sub, err := a.client.Subscribe(ctx, "author", "submitAndWatchExtrinsic", "unwatchExtrinsic", "extrinsicUpdate",
+		c, enc)
 	if err != nil {
-		return types.Hash{}, err
+		return nil, err
 	}
 
-	return types.NewHashFromHexString(res)
+	return &Subscription{sub: sub, channel: c}, nil
 }

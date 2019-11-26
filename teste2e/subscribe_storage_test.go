@@ -60,6 +60,7 @@ func TestState_SubscribeStorage_EventsRaw(t *testing.T) {
 		case <-timeout:
 			sub.Unsubscribe()
 			assert.FailNow(t, "timeout reached without getting 2 notifications from subscription")
+			return
 		}
 	}
 }
@@ -119,6 +120,7 @@ func TestState_SubscribeStorage_Events(t *testing.T) {
 		case <-timeout:
 			sub.Unsubscribe()
 			assert.FailNow(t, "timeout reached without getting 2 notifications from subscription")
+			return
 		}
 	}
 }

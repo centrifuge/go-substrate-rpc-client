@@ -17,9 +17,11 @@
 package types_test
 
 import (
+	"encoding/json"
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
+	"github.com/stretchr/testify/assert"
 )
 
 var testExtrinsicStatus1 = ExtrinsicStatus{IsFuture: true}
@@ -62,4 +64,39 @@ func TestExtrinsicStatus_Decode(t *testing.T) {
 		{[]byte{0x05}, testExtrinsicStatus6},
 		{[]byte{0x06}, testExtrinsicStatus7},
 	})
+}
+
+var testExtrinsicStatusTestCases = []struct {
+	encoded []byte
+	decoded ExtrinsicStatus
+}{
+	{[]byte("\"future\""), ExtrinsicStatus{IsFuture: true}},
+	{[]byte("\"ready\""), ExtrinsicStatus{IsReady: true}},
+	{[]byte("{\"finalized\":\"0x95e3b7f86541d06306691a2fe8cbd935d0bdd28ea14fe515e2db0fa87847f8f8\"}"),
+		ExtrinsicStatus{IsFinalized: true, AsFinalized: NewHash(MustHexDecodeString(
+			"0x95e3b7f86541d06306691a2fe8cbd935d0bdd28ea14fe515e2db0fa87847f8f8"))}},
+	{[]byte("{\"usurped\":\"0x95e3b7f86541d06306691a2fe8cbd935d0bdd28ea14fe515e2db0fa87847f8ab\"}"),
+		ExtrinsicStatus{IsUsurped: true, AsUsurped: NewHash(MustHexDecodeString(
+			"0x95e3b7f86541d06306691a2fe8cbd935d0bdd28ea14fe515e2db0fa87847f8ab"))}},
+	{[]byte("{\"broadcast\":[\"hello\",\"world\"]}"),
+		ExtrinsicStatus{IsBroadcast: true, AsBroadcast: []Text{"hello", "world"}}},
+	{[]byte("\"dropped\""), ExtrinsicStatus{IsDropped: true}},
+	{[]byte("\"invalid\""), ExtrinsicStatus{IsInvalid: true}},
+}
+
+func TestExtrinsicStatus_UnmarshalJSON(t *testing.T) {
+	for _, test := range testExtrinsicStatusTestCases {
+		var actual ExtrinsicStatus
+		err := json.Unmarshal(test.encoded, &actual)
+		assert.NoError(t, err)
+		assert.Equal(t, test.decoded, actual)
+	}
+}
+
+func TestExtrinsicStatus_MarshalJSON(t *testing.T) {
+	for _, test := range testExtrinsicStatusTestCases {
+		actual, err := json.Marshal(test.decoded)
+		assert.NoError(t, err)
+		assert.Equal(t, test.encoded, actual)
+	}
 }
