@@ -25,8 +25,8 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-// Subscription is a subscription established through one of the Client's subscribe methods.
-type Subscription struct {
+// ExtrinsicStatusSubscription is a subscription established through one of the Client's subscribe methods.
+type ExtrinsicStatusSubscription struct {
 	sub      *gethrpc.ClientSubscription
 	channel  chan types.ExtrinsicStatus
 	quitOnce sync.Once // ensures quit is closed once
@@ -35,7 +35,7 @@ type Subscription struct {
 // Chan returns the subscription channel.
 //
 // The channel is closed when Unsubscribe is called on the subscription.
-func (s *Subscription) Chan() <-chan types.ExtrinsicStatus {
+func (s *ExtrinsicStatusSubscription) Chan() <-chan types.ExtrinsicStatus {
 	return s.channel
 }
 
@@ -47,13 +47,13 @@ func (s *Subscription) Chan() <-chan types.ExtrinsicStatus {
 // on the underlying client and no other error has occurred.
 //
 // The error channel is closed when Unsubscribe is called on the subscription.
-func (s *Subscription) Err() <-chan error {
+func (s *ExtrinsicStatusSubscription) Err() <-chan error {
 	return s.sub.Err()
 }
 
 // Unsubscribe unsubscribes the notification and closes the error channel.
 // It can safely be called more than once.
-func (s *Subscription) Unsubscribe() {
+func (s *ExtrinsicStatusSubscription) Unsubscribe() {
 	s.sub.Unsubscribe()
 	s.quitOnce.Do(func() {
 		close(s.channel)
@@ -62,7 +62,7 @@ func (s *Subscription) Unsubscribe() {
 
 // SubmitAndWatchExtrinsic will submit and subscribe to watch an extrinsic until unsubscribed, returning a subscription
 // and a channel that will receive server notifications containing the extrinsic status updates.
-func (a *Author) SubmitAndWatchExtrinsic(xt types.Extrinsic) (*Subscription, error) {
+func (a *Author) SubmitAndWatchExtrinsic(xt types.Extrinsic) (*ExtrinsicStatusSubscription, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
 	defer cancel() // TODO move into subscribe function?
 
@@ -79,5 +79,5 @@ func (a *Author) SubmitAndWatchExtrinsic(xt types.Extrinsic) (*Subscription, err
 		return nil, err
 	}
 
-	return &Subscription{sub: sub, channel: c}, nil
+	return &ExtrinsicStatusSubscription{sub: sub, channel: c}, nil
 }

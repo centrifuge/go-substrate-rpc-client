@@ -25,8 +25,8 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-// Subscription is a subscription established through one of the Client's subscribe methods.
-type Subscription struct {
+// StorageSubscription is a subscription established through one of the Client's subscribe methods.
+type StorageSubscription struct {
 	sub      *gethrpc.ClientSubscription
 	channel  chan types.StorageChangeSet
 	quitOnce sync.Once // ensures quit is closed once
@@ -35,7 +35,7 @@ type Subscription struct {
 // Chan returns the subscription channel.
 //
 // The channel is closed when Unsubscribe is called on the subscription.
-func (s *Subscription) Chan() <-chan types.StorageChangeSet {
+func (s *StorageSubscription) Chan() <-chan types.StorageChangeSet {
 	return s.channel
 }
 
@@ -47,13 +47,13 @@ func (s *Subscription) Chan() <-chan types.StorageChangeSet {
 // on the underlying client and no other error has occurred.
 //
 // The error channel is closed when Unsubscribe is called on the subscription.
-func (s *Subscription) Err() <-chan error {
+func (s *StorageSubscription) Err() <-chan error {
 	return s.sub.Err()
 }
 
 // Unsubscribe unsubscribes the notification and closes the error channel.
 // It can safely be called more than once.
-func (s *Subscription) Unsubscribe() {
+func (s *StorageSubscription) Unsubscribe() {
 	s.sub.Unsubscribe()
 	s.quitOnce.Do(func() {
 		close(s.channel)
@@ -67,7 +67,7 @@ func (s *Subscription) Unsubscribe() {
 // subscriber dead. The subscription Err channel will receive ErrSubscriptionQueueOverflow. Use a sufficiently
 // large buffer on the channel or ensure that the channel usually has at least one reader to prevent this issue.
 func (s *State) SubscribeStorageRaw(keys []types.StorageKey) (
-	*Subscription, error) {
+	*StorageSubscription, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
 	defer cancel()
 
@@ -83,5 +83,5 @@ func (s *State) SubscribeStorageRaw(keys []types.StorageKey) (
 		return nil, err
 	}
 
-	return &Subscription{sub: sub, channel: c}, nil
+	return &StorageSubscription{sub: sub, channel: c}, nil
 }
