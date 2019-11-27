@@ -18,51 +18,438 @@ package gsrpc_test
 
 import (
 	"fmt"
+	"math/big"
+	"time"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/centrifuge/go-substrate-rpc-client/config"
+	"github.com/centrifuge/go-substrate-rpc-client/signature"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
 func Example_simpleConnect() {
+	// The following example shows how to instantiate a Substrate API and use it to connect to a node
+
 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
 	if err != nil {
 		panic(err)
 	}
 
-	hash, err := api.RPC.Chain.GetBlockHashLatest()
+	chain, err := api.RPC.System.Chain()
+	if err != nil {
+		panic(err)
+	}
+	nodeName, err := api.RPC.System.Name()
+	if err != nil {
+		panic(err)
+	}
+	nodeVersion, err := api.RPC.System.Version()
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(hash.Hex())
+	fmt.Printf("You are connected to chain %v using %v v%v\n", chain, nodeName, nodeVersion)
+
+	// Output: You are connected to chain Development using substrate-node v2.0.0
 }
 
-// TODO: add example for listening to new blocks
-// func Example_listenToNewBlocks() {
-// 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
-// 	if err != nil {
-// 		panic(err)
-// 	}
+func Example_listenToNewBlocks() {
+	// This example shows how to subscribe to new blocks.
+	//
+	// It displays the block number every time a new block is seen by the node you are connected to.
+	//
+	// NOTE: The example runs until 10 blocks are received or until you stop it with CTRL+C
 
-// 	heads, errs, close, err := api.RPC.System.SubscribeNewHead()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer close()
+	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
+	if err != nil {
+		panic(err)
+	}
 
-// 	// see gethrpc for more details
+	sub, err := api.RPC.Chain.SubscribeNewHeads()
+	if err != nil {
+		panic(err)
+	}
+	defer sub.Unsubscribe()
 
-// 	count := 0
+	count := 0
 
-// 	for {
-// 		select {
-// 		case head := <-heads:
-// 			fmt.Printf("#%v: Got header %v\n", count, head.Number)
-// 			count++
-// 		case err := <-errs:
-// 			fmt.Errorf("Got error: %v;", err)
-// 		}
-// 	}
-// }
+	for {
+		head := <-sub.Chan()
+		fmt.Printf("Chain is at block: #%v\n", head.Number)
+		count++
 
-//// TODO: implement more: https://polkadot.js.org/api/examples/promise/03_listen_to_balance_change/
+		if count == 10 {
+			sub.Unsubscribe()
+			break
+		}
+	}
+}
+
+func Example_listenToBalanceChange() {
+	// This example shows how to instantiate a Substrate API and use it to connect to a node and retrieve balance
+	// updates
+	//
+	// NOTE: The example runs until you stop it with CTRL+C
+
+	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
+	if err != nil {
+		panic(err)
+	}
+
+	meta, err := api.RPC.State.GetMetadataLatest()
+	if err != nil {
+		panic(err)
+	}
+
+	// Known account we want to use (available on dev chain, with funds)
+	alice, err := types.HexDecodeString("0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")
+	if err != nil {
+		panic(err)
+	}
+
+	key, err := types.CreateStorageKey(meta, "Balances", "FreeBalance", alice)
+	if err != nil {
+		panic(err)
+	}
+
+	// Retrieve the initial balance
+	var previous types.U128
+	err = api.RPC.State.GetStorageLatest(key, &previous)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%#x has a balance of %v\n", alice, previous)
+	fmt.Printf("You may leave this example running and transfer any value to %#x\n", alice)
+
+	// Here we subscribe to any balance changes
+	sub, err := api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key})
+	if err != nil {
+		panic(err)
+	}
+	defer sub.Unsubscribe()
+
+	// outer for loop for subscription notifications
+	for {
+		// inner loop for the changes within one of those notifications
+		for _, chng := range (<-sub.Chan()).Changes {
+			var current types.U128
+			if err = types.DecodeFromBytes(chng.StorageData, &current); err != nil {
+				panic(err)
+			}
+
+			// Calculate the delta
+			var change = types.U128{Int: big.NewInt(0).Sub(current.Int, previous.Int)}
+
+			// Only display positive value changes (Since we are pulling `previous` above already,
+			// the initial balance change will also be zero)
+			if change.Cmp(big.NewInt(0)) != 0 {
+				previous = current
+				fmt.Printf("New balance change of: %v\n", change)
+				return
+			}
+		}
+	}
+}
+
+func Example_unsubscribeFromListeningToUpdates() {
+	// This example shows how to subscribe to and later unsubscribe from listening to block updates.
+	//
+	// In this example we're calling the built-in unsubscribe() function after a timeOut of 20s to cleanup and
+	// unsubscribe from listening to updates.
+
+	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
+	if err != nil {
+		panic(err)
+	}
+
+	sub, err := api.RPC.Chain.SubscribeNewHeads()
+	if err != nil {
+		panic(err)
+	}
+	defer sub.Unsubscribe()
+
+	timeout := time.After(20 * time.Second)
+
+	for {
+		select {
+		case head := <-sub.Chan():
+			fmt.Printf("Chain is at block: #%v\n", head.Number)
+		case <-timeout:
+			sub.Unsubscribe()
+			fmt.Println("Unsubscribed")
+			return
+		}
+	}
+}
+
+func Example_makeASimpleTransfer() {
+	// This sample shows how to create a transaction to make a transfer from one an account to another.
+
+	// Instantiate the API
+	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
+	if err != nil {
+		panic(err)
+	}
+
+	meta, err := api.RPC.State.GetMetadataLatest()
+	if err != nil {
+		panic(err)
+	}
+
+	// Create a call, transferring 12345 units to Bob
+	bob, err := types.NewAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
+	if err != nil {
+		panic(err)
+	}
+
+	c, err := types.NewCall(meta, "Balances.transfer", bob, types.UCompact(12345))
+	if err != nil {
+		panic(err)
+	}
+
+	// Create the extrinsic
+	ext := types.NewExtrinsic(c)
+	if err != nil {
+		panic(err)
+	}
+
+	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
+	if err != nil {
+		panic(err)
+	}
+
+	rv, err := api.RPC.State.GetRuntimeVersionLatest()
+	if err != nil {
+		panic(err)
+	}
+
+	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", signature.TestKeyringPairAlice.PublicKey)
+	if err != nil {
+		panic(err)
+	}
+
+	var nonce uint32
+	err = api.RPC.State.GetStorageLatest(key, &nonce)
+	if err != nil {
+		panic(err)
+	}
+
+	o := types.SignatureOptions{
+		BlockHash:   genesisHash,
+		Era:         types.ExtrinsicEra{IsMortalEra: false},
+		GenesisHash: genesisHash,
+		Nonce:       types.UCompact(nonce),
+		SpecVersion: rv.SpecVersion,
+		Tip:         0,
+	}
+
+	// Sign the transaction using Alice's default account
+	err = ext.Sign(signature.TestKeyringPairAlice, o)
+	if err != nil {
+		panic(err)
+	}
+
+	// Send the extrinsic
+	hash, err := api.RPC.Author.SubmitExtrinsic(ext)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Transfer sent with hash %#x\n", hash)
+}
+
+func Example_displaySystemEvents() {
+	// Query the system events and extract information from them. This example runs until exited via Ctrl-C
+
+	// Create our API with a default connection to the local node
+	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
+	if err != nil {
+		panic(err)
+	}
+
+	meta, err := api.RPC.State.GetMetadataLatest()
+	if err != nil {
+		panic(err)
+	}
+
+	// Subscribe to system events via storage
+	key, err := types.CreateStorageKey(meta, "System", "Events", nil)
+	if err != nil {
+		panic(err)
+	}
+
+	sub, err := api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key})
+	if err != nil {
+		panic(err)
+	}
+	defer sub.Unsubscribe()
+
+	// outer for loop for subscription notifications
+	for {
+		set := <-sub.Chan()
+		// inner loop for the changes within one of those notifications
+		for _, chng := range set.Changes {
+			if !types.Eq(chng.StorageKey, key) || !chng.HasStorageData {
+				// skip, we are only interested in events with countent
+				continue
+			}
+
+			// Decode the event records
+			events := types.EventRecords{}
+			err = types.EventRecordsRaw(chng.StorageData).DecodeEventRecords(meta, &events)
+			if err != nil {
+				panic(err)
+			}
+
+			// Show what we are busy with
+			for _, e := range events.Balances_NewAccount {
+				fmt.Printf("\tBalances:NewAccount:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%#x, %v\n", e.AccountID, e.Balance)
+			}
+			for _, e := range events.Balances_ReapedAccount {
+				fmt.Printf("\tBalances:ReapedAccount:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%#x\n", e.AccountID)
+			}
+			for _, e := range events.Balances_Transfer {
+				fmt.Printf("\tBalances:Transfer:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%v, %v, %v, %v\n", e.From, e.To, e.Value, e.Fees)
+			}
+			for _, e := range events.Grandpa_NewAuthorities {
+				fmt.Printf("\tGrandpa:NewAuthorities:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%v\n", e.NewAuthorities)
+			}
+			for _, e := range events.Grandpa_Paused {
+				fmt.Printf("\tGrandpa:Paused:: (phase=%#v)\n", e.Phase)
+			}
+			for _, e := range events.Grandpa_Resumed {
+				fmt.Printf("\tGrandpa:Resumed:: (phase=%#v)\n", e.Phase)
+			}
+			for _, e := range events.ImOnline_HeartbeatReceived {
+				fmt.Printf("\tImOnline:HeartbeatReceived:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%#x\n", e.AuthorityID)
+			}
+			for _, e := range events.Indices_NewAccountIndex {
+				fmt.Printf("\tIndices:NewAccountIndex:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%#x%v\n", e.AccountID, e.AccountIndex)
+			}
+			for _, e := range events.Offences_Offence {
+				fmt.Printf("\tOffences:Offence:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%v%v\n", e.Kind, e.OpaqueTimeSlot)
+			}
+			for _, e := range events.Session_NewSession {
+				fmt.Printf("\tSession:NewSession:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%v\n", e.SessionIndex)
+			}
+			for _, e := range events.Staking_OldSlashingReportDiscarded {
+				fmt.Printf("\tStaking:OldSlashingReportDiscarded:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%v\n", e.SessionIndex)
+			}
+			for _, e := range events.Staking_Reward {
+				fmt.Printf("\tStaking:Reward:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%v\n", e.Balance)
+			}
+			for _, e := range events.Staking_Slash {
+				fmt.Printf("\tStaking:Slash:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%#x%v\n", e.AccountID, e.Balance)
+			}
+			for _, e := range events.System_ExtrinsicSuccess {
+				fmt.Printf("\tSystem:ExtrinsicSuccess:: (phase=%#v)\n", e.Phase)
+			}
+			for _, e := range events.System_ExtrinsicFailed {
+				fmt.Printf("\tSystem:ErtrinsicFailed:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%v\n", e.DispatchError)
+			}
+		}
+	}
+}
+
+func Example_transactionWithEvents() {
+	// Display the events that occur during a transfer by sending a value to bob
+
+	// Instantiate the API
+	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
+	if err != nil {
+		panic(err)
+	}
+
+	meta, err := api.RPC.State.GetMetadataLatest()
+	if err != nil {
+		panic(err)
+	}
+
+	// Create a call, transferring 12345 units to Bob
+	bob, err := types.NewAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
+	if err != nil {
+		panic(err)
+	}
+
+	amount := types.UCompact(12345)
+
+	c, err := types.NewCall(meta, "Balances.transfer", bob, amount)
+	if err != nil {
+		panic(err)
+	}
+
+	// Create the extrinsic
+	ext := types.NewExtrinsic(c)
+	if err != nil {
+		panic(err)
+	}
+
+	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
+	if err != nil {
+		panic(err)
+	}
+
+	rv, err := api.RPC.State.GetRuntimeVersionLatest()
+	if err != nil {
+		panic(err)
+	}
+
+	// Get the nonce for Alice
+	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", signature.TestKeyringPairAlice.PublicKey)
+	if err != nil {
+		panic(err)
+	}
+
+	var nonce uint32
+	err = api.RPC.State.GetStorageLatest(key, &nonce)
+	if err != nil {
+		panic(err)
+	}
+
+	o := types.SignatureOptions{
+		BlockHash:   genesisHash,
+		Era:         types.ExtrinsicEra{IsMortalEra: false},
+		GenesisHash: genesisHash,
+		Nonce:       types.UCompact(nonce),
+		SpecVersion: rv.SpecVersion,
+		Tip:         0,
+	}
+
+	fmt.Printf("Sending %v from %#x to %#x with nonce %v", amount, signature.TestKeyringPairAlice.PublicKey, bob.AsAccountID, nonce)
+
+	// Sign the transaction using Alice's default account
+	err = ext.Sign(signature.TestKeyringPairAlice, o)
+	if err != nil {
+		panic(err)
+	}
+
+	// Do the transfer and track the actual status
+	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(ext)
+	if err != nil {
+		panic(err)
+	}
+	defer sub.Unsubscribe()
+
+	for {
+		status := <-sub.Chan()
+		fmt.Printf("Transaction status: %#v\n", status)
+
+		if status.IsFinalized {
+			fmt.Printf("Completed at block hash: %#x\n", status.AsFinalized)
+			return
+		}
+	}
+}
