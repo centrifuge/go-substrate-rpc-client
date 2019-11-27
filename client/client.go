@@ -34,6 +34,8 @@ type Client interface {
 
 	URL() string
 	//MetaData(cache bool) (*MetadataVersioned, error)
+
+	Ctx() context.Context
 }
 
 type client struct {
@@ -49,9 +51,14 @@ type client struct {
 	//metadataLock sync.RWMutex
 }
 
-// Returns the URL the client connects to
+// URL returns the URL the client connects to
 func (c client) URL() string {
 	return c.url
+}
+
+// Ctx returns the context.Context
+func (c client) Ctx() context.Context {
+	return c.ctx
 }
 
 // TODO move to State struct

@@ -14,30 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rpc
+package system
 
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/author"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/state"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/system"
 )
 
-type RPC struct {
-	Author *author.Author
-	Chain  *chain.Chain
-	State  *state.State
-	System *system.System
+// System exposes methods for retrieval of system data
+type System struct {
 	client client.Client
 }
 
-func NewRPC(cl client.Client) *RPC {
-	return &RPC{
-		Author: author.NewAuthor(cl),
-		Chain:  chain.NewChain(cl),
-		State:  state.NewState(cl),
-		System: system.NewSystem(cl),
-		client: cl,
-	}
+// NewSystem creates a new System struct
+func NewSystem(cl client.Client) *System {
+	return &System{cl}
 }

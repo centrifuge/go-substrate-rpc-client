@@ -102,7 +102,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 	}
 	defer sub.Unsubscribe()
 
-	timeout := time.After(1000 * time.Second)
+	timeout := time.After(10 * time.Second)
 
 	for {
 		select {
@@ -115,7 +115,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 				return
 			}
 		case <-timeout:
-			assert.FailNow(t, "timeout reached without getting finalized status for extrinsic")
+			assert.FailNow(t, "timeout of 10 seconds reached without getting finalized status for extrinsic")
 			return
 		}
 	}

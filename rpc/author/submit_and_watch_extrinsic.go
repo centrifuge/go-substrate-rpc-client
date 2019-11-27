@@ -64,7 +64,7 @@ func (s *ExtrinsicStatusSubscription) Unsubscribe() {
 // that will receive server notifications containing the extrinsic status updates.
 func (a *Author) SubmitAndWatchExtrinsic(xt types.Extrinsic) (*ExtrinsicStatusSubscription, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
-	defer cancel() // TODO move into subscribe function?
+	defer cancel()
 
 	c := make(chan types.ExtrinsicStatus)
 
