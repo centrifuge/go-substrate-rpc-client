@@ -63,7 +63,7 @@ func (s *NewHeadsSubscription) Unsubscribe() {
 // SubscribeNewHeads subscribes the best headers, returning a subscription that will
 // receive server notifications containing the Header.
 func (c *Chain) SubscribeNewHeads() (*NewHeadsSubscription, error) {
-	ctx, cancel := context.WithTimeout(c.client.Ctx(), config.Default().SubscribeTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
 	defer cancel()
 
 	ch := make(chan types.Header)

@@ -68,7 +68,7 @@ func (s *StorageSubscription) Unsubscribe() {
 // large buffer on the channel or ensure that the channel usually has at least one reader to prevent this issue.
 func (s *State) SubscribeStorageRaw(keys []types.StorageKey) (
 	*StorageSubscription, error) {
-	ctx, cancel := context.WithTimeout(s.client.Ctx(), config.Default().SubscribeTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
 	defer cancel()
 
 	c := make(chan types.StorageChangeSet)
