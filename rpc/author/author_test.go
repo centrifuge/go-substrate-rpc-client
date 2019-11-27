@@ -46,10 +46,15 @@ func TestMain(m *testing.M) {
 // MockSrv holds data and methods exposed by the RPC Mock Server used in integration tests
 type MockSrv struct {
 	submitExtrinsicHash string
+	pendingExtrinsics   []string
 }
 
 func (s *MockSrv) SubmitExtrinsic(extrinsic string) string {
 	return mockSrv.submitExtrinsicHash
+}
+
+func (s *MockSrv) PendingExtrinsics() []string {
+	return mockSrv.pendingExtrinsics
 }
 
 // mockSrv sets default data used in tests. This data might become stale when substrate is updated – just run the tests
@@ -57,4 +62,5 @@ func (s *MockSrv) SubmitExtrinsic(extrinsic string) string {
 // config.Default().RPCURL
 var mockSrv = MockSrv{
 	submitExtrinsicHash: "0x9a8ef9794ded03b4d1ae45034351210e87f970f1f9500994bca82f9cd5a1166e",
+	pendingExtrinsics:   []string{"0x290284ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d00a023bbe883405b5fac2aa114093fcf3d0802d2f3d3715e09129b00a4bf741048caf53d8c7d97e872caa703e7d04f174a4e2ed4acadee4173a8b6bab7e45c0a06000c000600ff8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48e56c"}, //nolint:lll
 }

@@ -14,27 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rpc
+package types
 
-import (
-	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/author"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/state"
-)
-
-type RPC struct {
-	Author *author.Author
-	Chain  *chain.Chain
-	State  *state.State
-	client client.Client
-}
-
-func NewRPC(cl client.Client) *RPC {
-	return &RPC{
-		Author: author.NewAuthor(cl),
-		Chain:  chain.NewChain(cl),
-		State:  state.NewState(cl),
-		client: cl,
-	}
+// NetworkState contains the current state of the network
+type NetworkState struct {
+	PeerID Text
 }

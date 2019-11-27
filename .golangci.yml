@@ -45,6 +45,12 @@ issues:
     # Exclude some linters from running on tests files.
     - path: scale
       text: ".*"
+    - path: types/digest.go
+      linters:
+        - dupl
+    - path: types/digest_of.go
+      linters:
+        - dupl
     - path: types/int.go
       linters:
         - dupl

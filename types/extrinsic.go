@@ -36,6 +36,7 @@ const (
 	ExtrinsicVersion1       = 1
 	ExtrinsicVersion2       = 2
 	ExtrinsicVersion3       = 3
+	ExtrinsicVersion4       = 4
 )
 
 // Extrinsic is a piece of Args bundled into a block that expresses something from the "external" (i.e. off-chain)
@@ -44,8 +45,8 @@ const (
 type Extrinsic struct {
 	// Version is the encoded version flag (which encodes the raw transaction version and signing information in one byte)
 	Version byte
-	// Signature is the ExtrinsicSignatureV3, it's present depends on the Version flag
-	Signature ExtrinsicSignatureV3
+	// Signature is the ExtrinsicSignatureV4, it's presence depends on the Version flag
+	Signature ExtrinsicSignatureV4
 	// Method is the call this extrinsic wraps
 	Method Call
 }
@@ -53,7 +54,7 @@ type Extrinsic struct {
 // NewExtrinsic creates a new Extrinsic from the provided Call
 func NewExtrinsic(c Call) Extrinsic {
 	return Extrinsic{
-		Version: ExtrinsicVersion3,
+		Version: ExtrinsicVersion4,
 		Method:  c,
 	}
 }
@@ -119,7 +120,7 @@ func (e Extrinsic) Type() uint8 {
 
 // Sign adds a signature to the extrinsic
 func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error {
-	if e.Type() != ExtrinsicVersion3 {
+	if e.Type() != ExtrinsicVersion4 {
 		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(), e.Type())
 	}
 
@@ -149,9 +150,9 @@ func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error
 		return err
 	}
 
-	extSig := ExtrinsicSignatureV3{
+	extSig := ExtrinsicSignatureV4{
 		Signer:    signerPubKey,
-		Signature: sig,
+		Signature: MultiSignature{IsSr25519: true, AsSr25519: sig},
 		Era:       era,
 		Nonce:     o.Nonce,
 		Tip:       o.Tip,
@@ -180,7 +181,7 @@ func (e *Extrinsic) Decode(decoder scale.Decoder) error {
 
 	// signature
 	if e.IsSigned() {
-		if e.Type() != ExtrinsicVersion3 {
+		if e.Type() != ExtrinsicVersion4 {
 			return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(),
 				e.Type())
 		}
@@ -201,7 +202,7 @@ func (e *Extrinsic) Decode(decoder scale.Decoder) error {
 }
 
 func (e Extrinsic) Encode(encoder scale.Encoder) error {
-	if e.Type() != ExtrinsicVersion3 {
+	if e.Type() != ExtrinsicVersion4 {
 		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(),
 			e.Type())
 	}

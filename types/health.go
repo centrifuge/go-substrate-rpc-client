@@ -14,26 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package state
+package types
 
-// func TestState_SubscribeStorage(t *testing.T) {
-// 	meta, err := state.GetMetadataLatest()
-// 	assert.NoError(t, err)
-
-// 	key, err := types.CreateStorageKey(meta, "System", "Events", nil)
-// 	assert.NoError(t, err)
-
-// 	_, err = state.SubscribeStorageRaw([]types.StorageKey{key})
-// 	assert.NoError(t, err)
-
-// 	// TODO
-// 	// sub.Unsubscribe()
-
-// 	// test channel is closed
-// 	// _, ok := <-sub.Chan()
-
-// 	// assert.True(t, ok)
-
-// 	// assert.Equal(t, )
-// 	// fmt.Printf("%#v\n", <-c)
-// }
+// Health contains the status of a node
+type Health struct {
+	Peers           U64
+	IsSyncing       bool
+	ShouldHavePeers bool
+}

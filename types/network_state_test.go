@@ -14,27 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rpc
+package types_test
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/author"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/state"
+	"testing"
+
+	. "github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-type RPC struct {
-	Author *author.Author
-	Chain  *chain.Chain
-	State  *state.State
-	client client.Client
+func TestNetworkState_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, NetworkState{NewText("ab123")})
 }
 
-func NewRPC(cl client.Client) *RPC {
-	return &RPC{
-		Author: author.NewAuthor(cl),
-		Chain:  chain.NewChain(cl),
-		State:  state.NewState(cl),
-		client: cl,
-	}
+func TestNetworkState_Encode(t *testing.T) {
+	assertEncode(t, []encodingAssert{
+		{NetworkState{NewText("ab123")}, MustHexDecodeString("0x146162313233")},
+	})
+}
+
+func TestNetworkState_Decode(t *testing.T) {
+	assertDecode(t, []decodingAssert{
+		{MustHexDecodeString("0x146162313233"), NetworkState{NewText("ab123")}},
+	})
 }

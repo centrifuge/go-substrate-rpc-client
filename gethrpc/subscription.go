@@ -22,12 +22,10 @@ import (
 	"context"
 	crand "crypto/rand"
 	"encoding/binary"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"math/rand"
 	"reflect"
-	"strings"
 	"sync"
 	"time"
 )
@@ -42,7 +40,7 @@ var (
 var globalGen = randomIDGenerator()
 
 // ID defines a pseudo random number that is used to identify RPC subscriptions.
-type ID string
+type ID uint32
 
 // NewID returns a new, random ID.
 func NewID() ID {
@@ -62,19 +60,14 @@ func randomIDGenerator() func() ID {
 	return func() ID {
 		mu.Lock()
 		defer mu.Unlock()
-		id := make([]byte, 16)
+		id := make([]byte, 4)
 		rng.Read(id)
 		return encodeID(id)
 	}
 }
 
 func encodeID(b []byte) ID {
-	id := hex.EncodeToString(b)
-	id = strings.TrimLeft(id, "0")
-	if id == "" {
-		id = "0" // ID's are RPC quantities, no leading zero's and 0 is 0x0.
-	}
-	return ID("0x" + id)
+	return ID(uint32(b[0])<<24 | uint32(b[1])<<16 | uint32(b[2])<<8 | uint32(b[3]))
 }
 
 type notifierKey struct{}
@@ -88,8 +81,11 @@ func NotifierFromContext(ctx context.Context) (*Notifier, bool) {
 // Notifier is tied to a RPC connection that supports subscriptions.
 // Server callbacks use the notifier to send notifications.
 type Notifier struct {
-	h         *handler
-	namespace string
+	h                        *handler
+	namespace                string
+	subscribeMethodSuffix    string
+	unsubscribeMethodSuffix  string
+	notificationMethodSuffix string
 
 	mu           sync.Mutex
 	sub          *Subscription
@@ -111,7 +107,9 @@ func (n *Notifier) CreateSubscription() *Subscription {
 	} else if n.callReturned {
 		panic("can't create subscription after subscribe call has returned")
 	}
-	n.sub = &Subscription{ID: n.h.idgen(), namespace: n.namespace, err: make(chan error, 1)}
+	n.sub = &Subscription{ID: n.h.idgen(), namespace: n.namespace, subscribeMethodSuffix: n.subscribeMethodSuffix,
+		unsubscribeMethodSuffix: n.unsubscribeMethodSuffix, notificationMethodSuffix: n.notificationMethodSuffix,
+		err: make(chan error, 1)}
 	return n.sub
 }
 
@@ -170,11 +168,11 @@ func (n *Notifier) activate() error {
 }
 
 func (n *Notifier) send(sub *Subscription, data json.RawMessage) error {
-	params, _ := json.Marshal(&subscriptionResult{ID: 1, Result: data}) // TODO use sub.ID instead
+	params, _ := json.Marshal(&subscriptionResult{ID: int(sub.ID), Result: data})
 	ctx := context.Background()
 	return n.h.conn.Write(ctx, &jsonrpcMessage{
 		Version: vsn,
-		Method:  n.namespace + notificationMethodSuffix,
+		Method:  n.namespace + n.notificationMethodSuffix,
 		Params:  params,
 	})
 }
@@ -182,9 +180,12 @@ func (n *Notifier) send(sub *Subscription, data json.RawMessage) error {
 // A Subscription is created by a notifier and tight to that notifier. The client can use
 // this subscription to wait for an unsubscribe request for the client, see Err().
 type Subscription struct {
-	ID        ID
-	namespace string
-	err       chan error // closed on unsubscribe
+	ID                       ID
+	namespace                string
+	subscribeMethodSuffix    string
+	unsubscribeMethodSuffix  string
+	notificationMethodSuffix string
+	err                      chan error // closed on unsubscribe
 }
 
 // Err returns a channel that is closed when the client send an unsubscribe request.
@@ -200,12 +201,15 @@ func (s *Subscription) MarshalJSON() ([]byte, error) {
 // ClientSubscription is a subscription established through the Client's Subscribe or
 // EthSubscribe methods.
 type ClientSubscription struct {
-	client    *Client
-	etype     reflect.Type
-	channel   reflect.Value
-	namespace string
-	subid     string
-	in        chan json.RawMessage
+	client                   *Client
+	etype                    reflect.Type
+	channel                  reflect.Value
+	namespace                string
+	subscribeMethodSuffix    string
+	unsubscribeMethodSuffix  string
+	notificationMethodSuffix string
+	subid                    string
+	in                       chan json.RawMessage
 
 	quitOnce sync.Once     // ensures quit is closed once
 	quit     chan struct{} // quit is closed when the subscription exits
@@ -213,15 +217,19 @@ type ClientSubscription struct {
 	err      chan error
 }
 
-func newClientSubscription(c *Client, namespace string, channel reflect.Value) *ClientSubscription {
+func newClientSubscription(c *Client, namespace, subscribeMethodSuffix, unsubscribeMethodSuffix,
+	notificationMethodSuffix string, channel reflect.Value) *ClientSubscription {
 	sub := &ClientSubscription{
-		client:    c,
-		namespace: namespace,
-		etype:     channel.Type().Elem(),
-		channel:   channel,
-		quit:      make(chan struct{}),
-		err:       make(chan error, 1),
-		in:        make(chan json.RawMessage),
+		client:                   c,
+		namespace:                namespace,
+		subscribeMethodSuffix:    subscribeMethodSuffix,
+		unsubscribeMethodSuffix:  unsubscribeMethodSuffix,
+		notificationMethodSuffix: notificationMethodSuffix,
+		etype:                    channel.Type().Elem(),
+		channel:                  channel,
+		quit:                     make(chan struct{}),
+		err:                      make(chan error, 1),
+		in:                       make(chan json.RawMessage),
 	}
 	return sub
 }
@@ -323,5 +331,5 @@ func (sub *ClientSubscription) unmarshal(result json.RawMessage) (interface{}, e
 
 func (sub *ClientSubscription) requestUnsubscribe() error {
 	var result interface{}
-	return sub.client.Call(&result, sub.namespace+unsubscribeMethodSuffix, sub.subid)
+	return sub.client.Call(&result, sub.namespace+"_"+sub.unsubscribeMethodSuffix, sub.subid)
 }

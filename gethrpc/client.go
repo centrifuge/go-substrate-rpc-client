@@ -393,15 +393,15 @@ func (c *Client) Notify(ctx context.Context, method string, args ...interface{})
 	}
 }
 
-// EthSubscribe registers a subscripion under the "eth" namespace.
-func (c *Client) EthSubscribe(ctx context.Context, channel interface{}, args ...interface{}) (*ClientSubscription, error) {
-	return c.Subscribe(ctx, "eth", channel, args...)
-}
+// // EthSubscribe registers a subscripion under the "eth" namespace.
+// func (c *Client) EthSubscribe(ctx context.Context, channel interface{}, args ...interface{}) (*ClientSubscription, error) {
+// 	return c.Subscribe(ctx, "eth", channel, args...)
+// }
 
-// ShhSubscribe registers a subscripion under the "shh" namespace.
-func (c *Client) ShhSubscribe(ctx context.Context, channel interface{}, args ...interface{}) (*ClientSubscription, error) {
-	return c.Subscribe(ctx, "shh", channel, args...)
-}
+// // ShhSubscribe registers a subscripion under the "shh" namespace.
+// func (c *Client) ShhSubscribe(ctx context.Context, channel interface{}, args ...interface{}) (*ClientSubscription, error) {
+// 	return c.Subscribe(ctx, "shh", channel, args...)
+// }
 
 // Subscribe calls the "<namespace>_subscribe" method with the given arguments,
 // registering a subscription. Server notifications for the subscription are
@@ -415,11 +415,12 @@ func (c *Client) ShhSubscribe(ctx context.Context, channel interface{}, args ...
 // before considering the subscriber dead. The subscription Err channel will receive
 // ErrSubscriptionQueueOverflow. Use a sufficiently large buffer on the channel or ensure
 // that the channel usually has at least one reader to prevent this issue.
-func (c *Client) Subscribe(ctx context.Context, namespace string, channel interface{}, args ...interface{}) (*ClientSubscription, error) {
+func (c *Client) Subscribe(ctx context.Context, namespace, subscribeMethodSuffix, unsubscribeMethodSuffix,
+	notificationMethodSuffix string, channel interface{}, args ...interface{}) (*ClientSubscription, error) {
 	// Check type of channel first.
 	chanVal := reflect.ValueOf(channel)
 	if chanVal.Kind() != reflect.Chan || chanVal.Type().ChanDir()&reflect.SendDir == 0 {
-		panic("first argument to Subscribe must be a writable channel")
+		panic("sixth argument to Subscribe must be a writable channel")
 	}
 	if chanVal.IsNil() {
 		panic("channel given to Subscribe must not be nil")
@@ -428,14 +429,15 @@ func (c *Client) Subscribe(ctx context.Context, namespace string, channel interf
 		return nil, ErrNotificationsUnsupported
 	}
 
-	msg, err := c.newMessage(namespace+subscribeMethodSuffix, args...)
+	msg, err := c.newMessage(namespace+"_"+subscribeMethodSuffix, args...)
 	if err != nil {
 		return nil, err
 	}
 	op := &requestOp{
 		ids:  []json.RawMessage{msg.ID},
 		resp: make(chan *jsonrpcMessage),
-		sub:  newClientSubscription(c, namespace, chanVal),
+		sub: newClientSubscription(c, namespace, subscribeMethodSuffix, unsubscribeMethodSuffix,
+			notificationMethodSuffix, chanVal),
 	}
 
 	// Send the subscription request.

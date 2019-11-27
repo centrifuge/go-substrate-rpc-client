@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -234,11 +233,12 @@ func (h *handler) handleImmediate(msg *jsonrpcMessage) bool {
 	start := time.Now()
 	switch {
 	case msg.isNotification():
-		if strings.HasSuffix(msg.Method, notificationMethodSuffix) {
-			h.handleSubscriptionResult(msg)
-			return true
-		}
-		return false
+		// TODO find better way to perform this check
+		// if strings.HasSuffix(msg.Method, notificationMethodSuffix) {
+		h.handleSubscriptionResult(msg)
+		return true
+		// }
+		// return false
 	case msg.isResponse():
 		h.handleResponse(msg)
 		h.log.Trace("Handled RPC response", "reqid", idForLog{msg.ID}, "t", time.Since(start))
@@ -315,15 +315,15 @@ func (h *handler) handleCallMsg(ctx *callProc, msg *jsonrpcMessage) *jsonrpcMess
 
 // handleCall processes method calls.
 func (h *handler) handleCall(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage {
-	if msg.isSubscribe() {
-		return h.handleSubscribe(cp, msg)
-	}
+	// if msg.isSubscribe() {
+	// 	return h.handleSubscribe(cp, msg)
+	// }
 	var callb *callback
-	if msg.isUnsubscribe() {
-		callb = h.unsubscribeCb
-	} else {
-		callb = h.reg.callback(msg.Method)
-	}
+	// if msg.isUnsubscribe() {
+	// callb = h.unsubscribeCb
+	// } else {
+	callb = h.reg.callback(msg.Method)
+	// }
 	if callb == nil {
 		return msg.errorResponse(&methodNotFoundError{method: msg.Method})
 	}
@@ -336,37 +336,37 @@ func (h *handler) handleCall(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage 
 }
 
 // handleSubscribe processes *_subscribe method calls.
-func (h *handler) handleSubscribe(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage {
-	if !h.allowSubscribe {
-		return msg.errorResponse(ErrNotificationsUnsupported)
-	}
+// func (h *handler) handleSubscribe(cp *callProc, msg *jsonrpcMessage) *jsonrpcMessage {
+// 	if !h.allowSubscribe {
+// 		return msg.errorResponse(ErrNotificationsUnsupported)
+// 	}
 
-	// Subscription method name is first argument.
-	name, err := parseSubscriptionName(msg.Params)
-	if err != nil {
-		return msg.errorResponse(&invalidParamsError{err.Error()})
-	}
-	namespace := msg.namespace()
-	callb := h.reg.subscription(namespace, name)
-	if callb == nil {
-		return msg.errorResponse(&subscriptionNotFoundError{namespace, name})
-	}
+// 	// Subscription method name is first argument.
+// 	name, err := parseSubscriptionName(msg.Params)
+// 	if err != nil {
+// 		return msg.errorResponse(&invalidParamsError{err.Error()})
+// 	}
+// 	namespace := msg.namespace()
+// 	callb := h.reg.subscription(namespace, name)
+// 	if callb == nil {
+// 		return msg.errorResponse(&subscriptionNotFoundError{namespace, name})
+// 	}
 
-	// Parse subscription name arg too, but remove it before calling the callback.
-	argTypes := append([]reflect.Type{stringType}, callb.argTypes...)
-	args, err := parsePositionalArguments(msg.Params, argTypes)
-	if err != nil {
-		return msg.errorResponse(&invalidParamsError{err.Error()})
-	}
-	args = args[1:]
+// 	// Parse subscription name arg too, but remove it before calling the callback.
+// 	argTypes := append([]reflect.Type{stringType}, callb.argTypes...)
+// 	args, err := parsePositionalArguments(msg.Params, argTypes)
+// 	if err != nil {
+// 		return msg.errorResponse(&invalidParamsError{err.Error()})
+// 	}
+// 	args = args[1:]
 
-	// Install notifier in context so the subscription handler can find it.
-	n := &Notifier{h: h, namespace: namespace}
-	cp.notifiers = append(cp.notifiers, n)
-	ctx := context.WithValue(cp.ctx, notifierKey{}, n)
+// 	// Install notifier in context so the subscription handler can find it.
+// 	n := &Notifier{h: h, namespace: namespace}
+// 	cp.notifiers = append(cp.notifiers, n)
+// 	ctx := context.WithValue(cp.ctx, notifierKey{}, n)
 
-	return h.runMethod(ctx, msg, callb, args)
-}
+// 	return h.runMethod(ctx, msg, callb, args)
+// }
 
 // runMethod runs the Go callback for an RPC method.
 func (h *handler) runMethod(ctx context.Context, msg *jsonrpcMessage, callb *callback, args []reflect.Value) *jsonrpcMessage {

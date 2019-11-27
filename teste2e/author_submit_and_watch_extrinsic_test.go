@@ -19,14 +19,16 @@ package teste2e
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/centrifuge/go-substrate-rpc-client/config"
 	"github.com/centrifuge/go-substrate-rpc-client/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestChain_SubmitExtrinsic(t *testing.T) {
+func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping end-to-end test in short mode.")
 	}
@@ -55,11 +57,6 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-
-	// blockHash, err := api.RPC.Chain.GetBlockHashLatest()
-	// if err != nil {
-	// 	panic(err)
-	// }
 
 	era := types.ExtrinsicEra{IsMortalEra: false}
 
@@ -99,10 +96,27 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
-	extEnc, err := types.EncodeToHexString(ext)
+	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(ext)
 	if err != nil {
 		panic(err)
 	}
+	defer sub.Unsubscribe()
 
-	fmt.Printf("%#v\n", extEnc)
+	timeout := time.After(1000 * time.Second)
+
+	for {
+		select {
+		case status := <-sub.Chan():
+			fmt.Printf("%#v\n", status)
+
+			if status.IsFinalized {
+				assert.False(t, types.Eq(status.AsFinalized, types.ExtrinsicStatus{}.AsFinalized),
+					"expected AsFinalized not to be empty")
+				return
+			}
+		case <-timeout:
+			assert.FailNow(t, "timeout reached without getting finalized status for extrinsic")
+			return
+		}
+	}
 }
