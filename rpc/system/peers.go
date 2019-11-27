@@ -14,30 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rpc
+package system
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/author"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/state"
-	"github.com/centrifuge/go-substrate-rpc-client/rpc/system"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-type RPC struct {
-	Author *author.Author
-	Chain  *chain.Chain
-	State  *state.State
-	System *system.System
-	client client.Client
-}
-
-func NewRPC(cl client.Client) *RPC {
-	return &RPC{
-		Author: author.NewAuthor(cl),
-		Chain:  chain.NewChain(cl),
-		State:  state.NewState(cl),
-		System: system.NewSystem(cl),
-		client: cl,
-	}
+// Peers retrieves the currently connected peers
+func (c *System) Peers() ([]types.PeerInfo, error) {
+	var p []types.PeerInfo
+	err := c.client.Call(&p, "system_peers")
+	return p, err
 }
