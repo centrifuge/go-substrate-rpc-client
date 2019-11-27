@@ -116,13 +116,17 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		}
 	}
 
-	for i := 0; i < 30; i++ {
+	for i := 0; ; i++ {
 		xts, err := api.RPC.Author.PendingExtrinsics()
 		if err != nil {
 			panic(err)
 		}
 
 		fmt.Printf("Pending extrinsics: %#v\n", xts)
+
+		if i >= 2 {
+			break
+		}
 
 		time.Sleep(1 * time.Second)
 	}
