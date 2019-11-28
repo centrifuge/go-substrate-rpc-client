@@ -170,6 +170,13 @@ type EventSystemExtrinsicFailed struct {
 	Topics        []Hash
 }
 
+// EventTreasuryDeposit is emitted when some funds have been deposited
+type EventTreasuryDeposit struct {
+	Phase  Phase
+	Balance   U128
+	Topics []Hash
+}
+
 // EventRecords is a default set of possible event records that can be used as a target for
 // `func (e EventRecordsRaw) Decode(...`
 type EventRecords struct {
@@ -188,6 +195,7 @@ type EventRecords struct {
 	Staking_Slash                      []EventStakingSlash                      //nolint:stylecheck,golint
 	System_ExtrinsicSuccess            []EventSystemExtrinsicSuccess            //nolint:stylecheck,golint
 	System_ExtrinsicFailed             []EventSystemExtrinsicFailed             //nolint:stylecheck,golint
+	Treasury_Deposit                   []EventTreasuryDeposit                   //nolint:stylecheck,golint
 }
 
 // DecodeEventRecords decodes the events records from an EventRecordRaw into a target t using the given Metadata m
