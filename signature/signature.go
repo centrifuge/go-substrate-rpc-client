@@ -19,12 +19,12 @@ package signature
 import (
 	"encoding/hex"
 	"fmt"
-	"log"
+	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 )
 
-// const subkeyCmd = "/Users/philipstanislaus/go/src/github.com/paritytech/substrate/target/debug/subkey"
 const subkeyCmd = "subkey"
 
 type KeyringPair struct {
@@ -34,6 +34,46 @@ type KeyringPair struct {
 	Address string
 	// PublicKey
 	PublicKey []byte
+}
+
+var rePubKey = regexp.MustCompile(`Public key \(hex\): 0x([a-f0-9]*)\n`)
+var reAddress = regexp.MustCompile(`Address \(SS58\): ([a-zA-Z0-9]*)\n`)
+
+func KeyringPairFromSecret(seedOrPhrase string) (KeyringPair, error) {
+	// use "subkey" command for creation of public key and address
+	cmd := exec.Command(subkeyCmd, "inspect", seedOrPhrase)
+
+	// execute the command, get the output
+	out, err := cmd.Output()
+	if err != nil {
+		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret: %v", err.Error())
+	}
+
+	if string(out) == "Invalid phrase/URI given" {
+		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret: invalid phrase/URI given")
+	}
+
+	// find the pub key
+	resPk := rePubKey.FindStringSubmatch(string(out))
+	if len(resPk) != 2 {
+		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret, pubkey not found in output: %v", resPk)
+	}
+	pk, err := hex.DecodeString(string(resPk[1]))
+	if err != nil {
+		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret, could not hex decode pubkey: %v", string(resPk[1]))
+	}
+
+	// find the address
+	addr := reAddress.FindStringSubmatch(string(out))
+	if len(addr) != 2 {
+		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret, address not found in output: %v", addr)
+	}
+
+	return KeyringPair{
+		URI:       seedOrPhrase,
+		Address:   addr[1],
+		PublicKey: pk,
+	}, nil
 }
 
 var TestKeyringPairAlice = KeyringPair{
@@ -52,7 +92,7 @@ func Sign(data []byte, privateKeyURI string) ([]byte, error) {
 	dataHex := hex.EncodeToString(data)
 	cmd.Stdin = strings.NewReader(dataHex)
 
-	log.Printf("echo -n \"%v\" | %v sign %v --hex", dataHex, subkeyCmd, privateKeyURI)
+	// log.Printf("echo -n \"%v\" | %v sign %v --hex", dataHex, subkeyCmd, privateKeyURI)
 
 	// execute the command, get the output
 	out, err := cmd.Output()
@@ -85,12 +125,12 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 	dataHex := hex.EncodeToString(data)
 	cmd.Stdin = strings.NewReader(dataHex)
 
-	log.Printf("echo -n \"%v\" | %v verify %v %v --hex", dataHex, subkeyCmd, sigHex, privateKeyURI)
+	// log.Printf("echo -n \"%v\" | %v verify %v %v --hex", dataHex, subkeyCmd, sigHex, privateKeyURI)
 
 	// execute the command, get the output
 	out, err := cmd.Output()
 	if err != nil {
-		log.Fatal("Failed to verify with subkey", err.Error())
+		return false, fmt.Errorf("failed to verify with subkey: %v", err.Error())
 	}
 
 	// remove line feed
@@ -101,4 +141,19 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 	outStr := string(out)
 	valid := outStr == "Signature verifies correctly."
 	return valid, nil
+}
+
+// LoadKeyringPairFromEnv looks up whether the env variable TEST_PRIV_KEY is set and is not empty and tries to use its
+// content as a private phrase, seed or URI to derive a key ring pair. Panics if the private phrase, seed or URI is
+// not valid or the keyring pair cannot be derived
+func LoadKeyringPairFromEnv() (kp KeyringPair, ok bool) {
+	priv, ok := os.LookupEnv("TEST_PRIV_KEY")
+	if !ok || priv == "" {
+		return kp, false
+	}
+	kp, err := KeyringPairFromSecret(priv)
+	if err != nil {
+		panic(fmt.Errorf("cannot load keyring pair from env or use fallback: %v", err))
+	}
+	return kp, true
 }

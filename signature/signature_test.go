@@ -21,8 +21,36 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/signature"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
 )
+
+var testSecretPhrase = "little orbit comfort eyebrow talk pink flame ridge bring milk equip blood"
+var testSecretSeed = "0x167d9a020688544ea246b056799d6a771e97c9da057e4d0b87024537f99177bc"
+var testPubKey = "0xdc64bef918ddda3126a39a11113767741ddfdf91399f055e1d963f2ae1ec2535"
+var testAddressSS58 = "5H3gKVQU7DfNFfNGkgTrD7p715jjg7QXtat8X3UxiSyw7APW"
+
+func TestKeyRingPairFromSecretPhrase(t *testing.T) {
+	p, err := KeyringPairFromSecret(testSecretPhrase)
+	assert.NoError(t, err)
+
+	assert.Equal(t, KeyringPair{
+		URI: testSecretPhrase,
+		Address: testAddressSS58,
+		PublicKey: types.MustHexDecodeString(testPubKey),
+	}, p)
+}
+
+func TestKeyringPairFromSecretSeed(t *testing.T) {
+	p, err := KeyringPairFromSecret(testSecretSeed)
+	assert.NoError(t, err)
+
+	assert.Equal(t, KeyringPair{
+		URI: testSecretSeed,
+		Address: testAddressSS58,
+		PublicKey: types.MustHexDecodeString(testPubKey),
+	}, p)
+}
 
 func TestSignAndVerify(t *testing.T) {
 	data := []byte("hello!")
