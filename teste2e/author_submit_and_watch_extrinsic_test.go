@@ -33,6 +33,11 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		t.Skip("skipping end-to-end test in short mode.")
 	}
 
+	from, ok := signature.LoadKeyringPairFromEnv()
+	if !ok {
+		t.Skip("skipping end-to-end that requires a private key because TEST_PRIV_KEY is not set or empty")
+	}
+
 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
 	if err != nil {
 		panic(err)
@@ -70,7 +75,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
-	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", signature.TestKeyringPairAlice.PublicKey)
+	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", from.PublicKey)
 	if err != nil {
 		panic(err)
 	}
@@ -91,7 +96,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		Tip:         0,
 	}
 
-	err = ext.Sign(signature.TestKeyringPairAlice, o)
+	err = ext.Sign(from, o)
 	if err != nil {
 		panic(err)
 	}

@@ -19,6 +19,7 @@ package signature
 import (
 	"encoding/hex"
 	"fmt"
+	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -69,8 +70,8 @@ func KeyringPairFromSecret(seedOrPhrase string) (KeyringPair, error) {
 	}
 
 	return KeyringPair{
-		URI: seedOrPhrase,
-		Address: addr[1],
+		URI:       seedOrPhrase,
+		Address:   addr[1],
 		PublicKey: pk,
 	}, nil
 }
@@ -140,4 +141,19 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 	outStr := string(out)
 	valid := outStr == "Signature verifies correctly."
 	return valid, nil
+}
+
+// LoadKeyringPairFromEnv looks up whether the env variable TEST_PRIV_KEY is set and is not empty and tries to use its
+// content as a private phrase, seed or URI to derive a key ring pair. Panics if the private phrase, seed or URI is
+// not valid or the keyring pair cannot be derived
+func LoadKeyringPairFromEnv() (kp KeyringPair, ok bool) {
+	priv, ok := os.LookupEnv("TEST_PRIV_KEY")
+	if !ok || priv == "" {
+		return kp, false
+	}
+	kp, err := KeyringPairFromSecret(priv)
+	if err != nil {
+		panic(fmt.Errorf("cannot load keyring pair from env or use fallback: %v", err))
+	}
+	return kp, true
 }
