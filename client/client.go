@@ -34,14 +34,10 @@ type Client interface {
 
 	URL() string
 	//MetaData(cache bool) (*MetadataVersioned, error)
-
-	Ctx() context.Context
 }
 
 type client struct {
 	gethrpc.Client
-
-	ctx context.Context
 
 	url string
 
@@ -54,11 +50,6 @@ type client struct {
 // URL returns the URL the client connects to
 func (c client) URL() string {
 	return c.url
-}
-
-// Ctx returns the context.Context
-func (c client) Ctx() context.Context {
-	return c.ctx
 }
 
 // TODO move to State struct
@@ -92,7 +83,7 @@ func Connect(url string) (Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	cc := client{*c, ctx, url}
+	cc := client{*c, url}
 	return &cc, nil
 }
 
