@@ -25,7 +25,8 @@ import (
 )
 
 const (
-	Milliseconds = 1000
+	NanosInSecond  = 1e9
+	MillisInSecond = 1e3
 )
 
 // Moment is a wrapper around milliseconds/timestamps using the `time.Time` type.
@@ -50,13 +51,16 @@ func (m *Moment) Decode(decoder scale.Decoder) error {
 		return fmt.Errorf("cannot decode a uint64 into a Moment if it overflows int64")
 	}
 
-	*m = NewMoment(time.Unix(int64(u/Milliseconds), 0))
+	secs := u / MillisInSecond
+	nanos := (u % uint64(MillisInSecond)) * uint64(NanosInSecond)
+
+	*m = NewMoment(time.Unix(int64(secs), int64(nanos)))
 
 	return nil
 }
 
 func (m Moment) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(uint64(m.Unix()*Milliseconds))
+	err := encoder.Encode(uint64(m.UnixNano() / (NanosInSecond / MillisInSecond)))
 	if err != nil {
 		return err
 	}

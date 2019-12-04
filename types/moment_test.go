@@ -24,7 +24,7 @@ import (
 )
 
 func TestMoment_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewMoment(time.Unix(12345, 0)))
+	assertRoundtrip(t, NewMoment(time.Unix(1575470205, 874000000000)))
 	assertRoundtrip(t, NewMoment(time.Unix(0, 0)))
 }
 
