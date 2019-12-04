@@ -34,20 +34,20 @@ func TestMoment_EncodedLength(t *testing.T) {
 
 func TestMoment_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewMoment(time.Unix(12345, 0)), MustHexDecodeString("0x3930000000000000")},
+		{NewMoment(time.Unix(12345, 0)), MustHexDecodeString("0xa85ebc0000000000")},
 	})
 }
 
 func TestMoment_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
 		{NewMoment(time.Unix(12345, 0)), MustHexDecodeString(
-			"0x3927a81b1d2d202b1cd21a1183123a4720b4ae7ecdf5eeed9f4026833b0e88ef")},
+			"0x388c23ace057ec800ef437dcc68bfbcd2b1a22fe79aceb623d7d21f7bda56848")},
 	})
 }
 
 func TestMoment_Hex(t *testing.T) {
 	assertEncodeToHex(t, []encodeToHexAssert{
-		{NewMoment(time.Unix(12345, 0)), "0x3930000000000000"},
+		{NewMoment(time.Unix(12345, 0)), "0xa85ebc0000000000"},
 	})
 }
 
