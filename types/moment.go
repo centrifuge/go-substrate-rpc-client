@@ -24,9 +24,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
-// Moment is a wrapper around seconds/timestamps using the `time.Time` type. Internally the representation only has
-// second precicion (aligning with Rust), so any numbers passed an/out are always per-second. For any encoding/decoding
-// the 1000 multiplier would be applied to get it in line with time.Time.
+const (
+	NanosInSecond  = 1e9
+	MillisInSecond = 1e3
+)
+
+// Moment is a wrapper around milliseconds/timestamps using the `time.Time` type.
 type Moment struct {
 	time.Time
 }
@@ -48,13 +51,16 @@ func (m *Moment) Decode(decoder scale.Decoder) error {
 		return fmt.Errorf("cannot decode a uint64 into a Moment if it overflows int64")
 	}
 
-	*m = NewMoment(time.Unix(int64(u), 0))
+	secs := u / MillisInSecond
+	nanos := (u % uint64(MillisInSecond)) * uint64(NanosInSecond)
+
+	*m = NewMoment(time.Unix(int64(secs), int64(nanos)))
 
 	return nil
 }
 
 func (m Moment) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(uint64(m.Unix()))
+	err := encoder.Encode(uint64(m.UnixNano() / (NanosInSecond / MillisInSecond)))
 	if err != nil {
 		return err
 	}
