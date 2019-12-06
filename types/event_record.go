@@ -192,8 +192,8 @@ type EventRecords struct {
 	Grandpa_NewAuthorities             []EventGrandpaNewAuthorities             //nolint:stylecheck,golint
 	Grandpa_Paused                     []EventGrandpaPaused                     //nolint:stylecheck,golint
 	Grandpa_Resumed                    []EventGrandpaResumed                    //nolint:stylecheck,golint
-	ImOnline_AllGood                   []EventImOnlineAllGood                   //nolint:stylecheck,golint
 	ImOnline_HeartbeatReceived         []EventImOnlineHeartbeatReceived         //nolint:stylecheck,golint
+	ImOnline_AllGood                   []EventImOnlineAllGood                   //nolint:stylecheck,golint
 	Indices_NewAccountIndex            []EventIndicesNewAccountIndex            //nolint:stylecheck,golint
 	Offences_Offence                   []EventOffencesOffence                   //nolint:stylecheck,golint
 	Session_NewSession                 []EventSessionNewSession                 //nolint:stylecheck,golint
