@@ -101,6 +101,12 @@ type EventGrandpaResumed struct {
 	Topics []Hash
 }
 
+// EventImOnlineAllGood is emitted at the end of the session, no offence was committed
+type EventImOnlineAllGood struct {
+	Phase  Phase
+	Topics []Hash
+}
+
 // EventImOnlineHeartbeatReceived is emitted when a new heartbeat was received from AuthorityId
 type EventImOnlineHeartbeatReceived struct {
 	Phase       Phase
@@ -187,6 +193,7 @@ type EventRecords struct {
 	Grandpa_Paused                     []EventGrandpaPaused                     //nolint:stylecheck,golint
 	Grandpa_Resumed                    []EventGrandpaResumed                    //nolint:stylecheck,golint
 	ImOnline_HeartbeatReceived         []EventImOnlineHeartbeatReceived         //nolint:stylecheck,golint
+	ImOnline_AllGood                   []EventImOnlineAllGood                   //nolint:stylecheck,golint
 	Indices_NewAccountIndex            []EventIndicesNewAccountIndex            //nolint:stylecheck,golint
 	Offences_Offence                   []EventOffencesOffence                   //nolint:stylecheck,golint
 	Session_NewSession                 []EventSessionNewSession                 //nolint:stylecheck,golint
