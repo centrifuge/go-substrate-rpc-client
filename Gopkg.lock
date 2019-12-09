@@ -2,6 +2,17 @@
 
 
 [[projects]]
+  branch = "development"
+  digest = "1:ad77b20c92f2418802e50880d27084689d742fe263735b239aff52a713720627"
+  name = "github.com/ChainSafe/gossamer"
+  packages = [
+    "codec",
+    "common",
+  ]
+  pruneopts = "UT"
+  revision = "b47531a951e73920a49d06957516d2e593a594b6"
+
+[[projects]]
   branch = "master"
   digest = "1:7d191fd0c54ff370eaf6116a14dafe2a328df487baea280699f597aae858d00d"
   name = "github.com/aristanetworks/goarista"
@@ -119,6 +130,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/ChainSafe/gossamer/codec",
     "github.com/davecgh/go-spew/spew",
     "github.com/deckarep/golang-set",
     "github.com/ethereum/go-ethereum/common",

@@ -101,7 +101,7 @@ type EventGrandpaResumed struct {
 	Topics []Hash
 }
 
-// EventImOnlineAllGood is emitted at the end of the session, no offence was committed
+// EventImOnlineAllGood is emitted when at the end of the session, no offence was committed
 type EventImOnlineAllGood struct {
 	Phase  Phase
 	Topics []Hash
@@ -112,6 +112,27 @@ type EventImOnlineHeartbeatReceived struct {
 	Phase       Phase
 	AuthorityID AuthorityID
 	Topics      []Hash
+}
+
+type Exposure struct {
+	Total  UCompact
+	Own    UCompact
+	Others []IndividualExposure
+}
+
+type IndividualExposure struct {
+	Who   AccountID
+	Value UCompact
+}
+
+// EventImOnlineSomeOffline is emitted when the end of the session, at least once validator was found to be offline
+type EventImOnlineSomeOffline struct {
+	Phase                Phase
+	IdentificationTuples []struct {
+		ValidatorID        AccountID
+		FullIdentification Exposure
+	}
+	Topics []Hash
 }
 
 // EventIndicesNewAccountIndex is emitted when a new account index was assigned. This event is not triggered
@@ -148,11 +169,13 @@ type EventStakingOldSlashingReportDiscarded struct {
 	Topics       []Hash
 }
 
-// EventStakingReward is emitted when all validators have been rewarded by the given balance
+// EventStakingReward is emitted when all validators have been rewarded by the first balance; the second is the
+// remainder, from the maximum amount of reward.
 type EventStakingReward struct {
-	Phase   Phase
-	Balance U128
-	Topics  []Hash
+	Phase     Phase
+	Balance   U128
+	Remainder U128
+	Topics    []Hash
 }
 
 // EventStakingSlash is emitted when one validator (and its nominators) has been slashed by the given amount
@@ -178,9 +201,9 @@ type EventSystemExtrinsicFailed struct {
 
 // EventTreasuryDeposit is emitted when some funds have been deposited
 type EventTreasuryDeposit struct {
-	Phase  Phase
-	Balance   U128
-	Topics []Hash
+	Phase   Phase
+	Balance U128
+	Topics  []Hash
 }
 
 // EventRecords is a default set of possible event records that can be used as a target for
@@ -192,8 +215,9 @@ type EventRecords struct {
 	Grandpa_NewAuthorities             []EventGrandpaNewAuthorities             //nolint:stylecheck,golint
 	Grandpa_Paused                     []EventGrandpaPaused                     //nolint:stylecheck,golint
 	Grandpa_Resumed                    []EventGrandpaResumed                    //nolint:stylecheck,golint
-	ImOnline_HeartbeatReceived         []EventImOnlineHeartbeatReceived         //nolint:stylecheck,golint
 	ImOnline_AllGood                   []EventImOnlineAllGood                   //nolint:stylecheck,golint
+	ImOnline_HeartbeatReceived         []EventImOnlineHeartbeatReceived         //nolint:stylecheck,golint
+	ImOnline_SomeOffline               []EventImOnlineSomeOffline               //nolint:stylecheck,golint
 	Indices_NewAccountIndex            []EventIndicesNewAccountIndex            //nolint:stylecheck,golint
 	Offences_Offence                   []EventOffencesOffence                   //nolint:stylecheck,golint
 	Session_NewSession                 []EventSessionNewSession                 //nolint:stylecheck,golint
