@@ -115,12 +115,14 @@ type EventImOnlineHeartbeatReceived struct {
 	Topics      []Hash
 }
 
+// Exposure lists the own and nominated stake of a validator
 type Exposure struct {
 	Total  UCompact
 	Own    UCompact
 	Others []IndividualExposure
 }
 
+// IndividualExposure contains the nominated stake by one specific third party
 type IndividualExposure struct {
 	Who   AccountID
 	Value UCompact
