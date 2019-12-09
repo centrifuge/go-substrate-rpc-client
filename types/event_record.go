@@ -24,6 +24,7 @@ import (
 	"reflect"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/ethereum/go-ethereum/log"
 )
 
 // EventRecordsRaw is a raw record for a set of events, represented as the raw bytes. It exists since
@@ -101,7 +102,7 @@ type EventGrandpaResumed struct {
 	Topics []Hash
 }
 
-// EventImOnlineAllGood is emitted at the end of the session, no offence was committed
+// EventImOnlineAllGood is emitted when at the end of the session, no offence was committed
 type EventImOnlineAllGood struct {
 	Phase  Phase
 	Topics []Hash
@@ -112,6 +113,29 @@ type EventImOnlineHeartbeatReceived struct {
 	Phase       Phase
 	AuthorityID AuthorityID
 	Topics      []Hash
+}
+
+// Exposure lists the own and nominated stake of a validator
+type Exposure struct {
+	Total  UCompact
+	Own    UCompact
+	Others []IndividualExposure
+}
+
+// IndividualExposure contains the nominated stake by one specific third party
+type IndividualExposure struct {
+	Who   AccountID
+	Value UCompact
+}
+
+// EventImOnlineSomeOffline is emitted when the end of the session, at least once validator was found to be offline
+type EventImOnlineSomeOffline struct {
+	Phase                Phase
+	IdentificationTuples []struct {
+		ValidatorID        AccountID
+		FullIdentification Exposure
+	}
+	Topics []Hash
 }
 
 // EventIndicesNewAccountIndex is emitted when a new account index was assigned. This event is not triggered
@@ -148,11 +172,13 @@ type EventStakingOldSlashingReportDiscarded struct {
 	Topics       []Hash
 }
 
-// EventStakingReward is emitted when all validators have been rewarded by the given balance
+// EventStakingReward is emitted when all validators have been rewarded by the first balance; the second is the
+// remainder, from the maximum amount of reward.
 type EventStakingReward struct {
-	Phase   Phase
-	Balance U128
-	Topics  []Hash
+	Phase     Phase
+	Balance   U128
+	Remainder U128
+	Topics    []Hash
 }
 
 // EventStakingSlash is emitted when one validator (and its nominators) has been slashed by the given amount
@@ -178,9 +204,9 @@ type EventSystemExtrinsicFailed struct {
 
 // EventTreasuryDeposit is emitted when some funds have been deposited
 type EventTreasuryDeposit struct {
-	Phase  Phase
-	Balance   U128
-	Topics []Hash
+	Phase   Phase
+	Balance U128
+	Topics  []Hash
 }
 
 // EventRecords is a default set of possible event records that can be used as a target for
@@ -192,8 +218,9 @@ type EventRecords struct {
 	Grandpa_NewAuthorities             []EventGrandpaNewAuthorities             //nolint:stylecheck,golint
 	Grandpa_Paused                     []EventGrandpaPaused                     //nolint:stylecheck,golint
 	Grandpa_Resumed                    []EventGrandpaResumed                    //nolint:stylecheck,golint
-	ImOnline_HeartbeatReceived         []EventImOnlineHeartbeatReceived         //nolint:stylecheck,golint
 	ImOnline_AllGood                   []EventImOnlineAllGood                   //nolint:stylecheck,golint
+	ImOnline_HeartbeatReceived         []EventImOnlineHeartbeatReceived         //nolint:stylecheck,golint
+	ImOnline_SomeOffline               []EventImOnlineSomeOffline               //nolint:stylecheck,golint
 	Indices_NewAccountIndex            []EventIndicesNewAccountIndex            //nolint:stylecheck,golint
 	Offences_Offence                   []EventOffencesOffence                   //nolint:stylecheck,golint
 	Session_NewSession                 []EventSessionNewSession                 //nolint:stylecheck,golint
@@ -207,6 +234,8 @@ type EventRecords struct {
 
 // DecodeEventRecords decodes the events records from an EventRecordRaw into a target t using the given Metadata m
 func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
+	log.Debug(fmt.Sprintf("will decode event records from raw hex: %#x", e))
+
 	// ensure t is a pointer
 	ttyp := reflect.TypeOf(t)
 	if ttyp.Kind() != reflect.Ptr {
@@ -236,8 +265,12 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
 		return err
 	}
 
+	log.Debug(fmt.Sprintf("found %v events", n))
+
 	// iterate over events
 	for i := uint64(0); i < n; i++ {
+		log.Debug(fmt.Sprintf("decoding event #%v", i))
+
 		// decode Phase
 		phase := Phase{}
 		err := decoder.Decode(&phase)
@@ -252,12 +285,16 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
 			return fmt.Errorf("unable to decode EventID for event #%v: %v", i, err)
 		}
 
+		log.Debug(fmt.Sprintf("event #%v has EventID %v", i, id))
+
 		// ask metadata for method & event name for event
 		moduleName, eventName, err := m.FindEventNamesForEventID(id)
 		// moduleName, eventName, err := "System", "ExtrinsicSuccess", nil
 		if err != nil {
 			return fmt.Errorf("unable to find event with EventID %v in metadata for event #%v", id, i)
 		}
+
+		log.Debug(fmt.Sprintf("event #%v is in module %v with event name %v", i, moduleName, eventName))
 
 		// check whether name for eventID exists in t
 		field := val.FieldByName(fmt.Sprintf("%v_%v", moduleName, eventName))
@@ -299,6 +336,8 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
 
 		// add the decoded event to the slice
 		field.Set(reflect.Append(field, holder.Elem()))
+
+		log.Debug(fmt.Sprintf("decoded event #%v", i))
 	}
 	return nil
 }
