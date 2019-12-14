@@ -37,7 +37,8 @@ type KeyringPair struct {
 }
 
 var rePubKey = regexp.MustCompile(`Public key \(hex\): 0x([a-f0-9]*)\n`)
-var reAddress = regexp.MustCompile(`Address \(SS58\): ([a-zA-Z0-9]*)\n`)
+var reAddressOld = regexp.MustCompile(`Address \(SS58\): ([a-zA-Z0-9]*)\n`)
+var reAddressNew = regexp.MustCompile(`SS58 Address:\s+([a-zA-Z0-9]*)\n`)
 
 func KeyringPairFromSecret(seedOrPhrase string) (KeyringPair, error) {
 	// use "subkey" command for creation of public key and address
@@ -64,7 +65,10 @@ func KeyringPairFromSecret(seedOrPhrase string) (KeyringPair, error) {
 	}
 
 	// find the address
-	addr := reAddress.FindStringSubmatch(string(out))
+	addr := reAddressNew.FindStringSubmatch(string(out))
+	if len(addr) != 2 {
+		addr = reAddressOld.FindStringSubmatch(string(out))
+	}
 	if len(addr) != 2 {
 		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret, address not found in output: %v", addr)
 	}
