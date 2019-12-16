@@ -23,6 +23,8 @@ import (
 	"os/exec"
 	"regexp"
 	"strings"
+
+	"golang.org/x/crypto/blake2b"
 )
 
 const subkeyCmd = "subkey"
@@ -85,6 +87,12 @@ var TestKeyringPairAlice = KeyringPair{
 // Sign signs data with the private key under the given derivation path, returning the signature. Requires the subkey
 // command to be in path
 func Sign(data []byte, privateKeyURI string) ([]byte, error) {
+	// if data is longer than 256 bytes, hash it first
+	if len(data) > 256 {
+		h := blake2b.Sum256(data)
+		data = h[:]
+	}
+
 	// use "subkey" command for signature
 	cmd := exec.Command(subkeyCmd, "sign", privateKeyURI, "--hex")
 
