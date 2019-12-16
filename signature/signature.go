@@ -123,6 +123,12 @@ func Sign(data []byte, privateKeyURI string) ([]byte, error) {
 // Verify verifies data using the provided signature and the key under the derivation path. Requires the subkey
 // command to be in path
 func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
+	// if data is longer than 256 bytes, hash it first
+	if len(data) > 256 {
+		h := blake2b.Sum256(data)
+		data = h[:]
+	}
+
 	// hexify the sig
 	sigHex := hex.EncodeToString(sig)
 
