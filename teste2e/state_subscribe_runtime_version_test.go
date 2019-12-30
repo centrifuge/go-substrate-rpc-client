@@ -50,7 +50,7 @@ func TestState_SubscribeRuntimeVersion(t *testing.T) {
 			fmt.Printf("%#v\n", rv)
 			return
 		case <-timeout:
-			assert.FailNow(t, "timeout reached without getting 2 notifications from subscription")
+			assert.FailNow(t, "timeout reached without getting a notification from subscription")
 			return
 		}
 	}
