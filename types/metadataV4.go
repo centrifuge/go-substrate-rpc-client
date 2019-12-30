@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/xxhash"
 	"golang.org/x/crypto/blake2b"
 )
 
@@ -86,7 +87,7 @@ func (m *MetadataV4) FindEventNamesForEventID(eventID EventID) (Text, Text, erro
 	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
 }
 
-func (m *MetadataV4) FindStorageKeyHasher(module string, fn string) (hash.Hash, error) {
+func (m *MetadataV4) FindStorageEntryMetadata(module string, fn string) (StorageEntryMetadata, error) {
 	for _, mod := range m.Modules {
 		if !mod.HasStorage {
 			continue
@@ -98,17 +99,19 @@ func (m *MetadataV4) FindStorageKeyHasher(module string, fn string) (hash.Hash, 
 			if string(s.Name) != fn {
 				continue
 			}
-			if s.Type.IsMap {
-				return s.Type.AsMap.Hasher.HashFunc()
-			}
-			if s.Type.IsDoubleMap {
-				return s.Type.AsDoubleMap.Hasher.HashFunc()
-			}
-			return nil, nil
+			return s, nil
 		}
 		return nil, fmt.Errorf("storage %v not found within module %v", fn, module)
 	}
 	return nil, fmt.Errorf("module %v not found in metadata", module)
+}
+
+type StorageEntryMetadata interface {
+	IsPlain() bool
+	IsMap() bool
+	IsDoubleMap() bool
+	Hasher() (hash.Hash, error)
+	Hasher2() (hash.Hash, error)
 }
 
 type ModuleMetadataV4 struct {
@@ -226,6 +229,32 @@ type StorageFunctionMetadataV4 struct {
 	Type          StorageFunctionTypeV4
 	Fallback      Bytes
 	Documentation []Text
+}
+
+func (s StorageFunctionMetadataV4) IsPlain() bool {
+	return s.Type.IsType
+}
+
+func (s StorageFunctionMetadataV4) IsMap() bool {
+	return s.Type.IsMap
+}
+
+func (s StorageFunctionMetadataV4) IsDoubleMap() bool {
+	return s.Type.IsDoubleMap
+}
+
+func (s StorageFunctionMetadataV4) Hasher() (hash.Hash, error) {
+	if s.Type.IsMap {
+		return s.Type.AsMap.Hasher.HashFunc()
+	}
+	if s.Type.IsDoubleMap {
+		return s.Type.AsDoubleMap.Hasher.HashFunc()
+	}
+	return xxhash.New128(nil), nil
+}
+
+func (s StorageFunctionMetadataV4) Hasher2() (hash.Hash, error) {
+	return nil, fmt.Errorf("Hasher2 is not supported for metadata v4, please upgrade to use metadata v8 or newer")
 }
 
 type StorageFunctionTypeV4 struct {
@@ -384,9 +413,9 @@ type EventMetadataV4 struct {
 
 func (s StorageHasher) HashFunc() (hash.Hash, error) {
 	// Blake2_128
-	// if t.Hasher == 0 {
-	// 	// TODO implement Blake2_128
-	// }
+	if s.IsBlake2_128 {
+		return blake2b.New(128, nil)
+	}
 
 	// Blake2_256
 	if s.IsBlake2_256 {
@@ -394,19 +423,19 @@ func (s StorageHasher) HashFunc() (hash.Hash, error) {
 	}
 
 	// Twox128
-	// if t.Hasher == 2 {
-	// 	// TODO implement Twox128
-	// }
+	if s.IsTwox128 {
+		return xxhash.New128(nil), nil
+	}
 
 	// Twox256
-	// if t.Hasher == 3 {
-	// 	// TODO implement Twox256
-	// }
+	if s.IsTwox256 {
+		return xxhash.New256(nil), nil
+	}
 
 	// Twox64Concat
-	// if t.Hasher == 4 {
-	// 	// TODO implement Twox64Concat
-	// }
+	if s.IsTwox64Concat {
+		return xxhash.New64Concat(nil), nil
+	}
 
 	return nil, errors.New("hash function type not yet supported")
 }

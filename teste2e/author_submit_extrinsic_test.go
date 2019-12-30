@@ -79,7 +79,7 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
-	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", from.PublicKey)
+	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", from.PublicKey, nil)
 	if err != nil {
 		panic(err)
 	}

@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/xxhash"
 )
 
 // Modelled after packages/types/src/Metadata/v7/Metadata.ts
@@ -84,7 +85,7 @@ func (m *MetadataV7) FindEventNamesForEventID(eventID EventID) (Text, Text, erro
 	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
 }
 
-func (m *MetadataV7) FindStorageKeyHasher(module string, fn string) (hash.Hash, error) {
+func (m *MetadataV7) FindStorageEntryMetadata(module string, fn string) (StorageEntryMetadata, error) {
 	for _, mod := range m.Modules {
 		if !mod.HasStorage {
 			continue
@@ -96,13 +97,7 @@ func (m *MetadataV7) FindStorageKeyHasher(module string, fn string) (hash.Hash, 
 			if string(s.Name) != fn {
 				continue
 			}
-			if s.Type.IsMap {
-				return s.Type.AsMap.Hasher.HashFunc()
-			}
-			if s.Type.IsDoubleMap {
-				return s.Type.AsDoubleMap.Hasher.HashFunc()
-			}
-			return nil, nil
+			return s, nil
 		}
 		return nil, fmt.Errorf("storage %v not found within module %v", fn, module)
 	}
@@ -221,6 +216,35 @@ type StorageFunctionMetadataV5 struct {
 	Type          StorageFunctionTypeV5
 	Fallback      Bytes
 	Documentation []Text
+}
+
+func (s StorageFunctionMetadataV5) IsPlain() bool {
+	return s.Type.IsType
+}
+
+func (s StorageFunctionMetadataV5) IsMap() bool {
+	return s.Type.IsMap
+}
+
+func (s StorageFunctionMetadataV5) IsDoubleMap() bool {
+	return s.Type.IsDoubleMap
+}
+
+func (s StorageFunctionMetadataV5) Hasher() (hash.Hash, error) {
+	if s.Type.IsMap {
+		return s.Type.AsMap.Hasher.HashFunc()
+	}
+	if s.Type.IsDoubleMap {
+		return s.Type.AsDoubleMap.Hasher.HashFunc()
+	}
+	return xxhash.New128(nil), nil
+}
+
+func (s StorageFunctionMetadataV5) Hasher2() (hash.Hash, error) {
+	if !s.Type.IsDoubleMap {
+		return nil, fmt.Errorf("only DoubleMaps have a Hasher2")
+	}
+	return s.Type.AsDoubleMap.Key2Hasher.HashFunc()
 }
 
 type StorageFunctionTypeV5 struct {

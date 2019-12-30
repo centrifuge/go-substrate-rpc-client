@@ -18,7 +18,6 @@ package types
 
 import (
 	"fmt"
-	"hash"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
@@ -36,6 +35,8 @@ type Metadata struct {
 	AsMetadataV7 MetadataV7
 	IsMetadataV8 bool
 	AsMetadataV8 MetadataV8
+	IsMetadataV9 bool
+	AsMetadataV9 MetadataV9
 }
 
 func NewMetadataV4() *Metadata {
@@ -48,6 +49,10 @@ func NewMetadataV7() *Metadata {
 
 func NewMetadataV8() *Metadata {
 	return &Metadata{Version: 8, IsMetadataV8: true, AsMetadataV8: MetadataV8{make([]ModuleMetadataV8, 0)}}
+}
+
+func NewMetadataV9() *Metadata {
+	return &Metadata{Version: 9, IsMetadataV9: true, AsMetadataV9: MetadataV9{make([]ModuleMetadataV8, 0)}}
 }
 
 func (m *Metadata) Decode(decoder scale.Decoder) error {
@@ -74,6 +79,9 @@ func (m *Metadata) Decode(decoder scale.Decoder) error {
 	case 8:
 		m.IsMetadataV8 = true
 		err = decoder.Decode(&m.AsMetadataV8)
+	case 9:
+		m.IsMetadataV9 = true
+		err = decoder.Decode(&m.AsMetadataV9)
 	default:
 		return fmt.Errorf("unsupported metadata version %v", m.Version)
 	}
@@ -99,6 +107,8 @@ func (m Metadata) Encode(encoder scale.Encoder) error {
 		err = encoder.Encode(m.AsMetadataV7)
 	case 8:
 		err = encoder.Encode(m.AsMetadataV8)
+	case 9:
+		err = encoder.Encode(m.AsMetadataV9)
 	default:
 		return fmt.Errorf("unsupported metadata version %v", m.Version)
 	}
@@ -114,6 +124,8 @@ func (m *Metadata) FindCallIndex(call string) (CallIndex, error) {
 		return m.AsMetadataV7.FindCallIndex(call)
 	case m.IsMetadataV8:
 		return m.AsMetadataV8.FindCallIndex(call)
+	case m.IsMetadataV9:
+		return m.AsMetadataV9.FindCallIndex(call)
 	default:
 		return CallIndex{}, fmt.Errorf("unsupported metadata version")
 	}
@@ -127,19 +139,23 @@ func (m *Metadata) FindEventNamesForEventID(eventID EventID) (Text, Text, error)
 		return m.AsMetadataV7.FindEventNamesForEventID(eventID)
 	case m.IsMetadataV8:
 		return m.AsMetadataV8.FindEventNamesForEventID(eventID)
+	case m.IsMetadataV9:
+		return m.AsMetadataV9.FindEventNamesForEventID(eventID)
 	default:
 		return "", "", fmt.Errorf("unsupported metadata version")
 	}
 }
 
-func (m *Metadata) FindStorageKeyHasher(module string, fn string) (hash.Hash, error) {
+func (m *Metadata) FindStorageEntryMetadata(module string, fn string) (StorageEntryMetadata, error) {
 	switch {
 	case m.IsMetadataV4:
-		return m.AsMetadataV4.FindStorageKeyHasher(module, fn)
+		return m.AsMetadataV4.FindStorageEntryMetadata(module, fn)
 	case m.IsMetadataV7:
-		return m.AsMetadataV7.FindStorageKeyHasher(module, fn)
+		return m.AsMetadataV7.FindStorageEntryMetadata(module, fn)
 	case m.IsMetadataV8:
-		return m.AsMetadataV8.FindStorageKeyHasher(module, fn)
+		return m.AsMetadataV8.FindStorageEntryMetadata(module, fn)
+	case m.IsMetadataV9:
+		return m.AsMetadataV9.FindStorageEntryMetadata(module, fn)
 	default:
 		return nil, fmt.Errorf("unsupported metadata version")
 	}

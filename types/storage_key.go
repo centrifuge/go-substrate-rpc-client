@@ -21,7 +21,7 @@ import (
 	"io"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
-	"github.com/pierrec/xxHash/xxHash64"
+	"github.com/centrifuge/go-substrate-rpc-client/xxhash"
 )
 
 // StorageKey represents typically hashed storage keys of the system.
@@ -35,28 +35,21 @@ func NewStorageKey(b []byte) StorageKey {
 	return b
 }
 
-// CreateStorageKey uses the given metadata and to derive the right hashing of module, fn names and keys to create a
-// hashed StorageKey
-func CreateStorageKey(meta *Metadata, module string, fn string, key []byte) (StorageKey, error) {
-	hasher, err := meta.FindStorageKeyHasher(module, fn)
+// CreateStorageKey uses the given metadata and to derive the right hashing of method, prefix as well as arguments to
+// create a hashed StorageKey
+func CreateStorageKey(meta *Metadata, prefix, method string, arg []byte, arg2 []byte) (StorageKey, error) {
+	stringKey := []byte(prefix + " " + method)
+
+	entryMeta, err := meta.FindStorageEntryMetadata(prefix, method)
 	if err != nil {
 		return nil, err
 	}
 
-	afn := []byte(module + " " + fn)
-
-	if hasher != nil {
-		_, err = hasher.Write(append(afn, key...))
-		if err != nil {
-			return nil, err
-		}
-		return hasher.Sum(nil), nil
+	if entryMeta.IsDoubleMap() {
+		return createKeyDoubleMap(meta, method, prefix, stringKey, arg, arg2, entryMeta)
 	}
 
-	if key != nil {
-		return createMultiXxhash(append(afn, key...), 2)
-	}
-	return createMultiXxhash(afn, 2)
+	return createKey(meta, method, prefix, stringKey, arg, entryMeta)
 }
 
 // Encode implements encoding for StorageKey, which just unwraps the bytes of StorageKey
@@ -84,15 +77,79 @@ func (s StorageKey) Hex() string {
 	return fmt.Sprintf("%#x", s)
 }
 
-func createMultiXxhash(data []byte, rounds int) ([]byte, error) {
-	res := make([]byte, 0)
-	for i := 0; i < rounds; i++ {
-		h := xxHash64.New(uint64(i))
-		_, err := h.Write(data)
+// createKeyDoubleMap creates a key for a DoubleMap type
+func createKeyDoubleMap(meta *Metadata, method, prefix string, stringKey, arg, arg2 []byte,
+	entryMeta StorageEntryMetadata) (StorageKey, error) {
+	if arg == nil || arg2 == nil {
+		return nil, fmt.Errorf("%v is a DoubleMap and requires two arguments", method)
+	}
+
+	hasher, err := entryMeta.Hasher()
+	if err != nil {
+		return nil, err
+	}
+
+	hasher2, err := entryMeta.Hasher2()
+	if err != nil {
+		return nil, err
+	}
+
+	if meta.Version <= 8 {
+		_, err := hasher.Write(append(stringKey, arg...))
 		if err != nil {
 			return nil, err
 		}
-		res = append(res, h.Sum(nil)...)
+		_, err = hasher2.Write(arg2)
+		if err != nil {
+			return nil, err
+		}
+		return append(hasher.Sum(nil), hasher2.Sum(nil)...), err
 	}
-	return res, nil
+
+	_, err = hasher.Write(arg)
+	if err != nil {
+		return nil, err
+	}
+	_, err = hasher2.Write(arg2)
+	if err != nil {
+		return nil, err
+	}
+
+	key := createPrefixedKey(method, prefix)
+	key = append(key, hasher.Sum(nil)...)
+	key = append(key, hasher2.Sum(nil)...)
+
+	return key, nil
+}
+
+// createKey creates a key for either a map or a plain value
+func createKey(meta *Metadata, method, prefix string, stringKey, arg []byte, entryMeta StorageEntryMetadata) (
+	StorageKey, error) {
+	if entryMeta.IsMap() && arg == nil {
+		return nil, fmt.Errorf("%v is a Map and requires one argument", method)
+	}
+
+	hasher, err := entryMeta.Hasher()
+	if err != nil {
+		return nil, err
+	}
+
+	if meta.Version <= 8 {
+		_, err := hasher.Write(append(stringKey, arg...))
+		return hasher.Sum(nil), err
+	}
+
+	if entryMeta.IsMap() {
+		_, err := hasher.Write(arg)
+		if err != nil {
+			return nil, err
+		}
+		arg = hasher.Sum(nil)
+	}
+
+	return append(createPrefixedKey(method, prefix), arg...), nil
+}
+
+func createPrefixedKey(method, prefix string) []byte {
+	return append(xxhash.New128([]byte(prefix)).Sum(nil), xxhash.New128([]byte(method)).Sum(nil)...)
 }

@@ -87,7 +87,7 @@ func TestFindEventNamesForEventIDV8(t *testing.T) {
 	assert.Equal(t, exampleEventMetadataV4.Name, event)
 }
 
-func TestFindStorageKeyHasherV8(t *testing.T) {
-	_, err := exampleMetadataV8.FindStorageKeyHasher("myStoragePrefix", "myStorageFunc2")
+func TestFindStorageEntryMetadataV8(t *testing.T) {
+	_, err := exampleMetadataV8.FindStorageEntryMetadata("myStoragePrefix", "myStorageFunc2")
 	assert.NoError(t, err)
 }

@@ -23,12 +23,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
-// Modelled after packages/types/src/Metadata/v8/Metadata.ts
-type MetadataV8 struct {
+// Modelled after packages/types/src/Metadata/v9/Metadata.ts
+type MetadataV9 struct {
 	Modules []ModuleMetadataV8
 }
 
-func (m *MetadataV8) Decode(decoder scale.Decoder) error {
+func (m *MetadataV9) Decode(decoder scale.Decoder) error {
 	err := decoder.Decode(&m.Modules)
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func (m *MetadataV8) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (m MetadataV8) Encode(encoder scale.Encoder) error {
+func (m MetadataV9) Encode(encoder scale.Encoder) error {
 	err := encoder.Encode(m.Modules)
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func (m MetadataV8) Encode(encoder scale.Encoder) error {
 	return nil
 }
 
-func (m *MetadataV8) FindCallIndex(call string) (CallIndex, error) {
+func (m *MetadataV9) FindCallIndex(call string) (CallIndex, error) {
 	s := strings.Split(call, ".")
 	mi := uint8(0)
 	for _, mod := range m.Modules {
@@ -65,7 +65,7 @@ func (m *MetadataV8) FindCallIndex(call string) (CallIndex, error) {
 	return CallIndex{}, fmt.Errorf("module %v not found in metadata for call %v", s[0], call)
 }
 
-func (m *MetadataV8) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
+func (m *MetadataV9) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
 	mi := uint8(0)
 	for _, mod := range m.Modules {
 		if !mod.HasEvents {
@@ -83,7 +83,7 @@ func (m *MetadataV8) FindEventNamesForEventID(eventID EventID) (Text, Text, erro
 	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
 }
 
-func (m *MetadataV8) FindStorageEntryMetadata(module string, fn string) (StorageEntryMetadata, error) {
+func (m *MetadataV9) FindStorageEntryMetadata(module string, fn string) (StorageEntryMetadata, error) {
 	for _, mod := range m.Modules {
 		if !mod.HasStorage {
 			continue
@@ -100,121 +100,4 @@ func (m *MetadataV8) FindStorageEntryMetadata(module string, fn string) (Storage
 		return nil, fmt.Errorf("storage %v not found within module %v", fn, module)
 	}
 	return nil, fmt.Errorf("module %v not found in metadata", module)
-}
-
-type ModuleMetadataV8 struct {
-	Name       Text
-	HasStorage bool
-	Storage    StorageMetadata
-	HasCalls   bool
-	Calls      []FunctionMetadataV4
-	HasEvents  bool
-	Events     []EventMetadataV4
-	Constants  []ModuleConstantMetadataV6
-	Errors     []ErrorMetadataV8
-}
-
-func (m *ModuleMetadataV8) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&m.Name)
-	if err != nil {
-		return err
-	}
-
-	err = decoder.Decode(&m.HasStorage)
-	if err != nil {
-		return err
-	}
-
-	if m.HasStorage {
-		err = decoder.Decode(&m.Storage)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = decoder.Decode(&m.HasCalls)
-	if err != nil {
-		return err
-	}
-
-	if m.HasCalls {
-		err = decoder.Decode(&m.Calls)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = decoder.Decode(&m.HasEvents)
-	if err != nil {
-		return err
-	}
-
-	if m.HasEvents {
-		err = decoder.Decode(&m.Events)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = decoder.Decode(&m.Constants)
-	if err != nil {
-		return err
-	}
-
-	return decoder.Decode(&m.Errors)
-}
-
-func (m ModuleMetadataV8) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(m.Name)
-	if err != nil {
-		return err
-	}
-
-	err = encoder.Encode(m.HasStorage)
-	if err != nil {
-		return err
-	}
-
-	if m.HasStorage {
-		err = encoder.Encode(m.Storage)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = encoder.Encode(m.HasCalls)
-	if err != nil {
-		return err
-	}
-
-	if m.HasCalls {
-		err = encoder.Encode(m.Calls)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = encoder.Encode(m.HasEvents)
-	if err != nil {
-		return err
-	}
-
-	if m.HasEvents {
-		err = encoder.Encode(m.Events)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = encoder.Encode(m.Constants)
-	if err != nil {
-		return err
-	}
-
-	return encoder.Encode(m.Errors)
-}
-
-type ErrorMetadataV8 struct {
-	Name          Text
-	Documentation []Text
 }

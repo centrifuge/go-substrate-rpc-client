@@ -37,7 +37,8 @@ func TestState_SubscribeStorage_EventsRaw(t *testing.T) {
 		panic(err)
 	}
 
-	key := types.NewStorageKey(types.MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95c"))
+	key := types.NewStorageKey(types.MustHexDecodeString(
+		"0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7"))
 
 	sub, err := api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key})
 	if err != nil {
@@ -79,7 +80,7 @@ func TestState_SubscribeStorage_Events(t *testing.T) {
 		panic(err)
 	}
 
-	key, err := types.CreateStorageKey(meta, "System", "Events", nil)
+	key, err := types.CreateStorageKey(meta, "System", "Events", nil, nil)
 	if err != nil {
 		panic(err)
 	}
