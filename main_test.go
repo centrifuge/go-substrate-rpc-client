@@ -107,7 +107,7 @@ func Example_listenToBalanceChange() {
 		panic(err)
 	}
 
-	key, err := types.CreateStorageKey(meta, "Balances", "FreeBalance", alice)
+	key, err := types.CreateStorageKey(meta, "Balances", "FreeBalance", alice, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -224,7 +224,7 @@ func Example_makeASimpleTransfer() {
 		panic(err)
 	}
 
-	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", signature.TestKeyringPairAlice.PublicKey)
+	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", signature.TestKeyringPairAlice.PublicKey, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -274,7 +274,7 @@ func Example_displaySystemEvents() {
 	}
 
 	// Subscribe to system events via storage
-	key, err := types.CreateStorageKey(meta, "System", "Events", nil)
+	key, err := types.CreateStorageKey(meta, "System", "Events", nil, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -408,7 +408,7 @@ func Example_transactionWithEvents() {
 	}
 
 	// Get the nonce for Alice
-	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", signature.TestKeyringPairAlice.PublicKey)
+	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", signature.TestKeyringPairAlice.PublicKey, nil)
 	if err != nil {
 		panic(err)
 	}

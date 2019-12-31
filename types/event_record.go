@@ -189,16 +189,76 @@ type EventStakingSlash struct {
 	Topics    []Hash
 }
 
-// EventSystemExtrinsicSuccess is emitted when an extrinsic completed successfully
-type EventSystemExtrinsicSuccess struct {
+// EventSystemExtrinsicSuccessV8 is emitted when an extrinsic completed successfully
+//
+// Deprecated: EventSystemExtrinsicSuccessV8 exists to allow users to simply implement their own EventRecords struct if
+// they are on metadata version 8 or below. Use EventSystemExtrinsicSuccess otherwise
+type EventSystemExtrinsicSuccessV8 struct {
 	Phase  Phase
 	Topics []Hash
+}
+
+// EventSystemExtrinsicSuccess is emitted when an extrinsic completed successfully
+type EventSystemExtrinsicSuccess struct {
+	Phase        Phase
+	DispatchInfo DispatchInfo
+	Topics       []Hash
+}
+
+// DispatchInfo contains a bundle of static information collected from the `#[weight = $x]` attributes.
+type DispatchInfo struct {
+	// Weight of this transaction
+	Weight U32
+	// Class of this transaction
+	Class DispatchClass
+	/// PaysFee indicates whether this transaction pays fees
+	PaysFee bool
+}
+
+// DispatchClass is a generalized group of dispatch types. This is only distinguishing normal, user-triggered
+// transactions (`Normal`) and anything beyond which serves a higher purpose to the system (`Operational`).
+type DispatchClass struct {
+	// A normal dispatch
+	IsNormal bool
+	// An operational dispatch
+	IsOperational bool
+}
+
+func (d *DispatchClass) Decode(decoder scale.Decoder) error {
+	b, err := decoder.ReadOneByte()
+	if b == 0 {
+		d.IsNormal = true
+	} else if b == 1 {
+		d.IsOperational = true
+	}
+	return err
+}
+
+func (d DispatchClass) Encode(encoder scale.Encoder) error {
+	var err error
+	if d.IsNormal {
+		err = encoder.PushByte(0)
+	} else if d.IsOperational {
+		err = encoder.PushByte(1)
+	}
+	return err
+}
+
+// EventSystemExtrinsicFailedV8 is emitted when an extrinsic failed
+//
+// Deprecated: EventSystemExtrinsicFailedV8 exists to allow users to simply implement their own EventRecords struct if
+// they are on metadata version 8 or below. Use EventSystemExtrinsicFailed otherwise
+type EventSystemExtrinsicFailedV8 struct {
+	Phase         Phase
+	DispatchError DispatchError
+	Topics        []Hash
 }
 
 // EventSystemExtrinsicFailed is emitted when an extrinsic failed
 type EventSystemExtrinsicFailed struct {
 	Phase         Phase
 	DispatchError DispatchError
+	DispatchInfo  DispatchInfo
 	Topics        []Hash
 }
 

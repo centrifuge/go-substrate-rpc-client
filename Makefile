@@ -31,10 +31,10 @@ lint-fix: 			## runs linters on go code and automatically fixes issues
 	@golangci-lint run --fix
 
 test: 				## runs all tests in project against the RPC URL specified in the RPC_URL env variable or localhost while excluding gethrpc
-	@go test -v -race `go list ./... | grep -v '/gethrpc'`
+	@go test -race -count=1 `go list ./... | grep -v '/gethrpc'`
 
 test-cover: 			## runs all tests in project against the RPC URL specified in the RPC_URL env variable or localhost and report coverage
-	@go test -v -race -coverprofile=coverage.txt -covermode=atomic `go list ./... | grep -v '/gethrpc'`
+	@go test -race -coverprofile=coverage.txt -covermode=atomic `go list ./... | grep -v '/gethrpc'`
 	@mv coverage.txt shared
 
 test-dockerized: 		## runs all tests in a docker container against the Substrate Default Docker image
@@ -50,7 +50,7 @@ run-substrate-docker: 		## runs the Substrate 1.0 Default Docker image, this can
 	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:latest-v1.0 --dev --rpc-external --ws-external
 
 run-substrate-docker-v2: 	## runs the Substrate 2.0 Default Docker image, this can be used to run the tests
-	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:2.0.0-31c633c47 --dev --rpc-external --ws-external
+	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:2.0.0-5dece71 --dev --rpc-external --ws-external
 
 help: 				## shows this help
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)

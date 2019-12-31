@@ -61,9 +61,10 @@ func KeyringPairFromSecret(seedOrPhrase string) (KeyringPair, error) {
 	if len(resPk) != 2 {
 		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret, pubkey not found in output: %v", resPk)
 	}
-	pk, err := hex.DecodeString(string(resPk[1]))
+	pk, err := hex.DecodeString(resPk[1])
 	if err != nil {
-		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret, could not hex decode pubkey: %v", string(resPk[1]))
+		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret, could not hex decode pubkey: %v",
+			resPk[1])
 	}
 
 	// find the address

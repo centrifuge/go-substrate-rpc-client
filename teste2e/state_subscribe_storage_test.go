@@ -37,7 +37,15 @@ func TestState_SubscribeStorage_EventsRaw(t *testing.T) {
 		panic(err)
 	}
 
-	key := types.NewStorageKey(types.MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95c"))
+	meta, err := api.RPC.State.GetMetadataLatest()
+	if err != nil {
+		panic(err)
+	}
+
+	key, err := types.CreateStorageKey(meta, "System", "Events", nil, nil)
+	if err != nil {
+		panic(err)
+	}
 
 	sub, err := api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key})
 	if err != nil {
@@ -79,7 +87,7 @@ func TestState_SubscribeStorage_Events(t *testing.T) {
 		panic(err)
 	}
 
-	key, err := types.CreateStorageKey(meta, "System", "Events", nil)
+	key, err := types.CreateStorageKey(meta, "System", "Events", nil, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -102,6 +110,9 @@ func TestState_SubscribeStorage_Events(t *testing.T) {
 					// skip, we are only interested in events with content
 					continue
 				}
+
+				fmt.Printf("%#x\n", chng.StorageData)
+
 				events := types.EventRecords{}
 				err = types.EventRecordsRaw(chng.StorageData).DecodeEventRecords(meta, &events)
 				if err != nil {
