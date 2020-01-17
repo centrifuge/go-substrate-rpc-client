@@ -27,16 +27,18 @@ const MagicNumber uint32 = 0x6174656d
 // Modelled after https://github.com/paritytech/substrate/blob/v1.0.0rc2/srml/metadata/src/lib.rs
 
 type Metadata struct {
-	MagicNumber  uint32
-	Version      uint8
-	IsMetadataV4 bool
-	AsMetadataV4 MetadataV4
-	IsMetadataV7 bool
-	AsMetadataV7 MetadataV7
-	IsMetadataV8 bool
-	AsMetadataV8 MetadataV8
-	IsMetadataV9 bool
-	AsMetadataV9 MetadataV9
+	MagicNumber   uint32
+	Version       uint8
+	IsMetadataV4  bool
+	AsMetadataV4  MetadataV4
+	IsMetadataV7  bool
+	AsMetadataV7  MetadataV7
+	IsMetadataV8  bool
+	AsMetadataV8  MetadataV8
+	IsMetadataV9  bool
+	AsMetadataV9  MetadataV9
+	IsMetadataV10 bool
+	AsMetadataV10 MetadataV10
 }
 
 func NewMetadataV4() *Metadata {
@@ -53,6 +55,10 @@ func NewMetadataV8() *Metadata {
 
 func NewMetadataV9() *Metadata {
 	return &Metadata{Version: 9, IsMetadataV9: true, AsMetadataV9: MetadataV9{make([]ModuleMetadataV8, 0)}}
+}
+
+func NewMetadataV10() *Metadata {
+	return &Metadata{Version: 10, IsMetadataV10: true, AsMetadataV10: MetadataV10{make([]ModuleMetadataV10, 0)}}
 }
 
 func (m *Metadata) Decode(decoder scale.Decoder) error {
@@ -82,6 +88,9 @@ func (m *Metadata) Decode(decoder scale.Decoder) error {
 	case 9:
 		m.IsMetadataV9 = true
 		err = decoder.Decode(&m.AsMetadataV9)
+	case 10:
+		m.IsMetadataV10 = true
+		err = decoder.Decode(&m.AsMetadataV10)
 	default:
 		return fmt.Errorf("unsupported metadata version %v", m.Version)
 	}
@@ -109,6 +118,8 @@ func (m Metadata) Encode(encoder scale.Encoder) error {
 		err = encoder.Encode(m.AsMetadataV8)
 	case 9:
 		err = encoder.Encode(m.AsMetadataV9)
+	case 10:
+		err = encoder.Encode(m.AsMetadataV10)
 	default:
 		return fmt.Errorf("unsupported metadata version %v", m.Version)
 	}
@@ -126,6 +137,8 @@ func (m *Metadata) FindCallIndex(call string) (CallIndex, error) {
 		return m.AsMetadataV8.FindCallIndex(call)
 	case m.IsMetadataV9:
 		return m.AsMetadataV9.FindCallIndex(call)
+	case m.IsMetadataV10:
+		return m.AsMetadataV10.FindCallIndex(call)
 	default:
 		return CallIndex{}, fmt.Errorf("unsupported metadata version")
 	}
@@ -141,6 +154,8 @@ func (m *Metadata) FindEventNamesForEventID(eventID EventID) (Text, Text, error)
 		return m.AsMetadataV8.FindEventNamesForEventID(eventID)
 	case m.IsMetadataV9:
 		return m.AsMetadataV9.FindEventNamesForEventID(eventID)
+	case m.IsMetadataV10:
+		return m.AsMetadataV10.FindEventNamesForEventID(eventID)
 	default:
 		return "", "", fmt.Errorf("unsupported metadata version")
 	}
@@ -156,6 +171,8 @@ func (m *Metadata) FindStorageEntryMetadata(module string, fn string) (StorageEn
 		return m.AsMetadataV8.FindStorageEntryMetadata(module, fn)
 	case m.IsMetadataV9:
 		return m.AsMetadataV9.FindStorageEntryMetadata(module, fn)
+	case m.IsMetadataV10:
+		return m.AsMetadataV10.FindStorageEntryMetadata(module, fn)
 	default:
 		return nil, fmt.Errorf("unsupported metadata version")
 	}

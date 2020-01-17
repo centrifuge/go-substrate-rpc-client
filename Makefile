@@ -50,7 +50,7 @@ run-substrate-docker: 		## runs the Substrate 1.0 Default Docker image, this can
 	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:latest-v1.0 --dev --rpc-external --ws-external
 
 run-substrate-docker-v2: 	## runs the Substrate 2.0 Default Docker image, this can be used to run the tests
-	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:2.0.0-5dece71 --dev --rpc-external --ws-external
+	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:2.0.0-ddb309ae --dev --rpc-external --ws-external
 
 help: 				## shows this help
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
