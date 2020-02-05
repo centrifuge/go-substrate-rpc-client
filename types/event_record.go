@@ -293,6 +293,9 @@ type EventRecords struct {
 }
 
 // DecodeEventRecords decodes the events records from an EventRecordRaw into a target t using the given Metadata m
+// If this method returns an error like `unable to decode Phase for event #x: EOF`, it is likely that you have defined
+// a custom event record with a wrong type. For example your custom event record has a field with a length prefixed
+// type, such as types.Bytes, where your event in reallity contains a fixed width type, such as a types.U32.
 func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
 	log.Debug(fmt.Sprintf("will decode event records from raw hex: %#x", e))
 
