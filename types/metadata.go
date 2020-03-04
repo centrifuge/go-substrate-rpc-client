@@ -64,7 +64,7 @@ func NewMetadataV10() *Metadata {
 }
 
 func NewMetadataV11() *Metadata {
-	return &Metadata{Version: 11, IsMetadataV11: true, AsMetadataV11: MetadataV11{}}
+	return &Metadata{Version: 11, IsMetadataV11: true, AsMetadataV11: MetadataV11{MetadataV10: MetadataV10{Modules:make([]ModuleMetadataV10, 0)}}}
 }
 
 func (m *Metadata) Decode(decoder scale.Decoder) error {
