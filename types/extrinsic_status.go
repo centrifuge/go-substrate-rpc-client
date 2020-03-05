@@ -30,8 +30,8 @@ type ExtrinsicStatus struct {
 	IsReady     bool // 1:: Ready
 	IsBroadcast bool // 2:: Broadcast(Vec<Text>)
 	AsBroadcast []Text
-	IsInBlock	bool // 3:: InBlock(BlockHash)
-	AsInBlock Hash
+	IsInBlock   bool // 3:: InBlock(BlockHash)
+	AsInBlock   Hash
 	IsUsurped   bool // 3:: Usurped(Hash)
 	AsUsurped   Hash
 	IsDropped   bool // 5:: Dropped
