@@ -32,7 +32,7 @@ type ExtrinsicStatus struct {
 	AsBroadcast []Text
 	IsInBlock   bool // 3:: InBlock(BlockHash)
 	AsInBlock   Hash
-	IsUsurped   bool // 3:: Usurped(Hash)
+	IsUsurped   bool // 4:: Usurped(Hash)
 	AsUsurped   Hash
 	IsDropped   bool // 5:: Dropped
 	IsInvalid   bool // 6:: Invalid
@@ -127,7 +127,7 @@ func (e *ExtrinsicStatus) UnmarshalJSON(b []byte) error {
 
 	// no simple case, decode into helper
 	var tmp struct {
-		AsFinalized Hash   `json:"finalized"`
+		AsInBlock   Hash   `json:"inBlock"`
 		AsUsurped   Hash   `json:"usurped"`
 		AsBroadcast []Text `json:"broadcast"`
 	}
@@ -138,7 +138,7 @@ func (e *ExtrinsicStatus) UnmarshalJSON(b []byte) error {
 	switch {
 	case strings.HasPrefix(input, "{\"inBlock\""):
 		e.IsInBlock = true
-		e.AsInBlock = tmp.AsFinalized
+		e.AsInBlock = tmp.AsInBlock
 		return nil
 	case strings.HasPrefix(input, "{\"usurped\""):
 		e.IsUsurped = true
@@ -165,9 +165,9 @@ func (e ExtrinsicStatus) MarshalJSON() ([]byte, error) {
 		return []byte("\"invalid\""), nil
 	case e.IsInBlock:
 		var tmp struct {
-			AsFinalized Hash `json:"finalized"`
+			AsInBlock Hash `json:"inBlock"`
 		}
-		tmp.AsFinalized = e.AsInBlock
+		tmp.AsInBlock = e.AsInBlock
 		return json.Marshal(tmp)
 	case e.IsUsurped:
 		var tmp struct {

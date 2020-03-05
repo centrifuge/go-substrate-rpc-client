@@ -46,9 +46,9 @@ func TestExtrinsicStatus_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
 		{testExtrinsicStatus1, []byte{0x00}},
 		{testExtrinsicStatus2, []byte{0x01}},
-		{testExtrinsicStatus3, MustHexDecodeString("0x02ab00000000000000000000000000000000000000000000000000000000000000")}, //nolint:lll
-		{testExtrinsicStatus4, MustHexDecodeString("0x03cd00000000000000000000000000000000000000000000000000000000000000")}, //nolint:lll
-		{testExtrinsicStatus5, MustHexDecodeString("0x040c10546869730869732462726f616463617374")},
+		{testExtrinsicStatus3, MustHexDecodeString("0x03ab00000000000000000000000000000000000000000000000000000000000000")}, //nolint:lll
+		{testExtrinsicStatus4, MustHexDecodeString("0x04cd00000000000000000000000000000000000000000000000000000000000000")}, //nolint:lll
+		{testExtrinsicStatus5, MustHexDecodeString("0x020c10546869730869732462726f616463617374")},
 		{testExtrinsicStatus6, []byte{0x05}},
 		{testExtrinsicStatus7, []byte{0x06}},
 	})
@@ -58,9 +58,9 @@ func TestExtrinsicStatus_Decode(t *testing.T) {
 	assertDecode(t, []decodingAssert{
 		{[]byte{0x00}, testExtrinsicStatus1},
 		{[]byte{0x01}, testExtrinsicStatus2},
-		{MustHexDecodeString("0x02ab00000000000000000000000000000000000000000000000000000000000000"), testExtrinsicStatus3}, //nolint:lll
-		{MustHexDecodeString("0x03cd00000000000000000000000000000000000000000000000000000000000000"), testExtrinsicStatus4}, //nolint:lll
-		{MustHexDecodeString("0x040c10546869730869732462726f616463617374"), testExtrinsicStatus5},
+		{MustHexDecodeString("0x03ab00000000000000000000000000000000000000000000000000000000000000"), testExtrinsicStatus3}, //nolint:lll
+		{MustHexDecodeString("0x04cd00000000000000000000000000000000000000000000000000000000000000"), testExtrinsicStatus4}, //nolint:lll
+		{MustHexDecodeString("0x020c10546869730869732462726f616463617374"), testExtrinsicStatus5},
 		{[]byte{0x05}, testExtrinsicStatus6},
 		{[]byte{0x06}, testExtrinsicStatus7},
 	})
