@@ -28,12 +28,12 @@ import (
 type ExtrinsicStatus struct {
 	IsFuture    bool // 00:: Future
 	IsReady     bool // 1:: Ready
-	IsFinalized bool // 2:: Finalized(Hash)
-	AsFinalized Hash
+	IsBroadcast bool // 2:: Broadcast(Vec<Text>)
+	AsBroadcast []Text
+	IsInBlock	bool // 3:: InBlock(BlockHash)
+	AsInBlock Hash
 	IsUsurped   bool // 3:: Usurped(Hash)
 	AsUsurped   Hash
-	IsBroadcast bool // 4:: Broadcast(Vec<Text>)
-	AsBroadcast []Text
 	IsDropped   bool // 5:: Dropped
 	IsInvalid   bool // 6:: Invalid
 }
@@ -51,14 +51,14 @@ func (e *ExtrinsicStatus) Decode(decoder scale.Decoder) error {
 	case 1:
 		e.IsReady = true
 	case 2:
-		e.IsFinalized = true
-		err = decoder.Decode(&e.AsFinalized)
-	case 3:
-		e.IsUsurped = true
-		err = decoder.Decode(&e.AsUsurped)
-	case 4:
 		e.IsBroadcast = true
 		err = decoder.Decode(&e.AsBroadcast)
+	case 3:
+		e.IsInBlock = true
+		err = decoder.Decode(&e.AsInBlock)
+	case 4:
+		e.IsUsurped = true
+		err = decoder.Decode(&e.AsUsurped)
 	case 5:
 		e.IsDropped = true
 	case 6:
@@ -79,15 +79,15 @@ func (e ExtrinsicStatus) Encode(encoder scale.Encoder) error {
 		err1 = encoder.PushByte(0)
 	case e.IsReady:
 		err1 = encoder.PushByte(1)
-	case e.IsFinalized:
-		err1 = encoder.PushByte(2)
-		err2 = encoder.Encode(e.AsFinalized)
-	case e.IsUsurped:
-		err1 = encoder.PushByte(3)
-		err2 = encoder.Encode(e.AsUsurped)
 	case e.IsBroadcast:
-		err1 = encoder.PushByte(4)
+		err1 = encoder.PushByte(2)
 		err2 = encoder.Encode(e.AsBroadcast)
+	case e.IsInBlock:
+		err1 = encoder.PushByte(3)
+		err2 = encoder.Encode(e.AsInBlock)
+	case e.IsUsurped:
+		err1 = encoder.PushByte(4)
+		err2 = encoder.Encode(e.AsUsurped)
 	case e.IsDropped:
 		err1 = encoder.PushByte(5)
 	case e.IsInvalid:
@@ -136,9 +136,9 @@ func (e *ExtrinsicStatus) UnmarshalJSON(b []byte) error {
 	}
 
 	switch {
-	case strings.HasPrefix(input, "{\"finalized\""):
-		e.IsFinalized = true
-		e.AsFinalized = tmp.AsFinalized
+	case strings.HasPrefix(input, "{\"inBlock\""):
+		e.IsInBlock = true
+		e.AsInBlock = tmp.AsFinalized
 		return nil
 	case strings.HasPrefix(input, "{\"usurped\""):
 		e.IsUsurped = true
@@ -163,11 +163,11 @@ func (e ExtrinsicStatus) MarshalJSON() ([]byte, error) {
 		return []byte("\"dropped\""), nil
 	case e.IsInvalid:
 		return []byte("\"invalid\""), nil
-	case e.IsFinalized:
+	case e.IsInBlock:
 		var tmp struct {
 			AsFinalized Hash `json:"finalized"`
 		}
-		tmp.AsFinalized = e.AsFinalized
+		tmp.AsFinalized = e.AsInBlock
 		return json.Marshal(tmp)
 	case e.IsUsurped:
 		var tmp struct {

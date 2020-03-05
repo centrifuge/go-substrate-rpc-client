@@ -26,7 +26,7 @@ import (
 
 var testExtrinsicStatus1 = ExtrinsicStatus{IsFuture: true}
 var testExtrinsicStatus2 = ExtrinsicStatus{IsReady: true}
-var testExtrinsicStatus3 = ExtrinsicStatus{IsFinalized: true, AsFinalized: NewHash([]byte{0xab})}
+var testExtrinsicStatus3 = ExtrinsicStatus{IsInBlock: true, AsInBlock: NewHash([]byte{0xab})}
 var testExtrinsicStatus4 = ExtrinsicStatus{IsUsurped: true, AsUsurped: NewHash([]byte{0xcd})}
 var testExtrinsicStatus5 = ExtrinsicStatus{IsBroadcast: true, AsBroadcast: []Text{"This", "is", "broadcast"}}
 var testExtrinsicStatus6 = ExtrinsicStatus{IsDropped: true}
@@ -72,8 +72,8 @@ var testExtrinsicStatusTestCases = []struct {
 }{
 	{[]byte("\"future\""), ExtrinsicStatus{IsFuture: true}},
 	{[]byte("\"ready\""), ExtrinsicStatus{IsReady: true}},
-	{[]byte("{\"finalized\":\"0x95e3b7f86541d06306691a2fe8cbd935d0bdd28ea14fe515e2db0fa87847f8f8\"}"),
-		ExtrinsicStatus{IsFinalized: true, AsFinalized: NewHash(MustHexDecodeString(
+	{[]byte("{\"inBlock\":\"0x95e3b7f86541d06306691a2fe8cbd935d0bdd28ea14fe515e2db0fa87847f8f8\"}"),
+		ExtrinsicStatus{IsInBlock: true, AsInBlock: NewHash(MustHexDecodeString(
 			"0x95e3b7f86541d06306691a2fe8cbd935d0bdd28ea14fe515e2db0fa87847f8f8"))}},
 	{[]byte("{\"usurped\":\"0x95e3b7f86541d06306691a2fe8cbd935d0bdd28ea14fe515e2db0fa87847f8ab\"}"),
 		ExtrinsicStatus{IsUsurped: true, AsUsurped: NewHash(MustHexDecodeString(
