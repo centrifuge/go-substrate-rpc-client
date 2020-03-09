@@ -26,16 +26,22 @@ import (
 
 // ExtrinsicStatus is an enum containing the result of an extrinsic submission
 type ExtrinsicStatus struct {
-	IsFuture    bool // 00:: Future
-	IsReady     bool // 1:: Ready
-	IsFinalized bool // 2:: Finalized(Hash)
-	AsFinalized Hash
-	IsUsurped   bool // 3:: Usurped(Hash)
-	AsUsurped   Hash
-	IsBroadcast bool // 4:: Broadcast(Vec<Text>)
-	AsBroadcast []Text
-	IsDropped   bool // 5:: Dropped
-	IsInvalid   bool // 6:: Invalid
+	IsFuture          bool // 00:: Future
+	IsReady           bool // 1:: Ready
+	IsBroadcast       bool // 2:: Broadcast(Vec<Text>)
+	AsBroadcast       []Text
+	IsInBlock         bool // 3:: InBlock(BlockHash)
+	AsInBlock         Hash
+	IsRetracted       bool // 4:: Retracted(BlockHash)
+	AsRetracted       Hash
+	IsFinalityTimeout bool // 5:: FinalityTimeout(BlockHash)
+	AsFinalityTimeout Hash
+	IsFinalized       bool // 6:: Finalized(BlockHash)
+	AsFinalized       Hash
+	IsUsurped         bool // 7:: Usurped(Hash)
+	AsUsurped         Hash
+	IsDropped         bool // 8:: Dropped
+	IsInvalid         bool // 9:: Invalid
 }
 
 func (e *ExtrinsicStatus) Decode(decoder scale.Decoder) error {
@@ -51,17 +57,26 @@ func (e *ExtrinsicStatus) Decode(decoder scale.Decoder) error {
 	case 1:
 		e.IsReady = true
 	case 2:
-		e.IsFinalized = true
-		err = decoder.Decode(&e.AsFinalized)
-	case 3:
-		e.IsUsurped = true
-		err = decoder.Decode(&e.AsUsurped)
-	case 4:
 		e.IsBroadcast = true
 		err = decoder.Decode(&e.AsBroadcast)
+	case 3:
+		e.IsInBlock = true
+		err = decoder.Decode(&e.AsInBlock)
+	case 4:
+		e.IsRetracted = true
+		err = decoder.Decode(&e.AsRetracted)
 	case 5:
-		e.IsDropped = true
+		e.IsFinalityTimeout = true
+		err = decoder.Decode(&e.AsFinalityTimeout)
 	case 6:
+		e.IsFinalized = true
+		err = decoder.Decode(&e.AsFinalized)
+	case 7:
+		e.IsUsurped = true
+		err = decoder.Decode(&e.AsUsurped)
+	case 8:
+		e.IsDropped = true
+	case 9:
 		e.IsInvalid = true
 	}
 
@@ -79,19 +94,28 @@ func (e ExtrinsicStatus) Encode(encoder scale.Encoder) error {
 		err1 = encoder.PushByte(0)
 	case e.IsReady:
 		err1 = encoder.PushByte(1)
-	case e.IsFinalized:
+	case e.IsBroadcast:
 		err1 = encoder.PushByte(2)
+		err2 = encoder.Encode(e.AsBroadcast)
+	case e.IsInBlock:
+		err1 = encoder.PushByte(3)
+		err2 = encoder.Encode(e.AsInBlock)
+	case e.IsRetracted:
+		err1 = encoder.PushByte(4)
+		err2 = encoder.Encode(e.AsRetracted)
+	case e.IsFinalityTimeout:
+		err1 = encoder.PushByte(5)
+		err2 = encoder.Encode(e.AsFinalityTimeout)
+	case e.IsFinalized:
+		err1 = encoder.PushByte(6)
 		err2 = encoder.Encode(e.AsFinalized)
 	case e.IsUsurped:
-		err1 = encoder.PushByte(3)
+		err1 = encoder.PushByte(7)
 		err2 = encoder.Encode(e.AsUsurped)
-	case e.IsBroadcast:
-		err1 = encoder.PushByte(4)
-		err2 = encoder.Encode(e.AsBroadcast)
 	case e.IsDropped:
-		err1 = encoder.PushByte(5)
+		err1 = encoder.PushByte(8)
 	case e.IsInvalid:
-		err1 = encoder.PushByte(6)
+		err1 = encoder.PushByte(9)
 	}
 
 	if err1 != nil {
@@ -127,15 +151,34 @@ func (e *ExtrinsicStatus) UnmarshalJSON(b []byte) error {
 
 	// no simple case, decode into helper
 	var tmp struct {
-		AsFinalized Hash   `json:"finalized"`
-		AsUsurped   Hash   `json:"usurped"`
-		AsBroadcast []Text `json:"broadcast"`
+		AsBroadcast       []Text `json:"broadcast"`
+		AsInBlock         Hash   `json:"inBlock"`
+		AsRetracted       Hash   `json:"retracted"`
+		AsFinalityTimeout Hash   `json:"finalityTimeout"`
+		AsFinalized       Hash   `json:"finalized"`
+		AsUsurped         Hash   `json:"usurped"`
 	}
 	if err := json.Unmarshal(b, &tmp); err != nil {
 		return err
 	}
 
 	switch {
+	case strings.HasPrefix(input, "{\"broadcast\""):
+		e.IsBroadcast = true
+		e.AsBroadcast = tmp.AsBroadcast
+		return nil
+	case strings.HasPrefix(input, "{\"inBlock\""):
+		e.IsInBlock = true
+		e.AsInBlock = tmp.AsInBlock
+		return nil
+	case strings.HasPrefix(input, "{\"retracted\""):
+		e.IsRetracted = true
+		e.AsRetracted = tmp.AsRetracted
+		return nil
+	case strings.HasPrefix(input, "{\"finalityTimeout\""):
+		e.IsFinalityTimeout = true
+		e.AsFinalityTimeout = tmp.AsFinalityTimeout
+		return nil
 	case strings.HasPrefix(input, "{\"finalized\""):
 		e.IsFinalized = true
 		e.AsFinalized = tmp.AsFinalized
@@ -143,10 +186,6 @@ func (e *ExtrinsicStatus) UnmarshalJSON(b []byte) error {
 	case strings.HasPrefix(input, "{\"usurped\""):
 		e.IsUsurped = true
 		e.AsUsurped = tmp.AsUsurped
-		return nil
-	case strings.HasPrefix(input, "{\"broadcast\""):
-		e.IsBroadcast = true
-		e.AsBroadcast = tmp.AsBroadcast
 		return nil
 	}
 
@@ -163,6 +202,30 @@ func (e ExtrinsicStatus) MarshalJSON() ([]byte, error) {
 		return []byte("\"dropped\""), nil
 	case e.IsInvalid:
 		return []byte("\"invalid\""), nil
+	case e.IsBroadcast:
+		var tmp struct {
+			AsBroadcast []Text `json:"broadcast"`
+		}
+		tmp.AsBroadcast = e.AsBroadcast
+		return json.Marshal(tmp)
+	case e.IsInBlock:
+		var tmp struct {
+			AsInBlock Hash `json:"inBlock"`
+		}
+		tmp.AsInBlock = e.AsInBlock
+		return json.Marshal(tmp)
+	case e.IsRetracted:
+		var tmp struct {
+			AsRetracted Hash `json:"retracted"`
+		}
+		tmp.AsRetracted = e.AsRetracted
+		return json.Marshal(tmp)
+	case e.IsFinalityTimeout:
+		var tmp struct {
+			AsFinalityTimeout Hash `json:"finalityTimeout"`
+		}
+		tmp.AsFinalityTimeout = e.AsFinalityTimeout
+		return json.Marshal(tmp)
 	case e.IsFinalized:
 		var tmp struct {
 			AsFinalized Hash `json:"finalized"`
@@ -174,12 +237,6 @@ func (e ExtrinsicStatus) MarshalJSON() ([]byte, error) {
 			AsUsurped Hash `json:"usurped"`
 		}
 		tmp.AsUsurped = e.AsUsurped
-		return json.Marshal(tmp)
-	case e.IsBroadcast:
-		var tmp struct {
-			AsBroadcast []Text `json:"broadcast"`
-		}
-		tmp.AsBroadcast = e.AsBroadcast
 		return json.Marshal(tmp)
 	}
 	return nil, fmt.Errorf("cannot marshal ExtrinsicStatus, got %#v", e)

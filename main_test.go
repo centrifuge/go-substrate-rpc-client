@@ -447,8 +447,8 @@ func Example_transactionWithEvents() {
 		status := <-sub.Chan()
 		fmt.Printf("Transaction status: %#v\n", status)
 
-		if status.IsFinalized {
-			fmt.Printf("Completed at block hash: %#x\n", status.AsFinalized)
+		if status.IsInBlock {
+			fmt.Printf("Completed at block hash: %#x\n", status.AsInBlock)
 			return
 		}
 	}
