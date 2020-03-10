@@ -78,7 +78,7 @@ type EventRecords struct {
 	Staking_OldSlashingReportDiscarded []EventStakingOldSlashingReportDiscarded //nolint:stylecheck,golint
 	System_ExtrinsicSuccess            []EventSystemExtrinsicSuccess            //nolint:stylecheck,golint
 	System_ExtrinsicFailed             []EventSystemExtrinsicFailed             //nolint:stylecheck,golint
-	System_CodeUpdates                 []EventSystemCodeUpdated                 //nolint:stylecheck,golint
+	System_CodeUpdated                 []EventSystemCodeUpdated                 //nolint:stylecheck,golint
 	System_NewAccount                  []EventSystemNewAccount                  //nolint:stylecheck,golint
 	System_KilledAccount               []EventSystemKilledAccount               //nolint:stylecheck,golint
 	Treasury_Deposit                   []EventTreasuryDeposit                   //nolint:stylecheck,golint

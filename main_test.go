@@ -376,7 +376,7 @@ func Example_displaySystemEvents() {
 				fmt.Printf("\tSystem:ErtrinsicFailed:: (phase=%#v)\n", e.Phase)
 				fmt.Printf("\t\t%v\n", e.DispatchError)
 			}
-			for _, e := range events.System_CodeUpdates {
+			for _, e := range events.System_CodeUpdated {
 				fmt.Printf("\tSystem:CodeUpdates:: (phase=%#v)\n", e.Phase)
 			}
 			for _, e := range events.System_NewAccount {

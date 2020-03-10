@@ -259,10 +259,9 @@ type EventSystemCodeUpdated struct {
 
 // EventSystemNewAccount is emitted when a new account was created
 type EventSystemNewAccount struct {
-	Phase   Phase
-	Who     AccountID
-	Balance U128
-	Topics  []Hash
+	Phase  Phase
+	Who    AccountID
+	Topics []Hash
 }
 
 // EventSystemKilledAccount is emitted when an account is reaped
