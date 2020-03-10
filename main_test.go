@@ -210,9 +210,6 @@ func Example_makeASimpleTransfer() {
 
 	// Create the extrinsic
 	ext := types.NewExtrinsic(c)
-	if err != nil {
-		panic(err)
-	}
 
 	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
 	if err != nil {
@@ -291,7 +288,7 @@ func Example_displaySystemEvents() {
 		// inner loop for the changes within one of those notifications
 		for _, chng := range set.Changes {
 			if !types.Eq(chng.StorageKey, key) || !chng.HasStorageData {
-				// skip, we are only interested in events with countent
+				// skip, we are only interested in events with content
 				continue
 			}
 
@@ -303,17 +300,25 @@ func Example_displaySystemEvents() {
 			}
 
 			// Show what we are busy with
-			for _, e := range events.Balances_NewAccount {
-				fmt.Printf("\tBalances:NewAccount:: (phase=%#v)\n", e.Phase)
-				fmt.Printf("\t\t%#x, %v\n", e.AccountID, e.Balance)
+			for _, e := range events.Balances_Endowed {
+				fmt.Printf("\tBalances:Endowed:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%#x, %v\n", e.Who, e.Balance)
 			}
-			for _, e := range events.Balances_ReapedAccount {
-				fmt.Printf("\tBalances:ReapedAccount:: (phase=%#v)\n", e.Phase)
-				fmt.Printf("\t\t%#x\n", e.AccountID)
+			for _, e := range events.Balances_DustLost {
+				fmt.Printf("\tBalances:DustLost:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%#x, %v\n", e.Who, e.Balance)
 			}
 			for _, e := range events.Balances_Transfer {
 				fmt.Printf("\tBalances:Transfer:: (phase=%#v)\n", e.Phase)
-				fmt.Printf("\t\t%v, %v, %v, %v\n", e.From, e.To, e.Value, e.Fees)
+				fmt.Printf("\t\t%v, %v, %v\n", e.From, e.To, e.Value)
+			}
+			for _, e := range events.Balances_BalanceSet {
+				fmt.Printf("\tBalances:BalanceSet:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%v, %v, %v\n", e.Who, e.Free, e.Reserved)
+			}
+			for _, e := range events.Balances_Deposit {
+				fmt.Printf("\tBalances:Deposit:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%v, %v\n", e.Who, e.Balance)
 			}
 			for _, e := range events.Grandpa_NewAuthorities {
 				fmt.Printf("\tGrandpa:NewAuthorities:: (phase=%#v)\n", e.Phase)
@@ -329,9 +334,20 @@ func Example_displaySystemEvents() {
 				fmt.Printf("\tImOnline:HeartbeatReceived:: (phase=%#v)\n", e.Phase)
 				fmt.Printf("\t\t%#x\n", e.AuthorityID)
 			}
-			for _, e := range events.Indices_NewAccountIndex {
-				fmt.Printf("\tIndices:NewAccountIndex:: (phase=%#v)\n", e.Phase)
+			for _, e := range events.ImOnline_AllGood {
+				fmt.Printf("\tImOnline:AllGood:: (phase=%#v)\n", e.Phase)
+			}
+			for _, e := range events.ImOnline_SomeOffline {
+				fmt.Printf("\tImOnline:SomeOffline:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%v\n", e.IdentificationTuples)
+			}
+			for _, e := range events.Indices_IndexAssigned {
+				fmt.Printf("\tIndices:IndexAssigned:: (phase=%#v)\n", e.Phase)
 				fmt.Printf("\t\t%#x%v\n", e.AccountID, e.AccountIndex)
+			}
+			for _, e := range events.Indices_IndexFreed {
+				fmt.Printf("\tIndices:IndexFreed:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%v\n", e.AccountIndex)
 			}
 			for _, e := range events.Offences_Offence {
 				fmt.Printf("\tOffences:Offence:: (phase=%#v)\n", e.Phase)
@@ -339,10 +355,6 @@ func Example_displaySystemEvents() {
 			}
 			for _, e := range events.Session_NewSession {
 				fmt.Printf("\tSession:NewSession:: (phase=%#v)\n", e.Phase)
-				fmt.Printf("\t\t%v\n", e.SessionIndex)
-			}
-			for _, e := range events.Staking_OldSlashingReportDiscarded {
-				fmt.Printf("\tStaking:OldSlashingReportDiscarded:: (phase=%#v)\n", e.Phase)
 				fmt.Printf("\t\t%v\n", e.SessionIndex)
 			}
 			for _, e := range events.Staking_Reward {
@@ -353,12 +365,27 @@ func Example_displaySystemEvents() {
 				fmt.Printf("\tStaking:Slash:: (phase=%#v)\n", e.Phase)
 				fmt.Printf("\t\t%#x%v\n", e.AccountID, e.Balance)
 			}
+			for _, e := range events.Staking_OldSlashingReportDiscarded {
+				fmt.Printf("\tStaking:OldSlashingReportDiscarded:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%v\n", e.SessionIndex)
+			}
 			for _, e := range events.System_ExtrinsicSuccess {
 				fmt.Printf("\tSystem:ExtrinsicSuccess:: (phase=%#v)\n", e.Phase)
 			}
 			for _, e := range events.System_ExtrinsicFailed {
 				fmt.Printf("\tSystem:ErtrinsicFailed:: (phase=%#v)\n", e.Phase)
 				fmt.Printf("\t\t%v\n", e.DispatchError)
+			}
+			for _, e := range events.System_CodeUpdated {
+				fmt.Printf("\tSystem:CodeUpdated:: (phase=%#v)\n", e.Phase)
+			}
+			for _, e := range events.System_NewAccount {
+				fmt.Printf("\tSystem:NewAccount:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%#x\n", e.Who)
+			}
+			for _, e := range events.System_KilledAccount {
+				fmt.Printf("\tSystem:KilledAccount:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%#X\n", e.Who)
 			}
 		}
 	}
