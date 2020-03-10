@@ -377,19 +377,15 @@ func Example_displaySystemEvents() {
 				fmt.Printf("\t\t%v\n", e.DispatchError)
 			}
 			for _, e := range events.System_CodeUpdated {
-				fmt.Printf("\tSystem:CodeUpdates:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\tSystem:CodeUpdated:: (phase=%#v)\n", e.Phase)
 			}
 			for _, e := range events.System_NewAccount {
-				fmt.Printf("\tSystem:ErtrinsicFailed:: (phase=%#v)\n", e.Phase)
-				fmt.Printf("\t\t%#x%v\n", e.Who, e.Balance)
+				fmt.Printf("\tSystem:NewAccount:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\t\t%#x\n", e.Who)
 			}
 			for _, e := range events.System_KilledAccount {
-				fmt.Printf("\tSystem:ErtrinsicFailed:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\tSystem:KilledAccount:: (phase=%#v)\n", e.Phase)
 				fmt.Printf("\t\t%#X\n", e.Who)
-			}
-			for _, e := range events.System_ExtrinsicFailed {
-				fmt.Printf("\tSystem:ErtrinsicFailed:: (phase=%#v)\n", e.Phase)
-				fmt.Printf("\t\t%v\n", e.DispatchError)
 			}
 		}
 	}

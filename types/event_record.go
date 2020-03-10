@@ -82,7 +82,6 @@ type EventRecords struct {
 	System_NewAccount                  []EventSystemNewAccount                  //nolint:stylecheck,golint
 	System_KilledAccount               []EventSystemKilledAccount               //nolint:stylecheck,golint
 	Treasury_Deposit                   []EventTreasuryDeposit                   //nolint:stylecheck,golint
-	// TODO: Add missing treasury events
 }
 
 // DecodeEventRecords decodes the events records from an EventRecordRaw into a target t using the given Metadata m
