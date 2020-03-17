@@ -378,7 +378,10 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 		intHolder := reflect.New(t)
 		intPointer := intHolder.Interface()
 		err := binary.Read(pd.reader, binary.LittleEndian, intPointer)
-		if err != nil && err != io.EOF {
+		if err == io.EOF {
+			return errors.New("expected more bytes, but could not decode any more")
+		}
+		if err != nil {
 			return err
 		}
 		target.Set(intHolder.Elem())
