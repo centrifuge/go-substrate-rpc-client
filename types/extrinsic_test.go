@@ -114,7 +114,7 @@ func TestExtrinsic_Sign(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, uint8(ExtrinsicVersion4), extDec.Type())
-	assert.Equal(t, signature.TestKeyringPairAlice.PublicKey, extDec.Signature.Signer.AsAccountID[:])
+	assert.Equal(t, signature.TestKeyringPairAlice.PublicKey, extDec.Signature.Signer)
 
 	mb, err := EncodeToBytes(extDec.Method)
 	assert.NoError(t, err)
