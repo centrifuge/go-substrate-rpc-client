@@ -78,8 +78,9 @@ func TestEnd2end(t *testing.T) {
 	assert.NoError(t, err)
 
 	var validators []types.AccountID
-	err = api.RPC.State.GetStorageLatest(key, &validators)
+	ok, err := api.RPC.State.GetStorageLatest(key, &validators)
 	assert.NoError(t, err)
+	assert.True(t, ok)
 	fmt.Printf("Current validators:\n")
 	for i, v := range validators {
 		fmt.Printf("\tValidator %v: %#x\n", i, v)

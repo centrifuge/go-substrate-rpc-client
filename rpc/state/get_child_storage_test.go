@@ -28,14 +28,16 @@ var key = types.NewStorageKey(types.MustHexDecodeString(mockSrv.childStorageTrie
 
 func TestState_GetChildStorageLatest(t *testing.T) {
 	var decoded ChildStorageTrieTestVal
-	err := state.GetChildStorageLatest(childStorageKey, key, &decoded)
+	ok, err := state.GetChildStorageLatest(childStorageKey, key, &decoded)
+	assert.True(t, ok)
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.childStorageTrieValue, decoded)
 }
 
 func TestState_GetChildStorage(t *testing.T) {
 	var decoded ChildStorageTrieTestVal
-	err := state.GetChildStorageLatest(childStorageKey, key, &decoded)
+	ok, err := state.GetChildStorageLatest(childStorageKey, key, &decoded)
+	assert.True(t, ok)
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.childStorageTrieValue, decoded, mockSrv.blockHashLatest)
 }

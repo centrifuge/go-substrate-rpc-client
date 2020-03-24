@@ -21,23 +21,31 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-// GetChildStorage retreives the child storage for a key and decodes them into the provided interface
-func (s *State) GetChildStorage(childStorageKey, key types.StorageKey, target interface{}, blockHash types.Hash) error {
+// GetChildStorage retreives the child storage for a key and decodes them into the provided interface. Ok is true if the
+// value is not empty.
+func (s *State) GetChildStorage(childStorageKey, key types.StorageKey, target interface{}, blockHash types.Hash) (
+	ok bool, err error) {
 	raw, err := s.getChildStorageRaw(childStorageKey, key, &blockHash)
 	if err != nil {
-		return err
+		return false, err
 	}
-	return types.DecodeFromBytes(*raw, target)
+	if len(*raw) == 0 {
+		return false, nil
+	}
+	return true, types.DecodeFromBytes(*raw, target)
 }
 
 // GetChildStorageLatest retreives the child storage for a key for the latest block height and decodes them into the
-// provided interface
-func (s *State) GetChildStorageLatest(childStorageKey, key types.StorageKey, target interface{}) error {
+// provided interface. Ok is true if the value is not empty.
+func (s *State) GetChildStorageLatest(childStorageKey, key types.StorageKey, target interface{}) (ok bool, err error) {
 	raw, err := s.getChildStorageRaw(childStorageKey, key, nil)
 	if err != nil {
-		return err
+		return false, err
 	}
-	return types.DecodeFromBytes(*raw, target)
+	if len(*raw) == 0 {
+		return false, nil
+	}
+	return true, types.DecodeFromBytes(*raw, target)
 }
 
 // GetChildStorageRaw retreives the child storage for a key as raw bytes, without decoding them

@@ -25,16 +25,25 @@ import (
 
 func TestState_GetStorageLatest(t *testing.T) {
 	var decoded types.U64
-	err := state.GetStorageLatest(types.MustHexDecodeString(mockSrv.storageKeyHex), &decoded)
+	ok, err := state.GetStorageLatest(types.MustHexDecodeString(mockSrv.storageKeyHex), &decoded)
 	assert.NoError(t, err)
+	assert.True(t, ok)
 	assert.Equal(t, types.U64(0x5d892db8), decoded)
 }
 
 func TestState_GetStorage(t *testing.T) {
 	var decoded types.U64
-	err := state.GetStorage(types.MustHexDecodeString(mockSrv.storageKeyHex), &decoded, mockSrv.blockHashLatest)
+	ok, err := state.GetStorage(types.MustHexDecodeString(mockSrv.storageKeyHex), &decoded, mockSrv.blockHashLatest)
 	assert.NoError(t, err)
+	assert.True(t, ok)
 	assert.Equal(t, types.U64(0x5d892db8), decoded)
+}
+
+func TestState_GetStorageEmpty(t *testing.T) {
+	var decoded types.U64
+	ok, err := state.GetStorage([]byte{0xab}, &decoded, mockSrv.blockHashLatest)
+	assert.NoError(t, err)
+	assert.False(t, ok)
 }
 
 func TestState_GetStorageRawLatest(t *testing.T) {
