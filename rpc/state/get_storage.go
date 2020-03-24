@@ -17,26 +17,37 @@
 package state
 
 import (
+	"fmt"
+
 	"github.com/centrifuge/go-substrate-rpc-client/client"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-// GetStorage retreives the stored data and decodes them into the provided interface
-func (s *State) GetStorage(key types.StorageKey, target interface{}, blockHash types.Hash) error {
+// GetStorage retreives the stored data and decodes them into the provided interface. Ok is true if the value is not
+// empty.
+func (s *State) GetStorage(key types.StorageKey, target interface{}, blockHash types.Hash) (ok bool, err error) {
 	raw, err := s.getStorageRaw(key, &blockHash)
 	if err != nil {
-		return err
+		return false, err
 	}
-	return types.DecodeFromBytes(*raw, target)
+	fmt.Printf("%#v", raw)
+	if len(*raw) == 0 {
+		return false, nil
+	}
+	return true, types.DecodeFromBytes(*raw, target)
 }
 
-// GetStorageLatest retreives the stored data for the latest block height and decodes them into the provided interface
-func (s *State) GetStorageLatest(key types.StorageKey, target interface{}) error {
+// GetStorageLatest retreives the stored data for the latest block height and decodes them into the provided interface.
+// Ok is true if the value is not empty.
+func (s *State) GetStorageLatest(key types.StorageKey, target interface{}) (ok bool, err error) {
 	raw, err := s.getStorageRaw(key, nil)
 	if err != nil {
-		return err
+		return false, err
 	}
-	return types.DecodeFromBytes(*raw, target)
+	if len(*raw) == 0 {
+		return false, nil
+	}
+	return true, types.DecodeFromBytes(*raw, target)
 }
 
 // GetStorageRaw retreives the stored data as raw bytes, without decoding them
