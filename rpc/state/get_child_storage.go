@@ -23,7 +23,8 @@ import (
 
 // GetChildStorage retreives the child storage for a key and decodes them into the provided interface. Ok is true if the
 // value is not empty.
-func (s *State) GetChildStorage(childStorageKey, key types.StorageKey, target interface{}, blockHash types.Hash) (ok bool, err error) {
+func (s *State) GetChildStorage(childStorageKey, key types.StorageKey, target interface{}, blockHash types.Hash) (
+	ok bool, err error) {
 	raw, err := s.getChildStorageRaw(childStorageKey, key, &blockHash)
 	if err != nil {
 		return false, err

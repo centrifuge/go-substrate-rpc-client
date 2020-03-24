@@ -81,8 +81,8 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 	}
 
 	var nonce uint32
-	err = api.RPC.State.GetStorageLatest(key, &nonce)
-	if err != nil {
+	ok, err = api.RPC.State.GetStorageLatest(key, &nonce)
+	if err != nil || !ok {
 		panic(err)
 	}
 

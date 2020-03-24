@@ -24,6 +24,7 @@ import (
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/centrifuge/go-substrate-rpc-client/config"
 	"github.com/centrifuge/go-substrate-rpc-client/signature"
+
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
@@ -114,8 +115,8 @@ func Example_listenToBalanceChange() {
 
 	// Retrieve the initial balance
 	var previous types.U128
-	err = api.RPC.State.GetStorageLatest(key, &previous)
-	if err != nil {
+	ok, err := api.RPC.State.GetStorageLatest(key, &previous)
+	if err != nil || !ok {
 		panic(err)
 	}
 
@@ -227,8 +228,8 @@ func Example_makeASimpleTransfer() {
 	}
 
 	var nonce uint32
-	err = api.RPC.State.GetStorageLatest(key, &nonce)
-	if err != nil {
+	ok, err := api.RPC.State.GetStorageLatest(key, &nonce)
+	if err != nil || !ok {
 		panic(err)
 	}
 
@@ -441,8 +442,8 @@ func Example_transactionWithEvents() {
 	}
 
 	var nonce uint32
-	err = api.RPC.State.GetStorageLatest(key, &nonce)
-	if err != nil {
+	ok, err := api.RPC.State.GetStorageLatest(key, &nonce)
+	if err != nil || !ok {
 		panic(err)
 	}
 
