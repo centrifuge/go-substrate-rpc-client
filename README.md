@@ -29,7 +29,7 @@ Please refer to https://godoc.org/github.com/centrifuge/go-substrate-rpc-client
 
 ## Run tests locally against the Substrate Default Docker image
 
-1. Start the Substrate Default Docker image: `make run-substrate-docker`
+1. Start the Substrate Default Docker image: `make run-substrate-docker-v2`
 1. In another terminal, run the tests against that image: `make test`
 1. Visit https://polkadot.js.org/apps for inspection
 
