@@ -21,7 +21,7 @@ import (
 )
 
 // SubmitExtrinsic will submit a fully formatted extrinsic for block inclusion
-func (a *Author) SubmitExtrinsic(xt types.Extrinsic) (types.Hash, error) {
+func (a *Author) SubmitExtrinsic(xt interface{}) (types.Hash, error) {
 	enc, err := types.EncodeToHexString(xt)
 	if err != nil {
 		return types.Hash{}, err

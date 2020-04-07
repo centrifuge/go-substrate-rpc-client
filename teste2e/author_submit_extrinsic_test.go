@@ -47,6 +47,8 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
+	// NOTE: for chains with out pallet_indices, use the following instead:
+	// bob, err := types.NewAccountIDFromHex("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
 	bob, err := types.NewAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
 	if err != nil {
 		panic(err)
@@ -57,6 +59,8 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
+	// NOTE: for chains with out pallet_indices, use the following instead:
+	// ext := types.NewExtrinsicAccountID(c)
 	ext := types.NewExtrinsic(c)
 	if err != nil {
 		panic(err)
@@ -124,6 +128,8 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 	}
 
 	for i := 0; ; i++ {
+		// NOTE: for chains with out pallet_indices, use the following instead:
+		// xts, err := api.RPC.Author.PendingExtrinsicsAccountID()
 		xts, err := api.RPC.Author.PendingExtrinsics()
 		if err != nil {
 			panic(err)
