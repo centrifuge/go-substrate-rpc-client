@@ -46,7 +46,7 @@ type Extrinsic struct {
 	// Version is the encoded version flag (which encodes the raw transaction version and signing information in one byte)
 	Version byte
 	// Signature is the ExtrinsicSignatureV4, it's presence depends on the Version flag
-	Signature ExtrinsicSignatureV4
+	Signature ExtrinsicSignatureV5
 	// Method is the call this extrinsic wraps
 	Method Call
 }
@@ -150,8 +150,8 @@ func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error
 		return err
 	}
 
-	extSig := ExtrinsicSignatureV4{
-		Signer:    signerPubKey,
+	extSig := ExtrinsicSignatureV5{
+		Signer:    signerPubKey.AsAccountID,
 		Signature: MultiSignature{IsSr25519: true, AsSr25519: sig},
 		Era:       era,
 		Nonce:     o.Nonce,

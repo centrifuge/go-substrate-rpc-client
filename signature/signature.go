@@ -127,7 +127,7 @@ func Sign(data []byte, privateKeyURI string) ([]byte, error) {
 
 // Verify verifies data using the provided signature and the key under the derivation path. Requires the subkey
 // command to be in path
-func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
+func Verify(data []byte, sig []byte, publicIdentifier string) (bool, error) {
 	// if data is longer than 256 bytes, hash it first
 	if len(data) > 256 {
 		h := blake2b.Sum256(data)
@@ -138,13 +138,13 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 	sigHex := hex.EncodeToString(sig)
 
 	// use "subkey" command for signature
-	cmd := exec.Command(subkeyCmd, "verify", sigHex, privateKeyURI, "--hex")
+	cmd := exec.Command(subkeyCmd, "verify", sigHex, publicIdentifier, "--hex")
 
 	// data to stdin
 	dataHex := hex.EncodeToString(data)
 	cmd.Stdin = strings.NewReader(dataHex)
 
-	// log.Printf("echo -n \"%v\" | %v verify %v %v --hex", dataHex, subkeyCmd, sigHex, privateKeyURI)
+	// log.Printf("echo -n \"%v\" | %v verify %v %v --hex", dataHex, subkeyCmd, sigHex, publicIdentifier)
 
 	// execute the command, get the output
 	out, err := cmd.Output()

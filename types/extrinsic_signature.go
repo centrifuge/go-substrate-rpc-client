@@ -32,6 +32,14 @@ type ExtrinsicSignatureV4 struct {
 	Tip       UCompact     // extra via balances::TakeFees (Compact<Balance> where Balance is u128))
 }
 
+type ExtrinsicSignatureV5 struct {
+	Signer    AccountID
+	Signature MultiSignature
+	Era       ExtrinsicEra // extra via system::CheckEra
+	Nonce     UCompact     // extra via system::CheckNonce (Compact<Index> where Index is u32))
+	Tip       UCompact     // extra via balances::TakeFees (Compact<Balance> where Balance is u128))
+}
+
 type SignatureOptions struct {
 	Era         ExtrinsicEra // extra via system::CheckEra
 	Nonce       UCompact     // extra via system::CheckNonce (Compact<Index> where Index is u32)
