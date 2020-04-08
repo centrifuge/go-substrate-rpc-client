@@ -58,7 +58,7 @@ func TestSignAndVerify(t *testing.T) {
 	sig, err := Sign(data, TestKeyringPairAlice.URI)
 	assert.NoError(t, err)
 
-	ok, err := Verify(data, sig, TestKeyringPairAlice.Address)
+	ok, err := Verify(data, sig, TestKeyringPairAlice.URI)
 	assert.NoError(t, err)
 
 	assert.True(t, ok)
@@ -72,7 +72,7 @@ func TestSignAndVerifyLong(t *testing.T) {
 	sig, err := Sign(data, TestKeyringPairAlice.URI)
 	assert.NoError(t, err)
 
-	ok, err := Verify(data, sig, TestKeyringPairAlice.Address)
+	ok, err := Verify(data, sig, TestKeyringPairAlice.URI)
 	assert.NoError(t, err)
 
 	assert.True(t, ok)
