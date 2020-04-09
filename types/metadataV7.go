@@ -17,6 +17,7 @@
 package types
 
 import (
+	"context"
 	"fmt"
 	"hash"
 	"strings"
@@ -38,8 +39,8 @@ func (m *MetadataV7) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (m MetadataV7) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(m.Modules)
+func (m MetadataV7) Encode(ctx context.Context, encoder scale.Encoder) error {
+	err := encoder.Encode(ctx, m.Modules)
 	if err != nil {
 		return err
 	}
@@ -160,49 +161,49 @@ func (m *ModuleMetadataV7) Decode(decoder scale.Decoder) error {
 	return decoder.Decode(&m.Constants)
 }
 
-func (m ModuleMetadataV7) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(m.Name)
+func (m ModuleMetadataV7) Encode(ctx context.Context, encoder scale.Encoder) error {
+	err := encoder.Encode(ctx, m.Name)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(m.HasStorage)
+	err = encoder.Encode(ctx, m.HasStorage)
 	if err != nil {
 		return err
 	}
 
 	if m.HasStorage {
-		err = encoder.Encode(m.Storage)
+		err = encoder.Encode(ctx, m.Storage)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = encoder.Encode(m.HasCalls)
+	err = encoder.Encode(ctx, m.HasCalls)
 	if err != nil {
 		return err
 	}
 
 	if m.HasCalls {
-		err = encoder.Encode(m.Calls)
+		err = encoder.Encode(ctx, m.Calls)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = encoder.Encode(m.HasEvents)
+	err = encoder.Encode(ctx, m.HasEvents)
 	if err != nil {
 		return err
 	}
 
 	if m.HasEvents {
-		err = encoder.Encode(m.Events)
+		err = encoder.Encode(ctx, m.Events)
 		if err != nil {
 			return err
 		}
 	}
 
-	return encoder.Encode(m.Constants)
+	return encoder.Encode(ctx, m.Constants)
 }
 
 type StorageMetadata struct {
@@ -288,14 +289,14 @@ func (s *StorageFunctionTypeV5) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (s StorageFunctionTypeV5) Encode(encoder scale.Encoder) error {
+func (s StorageFunctionTypeV5) Encode(ctx context.Context, encoder scale.Encoder) error {
 	switch {
 	case s.IsType:
 		err := encoder.PushByte(0)
 		if err != nil {
 			return err
 		}
-		err = encoder.Encode(s.AsType)
+		err = encoder.Encode(ctx, s.AsType)
 		if err != nil {
 			return err
 		}
@@ -304,7 +305,7 @@ func (s StorageFunctionTypeV5) Encode(encoder scale.Encoder) error {
 		if err != nil {
 			return err
 		}
-		err = encoder.Encode(s.AsMap)
+		err = encoder.Encode(ctx, s.AsMap)
 		if err != nil {
 			return err
 		}
@@ -313,7 +314,7 @@ func (s StorageFunctionTypeV5) Encode(encoder scale.Encoder) error {
 		if err != nil {
 			return err
 		}
-		err = encoder.Encode(s.AsDoubleMap)
+		err = encoder.Encode(ctx, s.AsDoubleMap)
 		if err != nil {
 			return err
 		}

@@ -18,6 +18,7 @@ package types
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -75,7 +76,7 @@ func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
 		return err
 	}
 
-	prefix, err := EncodeToHexString(l)
+	prefix, err := EncodeToHexString(context.Background(), l)
 	if err != nil {
 		return err
 	}
@@ -91,7 +92,7 @@ func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
 		return err
 	}
 	length := UCompact(len(dec))
-	bprefix, err := EncodeToBytes(length)
+	bprefix, err := EncodeToBytes(context.Background(), length)
 	if err != nil {
 		return err
 	}
@@ -101,7 +102,7 @@ func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
 
 // MarshalJSON returns a JSON encoded byte array of Extrinsic
 func (e Extrinsic) MarshalJSON() ([]byte, error) {
-	s, err := EncodeToHexString(e)
+	s, err := EncodeToHexString(context.Background(), e)
 	if err != nil {
 		return nil, err
 	}
@@ -119,12 +120,12 @@ func (e Extrinsic) Type() uint8 {
 }
 
 // Sign adds a signature to the extrinsic
-func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error {
+func (e *Extrinsic) Sign(ctx context.Context, signer signature.KeyringPair, o SignatureOptions) error {
 	if e.Type() != ExtrinsicVersion4 {
 		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(), e.Type())
 	}
 
-	mb, err := EncodeToBytes(e.Method)
+	mb, err := EncodeToBytes(ctx, e.Method)
 	if err != nil {
 		return err
 	}
@@ -201,7 +202,7 @@ func (e *Extrinsic) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (e Extrinsic) Encode(encoder scale.Encoder) error {
+func (e Extrinsic) Encode(ctx context.Context, encoder scale.Encoder) error {
 	if e.Type() != ExtrinsicVersion4 {
 		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(),
 			e.Type())
@@ -213,21 +214,21 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 	tempEnc := scale.NewEncoder(&bb)
 
 	// encode the version of the extrinsic
-	err := tempEnc.Encode(e.Version)
+	err := tempEnc.Encode(ctx, e.Version)
 	if err != nil {
 		return err
 	}
 
 	// encode the signature if signed
 	if e.IsSigned() {
-		err = tempEnc.Encode(e.Signature)
+		err = tempEnc.Encode(ctx, e.Signature)
 		if err != nil {
 			return err
 		}
 	}
 
 	// encode the method
-	err = tempEnc.Encode(e.Method)
+	err = tempEnc.Encode(ctx, e.Method)
 	if err != nil {
 		return err
 	}
@@ -254,7 +255,7 @@ type Call struct {
 	Args      Args
 }
 
-func NewCall(m *Metadata, call string, args ...interface{}) (Call, error) {
+func NewCall(ctx context.Context, m *Metadata, call string, args ...interface{}) (Call, error) {
 	c, err := m.FindCallIndex(call)
 	if err != nil {
 		return Call{}, err
@@ -262,7 +263,7 @@ func NewCall(m *Metadata, call string, args ...interface{}) (Call, error) {
 
 	var a []byte
 	for _, arg := range args {
-		e, err := EncodeToBytes(arg)
+		e, err := EncodeToBytes(ctx, arg)
 		if err != nil {
 			return Call{}, err
 		}
@@ -292,13 +293,13 @@ func (m *CallIndex) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (m CallIndex) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(m.SectionIndex)
+func (m CallIndex) Encode(ctx context.Context, encoder scale.Encoder) error {
+	err := encoder.Encode(ctx, m.SectionIndex)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(m.MethodIndex)
+	err = encoder.Encode(ctx, m.MethodIndex)
 	if err != nil {
 		return err
 	}
@@ -310,7 +311,7 @@ func (m CallIndex) Encode(encoder scale.Encoder) error {
 type Args []byte
 
 // Encode implements encoding for Args, which just unwraps the bytes of Args
-func (a Args) Encode(encoder scale.Encoder) error {
+func (a Args) Encode(ctx context.Context, encoder scale.Encoder) error {
 	return encoder.Write(a)
 }
 

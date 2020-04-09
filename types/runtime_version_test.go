@@ -17,6 +17,7 @@
 package types_test
 
 import (
+	"context"
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
@@ -38,7 +39,7 @@ var exampleRuntimeVersionAPI = RuntimeVersionAPI{
 }
 
 func TestRuntimeVersion_Encode_Decode(t *testing.T) {
-	enc, err := EncodeToBytes(exampleRuntimeVersion)
+	enc, err := EncodeToBytes(context.Background(), exampleRuntimeVersion)
 	assert.NoError(t, err)
 
 	var output RuntimeVersion
@@ -49,7 +50,7 @@ func TestRuntimeVersion_Encode_Decode(t *testing.T) {
 }
 
 func TestRuntimeVersionAPI_Encode_Decode(t *testing.T) {
-	enc, err := EncodeToBytes(exampleRuntimeVersionAPI)
+	enc, err := EncodeToBytes(context.Background(), exampleRuntimeVersionAPI)
 	assert.NoError(t, err)
 
 	var output RuntimeVersionAPI

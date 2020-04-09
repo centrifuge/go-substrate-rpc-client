@@ -17,6 +17,7 @@
 package types
 
 import (
+	"context"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
@@ -223,7 +224,7 @@ func (d *DispatchClass) Decode(decoder scale.Decoder) error {
 	return err
 }
 
-func (d DispatchClass) Encode(encoder scale.Encoder) error {
+func (d DispatchClass) Encode(ctx context.Context, encoder scale.Encoder) error {
 	var err error
 	if d.IsNormal {
 		err = encoder.PushByte(0)

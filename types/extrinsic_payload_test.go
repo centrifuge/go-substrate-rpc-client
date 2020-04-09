@@ -17,6 +17,7 @@
 package types_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/signature"
@@ -44,7 +45,7 @@ func TestExtrinsicPayload(t *testing.T) {
 
 	assert.Equal(t, examplaryExtrinsicPayload, p)
 
-	enc, err := EncodeToHexString(examplaryExtrinsicPayload)
+	enc, err := EncodeToHexString(context.Background(), examplaryExtrinsicPayload)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x"+
@@ -69,7 +70,7 @@ func TestExtrinsicPayload_Sign(t *testing.T) {
 	assert.NoError(t, err)
 
 	// verify sig
-	b, err := EncodeToBytes(examplaryExtrinsicPayload)
+	b, err := EncodeToBytes(context.Background(), examplaryExtrinsicPayload)
 	assert.NoError(t, err)
 	ok, err := signature.Verify(b, sig[:], signature.TestKeyringPairAlice.URI)
 	assert.NoError(t, err)

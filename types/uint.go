@@ -17,6 +17,7 @@
 package types
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"math/big"
@@ -152,7 +153,7 @@ func (i *U128) Decode(decoder scale.Decoder) error {
 }
 
 // Encode implements encoding as per the Scale specification
-func (i U128) Encode(encoder scale.Encoder) error {
+func (i U128) Encode(ctx context.Context, encoder scale.Encoder) error {
 	b, err := BigIntToUintBytes(i.Int, 16)
 	if err != nil {
 		return err
@@ -200,7 +201,7 @@ func (i *U256) Decode(decoder scale.Decoder) error {
 }
 
 // Encode implements encoding as per the Scale specification
-func (i U256) Encode(encoder scale.Encoder) error {
+func (i U256) Encode(ctx context.Context, encoder scale.Encoder) error {
 	b, err := BigIntToUintBytes(i.Int, 32)
 	if err != nil {
 		return err

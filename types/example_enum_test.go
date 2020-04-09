@@ -17,6 +17,7 @@
 package types_test
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 
@@ -56,11 +57,11 @@ func (m *PhaseEnum) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (m PhaseEnum) Encode(encoder scale.Encoder) error {
+func (m PhaseEnum) Encode(ctx context.Context, encoder scale.Encoder) error {
 	var err1, err2 error
 	if m.IsApplyExtrinsic {
 		err1 = encoder.PushByte(0)
-		err2 = encoder.Encode(m.AsApplyExtrinsic)
+		err2 = encoder.Encode(ctx, m.AsApplyExtrinsic)
 	} else if m.IsFinalization {
 		err1 = encoder.PushByte(1)
 	}
@@ -81,7 +82,7 @@ func ExampleExampleEnum_applyExtrinsic() {
 		AsApplyExtrinsic: 1234,
 	}
 
-	enc, err := EncodeToHexString(applyExtrinsic)
+	enc, err := EncodeToHexString(context.Background(), applyExtrinsic)
 	if err != nil {
 		panic(err)
 	}
@@ -100,7 +101,7 @@ func ExampleExampleEnum_finalization() {
 		IsFinalization: true,
 	}
 
-	enc, err := EncodeToHexString(finalization)
+	enc, err := EncodeToHexString(context.Background(), finalization)
 	if err != nil {
 		panic(err)
 	}

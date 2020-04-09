@@ -17,6 +17,7 @@
 package types
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -36,8 +37,8 @@ func (m *MetadataV9) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (m MetadataV9) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(m.Modules)
+func (m MetadataV9) Encode(ctx context.Context, encoder scale.Encoder) error {
+	err := encoder.Encode(ctx, m.Modules)
 	if err != nil {
 		return err
 	}

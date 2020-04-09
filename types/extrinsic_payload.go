@@ -17,6 +17,7 @@
 package types
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
@@ -40,7 +41,7 @@ type ExtrinsicPayloadV3 struct {
 
 // Sign the extrinsic payload with the given derivation path
 func (e ExtrinsicPayloadV3) Sign(signer signature.KeyringPair) (Signature, error) {
-	b, err := EncodeToBytes(e)
+	b, err := EncodeToBytes(context.Background(), e)
 	if err != nil {
 		return Signature{}, err
 	}
@@ -51,38 +52,38 @@ func (e ExtrinsicPayloadV3) Sign(signer signature.KeyringPair) (Signature, error
 
 // Encode implements encoding for ExtrinsicPayloadV3, which just unwraps the bytes of ExtrinsicPayloadV3 without
 // adding a compact length prefix
-func (e ExtrinsicPayloadV3) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(e.Method)
+func (e ExtrinsicPayloadV3) Encode(ctx context.Context, encoder scale.Encoder) error {
+	err := encoder.Encode(ctx, e.Method)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(e.Era)
+	err = encoder.Encode(ctx, e.Era)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(e.Nonce)
+	err = encoder.Encode(ctx, e.Nonce)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(e.Tip)
+	err = encoder.Encode(ctx, e.Tip)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(e.SpecVersion)
+	err = encoder.Encode(ctx, e.SpecVersion)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(e.GenesisHash)
+	err = encoder.Encode(ctx, e.GenesisHash)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(e.BlockHash)
+	err = encoder.Encode(ctx, e.BlockHash)
 	if err != nil {
 		return err
 	}

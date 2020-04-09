@@ -17,6 +17,7 @@
 package types
 
 import (
+	"context"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
@@ -24,7 +25,7 @@ import (
 type Origin byte
 
 // Encode implements encoding for Origin, which does nothing
-func (n Origin) Encode(encoder scale.Encoder) error {
+func (n Origin) Encode(ctx context.Context, encoder scale.Encoder) error {
 	return nil
 }
 

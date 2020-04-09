@@ -17,6 +17,7 @@
 package gsrpc_test
 
 import (
+	"context"
 	"fmt"
 	"math/big"
 	"time"
@@ -204,7 +205,9 @@ func Example_makeASimpleTransfer() {
 		panic(err)
 	}
 
-	c, err := types.NewCall(meta, "Balances.transfer", bob, types.UCompact(12345))
+	ctx := context.Background()
+
+	c, err := types.NewCall(ctx, meta, "Balances.transfer", bob, types.UCompact(12345))
 	if err != nil {
 		panic(err)
 	}
@@ -243,13 +246,13 @@ func Example_makeASimpleTransfer() {
 	}
 
 	// Sign the transaction using Alice's default account
-	err = ext.Sign(signature.TestKeyringPairAlice, o)
+	err = ext.Sign(ctx, signature.TestKeyringPairAlice, o)
 	if err != nil {
 		panic(err)
 	}
 
 	// Send the extrinsic
-	hash, err := api.RPC.Author.SubmitExtrinsic(ext)
+	hash, err := api.RPC.Author.SubmitExtrinsic(ctx, ext)
 	if err != nil {
 		panic(err)
 	}
@@ -414,7 +417,9 @@ func Example_transactionWithEvents() {
 
 	amount := types.UCompact(12345)
 
-	c, err := types.NewCall(meta, "Balances.transfer", bob, amount)
+	ctx := context.Background()
+
+	c, err := types.NewCall(ctx, meta, "Balances.transfer", bob, amount)
 	if err != nil {
 		panic(err)
 	}
@@ -459,13 +464,13 @@ func Example_transactionWithEvents() {
 	fmt.Printf("Sending %v from %#x to %#x with nonce %v", amount, signature.TestKeyringPairAlice.PublicKey, bob.AsAccountID, nonce)
 
 	// Sign the transaction using Alice's default account
-	err = ext.Sign(signature.TestKeyringPairAlice, o)
+	err = ext.Sign(ctx, signature.TestKeyringPairAlice, o)
 	if err != nil {
 		panic(err)
 	}
 
 	// Do the transfer and track the actual status
-	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(ext)
+	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(ctx, ext)
 	if err != nil {
 		panic(err)
 	}

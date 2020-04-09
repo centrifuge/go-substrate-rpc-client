@@ -18,6 +18,7 @@ package types
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -36,7 +37,7 @@ import (
 type EventRecordsRaw []byte
 
 // Encode implements encoding for Data, which just unwraps the bytes of Data
-func (e EventRecordsRaw) Encode(encoder scale.Encoder) error {
+func (e EventRecordsRaw) Encode(ctx context.Context, encoder scale.Encoder) error {
 	return encoder.Write(e)
 }
 
@@ -224,11 +225,11 @@ func (p *Phase) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (p Phase) Encode(encoder scale.Encoder) error {
+func (p Phase) Encode(ctx context.Context, encoder scale.Encoder) error {
 	var err1, err2 error
 	if p.IsApplyExtrinsic {
 		err1 = encoder.PushByte(0)
-		err2 = encoder.Encode(p.AsApplyExtrinsic)
+		err2 = encoder.Encode(ctx, p.AsApplyExtrinsic)
 	} else if p.IsFinalization {
 		err1 = encoder.PushByte(1)
 	}
@@ -267,14 +268,14 @@ func (d *DispatchError) Decode(decoder scale.Decoder) error {
 	return decoder.Decode(&d.Error)
 }
 
-func (d DispatchError) Encode(encoder scale.Encoder) error {
+func (d DispatchError) Encode(ctx context.Context, encoder scale.Encoder) error {
 	var err error
 	if d.HasModule {
 		err = encoder.PushByte(1)
 		if err != nil {
 			return err
 		}
-		err = encoder.Encode(d.Module)
+		err = encoder.Encode(ctx, d.Module)
 	} else {
 		err = encoder.PushByte(0)
 	}
@@ -283,7 +284,7 @@ func (d DispatchError) Encode(encoder scale.Encoder) error {
 		return err
 	}
 
-	return encoder.Encode(&d.Error)
+	return encoder.Encode(ctx, &d.Error)
 }
 
 type EventID [2]byte

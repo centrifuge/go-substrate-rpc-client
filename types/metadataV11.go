@@ -1,6 +1,9 @@
 package types
 
-import "github.com/centrifuge/go-substrate-rpc-client/scale"
+import (
+	"context"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
+)
 
 // Modelled after packages/types/src/Metadata/v10/toV11.ts
 type MetadataV11 struct {
@@ -22,12 +25,12 @@ func (m *MetadataV11) Decode(decoder scale.Decoder) error {
 	return decoder.Decode(&m.Extrinsic)
 }
 
-func (m MetadataV11) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(m.MetadataV10)
+func (m MetadataV11) Encode(ctx context.Context, encoder scale.Encoder) error {
+	err := encoder.Encode(ctx, m.MetadataV10)
 	if err != nil {
 		return err
 	}
-	return encoder.Encode(m.Extrinsic)
+	return encoder.Encode(ctx, m.Extrinsic)
 }
 
 func (e *ExtrinsicV11) Decode(decoder scale.Decoder) error {
@@ -39,11 +42,11 @@ func (e *ExtrinsicV11) Decode(decoder scale.Decoder) error {
 	return decoder.Decode(&e.SignedExtensions)
 }
 
-func (e ExtrinsicV11) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(e.Version)
+func (e ExtrinsicV11) Encode(ctx context.Context, encoder scale.Encoder) error {
+	err := encoder.Encode(ctx, e.Version)
 	if err != nil {
 		return err
 	}
 
-	return encoder.Encode(e.SignedExtensions)
+	return encoder.Encode(ctx, e.SignedExtensions)
 }

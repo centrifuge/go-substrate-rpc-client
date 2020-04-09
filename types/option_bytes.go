@@ -16,7 +16,10 @@
 
 package types
 
-import "github.com/centrifuge/go-substrate-rpc-client/scale"
+import (
+	"context"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
+)
 
 // OptionBytes is a structure that can store a Bytes or a missing value
 type OptionBytes struct {
@@ -34,8 +37,8 @@ func NewOptionBytesEmpty() OptionBytes {
 	return OptionBytes{option: option{false}}
 }
 
-func (o OptionBytes) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionBytes) Encode(ctx context.Context, encoder scale.Encoder) error {
+	return encoder.EncodeOption(ctx, o.hasValue, o.value)
 }
 
 func (o *OptionBytes) Decode(decoder scale.Decoder) error {
@@ -75,8 +78,8 @@ func NewOptionBytes8Empty() OptionBytes8 {
 	return OptionBytes8{option: option{false}}
 }
 
-func (o OptionBytes8) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionBytes8) Encode(ctx context.Context, encoder scale.Encoder) error {
+	return encoder.EncodeOption(ctx, o.hasValue, o.value)
 }
 
 func (o *OptionBytes8) Decode(decoder scale.Decoder) error {
@@ -116,8 +119,8 @@ func NewOptionBytes16Empty() OptionBytes16 {
 	return OptionBytes16{option: option{false}}
 }
 
-func (o OptionBytes16) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionBytes16) Encode(ctx context.Context, encoder scale.Encoder) error {
+	return encoder.EncodeOption(ctx, o.hasValue, o.value)
 }
 
 func (o *OptionBytes16) Decode(decoder scale.Decoder) error {
@@ -157,8 +160,8 @@ func NewOptionBytes32Empty() OptionBytes32 {
 	return OptionBytes32{option: option{false}}
 }
 
-func (o OptionBytes32) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionBytes32) Encode(ctx context.Context, encoder scale.Encoder) error {
+	return encoder.EncodeOption(ctx, o.hasValue, o.value)
 }
 
 func (o *OptionBytes32) Decode(decoder scale.Decoder) error {
@@ -198,8 +201,8 @@ func NewOptionBytes64Empty() OptionBytes64 {
 	return OptionBytes64{option: option{false}}
 }
 
-func (o OptionBytes64) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionBytes64) Encode(ctx context.Context, encoder scale.Encoder) error {
+	return encoder.EncodeOption(ctx, o.hasValue, o.value)
 }
 
 func (o *OptionBytes64) Decode(decoder scale.Decoder) error {
@@ -239,8 +242,8 @@ func NewOptionBytes128Empty() OptionBytes128 {
 	return OptionBytes128{option: option{false}}
 }
 
-func (o OptionBytes128) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionBytes128) Encode(ctx context.Context, encoder scale.Encoder) error {
+	return encoder.EncodeOption(ctx, o.hasValue, o.value)
 }
 
 func (o *OptionBytes128) Decode(decoder scale.Decoder) error {
@@ -280,8 +283,8 @@ func NewOptionBytes256Empty() OptionBytes256 {
 	return OptionBytes256{option: option{false}}
 }
 
-func (o OptionBytes256) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionBytes256) Encode(ctx context.Context, encoder scale.Encoder) error {
+	return encoder.EncodeOption(ctx, o.hasValue, o.value)
 }
 
 func (o *OptionBytes256) Decode(decoder scale.Decoder) error {
@@ -321,8 +324,8 @@ func NewOptionBytes512Empty() OptionBytes512 {
 	return OptionBytes512{option: option{false}}
 }
 
-func (o OptionBytes512) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionBytes512) Encode(ctx context.Context, encoder scale.Encoder) error {
+	return encoder.EncodeOption(ctx, o.hasValue, o.value)
 }
 
 func (o *OptionBytes512) Decode(decoder scale.Decoder) error {
@@ -362,8 +365,8 @@ func NewOptionBytes1024Empty() OptionBytes1024 {
 	return OptionBytes1024{option: option{false}}
 }
 
-func (o OptionBytes1024) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionBytes1024) Encode(ctx context.Context, encoder scale.Encoder) error {
+	return encoder.EncodeOption(ctx, o.hasValue, o.value)
 }
 
 func (o *OptionBytes1024) Decode(decoder scale.Decoder) error {
@@ -403,8 +406,8 @@ func NewOptionBytes2048Empty() OptionBytes2048 {
 	return OptionBytes2048{option: option{false}}
 }
 
-func (o OptionBytes2048) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionBytes2048) Encode(ctx context.Context, encoder scale.Encoder) error {
+	return encoder.EncodeOption(ctx, o.hasValue, o.value)
 }
 
 func (o *OptionBytes2048) Decode(decoder scale.Decoder) error {

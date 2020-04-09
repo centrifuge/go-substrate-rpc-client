@@ -17,10 +17,13 @@
 package types
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
+
+const SkipAddressPrefix = "skipAddressPrefix"
 
 // Address is a wrapper around an AccountId or an AccountIndex. It is encoded with a prefix in case of an AccountID.
 // Basically the Address is encoded as `[ <prefix-byte>, ...publicKey/...bytes ]` as per spec
@@ -91,15 +94,18 @@ func (a *Address) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (a Address) Encode(encoder scale.Encoder) error {
+func (a Address) Encode(ctx context.Context, encoder scale.Encoder) error {
 	// type of address - public key
 	if a.IsAccountID {
-		err := encoder.PushByte(255)
-		if err != nil {
-			return err
+		v, ok := ctx.Value(SkipAddressPrefix).(bool)
+		if !ok || !v {
+			err := encoder.PushByte(255)
+			if err != nil {
+				return err
+			}
 		}
 
-		err = encoder.Write(a.AsAccountID[:])
+		err := encoder.Write(a.AsAccountID[:])
 		if err != nil {
 			return err
 		}
@@ -113,7 +119,7 @@ func (a Address) Encode(encoder scale.Encoder) error {
 			return err
 		}
 
-		return encoder.Encode(a.AsAccountIndex)
+		return encoder.Encode(ctx, a.AsAccountIndex)
 	}
 
 	if a.AsAccountIndex >= 0xf0 {
@@ -122,8 +128,8 @@ func (a Address) Encode(encoder scale.Encoder) error {
 			return err
 		}
 
-		return encoder.Encode(uint16(a.AsAccountIndex))
+		return encoder.Encode(ctx, uint16(a.AsAccountIndex))
 	}
 
-	return encoder.Encode(uint8(a.AsAccountIndex))
+	return encoder.Encode(ctx, uint8(a.AsAccountIndex))
 }

@@ -25,12 +25,3 @@ func NewAccountID(b []byte) AccountID {
 	copy(a[:], b)
 	return a
 }
-
-// NewAccountIDFromHex creates an AccountID from the given hex string (public key)
-func NewAccountIDFromHex(str string) (AccountID, error) {
-	b, err := HexDecodeString(str)
-	if err != nil {
-		return AccountID{}, err
-	}
-	return NewAccountID(b), nil
-}

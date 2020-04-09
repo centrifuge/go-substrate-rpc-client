@@ -17,6 +17,7 @@
 package types
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"time"
@@ -59,8 +60,8 @@ func (m *Moment) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (m Moment) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(uint64(m.UnixNano() / (NanosInSecond / MillisInSecond)))
+func (m Moment) Encode(ctx context.Context, encoder scale.Encoder) error {
+	err := encoder.Encode(ctx, uint64(m.UnixNano() / (NanosInSecond / MillisInSecond)))
 	if err != nil {
 		return err
 	}

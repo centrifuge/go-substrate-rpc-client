@@ -16,6 +16,10 @@
 
 package types
 
+import (
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
+)
+
 type ExtrinsicSignatureV3 struct {
 	Signer    Address
 	Signature Signature
@@ -32,14 +36,6 @@ type ExtrinsicSignatureV4 struct {
 	Tip       UCompact     // extra via balances::TakeFees (Compact<Balance> where Balance is u128))
 }
 
-type ExtrinsicSignatureV4AccountId struct {
-	Signer    AccountID
-	Signature MultiSignature
-	Era       ExtrinsicEra // extra via system::CheckEra
-	Nonce     UCompact     // extra via system::CheckNonce (Compact<Index> where Index is u32))
-	Tip       UCompact     // extra via balances::TakeFees (Compact<Balance> where Balance is u128))
-}
-
 type SignatureOptions struct {
 	Era         ExtrinsicEra // extra via system::CheckEra
 	Nonce       UCompact     // extra via system::CheckNonce (Compact<Index> where Index is u32)
@@ -47,4 +43,42 @@ type SignatureOptions struct {
 	SpecVersion U32          // additional via system::CheckVersion
 	GenesisHash Hash         // additional via system::CheckGenesis
 	BlockHash   Hash         // additional via system::CheckEra
+}
+
+func (es *ExtrinsicSignatureV4) Decode(decoder scale.Decoder) error {
+	b, err := decoder.ReadOneByte()
+	if err != nil {
+		return err
+	}
+	if b == 0xff {
+		err = decoder.Decode(&es.Signer.AsAccountID)
+		es.Signer.IsAccountID = true
+	} else {
+		err := decoder.Decode(&es.Signer)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = decoder.Decode(&es.Signature)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&es.Era)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&es.Nonce)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&es.Tip)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

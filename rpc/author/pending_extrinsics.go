@@ -40,24 +40,3 @@ func (a *Author) PendingExtrinsics() ([]types.Extrinsic, error) {
 	}
 	return xts, err
 }
-
-// PendingExtrinsicsAccountID returns all pending extrinsics, potentially grouped by sender
-func (a *Author) PendingExtrinsicsAccountID() ([]types.ExtrinsicAccountID, error) {
-	var res []string
-	err := a.client.Call(&res, "author_pendingExtrinsics")
-	if err != nil {
-		return nil, err
-	}
-
-	// fmt.Println(res)
-
-	xts := make([]types.ExtrinsicAccountID, len(res))
-
-	for i, re := range res {
-		err = types.DecodeFromHexString(re, &xts[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return xts, err
-}

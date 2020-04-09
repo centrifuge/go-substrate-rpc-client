@@ -17,6 +17,7 @@
 package teste2e
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -53,7 +54,9 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
-	c, err := types.NewCall(meta, "Balances.transfer", bob, types.UCompact(6969))
+	ctx := context.WithValue(context.Background(), "skipAddressPrefix", false)
+
+	c, err := types.NewCall(ctx, meta, "Balances.transfer", bob, types.UCompact(6969))
 	if err != nil {
 		panic(err)
 	}
@@ -98,12 +101,14 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		Tip:         0,
 	}
 
-	err = ext.Sign(from, o)
+
+
+	err = ext.Sign(ctx, from, o)
 	if err != nil {
 		panic(err)
 	}
 
-	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(ext)
+	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(ctx, ext)
 	if err != nil {
 		panic(err)
 	}

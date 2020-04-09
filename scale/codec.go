@@ -16,6 +16,7 @@ package scale
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -117,13 +118,13 @@ func (pe Encoder) EncodeUintCompact(v uint64) error {
 }
 
 // Encode a value to the stream.
-func (pe Encoder) Encode(value interface{}) error {
+func (pe Encoder) Encode(ctx context.Context, value interface{}) error {
 	t := reflect.TypeOf(value)
 
 	// If the type implements encodeable, use that implementation
 	encodeable := reflect.TypeOf((*Encodeable)(nil)).Elem()
 	if t.Implements(encodeable) {
-		err := value.(Encodeable).Encode(pe)
+		err := value.(Encodeable).Encode(ctx, pe)
 		if err != nil {
 			return err
 		}
@@ -173,7 +174,7 @@ func (pe Encoder) Encode(value interface{}) error {
 			return errors.New("Encoding null pointers not supported; consider using Option type")
 		} else {
 			dereferenced := rv.Elem()
-			err := pe.Encode(dereferenced.Interface())
+			err := pe.Encode(ctx, dereferenced.Interface())
 			if err != nil {
 				return err
 			}
@@ -184,7 +185,7 @@ func (pe Encoder) Encode(value interface{}) error {
 		rv := reflect.ValueOf(value)
 		l := rv.Len()
 		for i := 0; i < l; i++ {
-			err := pe.Encode(rv.Index(i).Interface())
+			err := pe.Encode(ctx, rv.Index(i).Interface())
 			if err != nil {
 				return err
 			}
@@ -203,7 +204,7 @@ func (pe Encoder) Encode(value interface{}) error {
 			return err
 		}
 		for i := 0; i < l; i++ {
-			err = pe.Encode(rv.Index(i).Interface())
+			err = pe.Encode(ctx, rv.Index(i).Interface())
 			if err != nil {
 				return err
 			}
@@ -212,7 +213,7 @@ func (pe Encoder) Encode(value interface{}) error {
 	// Strings are encoded as UTF-8 byte slices, just as in Rust
 	case reflect.String:
 		s := reflect.ValueOf(value).String()
-		err := pe.Encode([]byte(s))
+		err := pe.Encode(ctx, []byte(s))
 		if err != nil {
 			return err
 		}
@@ -220,7 +221,7 @@ func (pe Encoder) Encode(value interface{}) error {
 	case reflect.Struct:
 		rv := reflect.ValueOf(value)
 		for i := 0; i < rv.NumField(); i++ {
-			err := pe.Encode(rv.Field(i).Interface())
+			err := pe.Encode(ctx, rv.Field(i).Interface())
 			if err != nil {
 				return fmt.Errorf("type %s does not support Encodeable interface and could not be "+
 					"encoded field by field, error: %v", t, err)
@@ -251,7 +252,7 @@ func (pe Encoder) Encode(value interface{}) error {
 }
 
 // EncodeOption stores optionally present value to the stream.
-func (pe Encoder) EncodeOption(hasValue bool, value interface{}) error {
+func (pe Encoder) EncodeOption(ctx context.Context, hasValue bool, value interface{}) error {
 	if !hasValue {
 		err := pe.PushByte(0)
 		if err != nil {
@@ -262,7 +263,7 @@ func (pe Encoder) EncodeOption(hasValue bool, value interface{}) error {
 		if err != nil {
 			return err
 		}
-		err = pe.Encode(value)
+		err = pe.Encode(ctx, value)
 		if err != nil {
 			return err
 		}
@@ -547,7 +548,7 @@ func (pd Decoder) DecodeOption(hasValue *bool, valuePointer interface{}) error {
 // See OptionBool for an example implementation.
 type Encodeable interface {
 	// ParityEncode encodes and write this structure into a stream
-	Encode(encoder Encoder) error
+	Encode(ctx context.Context, encoder Encoder) error
 }
 
 // Decodeable is an interface that defines a custom encoding rules for a data type.
@@ -576,7 +577,7 @@ func NewOptionBool(value bool) OptionBool {
 }
 
 // ParityEncode implements encoding for OptionBool as per Rust implementation.
-func (o OptionBool) Encode(encoder Encoder) error {
+func (o OptionBool) Encode(ctx context.Context, encoder Encoder) error {
 	var err error
 	if !o.hasValue {
 		err = encoder.PushByte(0)
@@ -613,9 +614,9 @@ func (o *OptionBool) Decode(decoder Decoder) error {
 }
 
 // ToKeyedVec replicates the behaviour of Rust's to_keyed_vec helper.
-func ToKeyedVec(value interface{}, prependKey []byte) ([]byte, error) {
+func ToKeyedVec(ctx context.Context, value interface{}, prependKey []byte) ([]byte, error) {
 	var buffer = bytes.NewBuffer(prependKey)
-	err := Encoder{buffer}.Encode(value)
+	err := Encoder{buffer}.Encode(ctx, value)
 	if err != nil {
 		return nil, err
 	}

@@ -16,7 +16,10 @@
 
 package types
 
-import "encoding/json"
+import (
+	"context"
+	"encoding/json"
+)
 
 // Digest contains logs
 type Digest []DigestItem
@@ -44,7 +47,7 @@ func (d Digest) MarshalJSON() ([]byte, error) {
 	logs := make([]string, len(d))
 	var err error
 	for i, di := range d {
-		logs[i], err = EncodeToHexString(di)
+		logs[i], err = EncodeToHexString(context.Background(), di)
 		if err != nil {
 			return nil, err
 		}

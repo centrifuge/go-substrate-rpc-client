@@ -17,6 +17,7 @@
 package types_test
 
 import (
+	"context"
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
@@ -33,7 +34,7 @@ func TestStorageDataRaw_EncodedLength(t *testing.T) {
 func TestStorageDataRaw_Encode(t *testing.T) {
 	bz := []byte{12, 251, 42}
 	dataRaw := NewStorageDataRaw(bz)
-	encoded, err := EncodeToBytes(dataRaw)
+	encoded, err := EncodeToBytes(context.Background(), dataRaw)
 	assert.NoError(t, err)
 	assert.Equal(t, bz, encoded)
 }

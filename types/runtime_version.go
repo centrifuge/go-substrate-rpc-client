@@ -17,6 +17,7 @@
 package types
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -70,33 +71,33 @@ func (r *RuntimeVersion) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (r RuntimeVersion) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(r.APIs)
+func (r RuntimeVersion) Encode(ctx context.Context, encoder scale.Encoder) error {
+	err := encoder.Encode(ctx, r.APIs)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(r.AuthoringVersion)
+	err = encoder.Encode(ctx, r.AuthoringVersion)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(r.ImplName)
+	err = encoder.Encode(ctx, r.ImplName)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(r.ImplVersion)
+	err = encoder.Encode(ctx, r.ImplVersion)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(r.SpecName)
+	err = encoder.Encode(ctx, r.SpecName)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(r.SpecVersion)
+	err = encoder.Encode(ctx, r.SpecVersion)
 	if err != nil {
 		return err
 	}
@@ -140,13 +141,13 @@ func (r *RuntimeVersionAPI) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (r RuntimeVersionAPI) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(r.APIID)
+func (r RuntimeVersionAPI) Encode(ctx context.Context, encoder scale.Encoder) error {
+	err := encoder.Encode(ctx, r.APIID)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(r.Version)
+	err = encoder.Encode(ctx, r.Version)
 	if err != nil {
 		return err
 	}

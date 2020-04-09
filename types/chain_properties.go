@@ -17,6 +17,7 @@
 package types
 
 import (
+	"context"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
@@ -44,14 +45,14 @@ func (a *ChainProperties) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (a ChainProperties) Encode(encoder scale.Encoder) error {
-	if err := encoder.EncodeOption(a.IsSS58Format, a.AsSS58Format); err != nil {
+func (a ChainProperties) Encode(ctx context.Context, encoder scale.Encoder) error {
+	if err := encoder.EncodeOption(ctx, a.IsSS58Format, a.AsSS58Format); err != nil {
 		return err
 	}
-	if err := encoder.EncodeOption(a.IsTokenDecimals, a.AsTokenDecimals); err != nil {
+	if err := encoder.EncodeOption(ctx, a.IsTokenDecimals, a.AsTokenDecimals); err != nil {
 		return err
 	}
-	if err := encoder.EncodeOption(a.IsTokenSymbol, a.AsTokenSymbol); err != nil {
+	if err := encoder.EncodeOption(ctx, a.IsTokenSymbol, a.AsTokenSymbol); err != nil {
 		return err
 	}
 

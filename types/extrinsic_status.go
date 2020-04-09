@@ -17,6 +17,7 @@
 package types
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -87,7 +88,7 @@ func (e *ExtrinsicStatus) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (e ExtrinsicStatus) Encode(encoder scale.Encoder) error {
+func (e ExtrinsicStatus) Encode(ctx context.Context, encoder scale.Encoder) error {
 	var err1, err2 error
 	switch {
 	case e.IsFuture:
@@ -96,22 +97,22 @@ func (e ExtrinsicStatus) Encode(encoder scale.Encoder) error {
 		err1 = encoder.PushByte(1)
 	case e.IsBroadcast:
 		err1 = encoder.PushByte(2)
-		err2 = encoder.Encode(e.AsBroadcast)
+		err2 = encoder.Encode(ctx, e.AsBroadcast)
 	case e.IsInBlock:
 		err1 = encoder.PushByte(3)
-		err2 = encoder.Encode(e.AsInBlock)
+		err2 = encoder.Encode(ctx, e.AsInBlock)
 	case e.IsRetracted:
 		err1 = encoder.PushByte(4)
-		err2 = encoder.Encode(e.AsRetracted)
+		err2 = encoder.Encode(ctx, e.AsRetracted)
 	case e.IsFinalityTimeout:
 		err1 = encoder.PushByte(5)
-		err2 = encoder.Encode(e.AsFinalityTimeout)
+		err2 = encoder.Encode(ctx, e.AsFinalityTimeout)
 	case e.IsFinalized:
 		err1 = encoder.PushByte(6)
-		err2 = encoder.Encode(e.AsFinalized)
+		err2 = encoder.Encode(ctx, e.AsFinalized)
 	case e.IsUsurped:
 		err1 = encoder.PushByte(7)
-		err2 = encoder.Encode(e.AsUsurped)
+		err2 = encoder.Encode(ctx, e.AsUsurped)
 	case e.IsDropped:
 		err1 = encoder.PushByte(8)
 	case e.IsInvalid:

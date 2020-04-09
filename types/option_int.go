@@ -16,7 +16,10 @@
 
 package types
 
-import "github.com/centrifuge/go-substrate-rpc-client/scale"
+import (
+	"context"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
+)
 
 // OptionI8 is a structure that can store a I8 or a missing value
 type OptionI8 struct {
@@ -34,8 +37,8 @@ func NewOptionI8Empty() OptionI8 {
 	return OptionI8{option: option{false}}
 }
 
-func (o OptionI8) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionI8) Encode(ctx context.Context, encoder scale.Encoder) error {
+	return encoder.EncodeOption(ctx, o.hasValue, o.value)
 }
 
 func (o *OptionI8) Decode(decoder scale.Decoder) error {
@@ -75,8 +78,8 @@ func NewOptionI16Empty() OptionI16 {
 	return OptionI16{option: option{false}}
 }
 
-func (o OptionI16) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionI16) Encode(ctx context.Context, encoder scale.Encoder) error {
+	return encoder.EncodeOption(ctx, o.hasValue, o.value)
 }
 
 func (o *OptionI16) Decode(decoder scale.Decoder) error {
@@ -116,8 +119,8 @@ func NewOptionI32Empty() OptionI32 {
 	return OptionI32{option: option{false}}
 }
 
-func (o OptionI32) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionI32) Encode(ctx context.Context, encoder scale.Encoder) error {
+	return encoder.EncodeOption(ctx, o.hasValue, o.value)
 }
 
 func (o *OptionI32) Decode(decoder scale.Decoder) error {
@@ -157,8 +160,8 @@ func NewOptionI64Empty() OptionI64 {
 	return OptionI64{option: option{false}}
 }
 
-func (o OptionI64) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+func (o OptionI64) Encode(ctx context.Context, encoder scale.Encoder) error {
+	return encoder.EncodeOption(ctx, o.hasValue, o.value)
 }
 
 func (o *OptionI64) Decode(decoder scale.Decoder) error {

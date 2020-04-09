@@ -17,6 +17,7 @@
 package types
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
@@ -36,7 +37,7 @@ type BytesBare []byte
 
 // Encode implements encoding for BytesBare, which just unwraps the bytes of BytesBare without adding a compact
 // length prefix
-func (b BytesBare) Encode(encoder scale.Encoder) error {
+func (b BytesBare) Encode(ctx context.Context, encoder scale.Encoder) error {
 	return encoder.Write(b)
 }
 
