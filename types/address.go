@@ -95,7 +95,7 @@ func (a Address) Encode(encoder scale.Encoder) error {
 	opts := encoder.GetOpts()
 	// type of address - public key
 	if a.IsAccountID {
-		if opts == nil || !opts.SkipAccountIDHeader {
+		if opts == nil || !opts.SkipAccountIDHeader { // Skip in case target chain doesn't include indices pallet
 			err := encoder.PushByte(255)
 			if err != nil {
 				return err

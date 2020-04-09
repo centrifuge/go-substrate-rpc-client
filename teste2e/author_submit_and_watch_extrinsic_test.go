@@ -18,12 +18,12 @@ package teste2e
 
 import (
 	"fmt"
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"testing"
 	"time"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/centrifuge/go-substrate-rpc-client/config"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"

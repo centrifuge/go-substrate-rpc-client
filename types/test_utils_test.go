@@ -66,9 +66,9 @@ type encodingAssert struct {
 	expected []byte
 }
 
-func assertEncode(t *testing.T, encodingAsserts []encodingAssert) {
+func assertEncodeWithOpts(t *testing.T, encodingAsserts []encodingAssert, opts *scale.EncoderOptions) {
 	for _, test := range encodingAsserts {
-		result, err := EncodeToBytes(test.input, nil)
+		result, err := EncodeToBytes(test.input, opts)
 		if err != nil {
 			t.Errorf("Encoding error for input %v: %v\n", test.input, err)
 		}
@@ -76,6 +76,10 @@ func assertEncode(t *testing.T, encodingAsserts []encodingAssert) {
 			t.Errorf("Fail, input %v, expected %#x, result %#x\n", test.input, test.expected, result)
 		}
 	}
+}
+
+func assertEncode(t *testing.T, encodingAsserts []encodingAssert) {
+	assertEncodeWithOpts(t, encodingAsserts, nil)
 }
 
 type decodingAssert struct {
