@@ -72,6 +72,23 @@ func (a *Address) Decode(decoder scale.Decoder) error {
 		return fmt.Errorf("decoding of Address with 0xfe prefix not supported")
 	}
 
+	if b != 0xfd && b != 0xfc {
+		b0, err := decoder.ReadOneByte()
+		if err != nil { // Handle Index Account case
+			a.IsAccountIndex = true
+			a.AsAccountIndex = AccountIndex(b)
+			return nil
+		}
+		var sm [30]byte // Reading Address[32] minus b and b0 already read
+		err = decoder.Decode(&sm)
+		if err != nil {
+			return err
+		}
+		a.AsAccountID = NewAccountID(append([]byte{b, b0}, sm[:]...)) // Push b back to the front
+		a.IsAccountID = true
+		return nil
+	}
+
 	if b == 0xfd {
 		err = decoder.Decode(&a.AsAccountIndex)
 		a.IsAccountIndex = true
@@ -86,8 +103,6 @@ func (a *Address) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	a.IsAccountIndex = true
-	a.AsAccountIndex = AccountIndex(b)
 	return nil
 }
 
