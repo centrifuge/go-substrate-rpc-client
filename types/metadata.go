@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
@@ -112,30 +111,30 @@ func (m *Metadata) Decode(decoder scale.Decoder) error {
 	return err
 }
 
-func (m Metadata) Encode(ctx context.Context, encoder scale.Encoder) error {
-	err := encoder.Encode(ctx, m.MagicNumber)
+func (m Metadata) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(m.MagicNumber)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(ctx, m.Version)
+	err = encoder.Encode(m.Version)
 	if err != nil {
 		return err
 	}
 
 	switch m.Version {
 	case 4:
-		err = encoder.Encode(ctx, m.AsMetadataV4)
+		err = encoder.Encode(m.AsMetadataV4)
 	case 7:
-		err = encoder.Encode(ctx, m.AsMetadataV7)
+		err = encoder.Encode(m.AsMetadataV7)
 	case 8:
-		err = encoder.Encode(ctx, m.AsMetadataV8)
+		err = encoder.Encode(m.AsMetadataV8)
 	case 9:
-		err = encoder.Encode(ctx, m.AsMetadataV9)
+		err = encoder.Encode(m.AsMetadataV9)
 	case 10:
-		err = encoder.Encode(ctx, m.AsMetadataV10)
+		err = encoder.Encode(m.AsMetadataV10)
 	case 11:
-		err = encoder.Encode(ctx, m.AsMetadataV11)
+		err = encoder.Encode(m.AsMetadataV11)
 	default:
 		return fmt.Errorf("unsupported metadata version %v", m.Version)
 	}

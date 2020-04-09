@@ -57,11 +57,11 @@ func (m *PhaseEnum) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (m PhaseEnum) Encode(ctx context.Context, encoder scale.Encoder) error {
+func (m PhaseEnum) Encode(encoder scale.Encoder) error {
 	var err1, err2 error
 	if m.IsApplyExtrinsic {
 		err1 = encoder.PushByte(0)
-		err2 = encoder.Encode(ctx, m.AsApplyExtrinsic)
+		err2 = encoder.Encode(m.AsApplyExtrinsic)
 	} else if m.IsFinalization {
 		err1 = encoder.PushByte(1)
 	}

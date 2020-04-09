@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"fmt"
 	"io"
 
@@ -54,7 +53,7 @@ func CreateStorageKey(meta *Metadata, prefix, method string, arg []byte, arg2 []
 }
 
 // Encode implements encoding for StorageKey, which just unwraps the bytes of StorageKey
-func (s StorageKey) Encode(ctx context.Context, encoder scale.Encoder) error {
+func (s StorageKey) Encode(encoder scale.Encoder) error {
 	return encoder.Write(s)
 }
 

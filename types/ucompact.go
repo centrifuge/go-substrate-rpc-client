@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
@@ -34,7 +33,7 @@ func (u *UCompact) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (u UCompact) Encode(ctx context.Context, encoder scale.Encoder) error {
+func (u UCompact) Encode(encoder scale.Encoder) error {
 	err := encoder.EncodeUintCompact(uint64(u))
 	if err != nil {
 		return err

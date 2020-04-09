@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
@@ -37,8 +36,8 @@ func NewOptionU8Empty() OptionU8 {
 	return OptionU8{option: option{false}}
 }
 
-func (o OptionU8) Encode(ctx context.Context, encoder scale.Encoder) error {
-	return encoder.EncodeOption(ctx, o.hasValue, o.value)
+func (o OptionU8) Encode(encoder scale.Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
 }
 
 func (o *OptionU8) Decode(decoder scale.Decoder) error {
@@ -78,8 +77,8 @@ func NewOptionU16Empty() OptionU16 {
 	return OptionU16{option: option{false}}
 }
 
-func (o OptionU16) Encode(ctx context.Context, encoder scale.Encoder) error {
-	return encoder.EncodeOption(ctx, o.hasValue, o.value)
+func (o OptionU16) Encode(encoder scale.Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
 }
 
 func (o *OptionU16) Decode(decoder scale.Decoder) error {
@@ -119,8 +118,8 @@ func NewOptionU32Empty() OptionU32 {
 	return OptionU32{option: option{false}}
 }
 
-func (o OptionU32) Encode(ctx context.Context, encoder scale.Encoder) error {
-	return encoder.EncodeOption(ctx, o.hasValue, o.value)
+func (o OptionU32) Encode(encoder scale.Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
 }
 
 func (o *OptionU32) Decode(decoder scale.Decoder) error {
@@ -160,8 +159,8 @@ func NewOptionU64Empty() OptionU64 {
 	return OptionU64{option: option{false}}
 }
 
-func (o OptionU64) Encode(ctx context.Context, encoder scale.Encoder) error {
-	return encoder.EncodeOption(ctx, o.hasValue, o.value)
+func (o OptionU64) Encode(encoder scale.Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
 }
 
 func (o *OptionU64) Decode(decoder scale.Decoder) error {

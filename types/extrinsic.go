@@ -18,7 +18,6 @@ package types
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -76,7 +75,7 @@ func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
 		return err
 	}
 
-	prefix, err := EncodeToHexString(context.Background(), l)
+	prefix, err := EncodeToHexString(l, nil)
 	if err != nil {
 		return err
 	}
@@ -92,7 +91,7 @@ func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
 		return err
 	}
 	length := UCompact(len(dec))
-	bprefix, err := EncodeToBytes(context.Background(), length)
+	bprefix, err := EncodeToBytes(length, nil)
 	if err != nil {
 		return err
 	}
@@ -102,7 +101,7 @@ func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
 
 // MarshalJSON returns a JSON encoded byte array of Extrinsic
 func (e Extrinsic) MarshalJSON() ([]byte, error) {
-	s, err := EncodeToHexString(context.Background(), e)
+	s, err := EncodeToHexString(e, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -120,12 +119,12 @@ func (e Extrinsic) Type() uint8 {
 }
 
 // Sign adds a signature to the extrinsic
-func (e *Extrinsic) Sign(ctx context.Context, signer signature.KeyringPair, o SignatureOptions) error {
+func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions, opts *scale.EncoderOptions) error {
 	if e.Type() != ExtrinsicVersion4 {
 		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(), e.Type())
 	}
 
-	mb, err := EncodeToBytes(ctx, e.Method)
+	mb, err := EncodeToBytes(e.Method, opts)
 	if err != nil {
 		return err
 	}
@@ -146,7 +145,7 @@ func (e *Extrinsic) Sign(ctx context.Context, signer signature.KeyringPair, o Si
 
 	signerPubKey := NewAddressFromAccountID(signer.PublicKey)
 
-	sig, err := payload.Sign(signer)
+	sig, err := payload.Sign(signer, opts)
 	if err != nil {
 		return err
 	}
@@ -202,7 +201,7 @@ func (e *Extrinsic) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (e Extrinsic) Encode(ctx context.Context, encoder scale.Encoder) error {
+func (e Extrinsic) Encode(encoder scale.Encoder) error {
 	if e.Type() != ExtrinsicVersion4 {
 		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(),
 			e.Type())
@@ -211,24 +210,24 @@ func (e Extrinsic) Encode(ctx context.Context, encoder scale.Encoder) error {
 	// create a temporary buffer that will receive the plain encoded transaction (version, signature (optional),
 	// method/call)
 	var bb = bytes.Buffer{}
-	tempEnc := scale.NewEncoder(&bb)
+	tempEnc := scale.NewEncoder(&bb, encoder.GetOpts())
 
 	// encode the version of the extrinsic
-	err := tempEnc.Encode(ctx, e.Version)
+	err := tempEnc.Encode(e.Version)
 	if err != nil {
 		return err
 	}
 
 	// encode the signature if signed
 	if e.IsSigned() {
-		err = tempEnc.Encode(ctx, e.Signature)
+		err = tempEnc.Encode(e.Signature)
 		if err != nil {
 			return err
 		}
 	}
 
 	// encode the method
-	err = tempEnc.Encode(ctx, e.Method)
+	err = tempEnc.Encode(e.Method)
 	if err != nil {
 		return err
 	}
@@ -255,7 +254,7 @@ type Call struct {
 	Args      Args
 }
 
-func NewCall(ctx context.Context, m *Metadata, call string, args ...interface{}) (Call, error) {
+func NewCall(opts *scale.EncoderOptions, m *Metadata, call string, args ...interface{}) (Call, error) {
 	c, err := m.FindCallIndex(call)
 	if err != nil {
 		return Call{}, err
@@ -263,7 +262,7 @@ func NewCall(ctx context.Context, m *Metadata, call string, args ...interface{})
 
 	var a []byte
 	for _, arg := range args {
-		e, err := EncodeToBytes(ctx, arg)
+		e, err := EncodeToBytes(arg, opts)
 		if err != nil {
 			return Call{}, err
 		}
@@ -293,13 +292,13 @@ func (m *CallIndex) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (m CallIndex) Encode(ctx context.Context, encoder scale.Encoder) error {
-	err := encoder.Encode(ctx, m.SectionIndex)
+func (m CallIndex) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(m.SectionIndex)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(ctx, m.MethodIndex)
+	err = encoder.Encode(m.MethodIndex)
 	if err != nil {
 		return err
 	}
@@ -311,7 +310,7 @@ func (m CallIndex) Encode(ctx context.Context, encoder scale.Encoder) error {
 type Args []byte
 
 // Encode implements encoding for Args, which just unwraps the bytes of Args
-func (a Args) Encode(ctx context.Context, encoder scale.Encoder) error {
+func (a Args) Encode(encoder scale.Encoder) error {
 	return encoder.Write(a)
 }
 

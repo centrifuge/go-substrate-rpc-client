@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
@@ -52,7 +51,7 @@ func (e *ExtrinsicEra) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (e ExtrinsicEra) Encode(ctx context.Context, encoder scale.Encoder) error {
+func (e ExtrinsicEra) Encode(encoder scale.Encoder) error {
 	if e.IsImmortalEra {
 		return encoder.PushByte(0)
 	}

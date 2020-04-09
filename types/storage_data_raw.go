@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"fmt"
 	"io"
 
@@ -36,7 +35,7 @@ func NewStorageDataRaw(b []byte) StorageDataRaw {
 }
 
 // Encode implements encoding for StorageDataRaw, which just unwraps the bytes of StorageDataRaw
-func (s StorageDataRaw) Encode(ctx context.Context, encoder scale.Encoder) error {
+func (s StorageDataRaw) Encode(encoder scale.Encoder) error {
 	return encoder.Write(s)
 }
 

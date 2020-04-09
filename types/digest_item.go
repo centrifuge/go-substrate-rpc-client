@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
@@ -77,30 +76,30 @@ func (m *DigestItem) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (m DigestItem) Encode(ctx context.Context, encoder scale.Encoder) error {
+func (m DigestItem) Encode(encoder scale.Encoder) error {
 	var err1, err2 error
 	switch {
 	case m.IsOther:
 		err1 = encoder.PushByte(0)
-		err2 = encoder.Encode(ctx, m.AsOther)
+		err2 = encoder.Encode(m.AsOther)
 	case m.IsAuthoritiesChange:
 		err1 = encoder.PushByte(1)
-		err2 = encoder.Encode(ctx, m.AsAuthoritiesChange)
+		err2 = encoder.Encode(m.AsAuthoritiesChange)
 	case m.IsChangesTrieRoot:
 		err1 = encoder.PushByte(2)
-		err2 = encoder.Encode(ctx, m.AsChangesTrieRoot)
+		err2 = encoder.Encode(m.AsChangesTrieRoot)
 	case m.IsSealV0:
 		err1 = encoder.PushByte(3)
-		err2 = encoder.Encode(ctx, m.AsSealV0)
+		err2 = encoder.Encode(m.AsSealV0)
 	case m.IsConsensus:
 		err1 = encoder.PushByte(4)
-		err2 = encoder.Encode(ctx, m.AsConsensus)
+		err2 = encoder.Encode(m.AsConsensus)
 	case m.IsSeal:
 		err1 = encoder.PushByte(5)
-		err2 = encoder.Encode(ctx, m.AsSeal)
+		err2 = encoder.Encode(m.AsSeal)
 	case m.IsPreRuntime:
 		err1 = encoder.PushByte(6)
-		err2 = encoder.Encode(ctx, m.AsPreRuntime)
+		err2 = encoder.Encode(m.AsPreRuntime)
 	}
 
 	if err1 != nil {

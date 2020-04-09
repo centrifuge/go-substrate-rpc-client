@@ -17,8 +17,8 @@
 package teste2e
 
 import (
-	"context"
 	"fmt"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"testing"
 	"time"
 
@@ -54,9 +54,11 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
-	ctx := context.WithValue(context.Background(), "skipAddressPrefix", false)
+	// NOTE: for chains with out pallet_indices, use the following instead set SkipAccountIDHeader to true
+	// opts := &scale.EncoderOptions{SkipAccountIDHeader: true}
+	opts := &scale.EncoderOptions{}
 
-	c, err := types.NewCall(ctx, meta, "Balances.transfer", bob, types.UCompact(6969))
+	c, err := types.NewCall(opts, meta, "Balances.transfer", bob, types.UCompact(6969))
 	if err != nil {
 		panic(err)
 	}
@@ -103,12 +105,12 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 
 
 
-	err = ext.Sign(ctx, from, o)
+	err = ext.Sign(from, o, opts)
 	if err != nil {
 		panic(err)
 	}
 
-	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(ctx, ext)
+	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(ext, opts)
 	if err != nil {
 		panic(err)
 	}

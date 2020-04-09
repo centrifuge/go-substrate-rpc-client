@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"fmt"
 	"io"
 
@@ -36,7 +35,7 @@ func NewData(b []byte) Data {
 }
 
 // Encode implements encoding for Data, which just unwraps the bytes of Data
-func (d Data) Encode(ctx context.Context, encoder scale.Encoder) error {
+func (d Data) Encode(encoder scale.Encoder) error {
 	return encoder.Write(d)
 }
 

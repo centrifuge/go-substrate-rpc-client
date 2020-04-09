@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"encoding/json"
 )
 
@@ -47,7 +46,7 @@ func (d Digest) MarshalJSON() ([]byte, error) {
 	logs := make([]string, len(d))
 	var err error
 	for i, di := range d {
-		logs[i], err = EncodeToHexString(context.Background(), di)
+		logs[i], err = EncodeToHexString(di, nil)
 		if err != nil {
 			return nil, err
 		}

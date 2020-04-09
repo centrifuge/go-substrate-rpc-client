@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
@@ -56,18 +55,18 @@ func (m *MultiSignature) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (m MultiSignature) Encode(ctx context.Context, encoder scale.Encoder) error {
+func (m MultiSignature) Encode(encoder scale.Encoder) error {
 	var err1, err2 error
 	switch {
 	case m.IsEd25519:
 		err1 = encoder.PushByte(0)
-		err2 = encoder.Encode(ctx, m.AsEd25519)
+		err2 = encoder.Encode(m.AsEd25519)
 	case m.IsSr25519:
 		err1 = encoder.PushByte(1)
-		err2 = encoder.Encode(ctx, m.AsSr25519)
+		err2 = encoder.Encode(m.AsSr25519)
 	case m.IsEcdsa:
 		err1 = encoder.PushByte(2)
-		err2 = encoder.Encode(ctx, m.AsEcdsa)
+		err2 = encoder.Encode(m.AsEcdsa)
 	}
 
 	if err1 != nil {

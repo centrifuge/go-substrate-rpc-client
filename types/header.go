@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"encoding/json"
 	"strconv"
 	"strings"
@@ -56,7 +55,7 @@ func (b BlockNumber) MarshalJSON() ([]byte, error) {
 }
 
 // Encode implements encoding for BlockNumber, which just unwraps the bytes of BlockNumber
-func (b BlockNumber) Encode(ctx context.Context, encoder scale.Encoder) error {
+func (b BlockNumber) Encode(encoder scale.Encoder) error {
 	return encoder.EncodeUintCompact(uint64(b))
 }
 

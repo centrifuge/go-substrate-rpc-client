@@ -18,7 +18,6 @@ package types
 
 import (
 	"bytes"
-	"context"
 	"encoding/hex"
 	"fmt"
 	"reflect"
@@ -33,10 +32,10 @@ type Hexer interface {
 	Hex() string
 }
 
-// EncodeToBytes encodes `value` with the scale codec, returning []byte
-func EncodeToBytes(ctx context.Context, value interface{}) ([]byte, error) { // TODO rename to Encode
+// EncodeToBytes encodes `value` with the scale codec with passed EncoderOptions, returning []byte
+func EncodeToBytes(value interface{}, opts *scale.EncoderOptions) ([]byte, error) { // TODO rename to Encode
 	var buffer = bytes.Buffer{}
-	err := scale.NewEncoder(&buffer).Encode(ctx, value)
+	err := scale.NewEncoder(&buffer, opts).Encode(value)
 	if err != nil {
 		return buffer.Bytes(), err
 	}
@@ -44,8 +43,8 @@ func EncodeToBytes(ctx context.Context, value interface{}) ([]byte, error) { // 
 }
 
 // EncodeToHexString encodes `value` with the scale codec, returning a hex string (prefixed by 0x)
-func EncodeToHexString(ctx context.Context, value interface{}) (string, error) { // TODO rename to EncodeToHex
-	bz, err := EncodeToBytes(ctx, value)
+func EncodeToHexString(value interface{}, opts *scale.EncoderOptions) (string, error) { // TODO rename to EncodeToHex
+	bz, err := EncodeToBytes(value, opts)
 	if err != nil {
 		return "", err
 	}
@@ -68,9 +67,9 @@ func DecodeFromHexString(str string, target interface{}) error { // TODO rename 
 }
 
 // EncodedLength returns the length of the value when encoded as a byte array
-func EncodedLength(ctx context.Context, value interface{}) (int, error) {
+func EncodedLength(value interface{}, opts *scale.EncoderOptions) (int, error) {
 	var buffer = bytes.Buffer{}
-	err := scale.NewEncoder(&buffer).Encode(ctx, value)
+	err := scale.NewEncoder(&buffer, opts).Encode(value)
 	if err != nil {
 		return 0, err
 	}
@@ -78,8 +77,8 @@ func EncodedLength(ctx context.Context, value interface{}) (int, error) {
 }
 
 // GetHash returns a hash of the value
-func GetHash(ctx context.Context, value interface{}) (Hash, error) {
-	enc, err := EncodeToBytes(ctx, value)
+func GetHash(value interface{}, opts *scale.EncoderOptions) (Hash, error) {
+	enc, err := EncodeToBytes(value, opts)
 	if err != nil {
 		return Hash{}, err
 	}

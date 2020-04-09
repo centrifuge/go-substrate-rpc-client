@@ -55,16 +55,16 @@ func (a *MyVal) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (a MyVal) Encode(ctx context.Context, encoder scale.Encoder) error {
+func (a MyVal) Encode(encoder scale.Encoder) error {
 	var err1, err2 error
 
 	switch v := a.Value.(type) {
 	case uint8:
 		err1 = encoder.PushByte(0)
-		err2 = encoder.Encode(ctx, v)
+		err2 = encoder.Encode(v)
 	case string:
 		err1 = encoder.PushByte(1)
-		err2 = encoder.Encode(ctx, v)
+		err2 = encoder.Encode(v)
 	default:
 		return fmt.Errorf("unknown type %T", v)
 	}

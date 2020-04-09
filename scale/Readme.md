@@ -10,7 +10,7 @@ This code was copied over with many thanks from https://github.com/Joystream/par
     // See OptionBool for an example implementation.
     type Encodeable interface {
         // ParityEncode encodes and write this structure into a stream
-        ParityEncode(ctx context.Context, encoder Encoder)
+        ParityEncode(encoder Encoder)
     }
 
     // Decodeable is an interface that defines a custom encoding rules for a data type.

@@ -17,8 +17,9 @@
 package teste2e
 
 import (
-	"context"
 	"fmt"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"os"
 	"testing"
 	"time"
 
@@ -32,6 +33,8 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping end-to-end test in short mode.")
 	}
+
+	os.Setenv("TEST_PRIV_KEY", "//Alice")
 
 	from, ok := signature.LoadKeyringPairFromEnv()
 	if !ok {
@@ -53,10 +56,11 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
-	// NOTE: for chains with out pallet_indices, use the following instead set SkipAddressPrefix to true
-	ctx := context.WithValue(context.Background(), types.SkipAddressPrefix, false)
+	// NOTE: for chains with out pallet_indices, use the following instead set SkipAccountIDHeader to true
+	opts := &scale.EncoderOptions{SkipAccountIDHeader: true}
+	//opts := &scale.EncoderOptions{}
 
-	c, err := types.NewCall(ctx, meta, "Balances.transfer", bob, types.UCompact(6969))
+	c, err := types.NewCall(opts, meta, "Balances.transfer", bob, types.UCompact(6969))
 	if err != nil {
 		panic(err)
 	}
@@ -106,19 +110,19 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 
 		extI := ext
 
-		err = extI.Sign(ctx, from, o)
+		err = extI.Sign(from, o, opts)
 		if err != nil {
 			panic(err)
 		}
 
-		extEnc, err := types.EncodeToHexString(ctx, extI)
+		extEnc, err := types.EncodeToHexString(extI, opts)
 		if err != nil {
 			panic(err)
 		}
 
 		fmt.Printf("Extrinsic: %#v\n", extEnc)
 
-		_, err = api.RPC.Author.SubmitExtrinsic(ctx, extI)
+		_, err = api.RPC.Author.SubmitExtrinsic(extI, opts)
 		if err != nil {
 			panic(err)
 		}

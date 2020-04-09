@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
@@ -37,8 +36,8 @@ func NewOptionH160Empty() OptionH160 {
 	return OptionH160{option: option{false}}
 }
 
-func (o OptionH160) Encode(ctx context.Context, encoder scale.Encoder) error {
-	return encoder.EncodeOption(ctx, o.hasValue, o.value)
+func (o OptionH160) Encode(encoder scale.Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
 }
 
 func (o *OptionH160) Decode(decoder scale.Decoder) error {
@@ -78,8 +77,8 @@ func NewOptionH256Empty() OptionH256 {
 	return OptionH256{option: option{false}}
 }
 
-func (o OptionH256) Encode(ctx context.Context, encoder scale.Encoder) error {
-	return encoder.EncodeOption(ctx, o.hasValue, o.value)
+func (o OptionH256) Encode(encoder scale.Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
 }
 
 func (o *OptionH256) Decode(decoder scale.Decoder) error {
@@ -119,8 +118,8 @@ func NewOptionH512Empty() OptionH512 {
 	return OptionH512{option: option{false}}
 }
 
-func (o OptionH512) Encode(ctx context.Context, encoder scale.Encoder) error {
-	return encoder.EncodeOption(ctx, o.hasValue, o.value)
+func (o OptionH512) Encode(encoder scale.Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
 }
 
 func (o *OptionH512) Decode(decoder scale.Decoder) error {
@@ -160,8 +159,8 @@ func NewOptionHashEmpty() OptionHash {
 	return OptionHash{option: option{false}}
 }
 
-func (o OptionHash) Encode(ctx context.Context, encoder scale.Encoder) error {
-	return encoder.EncodeOption(ctx, o.hasValue, o.value)
+func (o OptionHash) Encode(encoder scale.Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
 }
 
 func (o *OptionHash) Decode(decoder scale.Decoder) error {

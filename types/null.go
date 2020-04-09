@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
@@ -30,7 +29,7 @@ func NewNull() Null {
 }
 
 // Encode implements encoding for Null, which does nothing
-func (n Null) Encode(ctx context.Context, encoder scale.Encoder) error {
+func (n Null) Encode(encoder scale.Encoder) error {
 	return nil
 }
 

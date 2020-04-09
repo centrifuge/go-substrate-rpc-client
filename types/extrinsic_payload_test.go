@@ -70,7 +70,7 @@ func TestExtrinsicPayload_Sign(t *testing.T) {
 	assert.NoError(t, err)
 
 	// verify sig
-	b, err := EncodeToBytes(context.Background(), examplaryExtrinsicPayload)
+	b, err := EncodeToBytes(examplaryExtrinsicPayload, nil)
 	assert.NoError(t, err)
 	ok, err := signature.Verify(b, sig[:], signature.TestKeyringPairAlice.URI)
 	assert.NoError(t, err)

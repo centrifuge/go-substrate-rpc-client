@@ -18,7 +18,6 @@ package types_test
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"reflect"
 	"testing"
@@ -42,7 +41,7 @@ func assertEqual(t *testing.T, a interface{}, b interface{}) {
 
 func assertRoundtrip(t *testing.T, value interface{}) {
 	var buffer = bytes.Buffer{}
-	err := scale.NewEncoder(&buffer).Encode(context.Background(), value)
+	err := scale.NewEncoder(&buffer, nil).Encode(value)
 	assert.NoError(t, err)
 	target := reflect.New(reflect.TypeOf(value))
 	err = scale.NewDecoder(&buffer).Decode(target.Interface())
@@ -52,7 +51,7 @@ func assertRoundtrip(t *testing.T, value interface{}) {
 
 func assertEncodedLength(t *testing.T, encodedLengthAsserts []encodedLengthAssert) {
 	for _, test := range encodedLengthAsserts {
-		result, err := EncodedLength(context.Background(), test.input)
+		result, err := EncodedLength(test.input, nil)
 		if err != nil {
 			t.Errorf("Encoded length error for input %v: %v\n", test.input, err)
 		}
@@ -69,7 +68,7 @@ type encodingAssert struct {
 
 func assertEncode(t *testing.T, encodingAsserts []encodingAssert) {
 	for _, test := range encodingAsserts {
-		result, err := EncodeToBytes(context.Background(), test.input)
+		result, err := EncodeToBytes(test.input, nil)
 		if err != nil {
 			t.Errorf("Encoding error for input %v: %v\n", test.input, err)
 		}
@@ -102,7 +101,7 @@ type hashAssert struct {
 
 func assertHash(t *testing.T, hashAsserts []hashAssert) {
 	for _, test := range hashAsserts {
-		result, err := GetHash(context.Background(), test.input)
+		result, err := GetHash(test.input, nil)
 		if err != nil {
 			t.Errorf("Hash error for input %v: %v\n", test.input, err)
 		}
@@ -119,7 +118,7 @@ type encodeToHexAssert struct {
 
 func assertEncodeToHex(t *testing.T, encodeToHexAsserts []encodeToHexAssert) {
 	for _, test := range encodeToHexAsserts {
-		result, err := EncodeToHexString(context.Background(), test.input)
+		result, err := EncodeToHexString(test.input, nil)
 		if err != nil {
 			t.Errorf("Hex error for input %v: %v\n", test.input, err)
 		}

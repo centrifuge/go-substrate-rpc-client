@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -37,8 +36,8 @@ func (m *MetadataV8) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (m MetadataV8) Encode(ctx context.Context, encoder scale.Encoder) error {
-	err := encoder.Encode(ctx, m.Modules)
+func (m MetadataV8) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(m.Modules)
 	if err != nil {
 		return err
 	}
@@ -165,54 +164,54 @@ func (m *ModuleMetadataV8) Decode(decoder scale.Decoder) error {
 	return decoder.Decode(&m.Errors)
 }
 
-func (m ModuleMetadataV8) Encode(ctx context.Context, encoder scale.Encoder) error {
-	err := encoder.Encode(ctx, m.Name)
+func (m ModuleMetadataV8) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(m.Name)
 	if err != nil {
 		return err
 	}
 
-	err = encoder.Encode(ctx, m.HasStorage)
+	err = encoder.Encode(m.HasStorage)
 	if err != nil {
 		return err
 	}
 
 	if m.HasStorage {
-		err = encoder.Encode(ctx, m.Storage)
+		err = encoder.Encode(m.Storage)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = encoder.Encode(ctx, m.HasCalls)
+	err = encoder.Encode(m.HasCalls)
 	if err != nil {
 		return err
 	}
 
 	if m.HasCalls {
-		err = encoder.Encode(ctx, m.Calls)
+		err = encoder.Encode(m.Calls)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = encoder.Encode(ctx, m.HasEvents)
+	err = encoder.Encode(m.HasEvents)
 	if err != nil {
 		return err
 	}
 
 	if m.HasEvents {
-		err = encoder.Encode(ctx, m.Events)
+		err = encoder.Encode(m.Events)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = encoder.Encode(ctx, m.Constants)
+	err = encoder.Encode(m.Constants)
 	if err != nil {
 		return err
 	}
 
-	return encoder.Encode(ctx, m.Errors)
+	return encoder.Encode(m.Errors)
 }
 
 type ErrorMetadataV8 struct {

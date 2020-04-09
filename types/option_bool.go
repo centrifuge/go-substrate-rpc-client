@@ -17,7 +17,6 @@
 package types
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
@@ -42,7 +41,7 @@ func NewOptionBoolEmpty() OptionBool {
 }
 
 // Encode implements encoding for OptionBool as per Rust implementation
-func (o OptionBool) Encode(ctx context.Context, encoder scale.Encoder) error {
+func (o OptionBool) Encode(encoder scale.Encoder) error {
 	var err error
 	if !o.hasValue {
 		err = encoder.PushByte(0)
