@@ -16,7 +16,6 @@ package scale
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"math"
 	"reflect"
@@ -43,14 +42,14 @@ func hexify(bytes []byte) string {
 
 func encodeToBytes(t *testing.T, value interface{}) []byte {
 	var buffer = bytes.Buffer{}
-	err := Encoder{&buffer}.Encode(value)
+	err := Encoder{&buffer, nil}.Encode(value)
 	assert.NoError(t, err)
 	return buffer.Bytes()
 }
 
 func assertRoundtrip(t *testing.T, value interface{}) {
 	var buffer = bytes.Buffer{}
-	err := Encoder{&buffer}.Encode(value)
+	err := Encoder{&buffer, nil}.Encode(value)
 	assert.NoError(t, err)
 	target := reflect.New(reflect.TypeOf(value))
 	err = Decoder{&buffer}.Decode(target.Interface())
@@ -92,7 +91,7 @@ func TestTypeImplementsEncodeableDecodeableEncodedAsExpected(t *testing.T) {
 	assertRoundtrip(t, value)
 
 	var buffer = bytes.Buffer{}
-	err := Encoder{&buffer}.Encode(value)
+	err := Encoder{&buffer, nil}.Encode(value)
 	assert.NoError(t, err)
 	assert.Equal(t, []byte{0x05}, buffer.Bytes())
 
@@ -130,7 +129,7 @@ func TestTypeImplementsEncodeableDecodeableSliceEncodedAsExpected(t *testing.T) 
 	// assertRoundtrip(t, value)
 
 	var buffer = bytes.Buffer{}
-	err := Encoder{&buffer}.Encode(value)
+	err := Encoder{&buffer, nil}.Encode(value)
 	assert.NoError(t, err)
 	assert.Equal(t, []byte{0xfe, 0xdc, 0xd}, buffer.Bytes())
 
@@ -156,20 +155,20 @@ func TestArrayCannotBeDecodedIntoIncompatible(t *testing.T) {
 	value := [3]byte{255, 254, 253}
 	value2 := [5]byte{1, 2, 3, 4, 5}
 	value3 := [1]byte{42}
-	ctx := context.Background()
+
 	var buffer = bytes.Buffer{}
-	err := Encoder{&buffer}.Encode(value)
+	err := Encoder{&buffer, nil}.Encode(value)
 	assert.NoError(t, err)
 	err = Decoder{&buffer}.Decode(&value2)
 	assert.EqualError(t, err, "expected more bytes, but could not decode any more")
 	buffer.Reset()
-	err = Encoder{&buffer}.Encode(value)
+	err = Encoder{&buffer, nil}.Encode(value)
 	assert.NoError(t, err)
 	err = Decoder{&buffer}.Decode(&value3)
 	assert.NoError(t, err)
 	assert.Equal(t, [1]byte{255}, value3)
 	buffer.Reset()
-	err = Encoder{&buffer}.Encode(value)
+	err = Encoder{&buffer, nil}.Encode(value)
 	assert.NoError(t, err)
 	err = Decoder{&buffer}.Decode(&value)
 	assert.NoError(t, err)
@@ -199,7 +198,7 @@ type OptionInt8 struct {
 }
 
 func (o OptionInt8) Encode(encoder Encoder) error {
-	return encoder.EncodeOption(ctx, o.hasValue, o.value)
+	return encoder.EncodeOption(o.hasValue, o.value)
 }
 
 func (o *OptionInt8) Decode(decoder Decoder) error {
@@ -249,7 +248,7 @@ func TestCompactIntegersEncodedAsExpected(t *testing.T) {
 		math.MaxUint64: "13 ff ff ff ff ff ff ff ff"}
 	for value, expectedHex := range tests {
 		var buffer = bytes.Buffer{}
-		err := Encoder{&buffer}.EncodeUintCompact(value)
+		err := Encoder{&buffer, nil}.EncodeUintCompact(value)
 		assert.NoError(t, err)
 		assertEqual(t, hexify(buffer.Bytes()), expectedHex)
 		decoded, _ := Decoder{&buffer}.DecodeUintCompact()

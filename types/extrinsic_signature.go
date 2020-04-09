@@ -16,9 +16,7 @@
 
 package types
 
-import (
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
-)
+import "github.com/centrifuge/go-substrate-rpc-client/scale"
 
 type ExtrinsicSignatureV3 struct {
 	Signer    Address
@@ -52,6 +50,9 @@ func (es *ExtrinsicSignatureV4) Decode(decoder scale.Decoder) error {
 	}
 	if b == 0xff {
 		err = decoder.Decode(&es.Signer.AsAccountID)
+		if err != nil {
+			return err
+		}
 		es.Signer.IsAccountID = true
 	} else {
 		err := decoder.Decode(&es.Signer)

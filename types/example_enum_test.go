@@ -17,7 +17,6 @@
 package types_test
 
 import (
-	"context"
 	"fmt"
 	"reflect"
 
@@ -82,7 +81,7 @@ func ExampleExampleEnum_applyExtrinsic() {
 		AsApplyExtrinsic: 1234,
 	}
 
-	enc, err := EncodeToHexString(context.Background(), applyExtrinsic)
+	enc, err := EncodeToHexString(applyExtrinsic, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -101,7 +100,7 @@ func ExampleExampleEnum_finalization() {
 		IsFinalization: true,
 	}
 
-	enc, err := EncodeToHexString(context.Background(), finalization)
+	enc, err := EncodeToHexString(finalization, nil)
 	if err != nil {
 		panic(err)
 	}

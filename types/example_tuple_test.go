@@ -17,7 +17,6 @@
 package types_test
 
 import (
-	"context"
 	"fmt"
 
 	"golang.org/x/crypto/blake2b"
@@ -34,7 +33,7 @@ func ExampleExampleTuple() {
 
 	doc := Doc{12, blake2b.Sum256([]byte("My document"))}
 
-	encoded, err := EncodeToHexString(context.Background(), doc)
+	encoded, err := EncodeToHexString(doc, nil)
 	if err != nil {
 		panic(err)
 	}

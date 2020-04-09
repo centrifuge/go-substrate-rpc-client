@@ -1,7 +1,6 @@
 package types_test
 
 import (
-	"context"
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
@@ -26,7 +25,7 @@ func TestNewMetadataV11_Decode(t *testing.T) {
 			metadata := NewMetadataV11()
 			err := DecodeFromBytes(MustHexDecodeString(s.hexData), metadata)
 			assert.NoError(t, err)
-			data, err := EncodeToBytes(context.Background(), metadata)
+			data, err := EncodeToBytes(metadata, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, s.hexData, HexEncodeToString(data))
 		})

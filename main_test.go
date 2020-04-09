@@ -17,8 +17,8 @@
 package gsrpc_test
 
 import (
-	"context"
 	"fmt"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"math/big"
 	"time"
 
@@ -205,9 +205,11 @@ func Example_makeASimpleTransfer() {
 		panic(err)
 	}
 
-	ctx := context.Background()
+	// NOTE: for chains with out pallet_indices, use the following instead set SkipAccountIDHeader to true
+	//opts := &scale.EncoderOptions{SkipAccountIDHeader: true}
+	opts := &scale.EncoderOptions{}
 
-	c, err := types.NewCall(ctx, meta, "Balances.transfer", bob, types.UCompact(12345))
+	c, err := types.NewCall(opts, meta, "Balances.transfer", bob, types.UCompact(12345))
 	if err != nil {
 		panic(err)
 	}
@@ -246,13 +248,13 @@ func Example_makeASimpleTransfer() {
 	}
 
 	// Sign the transaction using Alice's default account
-	err = ext.Sign(ctx, signature.TestKeyringPairAlice, o)
+	err = ext.Sign(signature.TestKeyringPairAlice, o, opts)
 	if err != nil {
 		panic(err)
 	}
 
 	// Send the extrinsic
-	hash, err := api.RPC.Author.SubmitExtrinsic(ctx, ext)
+	hash, err := api.RPC.Author.SubmitExtrinsic(ext, opts)
 	if err != nil {
 		panic(err)
 	}
@@ -417,9 +419,11 @@ func Example_transactionWithEvents() {
 
 	amount := types.UCompact(12345)
 
-	ctx := context.Background()
+	// NOTE: for chains with out pallet_indices, use the following instead set SkipAccountIDHeader to true
+	//opts := &scale.EncoderOptions{SkipAccountIDHeader: true}
+	opts := &scale.EncoderOptions{}
 
-	c, err := types.NewCall(ctx, meta, "Balances.transfer", bob, amount)
+	c, err := types.NewCall(opts, meta, "Balances.transfer", bob, amount)
 	if err != nil {
 		panic(err)
 	}
@@ -464,13 +468,13 @@ func Example_transactionWithEvents() {
 	fmt.Printf("Sending %v from %#x to %#x with nonce %v", amount, signature.TestKeyringPairAlice.PublicKey, bob.AsAccountID, nonce)
 
 	// Sign the transaction using Alice's default account
-	err = ext.Sign(ctx, signature.TestKeyringPairAlice, o)
+	err = ext.Sign(signature.TestKeyringPairAlice, o, opts)
 	if err != nil {
 		panic(err)
 	}
 
 	// Do the transfer and track the actual status
-	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(ctx, ext)
+	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(ext, opts)
 	if err != nil {
 		panic(err)
 	}

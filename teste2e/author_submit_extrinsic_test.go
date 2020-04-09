@@ -19,7 +19,6 @@ package teste2e
 import (
 	"fmt"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
-	"os"
 	"testing"
 	"time"
 
@@ -33,8 +32,6 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping end-to-end test in short mode.")
 	}
-
-	os.Setenv("TEST_PRIV_KEY", "//Alice")
 
 	from, ok := signature.LoadKeyringPairFromEnv()
 	if !ok {
@@ -57,8 +54,8 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 	}
 
 	// NOTE: for chains with out pallet_indices, use the following instead set SkipAccountIDHeader to true
-	opts := &scale.EncoderOptions{SkipAccountIDHeader: true}
-	//opts := &scale.EncoderOptions{}
+	//opts := &scale.EncoderOptions{SkipAccountIDHeader: true}
+	opts := &scale.EncoderOptions{}
 
 	c, err := types.NewCall(opts, meta, "Balances.transfer", bob, types.UCompact(6969))
 	if err != nil {

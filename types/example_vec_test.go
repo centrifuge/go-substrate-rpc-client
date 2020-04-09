@@ -17,7 +17,6 @@
 package types_test
 
 import (
-	"context"
 	"fmt"
 	"reflect"
 
@@ -27,7 +26,7 @@ import (
 func ExampleExampleVec_simple() {
 	ingredients := []string{"salt", "sugar"}
 
-	encoded, err := EncodeToHexString(context.Background(), ingredients)
+	encoded, err := EncodeToHexString(ingredients, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -58,7 +57,7 @@ func ExampleExampleVec_struct() {
 		Outstanding: []string{"Bob", "Carol"},
 	}
 
-	encoded, err := EncodeToBytes(context.Background(), votes)
+	encoded, err := EncodeToBytes(votes, nil)
 	if err != nil {
 		panic(err)
 	}

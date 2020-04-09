@@ -17,7 +17,6 @@
 package types_test
 
 import (
-	"context"
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
@@ -25,7 +24,7 @@ import (
 )
 
 func TestBlock_EncodeDecode(t *testing.T) {
-	enc, err := EncodeToHexString(context.Background(), ExamplarySignedBlock)
+	enc, err := EncodeToHexString(ExamplarySignedBlock, nil)
 	assert.NoError(t, err)
 
 	var dec SignedBlock

@@ -17,7 +17,6 @@
 package types_test
 
 import (
-	"context"
 	"fmt"
 	"reflect"
 
@@ -82,7 +81,7 @@ func (a MyVal) Encode(encoder scale.Encoder) error {
 func ExampleExampleVecAny() {
 	myValSlice := []MyVal{{uint8(12)}, {"Abc"}}
 
-	encoded, err := EncodeToBytes(context.Background(), myValSlice)
+	encoded, err := EncodeToBytes(myValSlice, nil)
 	if err != nil {
 		panic(err)
 	}

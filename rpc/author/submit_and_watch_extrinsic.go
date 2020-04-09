@@ -18,11 +18,11 @@ package author
 
 import (
 	"context"
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"sync"
 
 	"github.com/centrifuge/go-substrate-rpc-client/config"
 	gethrpc "github.com/centrifuge/go-substrate-rpc-client/gethrpc"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
@@ -63,7 +63,7 @@ func (s *ExtrinsicStatusSubscription) Unsubscribe() {
 
 // SubmitAndWatchExtrinsic will submit and subscribe to watch an extrinsic until unsubscribed, returning a subscription
 // that will receive server notifications containing the extrinsic status updates.
-func (a *Author) SubmitAndWatchExtrinsic(xt types.Extrinsic, opts *scale.EncoderOptions) (*ExtrinsicStatusSubscription, error) {
+func (a *Author) SubmitAndWatchExtrinsic(xt types.Extrinsic, opts *scale.EncoderOptions) (*ExtrinsicStatusSubscription, error) { //nolint:lll
 	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
 	defer cancel()
 
