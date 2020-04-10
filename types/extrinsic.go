@@ -44,7 +44,7 @@ type ExtrinsicWrapper struct {
 	opts      scale.EncoderOptions
 }
 
-func NewExtrinsicWrapper(extrinsic Extrinsic, opts scale.EncoderOptions) ExtrinsicWrapper {
+func NewExtrinsicWrapperWithOpts(extrinsic Extrinsic, opts scale.EncoderOptions) ExtrinsicWrapper {
 	return ExtrinsicWrapper{Extrinsic: extrinsic, opts: opts}
 }
 
@@ -68,8 +68,8 @@ type Extrinsic struct {
 	Method Call
 }
 
-// NewExtrinsic creates a new Extrinsic from the provided CallWrapper
-func NewExtrinsic(c CallWrapper) ExtrinsicWrapper {
+// NewExtrinsicWrapper creates a new ExtrinsicWrapper from the provided CallWrapper
+func NewExtrinsicWrapper(c CallWrapper) ExtrinsicWrapper {
 	return ExtrinsicWrapper{
 		Extrinsic: Extrinsic{
 			Version: ExtrinsicVersion4,

@@ -57,7 +57,7 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
-	ext := types.NewExtrinsic(c)
+	ext := types.NewExtrinsicWrapper(c)
 
 	// blockHash, err := api.RPC.Chain.GetBlockHashLatest()
 	// if err != nil {

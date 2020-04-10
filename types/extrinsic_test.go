@@ -33,7 +33,7 @@ func TestExtrinsic_Unsigned_EncodeDecode(t *testing.T) {
 	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", addr, UCompact(6969))
 	assert.NoError(t, err)
 
-	ext := NewExtrinsic(c)
+	ext := NewExtrinsicWrapper(c)
 
 	extEnc, err := EncodeToHexString(ext.Extrinsic, scale.EncoderOptions{})
 	assert.NoError(t, err)
@@ -72,7 +72,7 @@ func TestExtrinsic_Sign(t *testing.T) {
 		UCompact(6969))
 	assert.NoError(t, err)
 
-	ext := NewExtrinsic(c)
+	ext := NewExtrinsicWrapper(c)
 
 	o := SignatureOptions{
 		BlockHash: NewHash(MustHexDecodeString("0xec7afaf1cca720ce88c1d1b689d81f0583cc15a97d621cf046dd9abf605ef22f")),
@@ -149,7 +149,7 @@ func ExampleExtrinsic() {
 		panic(err)
 	}
 
-	ext := NewExtrinsic(c)
+	ext := NewExtrinsicWrapper(c)
 
 	ext.Extrinsic.Method.CallIndex.SectionIndex = 5
 	ext.Extrinsic.Method.CallIndex.MethodIndex = 0

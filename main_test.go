@@ -209,7 +209,7 @@ func Example_makeASimpleTransfer() {
 	}
 
 	// Create the extrinsic
-	ext := types.NewExtrinsic(c)
+	ext := types.NewExtrinsicWrapper(c)
 
 	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
 	if err != nil {
@@ -419,7 +419,7 @@ func Example_transactionWithEvents() {
 	}
 
 	// Create the extrinsic
-	ext := types.NewExtrinsic(c)
+	ext := types.NewExtrinsicWrapper(c)
 	if err != nil {
 		panic(err)
 	}
