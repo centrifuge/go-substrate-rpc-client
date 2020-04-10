@@ -149,3 +149,8 @@ func TestMetadataV10Polkadot_Decode(t *testing.T) {
 
 	assert.Equal(t, *ExamplaryMetadataV10Polkadot, *metadata)
 }
+
+func TestMetadataV10_ExistsModuleMetadata(t *testing.T) {
+	assert.True(t, exampleMetadataV10.ExistsModuleMetadata("EmptyModule"))
+	assert.False(t, exampleMetadataV10.ExistsModuleMetadata("NotExistModule"))
+}

@@ -50,3 +50,8 @@ func TestFindStorageEntryMetadataV9(t *testing.T) {
 	_, err := exampleMetadataV9.FindStorageEntryMetadata("myStoragePrefix", "myStorageFunc2")
 	assert.NoError(t, err)
 }
+
+func TestMetadataV9_ExistsModuleMetadata(t *testing.T) {
+	assert.True(t, exampleMetadataV9.ExistsModuleMetadata("EmptyModule"))
+	assert.False(t, exampleMetadataV9.ExistsModuleMetadata("NotExistModule"))
+}
