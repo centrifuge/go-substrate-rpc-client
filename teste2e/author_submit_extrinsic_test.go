@@ -47,10 +47,6 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
-	for i := 0; i < len(meta.AsMetadataV11.Modules); i++ {
-		fmt.Println(meta.AsMetadataV11.Modules[i].Name)
-	}
-
 	bob, err := types.NewAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
 	if err != nil {
 		panic(err)
