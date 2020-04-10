@@ -16,7 +16,11 @@
 
 package types
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
+)
 
 // Digest contains logs
 type Digest []DigestItem
@@ -44,7 +48,7 @@ func (d Digest) MarshalJSON() ([]byte, error) {
 	logs := make([]string, len(d))
 	var err error
 	for i, di := range d {
-		logs[i], err = EncodeToHexString(di, nil)
+		logs[i], err = EncodeToHexString(di, scale.EncoderOptions{})
 		if err != nil {
 			return nil, err
 		}

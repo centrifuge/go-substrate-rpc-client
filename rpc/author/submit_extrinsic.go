@@ -16,14 +16,11 @@
 
 package author
 
-import (
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
-	"github.com/centrifuge/go-substrate-rpc-client/types"
-)
+import "github.com/centrifuge/go-substrate-rpc-client/types"
 
 // SubmitExtrinsic will submit a fully formatted extrinsic for block inclusion
-func (a *Author) SubmitExtrinsic(xt types.Extrinsic, opts *scale.EncoderOptions) (types.Hash, error) {
-	enc, err := types.EncodeToHexString(xt, opts)
+func (a *Author) SubmitExtrinsic(xt types.ExtrinsicWrapper) (types.Hash, error) {
+	enc, err := types.EncodeToHexString(xt.Extrinsic, xt.GetOpts())
 	if err != nil {
 		return types.Hash{}, err
 	}

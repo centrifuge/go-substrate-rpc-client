@@ -21,6 +21,7 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
 )
@@ -51,11 +52,11 @@ var exampleEventAppEnc = []byte{0x0, 0x2a, 0x0, 0x0, 0x0, 0x10, 0x27, 0x0, 0x0, 
 var exampleEventFinEnc = []byte{0x1, 0x10, 0x27, 0x0, 0x0, 0x0, 0x1, 0x4, 0x1, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} //nolint:lll
 
 func TestEventSystemExtrinsicSuccess_Encode(t *testing.T) {
-	encoded, err := EncodeToBytes(exampleEventFin, nil)
+	encoded, err := EncodeToBytes(exampleEventFin, scale.EncoderOptions{})
 	assert.NoError(t, err)
 	assert.Equal(t, exampleEventFinEnc, encoded)
 
-	encoded, err = EncodeToBytes(exampleEventApp, nil)
+	encoded, err = EncodeToBytes(exampleEventApp, scale.EncoderOptions{})
 	assert.NoError(t, err)
 	assert.Equal(t, exampleEventAppEnc, encoded)
 }

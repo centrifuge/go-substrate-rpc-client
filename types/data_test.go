@@ -19,6 +19,7 @@ package types_test
 import (
 	"testing"
 
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
 )
@@ -33,7 +34,7 @@ func TestData_EncodedLength(t *testing.T) {
 func TestData_Encode(t *testing.T) {
 	bz := []byte{12, 251, 42}
 	data := Data(bz)
-	encoded, err := EncodeToBytes(data, nil)
+	encoded, err := EncodeToBytes(data, scale.EncoderOptions{})
 	assert.NoError(t, err)
 	assert.Equal(t, bz, encoded)
 }

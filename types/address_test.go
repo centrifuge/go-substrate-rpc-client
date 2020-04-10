@@ -54,7 +54,7 @@ func TestAddress_Encode(t *testing.T) {
 }
 
 func TestAddress_EncodeWithOptions(t *testing.T) {
-	opts := &scale.EncoderOptions{SkipAccountIDHeader: true}
+	opts := scale.EncoderOptions{SkipAccountIDHeader: true}
 	assertEncodeWithOpts(t, []encodingAssert{
 		{NewAddressFromAccountID([]byte{
 			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,

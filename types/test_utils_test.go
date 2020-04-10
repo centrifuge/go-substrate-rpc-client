@@ -41,7 +41,7 @@ func assertEqual(t *testing.T, a interface{}, b interface{}) {
 
 func assertRoundtrip(t *testing.T, value interface{}) {
 	var buffer = bytes.Buffer{}
-	err := scale.NewEncoder(&buffer, nil).Encode(value)
+	err := scale.NewEncoder(&buffer, scale.EncoderOptions{}).Encode(value)
 	assert.NoError(t, err)
 	target := reflect.New(reflect.TypeOf(value))
 	err = scale.NewDecoder(&buffer).Decode(target.Interface())
@@ -51,7 +51,7 @@ func assertRoundtrip(t *testing.T, value interface{}) {
 
 func assertEncodedLength(t *testing.T, encodedLengthAsserts []encodedLengthAssert) {
 	for _, test := range encodedLengthAsserts {
-		result, err := EncodedLength(test.input, nil)
+		result, err := EncodedLength(test.input, scale.EncoderOptions{})
 		if err != nil {
 			t.Errorf("Encoded length error for input %v: %v\n", test.input, err)
 		}
@@ -66,7 +66,7 @@ type encodingAssert struct {
 	expected []byte
 }
 
-func assertEncodeWithOpts(t *testing.T, encodingAsserts []encodingAssert, opts *scale.EncoderOptions) {
+func assertEncodeWithOpts(t *testing.T, encodingAsserts []encodingAssert, opts scale.EncoderOptions) {
 	for _, test := range encodingAsserts {
 		result, err := EncodeToBytes(test.input, opts)
 		if err != nil {
@@ -79,7 +79,7 @@ func assertEncodeWithOpts(t *testing.T, encodingAsserts []encodingAssert, opts *
 }
 
 func assertEncode(t *testing.T, encodingAsserts []encodingAssert) {
-	assertEncodeWithOpts(t, encodingAsserts, nil)
+	assertEncodeWithOpts(t, encodingAsserts, scale.EncoderOptions{})
 }
 
 type decodingAssert struct {
@@ -105,7 +105,7 @@ type hashAssert struct {
 
 func assertHash(t *testing.T, hashAsserts []hashAssert) {
 	for _, test := range hashAsserts {
-		result, err := GetHash(test.input, nil)
+		result, err := GetHash(test.input, scale.EncoderOptions{})
 		if err != nil {
 			t.Errorf("Hash error for input %v: %v\n", test.input, err)
 		}
@@ -122,7 +122,7 @@ type encodeToHexAssert struct {
 
 func assertEncodeToHex(t *testing.T, encodeToHexAsserts []encodeToHexAssert) {
 	for _, test := range encodeToHexAsserts {
-		result, err := EncodeToHexString(test.input, nil)
+		result, err := EncodeToHexString(test.input, scale.EncoderOptions{})
 		if err != nil {
 			t.Errorf("Hex error for input %v: %v\n", test.input, err)
 		}

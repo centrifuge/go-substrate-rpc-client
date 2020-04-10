@@ -44,14 +44,14 @@ type EncoderOptions struct {
 // Allows passing encoding options
 type Encoder struct {
 	writer io.Writer
-	opts *EncoderOptions
+	opts EncoderOptions
 }
 
-func NewEncoder(writer io.Writer, opts *EncoderOptions) *Encoder {
+func NewEncoder(writer io.Writer, opts EncoderOptions) *Encoder {
 	return &Encoder{writer: writer, opts: opts}
 }
 
-func (pe Encoder) GetOpts() *EncoderOptions {
+func (pe Encoder) GetOpts() EncoderOptions {
 	return pe.opts
 }
 
@@ -625,7 +625,7 @@ func (o *OptionBool) Decode(decoder Decoder) error {
 }
 
 // ToKeyedVec replicates the behaviour of Rust's to_keyed_vec helper.
-func ToKeyedVec(value interface{}, prependKey []byte, opts *EncoderOptions) ([]byte, error) {
+func ToKeyedVec(value interface{}, prependKey []byte, opts EncoderOptions) ([]byte, error) {
 	var buffer = bytes.NewBuffer(prependKey)
 	err := Encoder{buffer, opts}.Encode(value)
 	if err != nil {

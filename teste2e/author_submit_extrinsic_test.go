@@ -23,7 +23,6 @@ import (
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
 	"github.com/centrifuge/go-substrate-rpc-client/config"
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
@@ -48,16 +47,16 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
+	for i := 0; i < len(meta.AsMetadataV11.Modules); i++ {
+		fmt.Println(meta.AsMetadataV11.Modules[i].Name)
+	}
+
 	bob, err := types.NewAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
 	if err != nil {
 		panic(err)
 	}
 
-	// NOTE: for chains with out pallet_indices, use the following instead set SkipAccountIDHeader to true
-	//opts := &scale.EncoderOptions{SkipAccountIDHeader: true}
-	opts := &scale.EncoderOptions{}
-
-	c, err := types.NewCall(opts, meta, "Balances.transfer", bob, types.UCompact(6969))
+	c, err := types.NewCall(meta, "Balances.transfer", bob, types.UCompact(6969))
 	if err != nil {
 		panic(err)
 	}
@@ -107,19 +106,19 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 
 		extI := ext
 
-		err = extI.Sign(from, o, opts)
+		err = extI.Sign(from, o)
 		if err != nil {
 			panic(err)
 		}
 
-		extEnc, err := types.EncodeToHexString(extI, opts)
+		extEnc, err := types.EncodeToHexString(extI.Extrinsic, extI.GetOpts())
 		if err != nil {
 			panic(err)
 		}
 
 		fmt.Printf("Extrinsic: %#v\n", extEnc)
 
-		_, err = api.RPC.Author.SubmitExtrinsic(extI, opts)
+		_, err = api.RPC.Author.SubmitExtrinsic(extI)
 		if err != nil {
 			panic(err)
 		}

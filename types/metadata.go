@@ -198,3 +198,31 @@ func (m *Metadata) FindStorageEntryMetadata(module string, fn string) (StorageEn
 		return nil, fmt.Errorf("unsupported metadata version")
 	}
 }
+
+func (m *Metadata) ExistsModuleMetadata(module string) bool {
+	switch {
+	case m.IsMetadataV4:
+		return m.AsMetadataV4.ExistsModuleMetadata(module)
+	case m.IsMetadataV7:
+		return m.AsMetadataV7.ExistsModuleMetadata(module)
+	case m.IsMetadataV8:
+		return m.AsMetadataV8.ExistsModuleMetadata(module)
+	case m.IsMetadataV9:
+		return m.AsMetadataV9.ExistsModuleMetadata(module)
+	case m.IsMetadataV10:
+		return m.AsMetadataV10.ExistsModuleMetadata(module)
+	case m.IsMetadataV11:
+		return m.AsMetadataV11.ExistsModuleMetadata(module)
+	default:
+		return false
+	}
+}
+
+// BuildOptsFromMetadata sets certain EncoderOptions based on chain metadata
+func BuildOptsFromMetadata(meta *Metadata) scale.EncoderOptions {
+	var opts scale.EncoderOptions
+	if !meta.ExistsModuleMetadata("Indices") {
+		opts = scale.EncoderOptions{SkipAccountIDHeader: true}
+	}
+	return opts
+}

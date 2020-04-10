@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/signature"
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
@@ -29,12 +30,12 @@ func TestExtrinsic_Unsigned_EncodeDecode(t *testing.T) {
 	addr, err := NewAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
 	assert.NoError(t, err)
 
-	c, err := NewCall(nil, ExamplaryMetadataV4, "balances.transfer", addr, UCompact(6969))
+	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", addr, UCompact(6969))
 	assert.NoError(t, err)
 
 	ext := NewExtrinsic(c)
 
-	extEnc, err := EncodeToHexString(ext, nil)
+	extEnc, err := EncodeToHexString(ext.Extrinsic, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x"+
@@ -50,11 +51,11 @@ func TestExtrinsic_Unsigned_EncodeDecode(t *testing.T) {
 	err = DecodeFromHexString(extEnc, &extDec)
 	assert.NoError(t, err)
 
-	assert.Equal(t, ext, extDec)
+	assert.Equal(t, ext.Extrinsic, extDec)
 }
 
 func TestExtrinsic_Signed_EncodeDecode(t *testing.T) {
-	extEnc, err := EncodeToHexString(ExamplaryExtrinsic, nil)
+	extEnc, err := EncodeToHexString(ExamplaryExtrinsic, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	var extDec Extrinsic
@@ -65,7 +66,7 @@ func TestExtrinsic_Signed_EncodeDecode(t *testing.T) {
 }
 
 func TestExtrinsic_Sign(t *testing.T) {
-	c, err := NewCall(nil, ExamplaryMetadataV4,
+	c, err := NewCall(ExamplaryMetadataV4,
 		"balances.transfer", NewAddressFromAccountID(MustHexDecodeString(
 			"0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")),
 		UCompact(6969))
@@ -82,16 +83,16 @@ func TestExtrinsic_Sign(t *testing.T) {
 		Tip:         2,
 	}
 
-	assert.False(t, ext.IsSigned())
+	assert.False(t, ext.Extrinsic.IsSigned())
 
-	err = ext.Sign(signature.TestKeyringPairAlice, o, nil)
+	err = ext.Sign(signature.TestKeyringPairAlice, o)
 	assert.NoError(t, err)
 
 	// fmt.Printf("%#v", ext)
 
-	assert.True(t, ext.IsSigned())
+	assert.True(t, ext.Extrinsic.IsSigned())
 
-	extEnc, err := EncodeToHexString(ext, nil)
+	extEnc, err := EncodeToHexString(ext.Extrinsic, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	// extEnc will have the structure of the following. It can't be tested, since the signature is different on every
@@ -116,7 +117,7 @@ func TestExtrinsic_Sign(t *testing.T) {
 	assert.Equal(t, uint8(ExtrinsicVersion4), extDec.Type())
 	assert.Equal(t, signature.TestKeyringPairAlice.PublicKey, extDec.Signature.Signer.AsAccountID[:])
 
-	mb, err := EncodeToBytes(extDec.Method, nil)
+	mb, err := EncodeToBytes(extDec.Method, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	verifyPayload := ExtrinsicPayloadV3{
@@ -130,7 +131,7 @@ func TestExtrinsic_Sign(t *testing.T) {
 	}
 
 	// verify sig
-	b, err := EncodeToBytes(verifyPayload, nil)
+	b, err := EncodeToBytes(verifyPayload, scale.EncoderOptions{})
 	assert.NoError(t, err)
 	ok, err := signature.Verify(b, extDec.Signature.Signature.AsSr25519[:], signature.TestKeyringPairAlice.URI)
 	assert.NoError(t, err)
@@ -143,18 +144,15 @@ func ExampleExtrinsic() {
 		panic(err)
 	}
 
-	c, err := NewCall(nil, ExamplaryMetadataV4, "balances.transfer", bob, UCompact(6969))
+	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", bob, UCompact(6969))
 	if err != nil {
 		panic(err)
 	}
 
 	ext := NewExtrinsic(c)
-	if err != nil {
-		panic(err)
-	}
 
-	ext.Method.CallIndex.SectionIndex = 5
-	ext.Method.CallIndex.MethodIndex = 0
+	ext.Extrinsic.Method.CallIndex.SectionIndex = 5
+	ext.Extrinsic.Method.CallIndex.MethodIndex = 0
 
 	era := ExtrinsicEra{IsMortalEra: true, AsMortalEra: MortalEra{0x95, 0x00}}
 
@@ -167,14 +165,14 @@ func ExampleExtrinsic() {
 		Tip:         0,
 	}
 
-	err = ext.Sign(signature.TestKeyringPairAlice, o, nil)
+	err = ext.Sign(signature.TestKeyringPairAlice, o)
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Printf("%#v", ext)
 
-	extEnc, err := EncodeToHexString(ext, nil)
+	extEnc, err := EncodeToHexString(ext.Extrinsic, scale.EncoderOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -185,7 +183,7 @@ func ExampleExtrinsic() {
 func TestCall(t *testing.T) {
 	c := Call{CallIndex{6, 1}, Args{0, 0, 0}}
 
-	enc, err := EncodeToHexString(c, nil)
+	enc, err := EncodeToHexString(c, scale.EncoderOptions{})
 	assert.NoError(t, err)
 	assert.Equal(t, "0x0601000000", enc)
 }
@@ -194,30 +192,30 @@ func TestNewCallV4(t *testing.T) {
 	addr, err := NewAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
 	assert.NoError(t, err)
 
-	c, err := NewCall(nil, ExamplaryMetadataV4, "balances.transfer", addr, UCompact(1000))
+	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", addr, UCompact(1000))
 	assert.NoError(t, err)
 
-	enc, err := EncodeToHexString(c, nil)
+	enc, err := EncodeToHexString(c.Call, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x0300ff8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48a10f", enc)
 }
 
 func TestNewCallV7(t *testing.T) {
-	c, err := NewCall(nil, &exampleMetadataV7, "Module2.my function", U8(3))
+	c, err := NewCall(&exampleMetadataV7, "Module2.my function", U8(3))
 	assert.NoError(t, err)
 
-	enc, err := EncodeToHexString(c, nil)
+	enc, err := EncodeToHexString(c.Call, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x010003", enc)
 }
 
 func TestNewCallV8(t *testing.T) {
-	c, err := NewCall(nil, &exampleMetadataV8, "Module2.my function", U8(3))
+	c, err := NewCall(&exampleMetadataV8, "Module2.my function", U8(3))
 	assert.NoError(t, err)
 
-	enc, err := EncodeToHexString(c, nil)
+	enc, err := EncodeToHexString(c.Call, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x010003", enc)

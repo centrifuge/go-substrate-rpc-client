@@ -81,7 +81,7 @@ func ExampleExampleEnum_applyExtrinsic() {
 		AsApplyExtrinsic: 1234,
 	}
 
-	enc, err := EncodeToHexString(applyExtrinsic, nil)
+	enc, err := EncodeToHexString(applyExtrinsic, scale.EncoderOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -100,7 +100,7 @@ func ExampleExampleEnum_finalization() {
 		IsFinalization: true,
 	}
 
-	enc, err := EncodeToHexString(finalization, nil)
+	enc, err := EncodeToHexString(finalization, scale.EncoderOptions{})
 	if err != nil {
 		panic(err)
 	}
