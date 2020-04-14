@@ -16,18 +16,14 @@
 
 package author
 
-import (
-	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
-)
+import "github.com/centrifuge/go-substrate-rpc-client/client"
 
 // Author exposes methods for authoring of network items
 type Author struct {
 	client client.Client
-	opts   scale.EncoderOptions
 }
 
 // NewAuthor creates a new Author struct
-func NewAuthor(cl client.Client, opts scale.EncoderOptions) *Author {
-	return &Author{cl, opts}
+func NewAuthor(cl client.Client) *Author {
+	return &Author{cl}
 }

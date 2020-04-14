@@ -16,26 +16,14 @@
 
 package state
 
-import (
-	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
-)
+import "github.com/centrifuge/go-substrate-rpc-client/client"
 
 // State exposes methods for querying state
 type State struct {
 	client client.Client
-	opts   scale.EncoderOptions
 }
 
 // NewState creates a new State struct
 func NewState(c client.Client) *State {
 	return &State{client: c}
-}
-
-func (s *State) GetOpts() scale.EncoderOptions {
-	return s.opts
-}
-
-func (s *State) SetOpts(options scale.EncoderOptions) {
-	s.opts = options
 }

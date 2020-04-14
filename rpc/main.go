@@ -41,10 +41,10 @@ func NewRPC(cl client.Client) (*RPC, error) {
 	}
 
 	opts := types.BuildOptsFromMetadata(meta)
-	st.SetOpts(opts)
+	cl.SetOpts(opts)
 
 	return &RPC{
-		Author: author.NewAuthor(cl, opts),
+		Author: author.NewAuthor(cl),
 		Chain:  chain.NewChain(cl),
 		State:  st,
 		System: system.NewSystem(cl),

@@ -19,8 +19,6 @@ package state
 import (
 	"fmt"
 
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
-
 	"github.com/centrifuge/go-substrate-rpc-client/client"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
@@ -36,7 +34,7 @@ func (s *State) GetStorage(key types.StorageKey, target interface{}, blockHash t
 	if len(*raw) == 0 {
 		return false, nil
 	}
-	return true, types.DecodeFromBytes(*raw, target, scale.EncoderOptions{})
+	return true, types.DecodeFromBytes(*raw, target, s.client.GetOpts())
 }
 
 // GetStorageLatest retreives the stored data for the latest block height and decodes them into the provided interface.
@@ -49,7 +47,7 @@ func (s *State) GetStorageLatest(key types.StorageKey, target interface{}) (ok b
 	if len(*raw) == 0 {
 		return false, nil
 	}
-	return true, types.DecodeFromBytes(*raw, target, scale.EncoderOptions{})
+	return true, types.DecodeFromBytes(*raw, target, s.client.GetOpts())
 }
 
 // GetStorageRaw retreives the stored data as raw bytes, without decoding them
