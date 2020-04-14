@@ -18,7 +18,6 @@ package teste2e
 
 import (
 	"fmt"
-	"os"
 	"testing"
 	"time"
 
@@ -33,7 +32,6 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		t.Skip("skipping end-to-end test in short mode.")
 	}
 
-	os.Setenv("TEST_PRIV_KEY", "//Alice")
 	from, ok := signature.LoadKeyringPairFromEnv()
 	if !ok {
 		t.Skip("skipping end-to-end that requires a private key because TEST_PRIV_KEY is not set or empty")
