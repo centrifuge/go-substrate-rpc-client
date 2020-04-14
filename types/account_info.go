@@ -16,13 +16,13 @@
 
 package types
 
-// Deprecated: AccountInfo is an account information structure for contracts
-type AccountInfo struct {
+// Deprecated: AccountInfoV4 is an account information structure for contracts
+type AccountInfoV4 struct {
 	TrieID           []byte
 	CurrentMemStored uint64
 }
 
-// Deprecated: NewAccountInfo creates a new AccountInfo type
-func NewAccountInfo(trieID []byte, currentMemStored uint64) AccountInfo {
-	return AccountInfo{trieID, currentMemStored}
+// Deprecated: NewAccountInfoV4 creates a new AccountInfoV4 type
+func NewAccountInfoV4(trieID []byte, currentMemStored uint64) AccountInfoV4 {
+	return AccountInfoV4{trieID, currentMemStored}
 }

@@ -34,13 +34,25 @@ import (
 const maxUint = ^uint(0)
 const maxInt = int(maxUint >> 1)
 
-// Encoder is a wrapper around a Writer that allows encoding data items to a stream.
-type Encoder struct {
-	writer io.Writer
+// EncoderOptions is a collection of data that modifies the encoder behavior on custom encoding functions
+type EncoderOptions struct {
+	// NoPalletIndices enable this to work with substrate chains that do not have indices pallet in runtime
+	NoPalletIndices bool
 }
 
-func NewEncoder(writer io.Writer) *Encoder {
-	return &Encoder{writer: writer}
+// Encoder is a wrapper around a Writer that allows encoding data items to a stream.
+// Allows passing encoding options
+type Encoder struct {
+	writer io.Writer
+	opts EncoderOptions
+}
+
+func NewEncoder(writer io.Writer, opts EncoderOptions) *Encoder {
+	return &Encoder{writer: writer, opts: opts}
+}
+
+func (pe Encoder) Opts() EncoderOptions {
+	return pe.opts
 }
 
 // Write several bytes to the encoder.
@@ -220,6 +232,11 @@ func (pe Encoder) Encode(value interface{}) error {
 	case reflect.Struct:
 		rv := reflect.ValueOf(value)
 		for i := 0; i < rv.NumField(); i++ {
+			ft := rv.Type().Field(i)
+			tv, ok := ft.Tag.Lookup("scale")
+			if ok && tv == "-" {
+				continue
+			}
 			err := pe.Encode(rv.Field(i).Interface())
 			if err != nil {
 				return fmt.Errorf("type %s does not support Encodeable interface and could not be "+
@@ -273,10 +290,15 @@ func (pe Encoder) EncodeOption(hasValue bool, value interface{}) error {
 // Decoder is a wraper around a Reader that allows decoding data items from a stream.
 type Decoder struct {
 	reader io.Reader
+	opts   EncoderOptions
 }
 
-func NewDecoder(reader io.Reader) *Decoder {
-	return &Decoder{reader: reader}
+func (pd Decoder) Opts() EncoderOptions {
+	return pd.opts
+}
+
+func NewDecoder(reader io.Reader, opts EncoderOptions) *Decoder {
+	return &Decoder{reader: reader, opts: opts}
 }
 
 // Read reads bytes from a stream into a buffer
@@ -447,6 +469,11 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 
 	case reflect.Struct:
 		for i := 0; i < target.NumField(); i++ {
+			ft := target.Type().Field(i)
+			tv, ok := ft.Tag.Lookup("scale")
+			if ok && tv == "-" {
+				continue
+			}
 			err := pd.DecodeIntoReflectValue(target.Field(i))
 			if err != nil {
 				return fmt.Errorf("type %s does not support Decodeable interface and could not be "+
@@ -613,9 +640,9 @@ func (o *OptionBool) Decode(decoder Decoder) error {
 }
 
 // ToKeyedVec replicates the behaviour of Rust's to_keyed_vec helper.
-func ToKeyedVec(value interface{}, prependKey []byte) ([]byte, error) {
+func ToKeyedVec(value interface{}, prependKey []byte, opts EncoderOptions) ([]byte, error) {
 	var buffer = bytes.NewBuffer(prependKey)
-	err := Encoder{buffer}.Encode(value)
+	err := Encoder{buffer, opts}.Encode(value)
 	if err != nil {
 		return nil, err
 	}

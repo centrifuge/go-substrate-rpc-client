@@ -19,6 +19,7 @@ package types_test
 import (
 	"testing"
 
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
 )
@@ -33,7 +34,7 @@ func TestStorageDataRaw_EncodedLength(t *testing.T) {
 func TestStorageDataRaw_Encode(t *testing.T) {
 	bz := []byte{12, 251, 42}
 	dataRaw := NewStorageDataRaw(bz)
-	encoded, err := EncodeToBytes(dataRaw)
+	encoded, err := EncodeToBytes(dataRaw, scale.EncoderOptions{})
 	assert.NoError(t, err)
 	assert.Equal(t, bz, encoded)
 }
@@ -41,7 +42,7 @@ func TestStorageDataRaw_Encode(t *testing.T) {
 func TestStorageDataRaw_Decode(t *testing.T) {
 	bz := []byte{12, 251, 42}
 	decoded := make(StorageDataRaw, len(bz))
-	err := DecodeFromBytes(bz, &decoded)
+	err := DecodeFromBytes(bz, &decoded, scale.EncoderOptions{})
 	assert.NoError(t, err)
 	assert.Equal(t, StorageDataRaw(bz), decoded)
 }
