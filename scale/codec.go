@@ -36,8 +36,8 @@ const maxInt = int(maxUint >> 1)
 
 // EncoderOptions is a collection of data that modifies the encoder behavior on custom encoding functions
 type EncoderOptions struct {
-	// SkipAccountIDHeader enable this to work with substrate chains that do not have indices pallet in runtime
-	SkipAccountIDHeader bool
+	// NoPalletIndices enable this to work with substrate chains that do not have indices pallet in runtime
+	NoPalletIndices bool
 }
 
 // Encoder is a wrapper around a Writer that allows encoding data items to a stream.
@@ -51,7 +51,7 @@ func NewEncoder(writer io.Writer, opts EncoderOptions) *Encoder {
 	return &Encoder{writer: writer, opts: opts}
 }
 
-func (pe Encoder) GetOpts() EncoderOptions {
+func (pe Encoder) Opts() EncoderOptions {
 	return pe.opts
 }
 
@@ -293,7 +293,7 @@ type Decoder struct {
 	opts   EncoderOptions
 }
 
-func (pd Decoder) GetOpts() EncoderOptions {
+func (pd Decoder) Opts() EncoderOptions {
 	return pd.opts
 }
 

@@ -36,7 +36,7 @@ type Client interface {
 	URL() string
 
 	//MetaData(cache bool) (*MetadataVersioned, error)
-	GetOpts() scale.EncoderOptions
+	Opts() scale.EncoderOptions
 
 	SetOpts(options scale.EncoderOptions)
 }
@@ -53,13 +53,13 @@ type client struct {
 	opts scale.EncoderOptions
 }
 
-// GetOpts returns the Encoding Options required for this client
-func (c client) GetOpts() scale.EncoderOptions {
+// Opts returns the Encoding Options required for this client
+func (c client) Opts() scale.EncoderOptions {
 	return c.opts
 }
 
 // SetOpts sets Encoder Options on client struct
-func (c client) SetOpts(options scale.EncoderOptions) {
+func (c *client) SetOpts(options scale.EncoderOptions) {
 	c.opts = options
 }
 

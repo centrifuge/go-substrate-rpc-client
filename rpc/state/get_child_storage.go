@@ -32,7 +32,7 @@ func (s *State) GetChildStorage(childStorageKey, key types.StorageKey, target in
 	if len(*raw) == 0 {
 		return false, nil
 	}
-	return true, types.DecodeFromBytes(*raw, target, s.client.GetOpts())
+	return true, types.DecodeFromBytes(*raw, target, s.client.Opts())
 }
 
 // GetChildStorageLatest retreives the child storage for a key for the latest block height and decodes them into the
@@ -45,7 +45,7 @@ func (s *State) GetChildStorageLatest(childStorageKey, key types.StorageKey, tar
 	if len(*raw) == 0 {
 		return false, nil
 	}
-	return true, types.DecodeFromBytes(*raw, target, s.client.GetOpts())
+	return true, types.DecodeFromBytes(*raw, target, s.client.Opts())
 }
 
 // GetChildStorageRaw retreives the child storage for a key as raw bytes, without decoding them

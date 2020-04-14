@@ -222,7 +222,7 @@ func (m *Metadata) ExistsModuleMetadata(module string) bool {
 func BuildOptsFromMetadata(meta *Metadata) scale.EncoderOptions {
 	var opts scale.EncoderOptions
 	if !meta.ExistsModuleMetadata("Indices") {
-		opts = scale.EncoderOptions{SkipAccountIDHeader: true}
+		opts = scale.EncoderOptions{NoPalletIndices: true}
 	}
 	return opts
 }

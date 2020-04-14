@@ -62,6 +62,17 @@ func (a *Address) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
+	if decoder.Opts().NoPalletIndices {
+		var sm [31]byte // Reading Address[32] minus b already read
+		err = decoder.Decode(&sm)
+		if err != nil {
+			return err
+		}
+		a.AsAccountID = NewAccountID(append([]byte{b}, sm[:]...)) // Push b back to the front
+		a.IsAccountID = true
+		return nil
+	}
+
 	if b == 0xff {
 		err = decoder.Decode(&a.AsAccountID)
 		a.IsAccountID = true
@@ -86,27 +97,16 @@ func (a *Address) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	if decoder.GetOpts().SkipAccountIDHeader {
-		var sm [31]byte // Reading Address[32] minus b already read
-		err = decoder.Decode(&sm)
-		if err != nil {
-			return err
-		}
-		a.AsAccountID = NewAccountID(append([]byte{b}, sm[:]...)) // Push b back to the front
-		a.IsAccountID = true
-		return nil
-	}
-
 	a.IsAccountIndex = true
 	a.AsAccountIndex = AccountIndex(b)
 	return nil
 }
 
 func (a Address) Encode(encoder scale.Encoder) error {
-	opts := encoder.GetOpts()
+	opts := encoder.Opts()
 	// type of address - public key
 	if a.IsAccountID {
-		if !opts.SkipAccountIDHeader { // Skip in case target chain doesn't include indices pallet
+		if !opts.NoPalletIndices { // Skip in case target chain doesn't include indices pallet
 			err := encoder.PushByte(255)
 			if err != nil {
 				return err
