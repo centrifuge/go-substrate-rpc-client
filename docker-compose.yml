@@ -22,6 +22,7 @@ services:
         ipv4_address: 172.42.0.99
     environment:
       - RPC_URL=ws://172.42.0.2:9944
+      - TEST_PRIV_KEY=//Alice
     volumes:
       - "$PWD/shared:/go/src/github.com/centrifuge/go-substrate-rpc-client/shared"
 networks:

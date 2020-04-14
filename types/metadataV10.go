@@ -106,6 +106,15 @@ func (m *MetadataV10) FindStorageEntryMetadata(module string, fn string) (Storag
 	return nil, fmt.Errorf("module %v not found in metadata", module)
 }
 
+func (m *MetadataV10) ExistsModuleMetadata(module string) bool {
+	for _, mod := range m.Modules {
+		if string(mod.Name) == module {
+			return true
+		}
+	}
+	return false
+}
+
 type ModuleMetadataV10 struct {
 	Name       Text
 	HasStorage bool

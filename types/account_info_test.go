@@ -22,45 +22,45 @@ import (
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
-func TestAccountInfo_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewAccountInfo([]byte{1, 2, 3}, 13))
+func TestAccountInfoV4_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, NewAccountInfoV4([]byte{1, 2, 3}, 13))
 }
 
-func TestAccountInfo_EncodedLength(t *testing.T) {
+func TestAccountInfoV4_EncodedLength(t *testing.T) {
 	assertEncodedLength(t, []encodedLengthAssert{
-		{NewAccountInfo([]byte{1, 2, 3}, 13), 12},
+		{NewAccountInfoV4([]byte{1, 2, 3}, 13), 12},
 	})
 }
 
-func TestAccountInfo_Encode(t *testing.T) {
+func TestAccountInfoV4_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewAccountInfo([]byte{1, 2, 3}, 13), MustHexDecodeString("0x0c0102030d00000000000000")},
+		{NewAccountInfoV4([]byte{1, 2, 3}, 13), MustHexDecodeString("0x0c0102030d00000000000000")},
 	})
 }
 
-func TestAccountInfo_Hash(t *testing.T) {
+func TestAccountInfoV4_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewAccountInfo([]byte{1, 2, 3}, 13), MustHexDecodeString(
+		{NewAccountInfoV4([]byte{1, 2, 3}, 13), MustHexDecodeString(
 			"0x4fac0dfeb9b4efd2518c762e7d097fafaffaf8d56a2e784f9fc9919c22277804")},
 	})
 }
 
-func TestAccountInfo_Hex(t *testing.T) {
+func TestAccountInfoV4_Hex(t *testing.T) {
 	assertEncodeToHex(t, []encodeToHexAssert{
-		{NewAccountInfo([]byte{1, 2, 3}, 13), "0x0c0102030d00000000000000"},
+		{NewAccountInfoV4([]byte{1, 2, 3}, 13), "0x0c0102030d00000000000000"},
 	})
 }
 
-func TestAccountInfo_String(t *testing.T) {
+func TestAccountInfoV4_String(t *testing.T) {
 	assertString(t, []stringAssert{
-		{NewAccountInfo([]byte{1, 2, 3}, 13), "{[1 2 3] 13}"},
+		{NewAccountInfoV4([]byte{1, 2, 3}, 13), "{[1 2 3] 13}"},
 	})
 }
 
-func TestAccountInfo_Eq(t *testing.T) {
+func TestAccountInfoV4_Eq(t *testing.T) {
 	assertEq(t, []eqAssert{
-		{NewAccountInfo([]byte{1, 2, 3}, 13), NewAccountInfo([]byte{1, 2, 3}, 13), true},
-		{NewAccountInfo([]byte{1, 2, 3}, 13), NewAccountInfo([]byte{1, 2, 2}, 13), false},
-		{NewAccountInfo([]byte{1, 2, 3}, 13), NewBool(false), false},
+		{NewAccountInfoV4([]byte{1, 2, 3}, 13), NewAccountInfoV4([]byte{1, 2, 3}, 13), true},
+		{NewAccountInfoV4([]byte{1, 2, 3}, 13), NewAccountInfoV4([]byte{1, 2, 2}, 13), false},
+		{NewAccountInfoV4([]byte{1, 2, 3}, 13), NewBool(false), false},
 	})
 }

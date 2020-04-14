@@ -19,16 +19,17 @@ package types_test
 import (
 	"testing"
 
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBlock_EncodeDecode(t *testing.T) {
-	enc, err := EncodeToHexString(ExamplarySignedBlock)
+	enc, err := EncodeToHexString(ExamplarySignedBlock, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	var dec SignedBlock
-	err = DecodeFromHexString(enc, &dec)
+	err = DecodeFromHexString(enc, &dec, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, ExamplarySignedBlock, dec)

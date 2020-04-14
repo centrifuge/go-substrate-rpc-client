@@ -58,9 +58,6 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 	}
 
 	ext := types.NewExtrinsic(c)
-	if err != nil {
-		panic(err)
-	}
 
 	// blockHash, err := api.RPC.Chain.GetBlockHashLatest()
 	// if err != nil {
@@ -79,16 +76,18 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
-	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", from.PublicKey, nil)
+	key, err := types.CreateStorageKey(meta, "System", "Account", from.PublicKey, nil)
 	if err != nil {
 		panic(err)
 	}
 
-	var nonce uint32
-	ok, err = api.RPC.State.GetStorageLatest(key, &nonce)
+	var accountInfo types.AccountInfo
+	ok, err = api.RPC.State.GetStorageLatest(key, &accountInfo)
 	if err != nil || !ok {
 		panic(err)
 	}
+
+	nonce := uint32(accountInfo.Nonce)
 
 	for i := uint32(0); i < 4; i++ {
 		o := types.SignatureOptions{
@@ -108,7 +107,7 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 			panic(err)
 		}
 
-		extEnc, err := types.EncodeToHexString(extI)
+		extEnc, err := types.EncodeToHexString(extI, extI.Opts)
 		if err != nil {
 			panic(err)
 		}

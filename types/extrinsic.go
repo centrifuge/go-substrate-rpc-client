@@ -49,6 +49,8 @@ type Extrinsic struct {
 	Signature ExtrinsicSignatureV4
 	// Method is the call this extrinsic wraps
 	Method Call
+	// local context field only, not serialized
+	Opts scale.EncoderOptions `json:"opts,-" scale:"-"` //nolint:staticcheck
 }
 
 // NewExtrinsic creates a new Extrinsic from the provided Call
@@ -56,6 +58,7 @@ func NewExtrinsic(c Call) Extrinsic {
 	return Extrinsic{
 		Version: ExtrinsicVersion4,
 		Method:  c,
+		Opts:    c.Opts,
 	}
 }
 
@@ -70,19 +73,19 @@ func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
 	// extrinsics didn't have the length, cater for both approaches. This is very
 	// inconsistent with any other `Vec<u8>` implementation
 	var l UCompact
-	err := DecodeFromHexString(tmp, &l)
+	err := DecodeFromHexString(tmp, &l, e.Opts)
 	if err != nil {
 		return err
 	}
 
-	prefix, err := EncodeToHexString(l)
+	prefix, err := EncodeToHexString(l, e.Opts)
 	if err != nil {
 		return err
 	}
 
 	// determine whether length prefix is there
 	if strings.HasPrefix(tmp, prefix) {
-		return DecodeFromHexString(tmp, e)
+		return DecodeFromHexString(tmp, e, e.Opts)
 	}
 
 	// not there, prepend with compact encoded length prefix
@@ -91,17 +94,17 @@ func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
 		return err
 	}
 	length := UCompact(len(dec))
-	bprefix, err := EncodeToBytes(length)
+	bprefix, err := EncodeToBytes(length, e.Opts)
 	if err != nil {
 		return err
 	}
 	prefixed := append(bprefix, dec...)
-	return DecodeFromBytes(prefixed, e)
+	return DecodeFromBytes(prefixed, e, e.Opts)
 }
 
 // MarshalJSON returns a JSON encoded byte array of Extrinsic
 func (e Extrinsic) MarshalJSON() ([]byte, error) {
-	s, err := EncodeToHexString(e)
+	s, err := EncodeToHexString(e, e.Opts)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +127,7 @@ func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error
 		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(), e.Type())
 	}
 
-	mb, err := EncodeToBytes(e.Method)
+	mb, err := EncodeToBytes(e.Method, e.Opts)
 	if err != nil {
 		return err
 	}
@@ -145,7 +148,7 @@ func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error
 
 	signerPubKey := NewAddressFromAccountID(signer.PublicKey)
 
-	sig, err := payload.Sign(signer)
+	sig, err := payload.Sign(signer, e.Opts)
 	if err != nil {
 		return err
 	}
@@ -210,7 +213,7 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 	// create a temporary buffer that will receive the plain encoded transaction (version, signature (optional),
 	// method/call)
 	var bb = bytes.Buffer{}
-	tempEnc := scale.NewEncoder(&bb)
+	tempEnc := scale.NewEncoder(&bb, encoder.Opts())
 
 	// encode the version of the extrinsic
 	err := tempEnc.Encode(e.Version)
@@ -252,9 +255,13 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 type Call struct {
 	CallIndex CallIndex
 	Args      Args
+	// local context field only, not serialized
+	Opts scale.EncoderOptions `json:"opts,-" scale:"-"` //nolint:staticcheck
 }
 
 func NewCall(m *Metadata, call string, args ...interface{}) (Call, error) {
+	opts := BuildOptsFromMetadata(m)
+
 	c, err := m.FindCallIndex(call)
 	if err != nil {
 		return Call{}, err
@@ -262,14 +269,14 @@ func NewCall(m *Metadata, call string, args ...interface{}) (Call, error) {
 
 	var a []byte
 	for _, arg := range args {
-		e, err := EncodeToBytes(arg)
+		e, err := EncodeToBytes(arg, opts)
 		if err != nil {
 			return Call{}, err
 		}
 		a = append(a, e...)
 	}
 
-	return Call{c, a}, nil
+	return Call{c, a, opts}, nil
 }
 
 // Callindex is a 16 bit wrapper around the `[sectionIndex, methodIndex]` value that uniquely identifies a method

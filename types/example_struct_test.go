@@ -19,6 +19,7 @@ package types_test
 import (
 	"fmt"
 
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
@@ -31,14 +32,14 @@ func ExampleExampleStruct() {
 
 	dog := Animal{Name: "Bello", Legs: 2, Children: []string{"Sam"}}
 
-	encoded, err := EncodeToHexString(dog)
+	encoded, err := EncodeToHexString(dog, scale.EncoderOptions{})
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(encoded)
 
 	var decoded Animal
-	err = DecodeFromHexString(encoded, &decoded)
+	err = DecodeFromHexString(encoded, &decoded, scale.EncoderOptions{})
 	if err != nil {
 		panic(err)
 	}
