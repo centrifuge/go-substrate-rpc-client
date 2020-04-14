@@ -22,6 +22,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/rpc/chain"
 	"github.com/centrifuge/go-substrate-rpc-client/rpc/state"
 	"github.com/centrifuge/go-substrate-rpc-client/rpc/system"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
 type RPC struct {
@@ -32,12 +33,21 @@ type RPC struct {
 	client client.Client
 }
 
-func NewRPC(cl client.Client) *RPC {
+func NewRPC(cl client.Client) (*RPC, error) {
+	st := state.NewState(cl)
+	meta, err := st.GetMetadataLatest()
+	if err != nil {
+		return nil, err
+	}
+
+	opts := types.BuildOptsFromMetadata(meta)
+	st.SetOpts(opts)
+
 	return &RPC{
-		Author: author.NewAuthor(cl),
+		Author: author.NewAuthor(cl, opts),
 		Chain:  chain.NewChain(cl),
-		State:  state.NewState(cl),
+		State:  st,
 		System: system.NewSystem(cl),
 		client: cl,
-	}
+	}, nil
 }

@@ -33,9 +33,9 @@ func TestExtrinsic_Unsigned_EncodeDecode(t *testing.T) {
 	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", addr, UCompact(6969))
 	assert.NoError(t, err)
 
-	ext := NewExtrinsicWrapper(c)
+	ext := NewExtrinsic(c)
 
-	extEnc, err := EncodeToHexString(ext.Extrinsic, scale.EncoderOptions{})
+	extEnc, err := EncodeToHexString(ext, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x"+
@@ -48,10 +48,10 @@ func TestExtrinsic_Unsigned_EncodeDecode(t *testing.T) {
 		extEnc)
 
 	var extDec Extrinsic
-	err = DecodeFromHexString(extEnc, &extDec)
+	err = DecodeFromHexString(extEnc, &extDec, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
-	assert.Equal(t, ext.Extrinsic, extDec)
+	assert.Equal(t, ext, extDec)
 }
 
 func TestExtrinsic_Signed_EncodeDecode(t *testing.T) {
@@ -59,7 +59,7 @@ func TestExtrinsic_Signed_EncodeDecode(t *testing.T) {
 	assert.NoError(t, err)
 
 	var extDec Extrinsic
-	err = DecodeFromHexString(extEnc, &extDec)
+	err = DecodeFromHexString(extEnc, &extDec, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, ExamplaryExtrinsic, extDec)
@@ -72,7 +72,7 @@ func TestExtrinsic_Sign(t *testing.T) {
 		UCompact(6969))
 	assert.NoError(t, err)
 
-	ext := NewExtrinsicWrapper(c)
+	ext := NewExtrinsic(c)
 
 	o := SignatureOptions{
 		BlockHash: NewHash(MustHexDecodeString("0xec7afaf1cca720ce88c1d1b689d81f0583cc15a97d621cf046dd9abf605ef22f")),
@@ -83,16 +83,16 @@ func TestExtrinsic_Sign(t *testing.T) {
 		Tip:         2,
 	}
 
-	assert.False(t, ext.Extrinsic.IsSigned())
+	assert.False(t, ext.IsSigned())
 
 	err = ext.Sign(signature.TestKeyringPairAlice, o)
 	assert.NoError(t, err)
 
 	// fmt.Printf("%#v", ext)
 
-	assert.True(t, ext.Extrinsic.IsSigned())
+	assert.True(t, ext.IsSigned())
 
-	extEnc, err := EncodeToHexString(ext.Extrinsic, scale.EncoderOptions{})
+	extEnc, err := EncodeToHexString(ext, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	// extEnc will have the structure of the following. It can't be tested, since the signature is different on every
@@ -111,7 +111,7 @@ func TestExtrinsic_Sign(t *testing.T) {
 	// "e56c", // amount, compact
 
 	var extDec Extrinsic
-	err = DecodeFromHexString(extEnc, &extDec)
+	err = DecodeFromHexString(extEnc, &extDec, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, uint8(ExtrinsicVersion4), extDec.Type())
@@ -149,10 +149,10 @@ func ExampleExtrinsic() {
 		panic(err)
 	}
 
-	ext := NewExtrinsicWrapper(c)
+	ext := NewExtrinsic(c)
 
-	ext.Extrinsic.Method.CallIndex.SectionIndex = 5
-	ext.Extrinsic.Method.CallIndex.MethodIndex = 0
+	ext.Method.CallIndex.SectionIndex = 5
+	ext.Method.CallIndex.MethodIndex = 0
 
 	era := ExtrinsicEra{IsMortalEra: true, AsMortalEra: MortalEra{0x95, 0x00}}
 
@@ -172,7 +172,7 @@ func ExampleExtrinsic() {
 
 	fmt.Printf("%#v", ext)
 
-	extEnc, err := EncodeToHexString(ext.Extrinsic, scale.EncoderOptions{})
+	extEnc, err := EncodeToHexString(ext, scale.EncoderOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -181,7 +181,7 @@ func ExampleExtrinsic() {
 }
 
 func TestCall(t *testing.T) {
-	c := Call{CallIndex{6, 1}, Args{0, 0, 0}}
+	c := Call{CallIndex{6, 1}, Args{0, 0, 0}, scale.EncoderOptions{}}
 
 	enc, err := EncodeToHexString(c, scale.EncoderOptions{})
 	assert.NoError(t, err)
@@ -195,7 +195,7 @@ func TestNewCallV4(t *testing.T) {
 	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", addr, UCompact(1000))
 	assert.NoError(t, err)
 
-	enc, err := EncodeToHexString(c.Call, scale.EncoderOptions{})
+	enc, err := EncodeToHexString(c, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x0300ff8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48a10f", enc)
@@ -205,7 +205,7 @@ func TestNewCallV7(t *testing.T) {
 	c, err := NewCall(&exampleMetadataV7, "Module2.my function", U8(3))
 	assert.NoError(t, err)
 
-	enc, err := EncodeToHexString(c.Call, scale.EncoderOptions{})
+	enc, err := EncodeToHexString(c, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x010003", enc)
@@ -215,7 +215,7 @@ func TestNewCallV8(t *testing.T) {
 	c, err := NewCall(&exampleMetadataV8, "Module2.my function", U8(3))
 	assert.NoError(t, err)
 
-	enc, err := EncodeToHexString(c.Call, scale.EncoderOptions{})
+	enc, err := EncodeToHexString(c, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x010003", enc)

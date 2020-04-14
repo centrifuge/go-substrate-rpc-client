@@ -41,7 +41,7 @@ func ExampleExampleTuple() {
 	fmt.Println(encoded)
 
 	var decoded Doc
-	err = DecodeFromHexString(encoded, &decoded)
+	err = DecodeFromHexString(encoded, &decoded, scale.EncoderOptions{})
 	if err != nil {
 		panic(err)
 	}

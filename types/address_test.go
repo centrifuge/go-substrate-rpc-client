@@ -82,13 +82,6 @@ func TestAddress_Decode(t *testing.T) {
 			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
 		})},
 		{[]byte{
-			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
-			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
-		}, NewAddressFromAccountID([]byte{
-			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
-			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
-		})},
-		{[]byte{
 			253, 20, 19, 18, 17, // order is reversed because scale uses little endian
 		}, NewAddressFromAccountIndex(binary.BigEndian.Uint32([]byte{
 			17, 18, 19, 20,
@@ -100,4 +93,17 @@ func TestAddress_Decode(t *testing.T) {
 		})))},
 		{[]byte{23}, NewAddressFromAccountIndex(uint32(23))},
 	})
+}
+
+func TestAddress_DecodeWithOptions(t *testing.T) {
+	opts := scale.EncoderOptions{SkipAccountIDHeader: true}
+	assertDecodeWithOpts(t, []decodingAssert{
+		{[]byte{
+			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
+			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
+		}, NewAddressFromAccountID([]byte{
+			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
+			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
+		})},
+	}, opts)
 }

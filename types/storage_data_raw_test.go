@@ -42,7 +42,7 @@ func TestStorageDataRaw_Encode(t *testing.T) {
 func TestStorageDataRaw_Decode(t *testing.T) {
 	bz := []byte{12, 251, 42}
 	decoded := make(StorageDataRaw, len(bz))
-	err := DecodeFromBytes(bz, &decoded)
+	err := DecodeFromBytes(bz, &decoded, scale.EncoderOptions{})
 	assert.NoError(t, err)
 	assert.Equal(t, StorageDataRaw(bz), decoded)
 }

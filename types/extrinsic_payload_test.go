@@ -29,7 +29,7 @@ var examplaryExtrinsicPayload = ExtrinsicPayloadV3{Method: BytesBare{0x6, 0x0, 0
 
 func TestExtrinsicPayload(t *testing.T) {
 	var era ExtrinsicEra
-	err := DecodeFromHexString("0x0703", &era)
+	err := DecodeFromHexString("0x0703", &era, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	p := ExtrinsicPayloadV3{
@@ -61,7 +61,7 @@ func TestExtrinsicPayload(t *testing.T) {
 	// b := bytes.NewBuffer(MustHexDecodeString())
 
 	var dec ExtrinsicPayloadV3
-	err = DecodeFromHexString(enc, &dec)
+	err = DecodeFromHexString(enc, &dec, scale.EncoderOptions{})
 	assert.Error(t, err)
 }
 

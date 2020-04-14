@@ -44,7 +44,7 @@ func assertRoundtrip(t *testing.T, value interface{}) {
 	err := scale.NewEncoder(&buffer, scale.EncoderOptions{}).Encode(value)
 	assert.NoError(t, err)
 	target := reflect.New(reflect.TypeOf(value))
-	err = scale.NewDecoder(&buffer).Decode(target.Interface())
+	err = scale.NewDecoder(&buffer, scale.EncoderOptions{}).Decode(target.Interface())
 	assert.NoError(t, err)
 	assertEqual(t, target.Elem().Interface(), value)
 }
@@ -87,15 +87,19 @@ type decodingAssert struct {
 	expected interface{}
 }
 
-func assertDecode(t *testing.T, decodingAsserts []decodingAssert) {
+func assertDecodeWithOpts(t *testing.T, decodingAsserts []decodingAssert, opts scale.EncoderOptions) {
 	for _, test := range decodingAsserts {
 		target := reflect.New(reflect.TypeOf(test.expected))
-		err := DecodeFromBytes(test.input, target.Interface())
+		err := DecodeFromBytes(test.input, target.Interface(), opts)
 		if err != nil {
 			t.Errorf("Encoding error for input %v: %v\n", test.input, err)
 		}
 		assertEqual(t, target.Elem().Interface(), test.expected)
 	}
+}
+
+func assertDecode(t *testing.T, decodingAsserts []decodingAssert) {
+	assertDecodeWithOpts(t, decodingAsserts, scale.EncoderOptions{})
 }
 
 type hashAssert struct {

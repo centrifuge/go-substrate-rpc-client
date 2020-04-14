@@ -17,6 +17,7 @@
 package types_test
 
 import (
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -129,7 +130,7 @@ var exampleFunctionArgumentMetadata = FunctionArgumentMetadata{Name: "myFunction
 func TestMetadataV4_Decode(t *testing.T) {
 	metadata := NewMetadataV4()
 
-	err := DecodeFromBytes(MustHexDecodeString(ExamplaryMetadataV4String), metadata)
+	err := DecodeFromBytes(MustHexDecodeString(ExamplaryMetadataV4String), metadata, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, *ExamplaryMetadataV4, *metadata)

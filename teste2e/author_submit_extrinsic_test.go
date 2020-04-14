@@ -18,6 +18,7 @@ package teste2e
 
 import (
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -32,6 +33,7 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		t.Skip("skipping end-to-end test in short mode.")
 	}
 
+	os.Setenv("TEST_PRIV_KEY", "//Alice")
 	from, ok := signature.LoadKeyringPairFromEnv()
 	if !ok {
 		t.Skip("skipping end-to-end that requires a private key because TEST_PRIV_KEY is not set or empty")
@@ -57,7 +59,7 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
-	ext := types.NewExtrinsicWrapper(c)
+	ext := types.NewExtrinsic(c)
 
 	// blockHash, err := api.RPC.Chain.GetBlockHashLatest()
 	// if err != nil {
@@ -107,7 +109,7 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 			panic(err)
 		}
 
-		extEnc, err := types.EncodeToHexString(extI.Extrinsic, extI.GetOpts())
+		extEnc, err := types.EncodeToHexString(extI, extI.Opts)
 		if err != nil {
 			panic(err)
 		}

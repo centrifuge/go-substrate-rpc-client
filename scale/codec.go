@@ -232,6 +232,11 @@ func (pe Encoder) Encode(value interface{}) error {
 	case reflect.Struct:
 		rv := reflect.ValueOf(value)
 		for i := 0; i < rv.NumField(); i++ {
+			ft := rv.Type().Field(i)
+			tv, ok := ft.Tag.Lookup("scale")
+			if ok && tv == "-" {
+				continue
+			}
 			err := pe.Encode(rv.Field(i).Interface())
 			if err != nil {
 				return fmt.Errorf("type %s does not support Encodeable interface and could not be "+
@@ -285,10 +290,15 @@ func (pe Encoder) EncodeOption(hasValue bool, value interface{}) error {
 // Decoder is a wraper around a Reader that allows decoding data items from a stream.
 type Decoder struct {
 	reader io.Reader
+	opts   EncoderOptions
 }
 
-func NewDecoder(reader io.Reader) *Decoder {
-	return &Decoder{reader: reader}
+func (pd Decoder) GetOpts() EncoderOptions {
+	return pd.opts
+}
+
+func NewDecoder(reader io.Reader, opts EncoderOptions) *Decoder {
+	return &Decoder{reader: reader, opts: opts}
 }
 
 // Read reads bytes from a stream into a buffer
@@ -459,6 +469,11 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 
 	case reflect.Struct:
 		for i := 0; i < target.NumField(); i++ {
+			ft := target.Type().Field(i)
+			tv, ok := ft.Tag.Lookup("scale")
+			if ok && tv == "-" {
+				continue
+			}
 			err := pd.DecodeIntoReflectValue(target.Field(i))
 			if err != nil {
 				return fmt.Errorf("type %s does not support Decodeable interface and could not be "+

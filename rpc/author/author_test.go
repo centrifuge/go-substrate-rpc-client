@@ -17,6 +17,7 @@
 package author
 
 import (
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"os"
 	"testing"
 
@@ -38,7 +39,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	author = NewAuthor(cl)
+	author = NewAuthor(cl, scale.EncoderOptions{})
 
 	os.Exit(m.Run())
 }

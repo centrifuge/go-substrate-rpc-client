@@ -31,7 +31,7 @@ func TestNewMetadataV11_Decode(t *testing.T) {
 	for _, s := range tests{
 		t.Run(s.name, func(t *testing.T) {
 			metadata := NewMetadataV11()
-			err := DecodeFromBytes(MustHexDecodeString(s.hexData), metadata)
+			err := DecodeFromBytes(MustHexDecodeString(s.hexData), metadata, scale.EncoderOptions{})
 			assert.NoError(t, err)
 			data, err := EncodeToBytes(metadata, scale.EncoderOptions{})
 			assert.NoError(t, err)

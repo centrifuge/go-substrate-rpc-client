@@ -34,7 +34,7 @@ func ExampleExampleVec_simple() {
 	fmt.Println(encoded)
 
 	var decoded []string
-	err = DecodeFromHexString(encoded, &decoded)
+	err = DecodeFromHexString(encoded, &decoded, scale.EncoderOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -63,7 +63,7 @@ func ExampleExampleVec_struct() {
 		panic(err)
 	}
 	var decoded Votes
-	err = DecodeFromBytes(encoded, &decoded)
+	err = DecodeFromBytes(encoded, &decoded, scale.EncoderOptions{})
 	if err != nil {
 		panic(err)
 	}

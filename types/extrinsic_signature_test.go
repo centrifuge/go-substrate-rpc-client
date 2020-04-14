@@ -31,7 +31,7 @@ func TestExtrinsicSignatureV3_EncodeDecode(t *testing.T) {
 	assert.NoError(t, err)
 
 	var sigDec ExtrinsicSignatureV3
-	err = DecodeFromHexString(sigEnc, &sigDec)
+	err = DecodeFromHexString(sigEnc, &sigDec, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, sig, sigDec)
@@ -44,7 +44,7 @@ func TestExtrinsicSignatureV4_EncodeDecode(t *testing.T) {
 	assert.NoError(t, err)
 
 	var sigDec ExtrinsicSignatureV4
-	err = DecodeFromHexString(sigEnc, &sigDec)
+	err = DecodeFromHexString(sigEnc, &sigDec, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, sig, sigDec)
@@ -57,7 +57,7 @@ func TestExtrinsicSignatureV4_EncodeDecodeWithOpts(t *testing.T) {
 	assert.NoError(t, err)
 
 	var sigDec ExtrinsicSignatureV4
-	err = DecodeFromHexString(sigEnc, &sigDec)
+	err = DecodeFromHexString(sigEnc, &sigDec, scale.EncoderOptions{SkipAccountIDHeader: true})
 	assert.NoError(t, err)
 
 	assert.Equal(t, sig, sigDec)

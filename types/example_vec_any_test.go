@@ -88,7 +88,7 @@ func ExampleExampleVecAny() {
 	fmt.Println(encoded)
 
 	var decoded []MyVal
-	err = DecodeFromBytes(encoded, &decoded)
+	err = DecodeFromBytes(encoded, &decoded, scale.EncoderOptions{})
 	if err != nil {
 		panic(err)
 	}

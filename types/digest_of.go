@@ -35,7 +35,7 @@ func (d *DigestOf) UnmarshalJSON(bz []byte) error {
 	}
 	*d = make([]DigestItem, len(tmp.Logs))
 	for i, log := range tmp.Logs {
-		err := DecodeFromHexString(log, &(*d)[i])
+		err := DecodeFromHexString(log, &(*d)[i], scale.EncoderOptions{})
 		if err != nil {
 			return err
 		}

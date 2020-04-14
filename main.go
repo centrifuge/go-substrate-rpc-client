@@ -32,8 +32,13 @@ func NewSubstrateAPI(url string) (*SubstrateAPI, error) {
 		return nil, err
 	}
 
+	newRPC, err := rpc.NewRPC(cl)
+	if err != nil {
+		return nil, err
+	}
+
 	return &SubstrateAPI{
-		RPC:    rpc.NewRPC(cl),
+		RPC:    newRPC,
 		Client: cl,
 	}, nil
 }

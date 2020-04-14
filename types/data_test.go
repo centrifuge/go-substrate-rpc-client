@@ -42,7 +42,7 @@ func TestData_Encode(t *testing.T) {
 func TestData_Decode(t *testing.T) {
 	bz := []byte{12, 251, 42}
 	var decoded Data
-	err := DecodeFromBytes(bz, &decoded)
+	err := DecodeFromBytes(bz, &decoded, scale.EncoderOptions{})
 	assert.NoError(t, err)
 	assert.Equal(t, Data(bz), decoded)
 }

@@ -39,7 +39,7 @@ func ExampleExampleStruct() {
 	fmt.Println(encoded)
 
 	var decoded Animal
-	err = DecodeFromHexString(encoded, &decoded)
+	err = DecodeFromHexString(encoded, &decoded, scale.EncoderOptions{})
 	if err != nil {
 		panic(err)
 	}

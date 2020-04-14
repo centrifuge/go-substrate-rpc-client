@@ -63,12 +63,12 @@ func TestEventSystemExtrinsicSuccess_Encode(t *testing.T) {
 
 func TestEventSystemExtrinsicSuccess_Decode(t *testing.T) {
 	decoded := EventSystemExtrinsicSuccess{}
-	err := DecodeFromBytes(exampleEventFinEnc, &decoded)
+	err := DecodeFromBytes(exampleEventFinEnc, &decoded, scale.EncoderOptions{})
 	assert.NoError(t, err)
 	assert.Equal(t, exampleEventFin, decoded)
 
 	decoded = EventSystemExtrinsicSuccess{}
-	err = DecodeFromBytes(exampleEventAppEnc, &decoded)
+	err = DecodeFromBytes(exampleEventAppEnc, &decoded, scale.EncoderOptions{})
 	assert.NoError(t, err)
 	assert.Equal(t, exampleEventApp, decoded)
 }

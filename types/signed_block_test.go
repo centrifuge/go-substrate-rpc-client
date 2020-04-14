@@ -29,7 +29,7 @@ func TestBlock_EncodeDecode(t *testing.T) {
 	assert.NoError(t, err)
 
 	var dec SignedBlock
-	err = DecodeFromHexString(enc, &dec)
+	err = DecodeFromHexString(enc, &dec, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, ExamplarySignedBlock, dec)

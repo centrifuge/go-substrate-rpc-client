@@ -87,7 +87,7 @@ func ExampleExampleEnum_applyExtrinsic() {
 	}
 
 	var dec PhaseEnum
-	err = DecodeFromHexString(enc, &dec)
+	err = DecodeFromHexString(enc, &dec, scale.EncoderOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -106,7 +106,7 @@ func ExampleExampleEnum_finalization() {
 	}
 
 	var dec PhaseEnum
-	err = DecodeFromHexString(enc, &dec)
+	err = DecodeFromHexString(enc, &dec, scale.EncoderOptions{})
 	if err != nil {
 		panic(err)
 	}

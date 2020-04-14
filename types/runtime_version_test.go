@@ -43,7 +43,7 @@ func TestRuntimeVersion_Encode_Decode(t *testing.T) {
 	assert.NoError(t, err)
 
 	var output RuntimeVersion
-	err = DecodeFromBytes(enc, &output)
+	err = DecodeFromBytes(enc, &output, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, exampleRuntimeVersion, output)
@@ -54,7 +54,7 @@ func TestRuntimeVersionAPI_Encode_Decode(t *testing.T) {
 	assert.NoError(t, err)
 
 	var output RuntimeVersionAPI
-	err = DecodeFromBytes(enc, &output)
+	err = DecodeFromBytes(enc, &output, scale.EncoderOptions{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, exampleRuntimeVersionAPI, output)

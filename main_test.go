@@ -134,7 +134,7 @@ func Example_listenToBalanceChange() {
 		// inner loop for the changes within one of those notifications
 		for _, chng := range (<-sub.Chan()).Changes {
 			var current types.U128
-			if err = types.DecodeFromBytes(chng.StorageData, &current); err != nil {
+			if err = types.DecodeFromBytes(chng.StorageData, &current, api.RPC.State.GetOpts()); err != nil {
 				panic(err)
 			}
 
@@ -209,7 +209,7 @@ func Example_makeASimpleTransfer() {
 	}
 
 	// Create the extrinsic
-	ext := types.NewExtrinsicWrapper(c)
+	ext := types.NewExtrinsic(c)
 
 	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
 	if err != nil {
@@ -419,7 +419,7 @@ func Example_transactionWithEvents() {
 	}
 
 	// Create the extrinsic
-	ext := types.NewExtrinsicWrapper(c)
+	ext := types.NewExtrinsic(c)
 	if err != nil {
 		panic(err)
 	}

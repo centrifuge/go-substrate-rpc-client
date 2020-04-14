@@ -58,7 +58,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
-	ext := types.NewExtrinsicWrapper(c)
+	ext := types.NewExtrinsic(c)
 	if err != nil {
 		panic(err)
 	}
