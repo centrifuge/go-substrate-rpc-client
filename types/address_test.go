@@ -54,6 +54,7 @@ func TestAddress_Encode(t *testing.T) {
 
 func TestAddress_EncodeWithOptions(t *testing.T) {
 	SetSerDeOptions(SerDeOptions{NoPalletIndices: true})
+	defer SetSerDeOptions(SerDeOptions{NoPalletIndices: false})
 	assertEncode(t, []encodingAssert{
 		{NewAddressFromAccountID([]byte{
 			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
@@ -68,7 +69,6 @@ func TestAddress_EncodeWithOptions(t *testing.T) {
 			253, 20, 19, 18, 17, // order is reversed because scale uses little endian
 		}},
 	})
-	SetSerDeOptions(SerDeOptions{NoPalletIndices: false})
 }
 
 func TestAddress_Decode(t *testing.T) {
@@ -97,6 +97,7 @@ func TestAddress_Decode(t *testing.T) {
 
 func TestAddress_DecodeWithOptions(t *testing.T) {
 	SetSerDeOptions(SerDeOptions{NoPalletIndices: true})
+	defer SetSerDeOptions(SerDeOptions{NoPalletIndices: false})
 	assertDecode(t, []decodingAssert{
 		{[]byte{
 			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
@@ -113,5 +114,4 @@ func TestAddress_DecodeWithOptions(t *testing.T) {
 			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
 		})},
 	})
-	SetSerDeOptions(SerDeOptions{NoPalletIndices: false})
 }
