@@ -34,9 +34,9 @@ type Hexer interface {
 
 // EncodeToBytes encodes `value` with the scale codec with passed EncoderOptions, returning []byte
 // TODO rename to Encode
-func EncodeToBytes(value interface{}, opts scale.EncoderOptions) ([]byte, error) {
+func EncodeToBytes(value interface{}) ([]byte, error) {
 	var buffer = bytes.Buffer{}
-	err := scale.NewEncoder(&buffer, opts).Encode(value)
+	err := scale.NewEncoder(&buffer).Encode(value)
 	if err != nil {
 		return buffer.Bytes(), err
 	}
@@ -45,8 +45,8 @@ func EncodeToBytes(value interface{}, opts scale.EncoderOptions) ([]byte, error)
 
 // EncodeToHexString encodes `value` with the scale codec, returning a hex string (prefixed by 0x)
 // TODO rename to EncodeToHex
-func EncodeToHexString(value interface{}, opts scale.EncoderOptions) (string, error) {
-	bz, err := EncodeToBytes(value, opts)
+func EncodeToHexString(value interface{}) (string, error) {
+	bz, err := EncodeToBytes(value)
 	if err != nil {
 		return "", err
 	}
@@ -56,24 +56,24 @@ func EncodeToHexString(value interface{}, opts scale.EncoderOptions) (string, er
 
 // DecodeFromBytes decodes `bz` with the scale codec into `target`. `target` should be a pointer.
 // TODO rename to Decode
-func DecodeFromBytes(bz []byte, target interface{}, opts scale.EncoderOptions) error {
-	return scale.NewDecoder(bytes.NewReader(bz), opts).Decode(target)
+func DecodeFromBytes(bz []byte, target interface{}) error {
+	return scale.NewDecoder(bytes.NewReader(bz)).Decode(target)
 }
 
 // DecodeFromHexString decodes `str` with the scale codec into `target`. `target` should be a pointer.
 // TODO rename to DecodeFromHex
-func DecodeFromHexString(str string, target interface{}, opts scale.EncoderOptions) error {
+func DecodeFromHexString(str string, target interface{}) error {
 	bz, err := HexDecodeString(str)
 	if err != nil {
 		return err
 	}
-	return DecodeFromBytes(bz, target, opts)
+	return DecodeFromBytes(bz, target)
 }
 
 // EncodedLength returns the length of the value when encoded as a byte array
-func EncodedLength(value interface{}, opts scale.EncoderOptions) (int, error) {
+func EncodedLength(value interface{}) (int, error) {
 	var buffer = bytes.Buffer{}
-	err := scale.NewEncoder(&buffer, opts).Encode(value)
+	err := scale.NewEncoder(&buffer).Encode(value)
 	if err != nil {
 		return 0, err
 	}
@@ -81,8 +81,8 @@ func EncodedLength(value interface{}, opts scale.EncoderOptions) (int, error) {
 }
 
 // GetHash returns a hash of the value
-func GetHash(value interface{}, opts scale.EncoderOptions) (Hash, error) {
-	enc, err := EncodeToBytes(value, opts)
+func GetHash(value interface{}) (Hash, error) {
+	enc, err := EncodeToBytes(value)
 	if err != nil {
 		return Hash{}, err
 	}

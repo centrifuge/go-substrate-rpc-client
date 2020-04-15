@@ -134,7 +134,7 @@ func Example_listenToBalanceChange() {
 		// inner loop for the changes within one of those notifications
 		for _, chng := range (<-sub.Chan()).Changes {
 			var current types.U128
-			if err = types.DecodeFromBytes(chng.StorageData, &current, api.Client.Opts()); err != nil {
+			if err = types.DecodeFromBytes(chng.StorageData, &current); err != nil {
 				panic(err)
 			}
 

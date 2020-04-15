@@ -41,7 +41,7 @@ func NewRPC(cl client.Client) (*RPC, error) {
 	}
 
 	opts := types.BuildOptsFromMetadata(meta)
-	cl.SetOpts(opts)
+	types.SetSerDeOptions(opts)
 
 	return &RPC{
 		Author: author.NewAuthor(cl),

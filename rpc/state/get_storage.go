@@ -34,7 +34,7 @@ func (s *State) GetStorage(key types.StorageKey, target interface{}, blockHash t
 	if len(*raw) == 0 {
 		return false, nil
 	}
-	return true, types.DecodeFromBytes(*raw, target, s.client.Opts())
+	return true, types.DecodeFromBytes(*raw, target)
 }
 
 // GetStorageLatest retreives the stored data for the latest block height and decodes them into the provided interface.
@@ -47,7 +47,7 @@ func (s *State) GetStorageLatest(key types.StorageKey, target interface{}) (ok b
 	if len(*raw) == 0 {
 		return false, nil
 	}
-	return true, types.DecodeFromBytes(*raw, target, s.client.Opts())
+	return true, types.DecodeFromBytes(*raw, target)
 }
 
 // GetStorageRaw retreives the stored data as raw bytes, without decoding them

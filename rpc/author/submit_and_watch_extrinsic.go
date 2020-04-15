@@ -68,7 +68,7 @@ func (a *Author) SubmitAndWatchExtrinsic(xt types.Extrinsic) (*ExtrinsicStatusSu
 
 	c := make(chan types.ExtrinsicStatus)
 
-	enc, err := types.EncodeToHexString(xt, xt.Opts)
+	enc, err := types.EncodeToHexString(xt)
 	if err != nil {
 		return nil, err
 	}

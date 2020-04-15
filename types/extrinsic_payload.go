@@ -39,8 +39,8 @@ type ExtrinsicPayloadV3 struct {
 }
 
 // Sign the extrinsic payload with the given derivation path
-func (e ExtrinsicPayloadV3) Sign(signer signature.KeyringPair, opts scale.EncoderOptions) (Signature, error) {
-	b, err := EncodeToBytes(e, opts)
+func (e ExtrinsicPayloadV3) Sign(signer signature.KeyringPair) (Signature, error) {
+	b, err := EncodeToBytes(e)
 	if err != nil {
 		return Signature{}, err
 	}

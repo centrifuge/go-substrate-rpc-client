@@ -41,17 +41,17 @@ func assertEqual(t *testing.T, a interface{}, b interface{}) {
 
 func assertRoundtrip(t *testing.T, value interface{}) {
 	var buffer = bytes.Buffer{}
-	err := scale.NewEncoder(&buffer, scale.EncoderOptions{}).Encode(value)
+	err := scale.NewEncoder(&buffer).Encode(value)
 	assert.NoError(t, err)
 	target := reflect.New(reflect.TypeOf(value))
-	err = scale.NewDecoder(&buffer, scale.EncoderOptions{}).Decode(target.Interface())
+	err = scale.NewDecoder(&buffer).Decode(target.Interface())
 	assert.NoError(t, err)
 	assertEqual(t, target.Elem().Interface(), value)
 }
 
 func assertEncodedLength(t *testing.T, encodedLengthAsserts []encodedLengthAssert) {
 	for _, test := range encodedLengthAsserts {
-		result, err := EncodedLength(test.input, scale.EncoderOptions{})
+		result, err := EncodedLength(test.input)
 		if err != nil {
 			t.Errorf("Encoded length error for input %v: %v\n", test.input, err)
 		}
@@ -66,9 +66,9 @@ type encodingAssert struct {
 	expected []byte
 }
 
-func assertEncodeWithOpts(t *testing.T, encodingAsserts []encodingAssert, opts scale.EncoderOptions) {
+func assertEncode(t *testing.T, encodingAsserts []encodingAssert) {
 	for _, test := range encodingAsserts {
-		result, err := EncodeToBytes(test.input, opts)
+		result, err := EncodeToBytes(test.input)
 		if err != nil {
 			t.Errorf("Encoding error for input %v: %v\n", test.input, err)
 		}
@@ -78,28 +78,20 @@ func assertEncodeWithOpts(t *testing.T, encodingAsserts []encodingAssert, opts s
 	}
 }
 
-func assertEncode(t *testing.T, encodingAsserts []encodingAssert) {
-	assertEncodeWithOpts(t, encodingAsserts, scale.EncoderOptions{})
-}
-
 type decodingAssert struct {
 	input    []byte
 	expected interface{}
 }
 
-func assertDecodeWithOpts(t *testing.T, decodingAsserts []decodingAssert, opts scale.EncoderOptions) {
+func assertDecode(t *testing.T, decodingAsserts []decodingAssert) {
 	for _, test := range decodingAsserts {
 		target := reflect.New(reflect.TypeOf(test.expected))
-		err := DecodeFromBytes(test.input, target.Interface(), opts)
+		err := DecodeFromBytes(test.input, target.Interface())
 		if err != nil {
 			t.Errorf("Encoding error for input %v: %v\n", test.input, err)
 		}
 		assertEqual(t, target.Elem().Interface(), test.expected)
 	}
-}
-
-func assertDecode(t *testing.T, decodingAsserts []decodingAssert) {
-	assertDecodeWithOpts(t, decodingAsserts, scale.EncoderOptions{})
 }
 
 type hashAssert struct {
@@ -109,7 +101,7 @@ type hashAssert struct {
 
 func assertHash(t *testing.T, hashAsserts []hashAssert) {
 	for _, test := range hashAsserts {
-		result, err := GetHash(test.input, scale.EncoderOptions{})
+		result, err := GetHash(test.input)
 		if err != nil {
 			t.Errorf("Hash error for input %v: %v\n", test.input, err)
 		}
@@ -126,7 +118,7 @@ type encodeToHexAssert struct {
 
 func assertEncodeToHex(t *testing.T, encodeToHexAsserts []encodeToHexAssert) {
 	for _, test := range encodeToHexAsserts {
-		result, err := EncodeToHexString(test.input, scale.EncoderOptions{})
+		result, err := EncodeToHexString(test.input)
 		if err != nil {
 			t.Errorf("Hex error for input %v: %v\n", test.input, err)
 		}

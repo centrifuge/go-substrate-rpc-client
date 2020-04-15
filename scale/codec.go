@@ -34,25 +34,14 @@ import (
 const maxUint = ^uint(0)
 const maxInt = int(maxUint >> 1)
 
-// EncoderOptions is a collection of data that modifies the encoder behavior on custom encoding functions
-type EncoderOptions struct {
-	// NoPalletIndices enable this to work with substrate chains that do not have indices pallet in runtime
-	NoPalletIndices bool
-}
-
 // Encoder is a wrapper around a Writer that allows encoding data items to a stream.
 // Allows passing encoding options
 type Encoder struct {
 	writer io.Writer
-	opts EncoderOptions
 }
 
-func NewEncoder(writer io.Writer, opts EncoderOptions) *Encoder {
-	return &Encoder{writer: writer, opts: opts}
-}
-
-func (pe Encoder) Opts() EncoderOptions {
-	return pe.opts
+func NewEncoder(writer io.Writer) *Encoder {
+	return &Encoder{writer: writer}
 }
 
 // Write several bytes to the encoder.
@@ -290,15 +279,10 @@ func (pe Encoder) EncodeOption(hasValue bool, value interface{}) error {
 // Decoder is a wraper around a Reader that allows decoding data items from a stream.
 type Decoder struct {
 	reader io.Reader
-	opts   EncoderOptions
 }
 
-func (pd Decoder) Opts() EncoderOptions {
-	return pd.opts
-}
-
-func NewDecoder(reader io.Reader, opts EncoderOptions) *Decoder {
-	return &Decoder{reader: reader, opts: opts}
+func NewDecoder(reader io.Reader) *Decoder {
+	return &Decoder{reader: reader}
 }
 
 // Read reads bytes from a stream into a buffer
@@ -640,9 +624,9 @@ func (o *OptionBool) Decode(decoder Decoder) error {
 }
 
 // ToKeyedVec replicates the behaviour of Rust's to_keyed_vec helper.
-func ToKeyedVec(value interface{}, prependKey []byte, opts EncoderOptions) ([]byte, error) {
+func ToKeyedVec(value interface{}, prependKey []byte) ([]byte, error) {
 	var buffer = bytes.NewBuffer(prependKey)
-	err := Encoder{buffer, opts}.Encode(value)
+	err := Encoder{buffer}.Encode(value)
 	if err != nil {
 		return nil, err
 	}

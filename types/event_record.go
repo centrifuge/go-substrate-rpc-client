@@ -112,7 +112,7 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
 		return fmt.Errorf("target must point to a struct, but is " + fmt.Sprint(typ))
 	}
 
-	decoder := scale.NewDecoder(bytes.NewReader(e), scale.EncoderOptions{})
+	decoder := scale.NewDecoder(bytes.NewReader(e))
 
 	// determine number of events
 	n, err := decoder.DecodeUintCompact()

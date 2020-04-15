@@ -3,7 +3,6 @@ package types_test
 import (
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,7 +15,7 @@ var exampleMetadataV11 = Metadata{
 }
 
 func TestNewMetadataV11_Decode(t *testing.T) {
-	tests := []struct{
+	tests := []struct {
 		name, hexData string
 	}{
 		{
@@ -28,12 +27,12 @@ func TestNewMetadataV11_Decode(t *testing.T) {
 		},
 	}
 
-	for _, s := range tests{
+	for _, s := range tests {
 		t.Run(s.name, func(t *testing.T) {
 			metadata := NewMetadataV11()
-			err := DecodeFromBytes(MustHexDecodeString(s.hexData), metadata, scale.EncoderOptions{})
+			err := DecodeFromBytes(MustHexDecodeString(s.hexData), metadata)
 			assert.NoError(t, err)
-			data, err := EncodeToBytes(metadata, scale.EncoderOptions{})
+			data, err := EncodeToBytes(metadata)
 			assert.NoError(t, err)
 			assert.Equal(t, s.hexData, HexEncodeToString(data))
 		})
@@ -45,4 +44,3 @@ func TestMetadataV11_ExistsModuleMetadata(t *testing.T) {
 	assert.True(t, exampleMetadataV11.ExistsModuleMetadata("EmptyModule"))
 	assert.False(t, exampleMetadataV11.ExistsModuleMetadata("NotExistModule"))
 }
-
