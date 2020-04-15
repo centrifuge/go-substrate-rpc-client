@@ -40,7 +40,7 @@ func NewRPC(cl client.Client) (*RPC, error) {
 		return nil, err
 	}
 
-	opts := types.BuildOptsFromMetadata(meta)
+	opts := types.SerDeOptionsFromMetadata(meta)
 	types.SetSerDeOptions(opts)
 
 	return &RPC{

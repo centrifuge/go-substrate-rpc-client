@@ -18,8 +18,8 @@ func SetSerDeOptions(so SerDeOptions) {
 	defaultOptions = so
 }
 
-// BuildOptsFromMetadata sets certain EncoderOptions based on chain metadata
-func BuildOptsFromMetadata(meta *Metadata) SerDeOptions {
+// SerDeOptionsFromMetadata returns Serialise and deserialize options from metadata
+func SerDeOptionsFromMetadata(meta *Metadata) SerDeOptions {
 	var opts SerDeOptions
 	if !meta.ExistsModuleMetadata("Indices") {
 		opts.NoPalletIndices = true
