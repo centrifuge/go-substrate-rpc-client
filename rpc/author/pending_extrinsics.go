@@ -33,7 +33,7 @@ func (a *Author) PendingExtrinsics() ([]types.Extrinsic, error) {
 	xts := make([]types.Extrinsic, len(res))
 
 	for i, re := range res {
-		err = types.DecodeFromHexString(re, &xts[i], a.client.Opts())
+		err = types.DecodeFromHexString(re, &xts[i])
 		if err != nil {
 			return nil, err
 		}

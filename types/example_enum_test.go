@@ -81,13 +81,13 @@ func ExampleExampleEnum_applyExtrinsic() {
 		AsApplyExtrinsic: 1234,
 	}
 
-	enc, err := EncodeToHexString(applyExtrinsic, scale.EncoderOptions{})
+	enc, err := EncodeToHexString(applyExtrinsic)
 	if err != nil {
 		panic(err)
 	}
 
 	var dec PhaseEnum
-	err = DecodeFromHexString(enc, &dec, scale.EncoderOptions{})
+	err = DecodeFromHexString(enc, &dec)
 	if err != nil {
 		panic(err)
 	}
@@ -100,13 +100,13 @@ func ExampleExampleEnum_finalization() {
 		IsFinalization: true,
 	}
 
-	enc, err := EncodeToHexString(finalization, scale.EncoderOptions{})
+	enc, err := EncodeToHexString(finalization)
 	if err != nil {
 		panic(err)
 	}
 
 	var dec PhaseEnum
-	err = DecodeFromHexString(enc, &dec, scale.EncoderOptions{})
+	err = DecodeFromHexString(enc, &dec)
 	if err != nil {
 		panic(err)
 	}

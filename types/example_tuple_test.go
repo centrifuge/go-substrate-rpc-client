@@ -19,7 +19,6 @@ package types_test
 import (
 	"fmt"
 
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
 
 	"golang.org/x/crypto/blake2b"
@@ -34,14 +33,14 @@ func ExampleExampleTuple() {
 
 	doc := Doc{12, blake2b.Sum256([]byte("My document"))}
 
-	encoded, err := EncodeToHexString(doc, scale.EncoderOptions{})
+	encoded, err := EncodeToHexString(doc)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(encoded)
 
 	var decoded Doc
-	err = DecodeFromHexString(encoded, &decoded, scale.EncoderOptions{})
+	err = DecodeFromHexString(encoded, &decoded)
 	if err != nil {
 		panic(err)
 	}
