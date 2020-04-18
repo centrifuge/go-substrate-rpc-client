@@ -447,7 +447,8 @@ type EventDemocracyPreimageMissing struct {
 	Topics          []Hash
 }
 
-// EventDemocracyPreimageReaped is emitted when a registered preimage was removed and the deposit collected by the reaper (last item).
+// EventDemocracyPreimageReaped is emitted when a registered preimage was removed
+// and the deposit collected by the reaper (last item).
 type EventDemocracyPreimageReaped struct {
 	Phase    Phase
 	Hash     Hash
@@ -464,7 +465,8 @@ type EventDemocracyUnlocked struct {
 	Topics    []Hash
 }
 
-// EventCollectiveProposed is emitted when a motion (given hash) has been proposed (by given account) with a threshold (given `MemberCount`).
+// EventCollectiveProposed is emitted when a motion (given hash) has been proposed (by given account)
+// with a threshold (given `MemberCount`).
 type EventCollectiveProposed struct {
 	Phase         Phase
 	Who           AccountID
@@ -508,7 +510,8 @@ type EventCollectiveExecuted struct {
 	Topics   []Hash
 }
 
-// EventCollectiveMemberExecuted is emitted when a single member did some action; `bool` is true if returned without error.
+// EventCollectiveMemberExecuted is emitted when a single member did some action;
+// `bool` is true if returned without error.
 type EventCollectiveMemberExecuted struct {
 	Phase    Phase
 	Proposal Hash
