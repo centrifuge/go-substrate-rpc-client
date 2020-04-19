@@ -60,31 +60,31 @@ func TestCreateStorageKeyPlainV4(t *testing.T) {
 func TestCreateStorageKeyMapV10(t *testing.T) {
 	b := MustHexDecodeString(AlicePubKey)
 	m := ExamplaryMetadataV10
-	key, err := CreateStorageKey(m, "System", "AccountNonce", b, nil)
+	key, err := CreateStorageKey(m, "System", "Account", b, nil)
 	assert.NoError(t, err)
 	hex, err := Hex(key)
 	assert.NoError(t, err)
-	assert.Equal(t, "0x26aa394eea5630e07c48ae0c9558cef79c2f82b23e5fd031fb54c292794b4cc42e3fb4c297a84c5cebc0e78257d213d0927ccc7596044c6ba013dd05522aacba", hex) //nolint:lll
+	assert.Equal(t, "0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da92e3fb4c297a84c5cebc0e78257d213d0927ccc7596044c6ba013dd05522aacba", hex) //nolint:lll
 }
 
 func TestCreateStorageKeyMapV9(t *testing.T) {
 	b := MustHexDecodeString(AlicePubKey)
 	m := ExamplaryMetadataV9
-	key, err := CreateStorageKey(m, "System", "AccountNonce", b, nil)
+	key, err := CreateStorageKey(m, "System", "Account", b, nil)
 	assert.NoError(t, err)
 	hex, err := Hex(key)
 	assert.NoError(t, err)
-	assert.Equal(t, "0x26aa394eea5630e07c48ae0c9558cef79c2f82b23e5fd031fb54c292794b4cc42e3fb4c297a84c5cebc0e78257d213d0927ccc7596044c6ba013dd05522aacba", hex) //nolint:lll
+	assert.Equal(t, "0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da92e3fb4c297a84c5cebc0e78257d213d0927ccc7596044c6ba013dd05522aacba", hex) //nolint:lll
 }
 
 func TestCreateStorageKeyMapV4(t *testing.T) {
 	b := MustHexDecodeString(AlicePubKey)
 	m := ExamplaryMetadataV4
-	key, err := CreateStorageKey(m, "System", "AccountNonce", b, nil)
+	key, err := CreateStorageKey(m, "System", "Account", b, nil)
 	assert.NoError(t, err)
 	hex, err := Hex(key)
 	assert.NoError(t, err)
-	assert.Equal(t, "0x5c54163a1c72509b5250f0a30b9001fdee9d9b48388b06921f1b210e81e3a1f0", hex)
+	assert.Equal(t, "0xab87d3a20e4f89d9117dae5f834c6b772bd089e67ebb19cb87f370e484fddf33", hex)
 }
 
 func TestCreateStorageKeyDoubleMapV10(t *testing.T) {

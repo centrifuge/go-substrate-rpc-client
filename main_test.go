@@ -221,7 +221,7 @@ func Example_makeASimpleTransfer() {
 		panic(err)
 	}
 
-	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", signature.TestKeyringPairAlice.PublicKey, nil)
+	key, err := types.CreateStorageKey(meta, "System", "Account", signature.TestKeyringPairAlice.PublicKey, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -435,7 +435,7 @@ func Example_transactionWithEvents() {
 	}
 
 	// Get the nonce for Alice
-	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", signature.TestKeyringPairAlice.PublicKey, nil)
+	key, err := types.CreateStorageKey(meta, "System", "Account", signature.TestKeyringPairAlice.PublicKey, nil)
 	if err != nil {
 		panic(err)
 	}
