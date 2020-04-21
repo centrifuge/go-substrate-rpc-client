@@ -226,11 +226,13 @@ func Example_makeASimpleTransfer() {
 		panic(err)
 	}
 
-	var nonce uint32
-	ok, err := api.RPC.State.GetStorageLatest(key, &nonce)
+	var accountInfo types.AccountInfo
+	ok, err := api.RPC.State.GetStorageLatest(key, &accountInfo)
 	if err != nil || !ok {
 		panic(err)
 	}
+
+	nonce := uint32(accountInfo.Nonce)
 
 	o := types.SignatureOptions{
 		BlockHash:   genesisHash,
@@ -440,11 +442,13 @@ func Example_transactionWithEvents() {
 		panic(err)
 	}
 
-	var nonce uint32
-	ok, err := api.RPC.State.GetStorageLatest(key, &nonce)
+	var accountInfo types.AccountInfo
+	ok, err := api.RPC.State.GetStorageLatest(key, &accountInfo)
 	if err != nil || !ok {
 		panic(err)
 	}
+
+	nonce := uint32(accountInfo.Nonce)
 
 	o := types.SignatureOptions{
 		BlockHash:   genesisHash,
