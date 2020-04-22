@@ -221,16 +221,18 @@ func Example_makeASimpleTransfer() {
 		panic(err)
 	}
 
-	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", signature.TestKeyringPairAlice.PublicKey, nil)
+	key, err := types.CreateStorageKey(meta, "System", "Account", signature.TestKeyringPairAlice.PublicKey, nil)
 	if err != nil {
 		panic(err)
 	}
 
-	var nonce uint32
-	ok, err := api.RPC.State.GetStorageLatest(key, &nonce)
+	var accountInfo types.AccountInfo
+	ok, err := api.RPC.State.GetStorageLatest(key, &accountInfo)
 	if err != nil || !ok {
 		panic(err)
 	}
+
+	nonce := uint32(accountInfo.Nonce)
 
 	o := types.SignatureOptions{
 		BlockHash:   genesisHash,
@@ -435,16 +437,18 @@ func Example_transactionWithEvents() {
 	}
 
 	// Get the nonce for Alice
-	key, err := types.CreateStorageKey(meta, "System", "AccountNonce", signature.TestKeyringPairAlice.PublicKey, nil)
+	key, err := types.CreateStorageKey(meta, "System", "Account", signature.TestKeyringPairAlice.PublicKey, nil)
 	if err != nil {
 		panic(err)
 	}
 
-	var nonce uint32
-	ok, err := api.RPC.State.GetStorageLatest(key, &nonce)
+	var accountInfo types.AccountInfo
+	ok, err := api.RPC.State.GetStorageLatest(key, &accountInfo)
 	if err != nil || !ok {
 		panic(err)
 	}
+
+	nonce := uint32(accountInfo.Nonce)
 
 	o := types.SignatureOptions{
 		BlockHash:   genesisHash,
