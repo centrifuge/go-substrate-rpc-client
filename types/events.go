@@ -847,7 +847,6 @@ func (d DispatchResult) Encode(encoder scale.Encoder) error {
 	if d.Ok {
 		return encoder.PushByte(0)
 	}
-
 	return d.Error.Encode(encoder)
 }
 
