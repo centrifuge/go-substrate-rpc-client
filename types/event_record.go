@@ -122,13 +122,6 @@ type EventRecords struct {
 	Sudo_Sudid                         []EventSudoSudid                         //nolint:stylecheck,golint
 	Sudo_KeyChanged                    []EventSudoKeyChanged                    //nolint:stylecheck,golint
 	Sudo_SudoAsDone                    []EventSudoAsDone                        //nolint:stylecheck,golint
-	Council_Proposed                   []EventCollectiveProposed                //nolint:stylecheck,golint
-	Council_Voted                      []EventCollectiveProposed                //nolint:stylecheck,golint
-	Council_Approved                   []EventCollectiveApproved                //nolint:stylecheck,golint
-	Council_Disapproved                []EventCollectiveDisapproved             //nolint:stylecheck,golint
-	Council_Executed                   []EventCollectiveExecuted                //nolint:stylecheck,golint
-	Council_MemberExecuted             []EventCollectiveMemberExecuted          //nolint:stylecheck,golint
-	Council_Closed                     []EventCollectiveClosed                  //nolint:stylecheck,golint
 	Treasury_Proposed                  []EventTreasuryProposed                  //nolint:stylecheck,golint
 	Treasury_Spending                  []EventTreasurySpending                  //nolint:stylecheck,golint
 	Treasury_Awarded                   []EventTreasuryAwarded                   //nolint:stylecheck,golint
