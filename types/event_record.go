@@ -81,7 +81,64 @@ type EventRecords struct {
 	System_CodeUpdated                 []EventSystemCodeUpdated                 //nolint:stylecheck,golint
 	System_NewAccount                  []EventSystemNewAccount                  //nolint:stylecheck,golint
 	System_KilledAccount               []EventSystemKilledAccount               //nolint:stylecheck,golint
+	Assets_Issued                      []EventAssetIssued                       //nolint:stylecheck,golint
+	Assets_Transferred                 []EventAssetTransferred                  //nolint:stylecheck,golint
+	Assets_Destroyed                   []EventAssetDestroyed                    //nolint:stylecheck,golint
+	Democracy_Proposed                 []EventDemocracyProposed                 //nolint:stylecheck,golint
+	Democracy_Tabled                   []EventDemocracyTabled                   //nolint:stylecheck,golint
+	Democracy_ExternalTabled           []EventDemocracyExternalTabled           //nolint:stylecheck,golint
+	Democracy_Started                  []EventDemocracyStarted                  //nolint:stylecheck,golint
+	Democracy_Passed                   []EventDemocracyPassed                   //nolint:stylecheck,golint
+	Democracy_NotPassed                []EventDemocracyNotPassed                //nolint:stylecheck,golint
+	Democracy_Cancelled                []EventDemocracyCancelled                //nolint:stylecheck,golint
+	Democracy_Executed                 []EventDemocracyExecuted                 //nolint:stylecheck,golint
+	Democracy_Delegated                []EventDemocracyDelegated                //nolint:stylecheck,golint
+	Democracy_Undelegated              []EventDemocracyUndelegated              //nolint:stylecheck,golint
+	Democracy_Vetoed                   []EventDemocracyVetoed                   //nolint:stylecheck,golint
+	Democracy_PreimageNoted            []EventDemocracyPreimageNoted            //nolint:stylecheck,golint
+	Democracy_PreimageUsed             []EventDemocracyPreimageUsed             //nolint:stylecheck,golint
+	Democracy_PreimageInvalid          []EventDemocracyPreimageInvalid          //nolint:stylecheck,golint
+	Democracy_PreimageMissing          []EventDemocracyPreimageMissing          //nolint:stylecheck,golint
+	Democracy_PreimageReaped           []EventDemocracyPreimageReaped           //nolint:stylecheck,golint
+	Democracy_Unlocked                 []EventDemocracyUnlocked                 //nolint:stylecheck,golint
+	Elections_NewTerm                  []EventElectionsNewTerm                  //nolint:stylecheck,golint
+	Elections_EmptyTerm                []EventElectionsEmptyTerm                //nolint:stylecheck,golint
+	Elections_MemberKicked             []EventElectionsMemberKicked             //nolint:stylecheck,golint
+	Elections_MemberRenounced          []EventElectionsMemberRenounced          //nolint:stylecheck,golint
+	Elections_VoterReported            []EventElectionsVoterReported            //nolint:stylecheck,golint
+	Identity_IdentitySet               []EventIdentitySet                       //nolint:stylecheck,golint
+	Identity_IdentityCleared           []EventIdentityCleared                   //nolint:stylecheck,golint
+	Identity_IdentityKilled            []EventIdentityKilled                    //nolint:stylecheck,golint
+	Identity_JudgementRequested        []EventIdentityJudgementRequested        //nolint:stylecheck,golint
+	Identity_JudgementUnrequested      []EventIdentityJudgementUnrequested      //nolint:stylecheck,golint
+	Identity_JudgementGiven            []EventIdentityJudgementGiven            //nolint:stylecheck,golint
+	Identity_RegistrarAdded            []EventIdentityRegistrarAdded            //nolint:stylecheck,golint
+	Recovery_RecoveryCreated           []EventRecoveryCreated                   //nolint:stylecheck,golint
+	Recovery_RecoveryInitiated         []EventRecoveryInitiated                 //nolint:stylecheck,golint
+	Recovery_RecoveryVouched           []EventRecoveryVouched                   //nolint:stylecheck,golint
+	Recovery_RecoveryClosed            []EventRecoveryClosed                    //nolint:stylecheck,golint
+	Recovery_AccountRecovered          []EventRecoveryAccountRecovered          //nolint:stylecheck,golint
+	Recovery_RecoveryRemoved           []EventRecoveryRemoved                   //nolint:stylecheck,golint
+	Sudo_Sudid                         []EventSudoSudid                         //nolint:stylecheck,golint
+	Sudo_KeyChanged                    []EventSudoKeyChanged                    //nolint:stylecheck,golint
+	Sudo_SudoAsDone                    []EventSudoAsDone                        //nolint:stylecheck,golint
+	Treasury_Proposed                  []EventTreasuryProposed                  //nolint:stylecheck,golint
+	Treasury_Spending                  []EventTreasurySpending                  //nolint:stylecheck,golint
+	Treasury_Awarded                   []EventTreasuryAwarded                   //nolint:stylecheck,golint
+	Treasury_Rejected                  []EventTreasuryRejected                  //nolint:stylecheck,golint
+	Treasury_Burnt                     []EventTreasuryBurnt                     //nolint:stylecheck,golint
+	Treasury_Rollover                  []EventTreasuryRollover                  //nolint:stylecheck,golint
 	Treasury_Deposit                   []EventTreasuryDeposit                   //nolint:stylecheck,golint
+	Treasury_NewTip                    []EventTreasuryNewTip                    //nolint:stylecheck,golint
+	Treasury_TipClosing                []EventTreasuryTipClosing                //nolint:stylecheck,golint
+	Treasury_TipClosed                 []EventTreasuryTipClosed                 //nolint:stylecheck,golint
+	Treasury_TipRetracted              []EventTreasuryTipRetracted              //nolint:stylecheck,golint
+	Utility_BatchInterrupted           []EventUtilityBatchInterrupted           //nolint:stylecheck,golint
+	Utility_BatchCompleted             []EventUtilityBatchCompleted             //nolint:stylecheck,golint
+	Utility_NewMultisig                []EventUtilityNewMultisig                //nolint:stylecheck,golint
+	Utility_MultisigApproval           []EventUtilityMultisigApproval           //nolint:stylecheck,golint
+	Utility_MultisigExecuted           []EventUtilityMultisigExecuted           //nolint:stylecheck,golint
+	Utility_MultisigCancelled          []EventUtilityMultisigCancelled          //nolint:stylecheck,golint
 }
 
 // DecodeEventRecords decodes the events records from an EventRecordRaw into a target t using the given Metadata m
