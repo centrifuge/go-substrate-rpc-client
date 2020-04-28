@@ -107,7 +107,7 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 			panic(err)
 		}
 
-		extEnc, err := types.EncodeToHexString(extI, extI.Opts)
+		extEnc, err := types.EncodeToHexString(extI)
 		if err != nil {
 			panic(err)
 		}

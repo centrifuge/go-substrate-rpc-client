@@ -22,7 +22,6 @@ import (
 
 	"github.com/centrifuge/go-substrate-rpc-client/config"
 	gethrpc "github.com/centrifuge/go-substrate-rpc-client/gethrpc"
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
@@ -34,11 +33,6 @@ type Client interface {
 		*gethrpc.ClientSubscription, error)
 
 	URL() string
-
-	//MetaData(cache bool) (*MetadataVersioned, error)
-	Opts() scale.EncoderOptions
-
-	SetOpts(options scale.EncoderOptions)
 }
 
 type client struct {
@@ -50,17 +44,6 @@ type client struct {
 	//metadataVersioned *MetadataVersioned
 
 	//metadataLock sync.RWMutex
-	opts scale.EncoderOptions
-}
-
-// Opts returns the Encoding Options required for this client
-func (c client) Opts() scale.EncoderOptions {
-	return c.opts
-}
-
-// SetOpts sets Encoder Options on client struct
-func (c *client) SetOpts(options scale.EncoderOptions) {
-	c.opts = options
 }
 
 // URL returns the URL the client connects to
@@ -99,7 +82,7 @@ func Connect(url string) (Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	cc := client{*c, url, scale.EncoderOptions{}}
+	cc := client{*c, url}
 	return &cc, nil
 }
 

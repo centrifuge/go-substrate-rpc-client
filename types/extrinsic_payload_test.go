@@ -19,7 +19,6 @@ package types_test
 import (
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/signature"
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
@@ -29,7 +28,7 @@ var examplaryExtrinsicPayload = ExtrinsicPayloadV3{Method: BytesBare{0x6, 0x0, 0
 
 func TestExtrinsicPayload(t *testing.T) {
 	var era ExtrinsicEra
-	err := DecodeFromHexString("0x0703", &era, scale.EncoderOptions{})
+	err := DecodeFromHexString("0x0703", &era)
 	assert.NoError(t, err)
 
 	p := ExtrinsicPayloadV3{
@@ -45,7 +44,7 @@ func TestExtrinsicPayload(t *testing.T) {
 
 	assert.Equal(t, examplaryExtrinsicPayload, p)
 
-	enc, err := EncodeToHexString(examplaryExtrinsicPayload, scale.EncoderOptions{})
+	enc, err := EncodeToHexString(examplaryExtrinsicPayload)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x"+
@@ -61,16 +60,16 @@ func TestExtrinsicPayload(t *testing.T) {
 	// b := bytes.NewBuffer(MustHexDecodeString())
 
 	var dec ExtrinsicPayloadV3
-	err = DecodeFromHexString(enc, &dec, scale.EncoderOptions{})
+	err = DecodeFromHexString(enc, &dec)
 	assert.Error(t, err)
 }
 
 func TestExtrinsicPayload_Sign(t *testing.T) {
-	sig, err := examplaryExtrinsicPayload.Sign(signature.TestKeyringPairAlice, scale.EncoderOptions{})
+	sig, err := examplaryExtrinsicPayload.Sign(signature.TestKeyringPairAlice)
 	assert.NoError(t, err)
 
 	// verify sig
-	b, err := EncodeToBytes(examplaryExtrinsicPayload, scale.EncoderOptions{})
+	b, err := EncodeToBytes(examplaryExtrinsicPayload)
 	assert.NoError(t, err)
 	ok, err := signature.Verify(b, sig[:], signature.TestKeyringPairAlice.URI)
 	assert.NoError(t, err)

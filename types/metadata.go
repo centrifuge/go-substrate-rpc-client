@@ -217,12 +217,3 @@ func (m *Metadata) ExistsModuleMetadata(module string) bool {
 		return false
 	}
 }
-
-// BuildOptsFromMetadata sets certain EncoderOptions based on chain metadata
-func BuildOptsFromMetadata(meta *Metadata) scale.EncoderOptions {
-	var opts scale.EncoderOptions
-	if !meta.ExistsModuleMetadata("Indices") {
-		opts = scale.EncoderOptions{NoPalletIndices: true}
-	}
-	return opts
-}

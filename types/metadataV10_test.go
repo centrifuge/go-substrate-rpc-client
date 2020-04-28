@@ -17,7 +17,6 @@
 package types_test
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
@@ -136,7 +135,7 @@ func TestFindStorageEntryMetadataV10(t *testing.T) {
 func TestMetadataV10_Decode(t *testing.T) {
 	metadata := NewMetadataV10()
 
-	err := DecodeFromBytes(MustHexDecodeString(ExamplaryMetadataV10String), metadata, scale.EncoderOptions{})
+	err := DecodeFromBytes(MustHexDecodeString(ExamplaryMetadataV10String), metadata)
 	assert.NoError(t, err)
 
 	assert.Equal(t, *ExamplaryMetadataV10, *metadata)
@@ -145,7 +144,7 @@ func TestMetadataV10_Decode(t *testing.T) {
 func TestMetadataV10Polkadot_Decode(t *testing.T) {
 	metadata := NewMetadataV10()
 
-	err := DecodeFromBytes(MustHexDecodeString(ExamplaryMetadataV10PolkadotString), metadata, scale.EncoderOptions{})
+	err := DecodeFromBytes(MustHexDecodeString(ExamplaryMetadataV10PolkadotString), metadata)
 	assert.NoError(t, err)
 
 	assert.Equal(t, *ExamplaryMetadataV10Polkadot, *metadata)

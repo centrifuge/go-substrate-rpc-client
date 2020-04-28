@@ -20,21 +20,20 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
 func ExampleExampleVec_simple() {
 	ingredients := []string{"salt", "sugar"}
 
-	encoded, err := EncodeToHexString(ingredients, scale.EncoderOptions{})
+	encoded, err := EncodeToHexString(ingredients)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(encoded)
 
 	var decoded []string
-	err = DecodeFromHexString(encoded, &decoded, scale.EncoderOptions{})
+	err = DecodeFromHexString(encoded, &decoded)
 	if err != nil {
 		panic(err)
 	}
@@ -58,12 +57,12 @@ func ExampleExampleVec_struct() {
 		Outstanding: []string{"Bob", "Carol"},
 	}
 
-	encoded, err := EncodeToBytes(votes, scale.EncoderOptions{})
+	encoded, err := EncodeToBytes(votes)
 	if err != nil {
 		panic(err)
 	}
 	var decoded Votes
-	err = DecodeFromBytes(encoded, &decoded, scale.EncoderOptions{})
+	err = DecodeFromBytes(encoded, &decoded)
 	if err != nil {
 		panic(err)
 	}

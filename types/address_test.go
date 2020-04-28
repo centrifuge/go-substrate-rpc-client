@@ -18,7 +18,6 @@ package types_test
 
 import (
 	"encoding/binary"
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
@@ -54,8 +53,9 @@ func TestAddress_Encode(t *testing.T) {
 }
 
 func TestAddress_EncodeWithOptions(t *testing.T) {
-	opts := scale.EncoderOptions{NoPalletIndices: true}
-	assertEncodeWithOpts(t, []encodingAssert{
+	SetSerDeOptions(SerDeOptions{NoPalletIndices: true})
+	defer SetSerDeOptions(SerDeOptions{NoPalletIndices: false})
+	assertEncode(t, []encodingAssert{
 		{NewAddressFromAccountID([]byte{
 			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
 			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
@@ -68,7 +68,7 @@ func TestAddress_EncodeWithOptions(t *testing.T) {
 		})), []byte{
 			253, 20, 19, 18, 17, // order is reversed because scale uses little endian
 		}},
-	}, opts)
+	})
 }
 
 func TestAddress_Decode(t *testing.T) {
@@ -96,8 +96,9 @@ func TestAddress_Decode(t *testing.T) {
 }
 
 func TestAddress_DecodeWithOptions(t *testing.T) {
-	opts := scale.EncoderOptions{NoPalletIndices: true}
-	assertDecodeWithOpts(t, []decodingAssert{
+	SetSerDeOptions(SerDeOptions{NoPalletIndices: true})
+	defer SetSerDeOptions(SerDeOptions{NoPalletIndices: false})
+	assertDecode(t, []decodingAssert{
 		{[]byte{
 			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
 			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
@@ -112,5 +113,5 @@ func TestAddress_DecodeWithOptions(t *testing.T) {
 			254, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
 			1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
 		})},
-	}, opts)
+	})
 }

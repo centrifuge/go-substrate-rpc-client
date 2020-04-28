@@ -17,7 +17,6 @@
 package types_test
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/types"
@@ -144,7 +143,7 @@ func TestStorageKey_Encode(t *testing.T) {
 func TestStorageKey_Decode(t *testing.T) {
 	bz := []byte{12, 251, 42}
 	decoded := make(StorageKey, len(bz))
-	err := DecodeFromBytes(bz, &decoded, scale.EncoderOptions{})
+	err := DecodeFromBytes(bz, &decoded)
 	assert.NoError(t, err)
 	assert.Equal(t, StorageKey(bz), decoded)
 }

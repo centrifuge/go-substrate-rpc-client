@@ -20,8 +20,8 @@ clean: 				##clean vendor folder. Should be run before a make install
 	@echo 'done cleaning'
 
 install: 			## installs dependencies
-	@command -v dep >/dev/null 2>&1 || go get -u github.com/golang/dep/...
-	@command -v golangci-lint >/dev/null 2>&1 || go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+	@command -v dep >/dev/null 2>&1 || curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+	@command -v golangci-lint >/dev/null 2>&1 || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin v1.25.0
 	@dep ensure
 
 lint: 				## runs linters on go code
