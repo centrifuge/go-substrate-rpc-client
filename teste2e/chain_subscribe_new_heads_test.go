@@ -22,7 +22,7 @@ import (
 	"time"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
-	"github.com/centrifuge/go-substrate-rpc-client/config"
+	"github.com/mailchain/go-substrate-rpc-client/config"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -19,7 +19,7 @@ package types
 import (
 	"fmt"
 
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/mailchain/go-substrate-rpc-client/scale"
 )
 
 // Address is a wrapper around an AccountId or an AccountIndex. It is encoded with a prefix in case of an AccountID.

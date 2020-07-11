@@ -22,9 +22,9 @@ import (
 	"time"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
-	"github.com/centrifuge/go-substrate-rpc-client/config"
-	"github.com/centrifuge/go-substrate-rpc-client/signature"
-	"github.com/centrifuge/go-substrate-rpc-client/types"
+	"github.com/mailchain/go-substrate-rpc-client/config"
+	"github.com/mailchain/go-substrate-rpc-client/signature"
+	"github.com/mailchain/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -97,8 +97,6 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		SpecVersion: rv.SpecVersion,
 		Tip:         0,
 	}
-
-
 
 	err = ext.Sign(from, o)
 	if err != nil {
