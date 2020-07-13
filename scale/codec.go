@@ -104,7 +104,7 @@ func (pe Encoder) EncodeUintCompact(v big.Int) error {
 		return err
 	}
 	buf := v.Bytes()
-	reverse(buf)
+	Reverse(buf)
 	err = pe.Write(buf)
 	if err != nil {
 		return err
@@ -525,15 +525,15 @@ func (pd Decoder) DecodeUintCompact() (*big.Int, error) {
 		if err != nil {
 			return nil, err
 		}
-		reverse(buf)
+		Reverse(buf)
 		return new(big.Int).SetBytes(buf), nil
 	default:
 		return nil, errors.New("Code should be unreachable")
 	}
 }
 
-// reverse reverses bytes in place (manipulates the underlying array)
-func reverse(b []byte) {
+// Reverse reverses bytes in place (manipulates the underlying array)
+func Reverse(b []byte) {
 	for i, j := 0, len(b)-1; i < j; i, j = i+1, j-1 {
 		b[i], b[j] = b[j], b[i]
 	}
