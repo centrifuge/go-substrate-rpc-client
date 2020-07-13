@@ -17,6 +17,8 @@
 package types_test
 
 import (
+	"bytes"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"math/big"
 	"testing"
 
@@ -169,6 +171,64 @@ func TestU64_Hex(t *testing.T) {
 	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewU64(29), "0x1d00000000000000"},
 	})
+}
+
+func TestUCompact_EncodeDecode(t *testing.T) {
+	bn := MustHexDecodeString("0x5C2D3BE75CEF559F050") //27205758526767196926032
+	uc := NewUCompact(big.NewInt(0).SetBytes(bn))
+
+	// Encode
+	var buffer = bytes.Buffer{}
+	err := scale.NewEncoder(&buffer).Encode(uc)
+	assert.NoError(t, err)
+	assert.Equal(t, buffer.Bytes(), MustHexDecodeString("0x1b50f059f5ce75bed3c205")) // Encoded number above
+
+	// Decode
+	dec := scale.NewDecoder(bytes.NewReader(buffer.Bytes()))
+	var res UCompact
+	err = dec.Decode(&res)
+	assert.NoError(t, err)
+	assert.Equal(t, uc, res)
+}
+
+func TestUCompact_EncodeDecode_MaxValue(t *testing.T) {
+	// Valid Max Number Encode/Decode [ 67 bytes -> MAX = (2**536)-1 ]
+	bigNumber := []byte{
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff,
+	}
+	maxValue := NewUCompact(new(big.Int).SetBytes(bigNumber))
+	expectedEncoded := MustHexDecodeString("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
+
+	var buffer = bytes.Buffer{}
+	err := scale.NewEncoder(&buffer).Encode(maxValue)
+	assert.NoError(t, err)
+	assert.Equal(t, buffer.Bytes(), expectedEncoded)
+
+	dec := scale.NewDecoder(bytes.NewReader(buffer.Bytes()))
+	var res UCompact
+	err = dec.Decode(&res)
+	assert.NoError(t, err)
+	assert.Equal(t, maxValue, res)
+
+	// Invalid max number Encode/Decode [ 68 bytes ]
+	bigNumber = append(bigNumber, []byte{0xff}...)
+	maxValue = NewUCompact(new(big.Int).SetBytes(bigNumber))
+
+	buffer = bytes.Buffer{}
+	err = scale.NewEncoder(&buffer).Encode(maxValue)
+	assert.Error(t, err)
+
+	// Decoding truncates at max length
+	expectedEncoded = append(expectedEncoded, []byte{0xab, 0xff, 0x34}...)
+	dec = scale.NewDecoder(bytes.NewReader(expectedEncoded))
+	var res1 UCompact
+	err = dec.Decode(&res1)
+	assert.NoError(t, err)
+	assert.Equal(t, res, res1)
 }
 
 func TestU64_String(t *testing.T) {
