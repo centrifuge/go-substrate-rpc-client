@@ -22,6 +22,7 @@ import (
 	"io"
 	"log"
 	"math"
+	"math/big"
 	"reflect"
 )
 
@@ -70,47 +71,50 @@ func (pe Encoder) PushByte(b byte) error {
 //   zL zL zL 10 / zM zM zM zL / zM zM zM zM / zH zH zH zM					(2**14 ... 2**30 - 1)	(u16, u32)  low LMMH high
 //   nn nn nn 11 [ / zz zz zz zz ]{4 + n}									(2**30 ... 2**536 - 1)	(u32, u64, u128, U256, U512, U520) straight LE-encoded
 // Rust implementation: see impl<'a> Encode for CompactRef<'a, u64>
-func (pe Encoder) EncodeUintCompact(v uint64) error {
+func (pe Encoder) EncodeUintCompact(v big.Int) error {
+	if v.Sign() == -1 {
+		return errors.New("Assertion error: EncodeUintCompact cannot process negative numbers")
+	}
 
-	// TODO: handle numbers wider than 64 bits (byte slices?)
-	// Currently, Rust implementation only seems to support u128
-
-	if v < 1<<30 {
-		if v < 1<<6 {
-			err := pe.PushByte(byte(v) << 2)
-			if err != nil {
-				return err
+	if v.IsUint64() {
+		if v.Uint64() < 1<<30 {
+			if v.Uint64() < 1<<6 {
+				err := pe.PushByte(byte(v.Uint64()) << 2)
+				if err != nil {
+					return err
+				}
+			} else if v.Uint64() < 1<<14 {
+				err := binary.Write(pe.writer, binary.LittleEndian, uint16(v.Uint64()<<2)+1)
+				if err != nil {
+					return err
+				}
+			} else {
+				err := binary.Write(pe.writer, binary.LittleEndian, uint32(v.Uint64()<<2)+2)
+				if err != nil {
+					return err
+				}
 			}
-		} else if v < 1<<14 {
-			err := binary.Write(pe.writer, binary.LittleEndian, uint16(v<<2)+1)
-			if err != nil {
-				return err
-			}
-		} else {
-			err := binary.Write(pe.writer, binary.LittleEndian, uint32(v<<2)+2)
-			if err != nil {
-				return err
-			}
+			return nil
 		}
-		return nil
 	}
 
-	n := byte(0)
-	limit := uint64(1 << 32)
-	for v >= limit && limit > 256 { // when overflows, limit will be < 256
-		n++
-		limit <<= 8
+	numBytes := len(v.Bytes())
+	if numBytes > 255 {
+		return errors.New("Assertion error: numBytes>255 exeeds allowed for length prefix")
 	}
-	if n > 4 {
-		return errors.New("Assertion error: n>4 needed to compact-encode uint64")
+	topSixBits := uint8(numBytes - 4)
+	lengthByte := topSixBits<<2 + 3
+
+	if topSixBits > 63 {
+		return errors.New("Assertion error: n<=63 needed to compact-encode substrate unsigned big integer")
 	}
-	err := pe.PushByte((n << 2) + 3)
+	err := pe.PushByte(lengthByte)
 	if err != nil {
 		return err
 	}
-	buf := make([]byte, 8)
-	binary.LittleEndian.PutUint64(buf, v)
-	err = pe.Write(buf[:4+n])
+	buf := v.Bytes()
+	Reverse(buf)
+	err = pe.Write(buf)
 	if err != nil {
 		return err
 	}
@@ -199,7 +203,7 @@ func (pe Encoder) Encode(value interface{}) error {
 		if len64 > math.MaxUint32 {
 			return errors.New("Attempted to serialize a collection with too many elements.")
 		}
-		err := pe.EncodeUintCompact(len64)
+		err := pe.EncodeUintCompact(*big.NewInt(0).SetUint64(len64))
 		if err != nil {
 			return err
 		}
@@ -419,13 +423,13 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 	// Slices: first compact-encode length, then each item individually
 	case reflect.Slice:
 		codedLen64, _ := pd.DecodeUintCompact()
-		if codedLen64 > math.MaxUint32 {
+		if codedLen64.Uint64() > math.MaxUint32 {
 			return errors.New("Encoded array length is higher than allowed by the protocol (32-bit unsigned integer)")
 		}
-		if codedLen64 > uint64(maxInt) {
+		if codedLen64.Uint64() > uint64(maxInt) {
 			return errors.New("Encoded array length is higher than allowed by the platform")
 		}
-		codedLen := int(codedLen64)
+		codedLen := int(codedLen64.Uint64())
 		targetLen := target.Len()
 		if codedLen != targetLen {
 			if int(codedLen) > target.Cap() {
@@ -487,51 +491,60 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 }
 
 // DecodeUintCompact decodes a compact-encoded integer. See EncodeUintCompact method.
-func (pd Decoder) DecodeUintCompact() (uint64, error) {
+func (pd Decoder) DecodeUintCompact() (*big.Int, error) {
 	b, _ := pd.ReadOneByte()
 	mode := b & 3
 	switch mode {
 	case 0:
 		// right shift to remove mode bits
-		return uint64(b >> 2), nil
+		return big.NewInt(0).SetUint64(uint64(b >> 2)), nil
 	case 1:
 		bb, err := pd.ReadOneByte()
 		if err != nil {
-			return 0, err
+			return nil, err
 		}
 		r := uint64(bb)
 		// * 2^6
 		r <<= 6
 		// right shift to remove mode bits and add to prev
 		r += uint64(b >> 2)
-		return r, nil
+		return big.NewInt(0).SetUint64(r), nil
 	case 2:
 		// value = 32 bits + mode
 		buf := make([]byte, 4)
 		buf[0] = b
 		err := pd.Read(buf[1:4])
 		if err != nil {
-			return 0, err
+			return nil, err
 		}
 		// set the buffer in little endian order
 		r := binary.LittleEndian.Uint32(buf)
 		// remove the last 2 mode bits
 		r >>= 2
-		return uint64(r), nil
+		return big.NewInt(0).SetUint64(uint64(r)) , nil
 	case 3:
 		// remove mode bits
 		l := b >> 2
-		if l > 4 {
-			return 0, errors.New("Not supported: l>4 encountered when decoding a compact-encoded uint")
+
+		if l > 63 { // Max upper bound of 536 is (67 - 4)
+			return nil, errors.New("Not supported: l>63 encountered when decoding a compact-encoded uint")
 		}
-		buf := make([]byte, 8)
-		err := pd.Read(buf[:l+4])
+		buf := make([]byte, l+4)
+		err := pd.Read(buf)
 		if err != nil {
-			return 0, err
+			return nil, err
 		}
-		return binary.LittleEndian.Uint64(buf), nil
+		Reverse(buf)
+		return new(big.Int).SetBytes(buf), nil
 	default:
-		return 0, errors.New("Code should be unreachable")
+		return nil, errors.New("Code should be unreachable")
+	}
+}
+
+// Reverse reverses bytes in place (manipulates the underlying array)
+func Reverse(b []byte) {
+	for i, j := 0, len(b)-1; i < j; i, j = i+1, j-1 {
+		b[i], b[j] = b[j], b[i]
 	}
 }
 

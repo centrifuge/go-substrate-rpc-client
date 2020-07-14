@@ -134,7 +134,7 @@ func (i *I128) Decode(decoder scale.Decoder) error {
 		return err
 	}
 	// reverse bytes, scale uses little-endian encoding, big.int's bytes are expected in big-endian
-	reverse(bs)
+	scale.Reverse(bs)
 
 	b, err := IntBytesToBigInt(bs)
 	if err != nil {
@@ -159,7 +159,7 @@ func (i I128) Encode(encoder scale.Encoder) error {
 	}
 
 	// reverse bytes, scale uses little-endian encoding, big.int's bytes are expected in big-endian
-	reverse(b)
+	scale.Reverse(b)
 
 	return encoder.Write(b)
 }
@@ -182,7 +182,7 @@ func (i *I256) Decode(decoder scale.Decoder) error {
 		return err
 	}
 	// reverse bytes, scale uses little-endian encoding, big.int's bytes are expected in big-endian
-	reverse(bs)
+	scale.Reverse(bs)
 
 	b, err := IntBytesToBigInt(bs)
 	if err != nil {
@@ -207,16 +207,9 @@ func (i I256) Encode(encoder scale.Encoder) error {
 	}
 
 	// reverse bytes, scale uses little-endian encoding, big.int's bytes are expected in big-endian
-	reverse(b)
+	scale.Reverse(b)
 
 	return encoder.Write(b)
-}
-
-// reverse reverses bytes in place (manipulates the underlying array)
-func reverse(b []byte) {
-	for i, j := 0, len(b)-1; i < j; i, j = i+1, j-1 {
-		b[i], b[j] = b[j], b[i]
-	}
 }
 
 // BigIntToIntBytes encodes the given big.Int to a big endian encoded signed integer byte slice of the given byte

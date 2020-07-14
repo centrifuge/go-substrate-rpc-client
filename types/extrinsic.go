@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/big"
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
@@ -90,7 +91,7 @@ func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
 	if err != nil {
 		return err
 	}
-	length := UCompact(len(dec))
+	length := NewUCompactFromUInt(uint64(len(dec)))
 	bprefix, err := EncodeToBytes(length)
 	if err != nil {
 		return err
@@ -234,7 +235,7 @@ func (e Extrinsic) Encode(encoder scale.Encoder) error {
 
 	// take the temporary buffer to determine length, write that as prefix
 	eb := bb.Bytes()
-	err = encoder.EncodeUintCompact(uint64(len(eb)))
+	err = encoder.EncodeUintCompact(*big.NewInt(0).SetUint64(uint64(len(eb))))
 	if err != nil {
 		return err
 	}
