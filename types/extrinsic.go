@@ -91,7 +91,7 @@ func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
 	if err != nil {
 		return err
 	}
-	length := NewUCompact(big.NewInt(int64(len(dec))))
+	length := NewUCompactFromUInt(uint64(len(dec)))
 	bprefix, err := EncodeToBytes(length)
 	if err != nil {
 		return err

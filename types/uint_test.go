@@ -222,6 +222,14 @@ func TestUCompact_EncodeDecode_MaxValue(t *testing.T) {
 	err = scale.NewEncoder(&buffer).Encode(maxValue)
 	assert.Error(t, err)
 
+	// Invalid big number max length field max 256 - 272
+	reallyBigNumber := append(bigNumber, append(bigNumber, append(bigNumber, bigNumber...)...)...)
+	maxValue = NewUCompact(new(big.Int).SetBytes(reallyBigNumber))
+
+	buffer = bytes.Buffer{}
+	err = scale.NewEncoder(&buffer).Encode(maxValue)
+	assert.Error(t, err)
+
 	// Decoding truncates at max length
 	expectedEncoded = append(expectedEncoded, []byte{0xab, 0xff, 0x34}...)
 	dec = scale.NewDecoder(bytes.NewReader(expectedEncoded))
@@ -229,6 +237,13 @@ func TestUCompact_EncodeDecode_MaxValue(t *testing.T) {
 	err = dec.Decode(&res1)
 	assert.NoError(t, err)
 	assert.Equal(t, res, res1)
+}
+
+func TestUCompact_EncodeNegative(t *testing.T) {
+	negNumber := NewUCompact(big.NewInt(-100))
+	var buffer = bytes.Buffer{}
+	err := scale.NewEncoder(&buffer).Encode(negNumber)
+	assert.Error(t, err)
 }
 
 func TestU64_String(t *testing.T) {

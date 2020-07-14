@@ -72,32 +72,41 @@ func (pe Encoder) PushByte(b byte) error {
 //   nn nn nn 11 [ / zz zz zz zz ]{4 + n}									(2**30 ... 2**536 - 1)	(u32, u64, u128, U256, U512, U520) straight LE-encoded
 // Rust implementation: see impl<'a> Encode for CompactRef<'a, u64>
 func (pe Encoder) EncodeUintCompact(v big.Int) error {
-	if v.Uint64() < 1<<30 {
-		if v.Uint64() < 1<<6 {
-			err := pe.PushByte(byte(v.Uint64()) << 2)
-			if err != nil {
-				return err
+	if v.Sign() == -1 {
+		return errors.New("Assertion error: EncodeUintCompact cannot process negative numbers")
+	}
+
+	if v.IsUint64() {
+		if v.Uint64() < 1<<30 {
+			if v.Uint64() < 1<<6 {
+				err := pe.PushByte(byte(v.Uint64()) << 2)
+				if err != nil {
+					return err
+				}
+			} else if v.Uint64() < 1<<14 {
+				err := binary.Write(pe.writer, binary.LittleEndian, uint16(v.Uint64()<<2)+1)
+				if err != nil {
+					return err
+				}
+			} else {
+				err := binary.Write(pe.writer, binary.LittleEndian, uint32(v.Uint64()<<2)+2)
+				if err != nil {
+					return err
+				}
 			}
-		} else if v.Uint64() < 1<<14 {
-			err := binary.Write(pe.writer, binary.LittleEndian, uint16(v.Uint64()<<2)+1)
-			if err != nil {
-				return err
-			}
-		} else {
-			err := binary.Write(pe.writer, binary.LittleEndian, uint32(v.Uint64()<<2)+2)
-			if err != nil {
-				return err
-			}
+			return nil
 		}
-		return nil
 	}
 
 	numBytes := len(v.Bytes())
+	if numBytes > 255 {
+		return errors.New("Assertion error: numBytes>255 exeeds allowed for length prefix")
+	}
 	topSixBits := uint8(numBytes - 4)
 	lengthByte := topSixBits<<2 + 3
 
 	if topSixBits > 63 {
-		return errors.New("Assertion error: n<=63 needed to compact-encode substrate big integer")
+		return errors.New("Assertion error: n<=63 needed to compact-encode substrate unsigned big integer")
 	}
 	err := pe.PushByte(lengthByte)
 	if err != nil {

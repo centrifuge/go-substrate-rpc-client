@@ -18,7 +18,6 @@ package types_test
 
 import (
 	"fmt"
-	"math/big"
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/signature"
@@ -30,7 +29,7 @@ func TestExtrinsic_Unsigned_EncodeDecode(t *testing.T) {
 	addr, err := NewAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
 	assert.NoError(t, err)
 
-	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", addr, NewUCompact(big.NewInt(6969)))
+	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", addr, NewUCompactFromUInt(6969))
 	assert.NoError(t, err)
 
 	ext := NewExtrinsic(c)
@@ -69,7 +68,7 @@ func TestExtrinsic_Sign(t *testing.T) {
 	c, err := NewCall(ExamplaryMetadataV4,
 		"balances.transfer", NewAddressFromAccountID(MustHexDecodeString(
 			"0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")),
-		NewUCompact(big.NewInt(6969)))
+		NewUCompactFromUInt(6969))
 	assert.NoError(t, err)
 
 	ext := NewExtrinsic(c)
@@ -78,9 +77,9 @@ func TestExtrinsic_Sign(t *testing.T) {
 		BlockHash: NewHash(MustHexDecodeString("0xec7afaf1cca720ce88c1d1b689d81f0583cc15a97d621cf046dd9abf605ef22f")),
 		// Era: ExtrinsicEra{IsImmortalEra: true},
 		GenesisHash: NewHash(MustHexDecodeString("0xdcd1346701ca8396496e52aa2785b1748deb6db09551b72159dcb3e08991025b")),
-		Nonce:       NewUCompact(big.NewInt(1)),
+		Nonce:       NewUCompactFromUInt(1),
 		SpecVersion: 123,
-		Tip:         NewUCompact(big.NewInt(2)),
+		Tip:         NewUCompactFromUInt(2),
 	}
 
 	assert.False(t, ext.IsSigned())
@@ -144,7 +143,7 @@ func ExampleExtrinsic() {
 		panic(err)
 	}
 
-	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", bob, NewUCompact(big.NewInt(6969)))
+	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", bob, NewUCompactFromUInt(6969))
 	if err != nil {
 		panic(err)
 	}
@@ -160,9 +159,9 @@ func ExampleExtrinsic() {
 		BlockHash:   NewHash(MustHexDecodeString("0x223e3eb79416e6258d262b3a76e827aa0886b884a96bf96395cdd1c52d0eeb45")),
 		Era:         era,
 		GenesisHash: NewHash(MustHexDecodeString("0x81ad0bfe2a0bccd91d2e89852d79b7ff696d4714758e5f7c6f17ec7527e1f550")),
-		Nonce:       NewUCompact(big.NewInt(1)),
+		Nonce:       NewUCompactFromUInt(1),
 		SpecVersion: 170,
-		Tip:         NewUCompact(big.NewInt(0)),
+		Tip:         NewUCompactFromUInt(0),
 	}
 
 	err = ext.Sign(signature.TestKeyringPairAlice, o)
@@ -192,7 +191,7 @@ func TestNewCallV4(t *testing.T) {
 	addr, err := NewAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
 	assert.NoError(t, err)
 
-	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", addr, NewUCompact(big.NewInt(1000)))
+	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", addr, NewUCompactFromUInt(1000))
 	assert.NoError(t, err)
 
 	enc, err := EncodeToHexString(c)

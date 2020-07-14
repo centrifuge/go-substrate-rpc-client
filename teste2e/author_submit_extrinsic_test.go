@@ -18,7 +18,6 @@ package teste2e
 
 import (
 	"fmt"
-	"math/big"
 	"testing"
 	"time"
 
@@ -53,7 +52,7 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		panic(err)
 	}
 
-	c, err := types.NewCall(meta, "Balances.transfer", bob, types.NewUCompact(big.NewInt(6969)))
+	c, err := types.NewCall(meta, "Balances.transfer", bob, types.NewUCompactFromUInt(6969))
 	if err != nil {
 		panic(err)
 	}
@@ -96,9 +95,9 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 			BlockHash:   genesisHash, // BlockHash needs to == GenesisHash if era is immortal. // TODO: add an error?
 			Era:         era,
 			GenesisHash: genesisHash,
-			Nonce:       types.NewUCompact(new(big.Int).SetUint64(uint64(nonce + i))),
+			Nonce:       types.NewUCompactFromUInt(uint64(nonce + i)),
 			SpecVersion: rv.SpecVersion,
-			Tip:         types.NewUCompact(big.NewInt(0)),
+			Tip:         types.NewUCompactFromUInt(0),
 		}
 
 		extI := ext
