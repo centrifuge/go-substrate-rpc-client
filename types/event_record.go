@@ -180,7 +180,7 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
 	log.Debug(fmt.Sprintf("found %v events", n))
 
 	// iterate over events
-	for i := uint64(0); i < n; i++ {
+	for i := uint64(0); i < n.Uint64(); i++ {
 		log.Debug(fmt.Sprintf("decoding event #%v", i))
 
 		// decode Phase

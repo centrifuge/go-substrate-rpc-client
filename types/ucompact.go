@@ -17,11 +17,20 @@
 package types
 
 import (
+	"math/big"
+
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
-// TODO adjust to use U256 or even big ints instead, needs to adopt codec though
-type UCompact uint64
+type UCompact big.Int
+
+func NewUCompact(value *big.Int) UCompact {
+	return UCompact(*value)
+}
+
+func NewUCompactFromUInt(value uint64) UCompact {
+	return NewUCompact(new(big.Int).SetUint64(value))
+}
 
 func (u *UCompact) Decode(decoder scale.Decoder) error {
 	ui, err := decoder.DecodeUintCompact()
@@ -29,12 +38,12 @@ func (u *UCompact) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	*u = UCompact(ui)
+	*u = UCompact(*ui)
 	return nil
 }
 
 func (u UCompact) Encode(encoder scale.Encoder) error {
-	err := encoder.EncodeUintCompact(uint64(u))
+	err := encoder.EncodeUintCompact(big.Int(u))
 	if err != nil {
 		return err
 	}
