@@ -802,7 +802,7 @@ type EventUtilityNewMultisig struct {
 // TimePoint is a global extrinsic index, formed as the extrinsic index within a block,
 // together with that block's height.
 type TimePoint struct {
-	Height BlockNumber
+	Height U32
 	Index  U32
 }
 
@@ -813,7 +813,8 @@ type EventUtilityMultisigApproval struct {
 	Who       AccountID
 	TimePoint TimePoint
 	ID        AccountID
-	CallHash  Hash
+	// TODO Get CallHash back on for newer versions of substrate
+	//CallHash  Hash
 	Topics    []Hash
 }
 
@@ -858,7 +859,8 @@ type EventUtilityMultisigExecuted struct {
 	Who       AccountID
 	TimePoint TimePoint
 	ID        AccountID
-	CallHash  Hash
+	// TODO Get CallHash back on for newer versions of substrate
+	//CallHash  Hash
 	Result    DispatchResult
 	Topics    []Hash
 }
@@ -870,6 +872,7 @@ type EventUtilityMultisigCancelled struct {
 	Who       AccountID
 	TimePoint TimePoint
 	ID        AccountID
-	CallHash  Hash
+	// TODO Get CallHash back on for newer versions of substrate
+	//CallHash  Hash
 	Topics    []Hash
 }
