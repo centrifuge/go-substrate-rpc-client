@@ -239,7 +239,7 @@ func TestEventRecordsRaw_Decode(t *testing.T) {
 
 			"0002000000" + // ApplyExtrinsic(2)
 			"0001" + // System_ExtrinsicFailed
-			"01" + // HasModule
+			"03" + // HasModule
 			"0b" + // Module
 			"00" + // Error
 			"10270000" + // Weight
