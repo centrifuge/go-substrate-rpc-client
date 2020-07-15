@@ -794,7 +794,8 @@ type EventUtilityBatchCompleted struct {
 type EventUtilityNewMultisig struct {
 	Phase    Phase
 	Who, ID  AccountID
-	CallHash Hash
+	// TODO Get CallHash back on for newer versions of substrate
+	//CallHash Hash
 	Topics   []Hash
 }
 
