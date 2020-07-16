@@ -55,9 +55,8 @@ func KeyringPairFromSecret(seedOrPhrase, network string) (KeyringPair, error) {
 	cmd := exec.Command(subkeyCmd, args...)
 
 	// execute the command, get the output
-	out, err := cmd.CombinedOutput()
+	out, err := cmd.Output()
 	if err != nil {
-		fmt.Println(string(out))
 		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret: %v", err.Error())
 	}
 
