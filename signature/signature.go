@@ -42,13 +42,22 @@ var rePubKey = regexp.MustCompile(`Public key \(hex\): 0x([a-f0-9]*)\n`)
 var reAddressOld = regexp.MustCompile(`Address \(SS58\): ([a-zA-Z0-9]*)\n`)
 var reAddressNew = regexp.MustCompile(`SS58 Address:\s+([a-zA-Z0-9]*)\n`)
 
-func KeyringPairFromSecret(seedOrPhrase string) (KeyringPair, error) {
+// KeyringPairFromSecret creates KeyPair based on seed/phrase and network
+// Leave network empty for default behavior
+func KeyringPairFromSecret(seedOrPhrase, network string) (KeyringPair, error) {
+	var args []string
+	if network != "" {
+		args = []string{"-n", network}
+	}
+	args = append(args, []string{"inspect", seedOrPhrase}...)
+
 	// use "subkey" command for creation of public key and address
-	cmd := exec.Command(subkeyCmd, "inspect", seedOrPhrase)
+	cmd := exec.Command(subkeyCmd, args...)
 
 	// execute the command, get the output
-	out, err := cmd.Output()
+	out, err := cmd.CombinedOutput()
 	if err != nil {
+		fmt.Println(string(out))
 		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret: %v", err.Error())
 	}
 
@@ -165,12 +174,13 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 // LoadKeyringPairFromEnv looks up whether the env variable TEST_PRIV_KEY is set and is not empty and tries to use its
 // content as a private phrase, seed or URI to derive a key ring pair. Panics if the private phrase, seed or URI is
 // not valid or the keyring pair cannot be derived
-func LoadKeyringPairFromEnv() (kp KeyringPair, ok bool) {
+// Can take a Network property, leave empty for default
+func LoadKeyringPairFromEnv(network string) (kp KeyringPair, ok bool) {
 	priv, ok := os.LookupEnv("TEST_PRIV_KEY")
 	if !ok || priv == "" {
 		return kp, false
 	}
-	kp, err := KeyringPairFromSecret(priv)
+	kp, err := KeyringPairFromSecret(priv, network)
 	if err != nil {
 		panic(fmt.Errorf("cannot load keyring pair from env or use fallback: %v", err))
 	}
