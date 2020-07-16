@@ -27,6 +27,47 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
+func TestChain_Events(t *testing.T) {
+	targetURL := config.Default().RPCURL // Replace with desired endpoint
+	api, err := gsrpc.NewSubstrateAPI(targetURL)
+	if err != nil {
+		panic(err)
+	}
+
+	meta, err := api.RPC.State.GetMetadataLatest()
+	if err != nil {
+		panic(err)
+	}
+
+	key, err := types.CreateStorageKey(meta, "System", "Events", nil, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	//fmt.Printf("%x\n", key)
+
+	blockNUmber := uint64(0) // Replace with desired block to parse events
+
+	bh, err := api.RPC.Chain.GetBlockHash(blockNUmber)
+	if err != nil {
+		panic(err)
+	}
+
+	raw, err := api.RPC.State.GetStorageRaw(key, bh)
+	if err != nil {
+		panic(err)
+	}
+
+	//fmt.Printf("%x\n", *raw)
+
+	events := types.EventRecords{}
+	err = types.EventRecordsRaw(*raw).DecodeEventRecords(meta, &events)
+	if err != nil {
+		panic(err)
+	}
+
+}
+
 func TestChain_SubmitExtrinsic(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping end-to-end test in short mode.")
