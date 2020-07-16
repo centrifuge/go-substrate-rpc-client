@@ -792,16 +792,17 @@ type EventUtilityBatchCompleted struct {
 // EventUtilityNewMultisig is emitted when a new multisig operation has begun.
 // First param is the account that is approving, second is the multisig account, third is hash of the call.
 type EventUtilityNewMultisig struct {
-	Phase    Phase
-	Who, ID  AccountID
-	CallHash Hash
-	Topics   []Hash
+	Phase   Phase
+	Who, ID AccountID
+	// TODO Get CallHash back on for newer versions of substrate
+	//CallHash Hash
+	Topics []Hash
 }
 
 // TimePoint is a global extrinsic index, formed as the extrinsic index within a block,
 // together with that block's height.
 type TimePoint struct {
-	Height BlockNumber
+	Height U32
 	Index  U32
 }
 
@@ -812,8 +813,9 @@ type EventUtilityMultisigApproval struct {
 	Who       AccountID
 	TimePoint TimePoint
 	ID        AccountID
-	CallHash  Hash
-	Topics    []Hash
+	// TODO Get CallHash back on for newer versions of substrate
+	//CallHash  Hash
+	Topics []Hash
 }
 
 // DispatchResult can be returned from dispatchable functions
@@ -857,9 +859,10 @@ type EventUtilityMultisigExecuted struct {
 	Who       AccountID
 	TimePoint TimePoint
 	ID        AccountID
-	CallHash  Hash
-	Result    DispatchResult
-	Topics    []Hash
+	// TODO Get CallHash back on for newer versions of substrate
+	//CallHash  Hash
+	Result DispatchResult
+	Topics []Hash
 }
 
 // EventUtility is emitted when a multisig operation has been cancelled. First param is the account that is
@@ -869,6 +872,7 @@ type EventUtilityMultisigCancelled struct {
 	Who       AccountID
 	TimePoint TimePoint
 	ID        AccountID
-	CallHash  Hash
-	Topics    []Hash
+	// TODO Get CallHash back on for newer versions of substrate
+	//CallHash  Hash
+	Topics []Hash
 }
