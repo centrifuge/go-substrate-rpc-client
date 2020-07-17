@@ -173,8 +173,10 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 // LoadKeyringPairFromEnv looks up whether the env variable TEST_PRIV_KEY is set and is not empty and tries to use its
 // content as a private phrase, seed or URI to derive a key ring pair. Panics if the private phrase, seed or URI is
 // not valid or the keyring pair cannot be derived
-// Can take a Network property, leave empty for default
-func LoadKeyringPairFromEnv(network string) (kp KeyringPair, ok bool) {
+// Loads Network from TEST_NETWORK variable
+// Leave TEST_NETWORK empty or unset for default
+func LoadKeyringPairFromEnv() (kp KeyringPair, ok bool) {
+	network := os.Getenv("TEST_NETWORK")
 	priv, ok := os.LookupEnv("TEST_PRIV_KEY")
 	if !ok || priv == "" {
 		return kp, false

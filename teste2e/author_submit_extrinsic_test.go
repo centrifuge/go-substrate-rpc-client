@@ -73,7 +73,7 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 		t.Skip("skipping end-to-end test in short mode.")
 	}
 
-	from, ok := signature.LoadKeyringPairFromEnv("")
+	from, ok := signature.LoadKeyringPairFromEnv()
 	if !ok {
 		t.Skip("skipping end-to-end that requires a private key because TEST_PRIV_KEY is not set or empty")
 	}
