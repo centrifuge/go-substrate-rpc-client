@@ -17,7 +17,7 @@
 package types
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/Snowfork/go-substrate-rpc-client/scale"
 )
 
 // ChainProperties contains the SS58 format, the token decimals and the token symbol

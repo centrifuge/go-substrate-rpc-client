@@ -20,9 +20,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/centrifuge/go-substrate-rpc-client/config"
-	gethrpc "github.com/centrifuge/go-substrate-rpc-client/gethrpc"
-	"github.com/centrifuge/go-substrate-rpc-client/types"
+	"github.com/Snowfork/go-substrate-rpc-client/config"
+	gethrpc "github.com/Snowfork/go-substrate-rpc-client/gethrpc"
+	"github.com/Snowfork/go-substrate-rpc-client/types"
 )
 
 // RuntimeVersionSubscription is a subscription established through one of the Client's subscribe methods.

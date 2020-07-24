@@ -23,7 +23,7 @@ import (
 	"io"
 	"reflect"
 
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/Snowfork/go-substrate-rpc-client/scale"
 	"github.com/ethereum/go-ethereum/log"
 )
 

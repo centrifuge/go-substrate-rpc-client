@@ -44,7 +44,7 @@ test-dockerized: 		## runs all tests in a docker container against the Substrate
 test-e2e-deployed: export RPC_URL?=wss://serinus-5.kusama.network
 test-e2e-deployed: 		## runs only end-to-end (e2e) tests against a deployed testnet (defaults to Kusama CC2 (wss://serinus-5.kusama.network) if RPC_URL is not set)
 	@docker build . -t gsrpc-test
-	@docker run --rm -e RPC_URL -e TEST_PRIV_KEY gsrpc-test go test -v github.com/centrifuge/go-substrate-rpc-client/teste2e
+	@docker run --rm -e RPC_URL -e TEST_PRIV_KEY gsrpc-test go test -v github.com/Snowfork/go-substrate-rpc-client/teste2e
 
 run-substrate-docker: 		## runs the Substrate 1.0 Default Docker image, this can be used to run the tests
 	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:latest-v1.0 --dev --rpc-external --ws-external

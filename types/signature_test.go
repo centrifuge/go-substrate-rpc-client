@@ -19,7 +19,7 @@ package types_test
 import (
 	"testing"
 
-	. "github.com/centrifuge/go-substrate-rpc-client/types"
+	. "github.com/Snowfork/go-substrate-rpc-client/types"
 )
 
 func TestSignature_EncodeDecode(t *testing.T) {
