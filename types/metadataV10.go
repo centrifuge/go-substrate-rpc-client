@@ -428,8 +428,8 @@ func (s StorageHasherV10) HashFunc() (hash.Hash, error) {
 	}
 
 	// Blake2_256
-	if s.IsBlake2_128Concat { // TODO add support
-		return nil, errors.New("hash function type blake2_128concat not yet supported")
+	if s.IsBlake2_128Concat {
+		return Blake2b128ConcatNew()
 	}
 
 	// Twox128
