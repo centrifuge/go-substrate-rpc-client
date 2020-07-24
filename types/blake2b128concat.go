@@ -7,32 +7,33 @@ import (
 )
 
 type blake2b128concat struct {
+	// the underlying blake2b_128 hasher
 	hasher hash.Hash
 
-	// the key we need to append to the hash digest
+	// the key we need to append to the finalized hash digest (see Sum())
 	key []byte
 }
 
-func (bh blake2b128concat) Write(p []byte) (n int, err error) {
+func (bh *blake2b128concat) Write(p []byte) (n int, err error) {
 	// save the key for later use in Sum()
 	bh.key = p
 	return bh.hasher.Write(p)
 }
 
-func (bh blake2b128concat) Sum(b []byte) []byte {
+func (bh *blake2b128concat) Sum(b []byte) []byte {
 	// append key to final hash digest
 	return append(b, append(bh.hasher.Sum(nil), bh.key...)...)
 }
 
-func (bh blake2b128concat) Reset() {
+func (bh *blake2b128concat) Reset() {
 	bh.hasher.Reset()
 }
 
-func (bh blake2b128concat) Size() int {
+func (bh *blake2b128concat) Size() int {
 	return bh.hasher.Size()
 }
 
-func (bh blake2b128concat) BlockSize() int {
+func (bh *blake2b128concat) BlockSize() int {
 	return bh.hasher.BlockSize()
 }
 
@@ -47,5 +48,5 @@ func Blake2b128ConcatNew() (hash.Hash, error) {
 		key:    nil,
 	}
 
-	return hasher, nil
+	return &hasher, nil
 }
