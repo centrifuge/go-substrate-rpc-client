@@ -17,7 +17,7 @@
 package chain
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/types"
+	"github.com/Snowfork/go-substrate-rpc-client/types"
 )
 
 // GetBlockHash returns the block hash for a specific block height

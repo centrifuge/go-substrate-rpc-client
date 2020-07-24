@@ -16,7 +16,7 @@
 
 package types
 
-import "github.com/centrifuge/go-substrate-rpc-client/scale"
+import "github.com/Snowfork/go-substrate-rpc-client/scale"
 
 // MultiSignature
 type MultiSignature struct {

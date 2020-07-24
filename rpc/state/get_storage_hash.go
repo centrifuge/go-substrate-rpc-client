@@ -17,8 +17,8 @@
 package state
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/types"
+	"github.com/Snowfork/go-substrate-rpc-client/client"
+	"github.com/Snowfork/go-substrate-rpc-client/types"
 )
 
 // GetStorageHash retreives the storage hash for the given key

@@ -17,7 +17,7 @@
 package system
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/types"
+	"github.com/Snowfork/go-substrate-rpc-client/types"
 )
 
 // Chain retrieves the chain

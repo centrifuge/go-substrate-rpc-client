@@ -21,9 +21,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/rpcmocksrv"
-	"github.com/centrifuge/go-substrate-rpc-client/types"
+	"github.com/Snowfork/go-substrate-rpc-client/client"
+	"github.com/Snowfork/go-substrate-rpc-client/rpcmocksrv"
+	"github.com/Snowfork/go-substrate-rpc-client/types"
 )
 
 var state *State

@@ -19,8 +19,8 @@ package types_test
 import (
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/signature"
-	. "github.com/centrifuge/go-substrate-rpc-client/types"
+	"github.com/Snowfork/go-substrate-rpc-client/signature"
+	. "github.com/Snowfork/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
 )
 

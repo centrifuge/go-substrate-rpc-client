@@ -14,7 +14,7 @@ git:
 notifications:
   email: false
 
-go_import_path: github.com/centrifuge/go-substrate-rpc-client
+go_import_path: github.com/Snowfork/go-substrate-rpc-client
 
 services:
   - docker
