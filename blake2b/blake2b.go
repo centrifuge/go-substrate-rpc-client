@@ -6,7 +6,7 @@ import (
 	"golang.org/x/crypto/blake2b"
 )
 
-type blake2b128concat struct {
+type state struct {
 	// the underlying blake2b_128 hasher
 	hasher hash.Hash
 
@@ -14,32 +14,28 @@ type blake2b128concat struct {
 	key []byte
 }
 
-func (bh *blake2b128concat) Write(p []byte) (n int, err error) {
+func (s *state) Write(p []byte) (n int, err error) {
 	// save the key for later use in Sum()
-	bh.key = append(bh.key, p...)
+	s.key = append(s.key, p...)
 
-	return bh.hasher.Write(p)
+	return s.hasher.Write(p)
 }
 
-func (bh *blake2b128concat) Sum(b []byte) []byte {
+func (s *state) Sum(b []byte) []byte {
 	// append key to final hash digest
-	return append(b, append(bh.hasher.Sum(nil), bh.key...)...)
+	return append(b, append(s.hasher.Sum(nil), s.key...)...)
 }
 
-func (bh *blake2b128concat) Reset() {
-	bh.hasher.Reset()
+func (s *state) Reset() {
+	s.hasher.Reset()
 }
 
-func (bh *blake2b128concat) Size() int {
-	return bh.hasher.Size()
+func (s *state) Size() int {
+	return s.hasher.Size()
 }
 
-func (bh *blake2b128concat) BlockSize() int {
-	return bh.hasher.BlockSize()
-}
-
-func New128(key []byte) (hash.Hash, error) {
-	return blake2b.New(16, key)
+func (s *state) BlockSize() int {
+	return s.hasher.BlockSize()
 }
 
 func New128Concat(key []byte) (hash.Hash, error) {
@@ -48,12 +44,16 @@ func New128Concat(key []byte) (hash.Hash, error) {
 		return nil, err
 	}
 
-	hasher := blake2b128concat{
+	hasher := state{
 		hasher: inner,
 		key:    key,
 	}
 
 	return &hasher, nil
+}
+
+func New128(key []byte) (hash.Hash, error) {
+	return blake2b.New(16, key)
 }
 
 func New256(key []byte) (hash.Hash, error) {
