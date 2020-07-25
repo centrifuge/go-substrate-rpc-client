@@ -1,4 +1,4 @@
-package types
+package blake2b128concat
 
 import (
 	"hash"
@@ -16,7 +16,8 @@ type blake2b128concat struct {
 
 func (bh *blake2b128concat) Write(p []byte) (n int, err error) {
 	// save the key for later use in Sum()
-	bh.key = p
+	bh.key = append(bh.key, p...)
+
 	return bh.hasher.Write(p)
 }
 
@@ -37,7 +38,7 @@ func (bh *blake2b128concat) BlockSize() int {
 	return bh.hasher.BlockSize()
 }
 
-func Blake2b128ConcatNew() (hash.Hash, error) {
+func New() (hash.Hash, error) {
 	inner, err := blake2b.New(16, nil)
 	if err != nil {
 		return nil, err

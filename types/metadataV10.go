@@ -22,6 +22,7 @@ import (
 	"hash"
 	"strings"
 
+	"github.com/Snowfork/go-substrate-rpc-client/blake2b128concat"
 	"github.com/Snowfork/go-substrate-rpc-client/scale"
 	"github.com/Snowfork/go-substrate-rpc-client/xxhash"
 	"golang.org/x/crypto/blake2b"
@@ -429,7 +430,7 @@ func (s StorageHasherV10) HashFunc() (hash.Hash, error) {
 
 	// Blake2_256
 	if s.IsBlake2_128Concat {
-		return Blake2b128ConcatNew()
+		return blake2b128concat.New()
 	}
 
 	// Twox128
