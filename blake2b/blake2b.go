@@ -50,7 +50,7 @@ func New128Concat(key []byte) (hash.Hash, error) {
 
 	hasher := blake2b128concat{
 		hasher: inner,
-		key:    nil,
+		key:    key,
 	}
 
 	return &hasher, nil
