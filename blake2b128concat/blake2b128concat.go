@@ -1,4 +1,4 @@
-package blake2b128concat
+package blake2b
 
 import (
 	"hash"
@@ -38,8 +38,12 @@ func (bh *blake2b128concat) BlockSize() int {
 	return bh.hasher.BlockSize()
 }
 
-func New() (hash.Hash, error) {
-	inner, err := blake2b.New(16, nil)
+func New128(key []byte) (hash.Hash, error) {
+	return blake2b.New(16, key)
+}
+
+func New128Concat(key []byte) (hash.Hash, error) {
+	inner, err := blake2b.New(16, key)
 	if err != nil {
 		return nil, err
 	}
@@ -50,4 +54,8 @@ func New() (hash.Hash, error) {
 	}
 
 	return &hasher, nil
+}
+
+func New256(key []byte) (hash.Hash, error) {
+	return blake2b.New256(key)
 }
