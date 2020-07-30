@@ -27,7 +27,7 @@ import (
 // the contents included. Note that `BytesBare` is absolutely critical – we don't want the method (Bytes)
 // to have the length prefix included. This means that the data-as-signed is un-decodable,
 // but is also doesn't need the extra information, only the pure data (and is not decoded)
-// ... The same applies to V1-V3, if we have a V5, carry move this comment to latest
+// ... The same applies to V1-V2, if we have a V4, carry move this comment to latest
 type ExtrinsicPayloadV3 struct {
 	Method      BytesBare
 	Era         ExtrinsicEra // extra via system::CheckEra
