@@ -138,6 +138,7 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 			GenesisHash: genesisHash,
 			Nonce:       types.NewUCompactFromUInt(uint64(nonce + i)),
 			SpecVersion: rv.SpecVersion,
+			TxVersion:   1,
 			Tip:         types.NewUCompactFromUInt(0),
 		}
 
