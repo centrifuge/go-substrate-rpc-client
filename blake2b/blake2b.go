@@ -1,3 +1,5 @@
+// Package blake2b is a thin wrapper over golang.org/x/crypto/blake2b,
+// and additionally provides a BLAKE2b-128-concat hashing algorithm.
 package blake2b
 
 import (
@@ -6,6 +8,7 @@ import (
 	"golang.org/x/crypto/blake2b"
 )
 
+// State for the blake2b_128_concat hasher
 type state struct {
 	// the underlying blake2b_128 hasher
 	hasher hash.Hash
@@ -23,21 +26,24 @@ func (s *state) Write(p []byte) (n int, err error) {
 
 func (s *state) Sum(b []byte) []byte {
 	// append key to final hash digest
-	return append(b, append(s.hasher.Sum(nil), s.key...)...)
+	return append(s.hasher.Sum(b), s.key...)
 }
 
 func (s *state) Reset() {
+	s.key = nil
 	s.hasher.Reset()
 }
 
 func (s *state) Size() int {
-	return s.hasher.Size()
+	return s.hasher.Size() + len(s.key)
 }
 
 func (s *state) BlockSize() int {
 	return s.hasher.BlockSize()
 }
 
+// New128Concat returns a new hash.Hash computing the BLAKE2b-128-concat checksum. A non-nil
+// key turns the hash into a MAC. The key must be between zero and 64 bytes long.
 func New128Concat(key []byte) (hash.Hash, error) {
 	inner, err := blake2b.New(16, key)
 	if err != nil {
@@ -52,10 +58,14 @@ func New128Concat(key []byte) (hash.Hash, error) {
 	return &hasher, nil
 }
 
+// New128 returns a new hash.Hash computing the BLAKE2b-128 checksum. A non-nil
+// key turns the hash into a MAC. The key must be between zero and 64 bytes long.
 func New128(key []byte) (hash.Hash, error) {
 	return blake2b.New(16, key)
 }
 
+// New256 returns a new hash.Hash computing the BLAKE2b-256 checksum. A non-nil
+// key turns the hash into a MAC. The key must be between zero and 64 bytes long.
 func New256(key []byte) (hash.Hash, error) {
 	return blake2b.New256(key)
 }
