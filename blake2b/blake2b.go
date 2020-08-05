@@ -9,7 +9,7 @@ import (
 )
 
 // State for the blake2b_128_concat hasher
-type state struct {
+type concatState struct {
 	// the underlying blake2b_128 hasher
 	hasher hash.Hash
 
@@ -17,28 +17,28 @@ type state struct {
 	key []byte
 }
 
-func (s *state) Write(p []byte) (n int, err error) {
+func (s *concatState) Write(p []byte) (n int, err error) {
 	// save the key for later use in Sum()
 	s.key = append(s.key, p...)
 
 	return s.hasher.Write(p)
 }
 
-func (s *state) Sum(b []byte) []byte {
+func (s *concatState) Sum(b []byte) []byte {
 	// append key to final hash digest
 	return append(s.hasher.Sum(b), s.key...)
 }
 
-func (s *state) Reset() {
+func (s *concatState) Reset() {
 	s.key = nil
 	s.hasher.Reset()
 }
 
-func (s *state) Size() int {
+func (s *concatState) Size() int {
 	return s.hasher.Size() + len(s.key)
 }
 
-func (s *state) BlockSize() int {
+func (s *concatState) BlockSize() int {
 	return s.hasher.BlockSize()
 }
 
@@ -50,7 +50,7 @@ func New128Concat(key []byte) (hash.Hash, error) {
 		return nil, err
 	}
 
-	hasher := state{
+	hasher := concatState{
 		hasher: inner,
 		key:    key,
 	}
