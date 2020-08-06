@@ -38,7 +38,7 @@ type KeyringPair struct {
 	PublicKey []byte
 }
 
-var rePubKey = regexp.MustCompile(`Public key \(hex\): 0x([a-f0-9]*)\n`)
+var rePubKey = regexp.MustCompile(`Public key \(hex\):\s+0x([a-f0-9]*)\n`)
 var reAddressOld = regexp.MustCompile(`Address \(SS58\): ([a-zA-Z0-9]*)\n`)
 var reAddressNew = regexp.MustCompile(`SS58 Address:\s+([a-zA-Z0-9]*)\n`)
 

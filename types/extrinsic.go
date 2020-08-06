@@ -134,12 +134,13 @@ func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error
 		era = ExtrinsicEra{IsImmortalEra: true}
 	}
 
-	payload := ExtrinsicPayloadV3{
+	payload := ExtrinsicPayloadV4{
 		Method:      mb,
 		Era:         era,
 		Nonce:       o.Nonce,
 		Tip:         o.Tip,
 		SpecVersion: o.SpecVersion,
+		TxVersion:   o.TxVersion,
 		GenesisHash: o.GenesisHash,
 		BlockHash:   o.BlockHash,
 	}

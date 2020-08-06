@@ -22,9 +22,9 @@ import (
 	"hash"
 	"strings"
 
+	"github.com/Snowfork/go-substrate-rpc-client/blake2b"
 	"github.com/Snowfork/go-substrate-rpc-client/scale"
 	"github.com/Snowfork/go-substrate-rpc-client/xxhash"
-	"golang.org/x/crypto/blake2b"
 )
 
 // Modelled after packages/types/src/Metadata/v10/Metadata.ts
@@ -419,7 +419,7 @@ func (s StorageHasherV10) Encode(encoder scale.Encoder) error {
 func (s StorageHasherV10) HashFunc() (hash.Hash, error) {
 	// Blake2_128
 	if s.IsBlake2_128 {
-		return blake2b.New(128, nil)
+		return blake2b.New128(nil)
 	}
 
 	// Blake2_256
@@ -427,9 +427,9 @@ func (s StorageHasherV10) HashFunc() (hash.Hash, error) {
 		return blake2b.New256(nil)
 	}
 
-	// Blake2_256
-	if s.IsBlake2_128Concat { // TODO add support
-		return nil, errors.New("hash function type blake2_128concat not yet supported")
+	// Blake2_128Concat
+	if s.IsBlake2_128Concat {
+		return blake2b.New128Concat(nil)
 	}
 
 	// Twox128
