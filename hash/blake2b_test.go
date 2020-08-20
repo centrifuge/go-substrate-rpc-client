@@ -23,8 +23,16 @@ import (
 )
 
 func TestBlake2_128Concat(t *testing.T) {
-	h := NewBlake2b128Concat([]byte("abc"))
+	h, err := NewBlake2b128Concat(nil)
+	assert.NoError(t, err)
+	n, err := h.Write([]byte("abc"))
+	assert.NoError(t, err)
+	assert.Equal(t, 3, n)
 	assert.Equal(t, []byte{
 		0xcf, 0x4a, 0xb7, 0x91, 0xc6, 0x2b, 0x8d, 0x2b, 0x21, 0x9, 0xc9, 0x2, 0x75, 0x28, 0x78, 0x16, 0x61, 0x62, 0x63,
 	}, h.Sum(nil))
+	assert.Equal(t, 128, h.BlockSize())
+	assert.Equal(t, 19, h.Size())
+	h.Reset()
+	assert.Equal(t, 16, h.Size())
 }
