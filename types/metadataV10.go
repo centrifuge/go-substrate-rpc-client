@@ -22,6 +22,7 @@ import (
 	"hash"
 	"strings"
 
+	ghash "github.com/centrifuge/go-substrate-rpc-client/hash"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/xxhash"
 	"golang.org/x/crypto/blake2b"
@@ -367,6 +368,7 @@ type StorageHasherV10 struct {
 	IsTwox128          bool // 3
 	IsTwox256          bool // 4
 	IsTwox64Concat     bool // 5
+	IsIdentity         bool // 6
 }
 
 func (s *StorageHasherV10) Decode(decoder scale.Decoder) error {
@@ -389,6 +391,8 @@ func (s *StorageHasherV10) Decode(decoder scale.Decoder) error {
 		s.IsTwox256 = true
 	case 5:
 		s.IsTwox64Concat = true
+	case 6:
+		s.IsIdentity = true
 	default:
 		return fmt.Errorf("received unexpected storage hasher type %v", t)
 	}
@@ -410,6 +414,8 @@ func (s StorageHasherV10) Encode(encoder scale.Encoder) error {
 		t = 4
 	case s.IsTwox64Concat:
 		t = 5
+	case s.IsIdentity:
+		t = 6
 	default:
 		return fmt.Errorf("expected storage hasher, but none was set: %v", s)
 	}
@@ -419,7 +425,7 @@ func (s StorageHasherV10) Encode(encoder scale.Encoder) error {
 func (s StorageHasherV10) HashFunc() (hash.Hash, error) {
 	// Blake2_128
 	if s.IsBlake2_128 {
-		return blake2b.New(128, nil)
+		return blake2b.New(16, nil)
 	}
 
 	// Blake2_256
@@ -427,9 +433,9 @@ func (s StorageHasherV10) HashFunc() (hash.Hash, error) {
 		return blake2b.New256(nil)
 	}
 
-	// Blake2_256
-	if s.IsBlake2_128Concat { // TODO add support
-		return nil, errors.New("hash function type blake2_128concat not yet supported")
+	// Blake2_128Concat
+	if s.IsBlake2_128Concat {
+		return ghash.NewBlake2b128Concat(nil), nil
 	}
 
 	// Twox128
@@ -445,6 +451,11 @@ func (s StorageHasherV10) HashFunc() (hash.Hash, error) {
 	// Twox64Concat
 	if s.IsTwox64Concat {
 		return xxhash.New64Concat(nil), nil
+	}
+
+	// Identity
+	if s.IsIdentity {
+		return ghash.NewIdentity(nil), nil
 	}
 
 	return nil, errors.New("hash function type not yet supported")
