@@ -56,5 +56,5 @@ func (i *identity) Size() int {
 // of data, but it may operate more efficiently if all writes
 // are a multiple of the block size.
 func (i *identity) BlockSize() int {
-	return 32
+	return 0
 }

@@ -25,7 +25,6 @@ import (
 	ghash "github.com/centrifuge/go-substrate-rpc-client/hash"
 	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/xxhash"
-	"golang.org/x/crypto/blake2b"
 )
 
 // Modelled after packages/types/src/Metadata/v10/Metadata.ts
@@ -425,17 +424,17 @@ func (s StorageHasherV10) Encode(encoder scale.Encoder) error {
 func (s StorageHasherV10) HashFunc() (hash.Hash, error) {
 	// Blake2_128
 	if s.IsBlake2_128 {
-		return blake2b.New(16, nil)
+		return ghash.NewBlake2b128(nil)
 	}
 
 	// Blake2_256
 	if s.IsBlake2_256 {
-		return blake2b.New256(nil)
+		return ghash.NewBlake2b256(nil)
 	}
 
 	// Blake2_128Concat
 	if s.IsBlake2_128Concat {
-		return ghash.NewBlake2b128Concat(nil), nil
+		return ghash.NewBlake2b128Concat(nil)
 	}
 
 	// Twox128

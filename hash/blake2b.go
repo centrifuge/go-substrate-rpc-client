@@ -23,42 +23,35 @@ import (
 )
 
 type blake2b128Concat struct {
-	data []byte
+	hasher hash.Hash
+	data   []byte
 }
 
-func NewBlake2b128Concat(b []byte) hash.Hash {
-	return &blake2b128Concat{data: b}
+// NewBlake2b128Concat returns an instance of blake2b concat hasher
+func NewBlake2b128Concat(k []byte) (hash.Hash, error) {
+	h, err := blake2b.New(16, k)
+	if err != nil {
+		return nil, err
+	}
+	return &blake2b128Concat{hasher: h, data: k}, nil
 }
 
 // Write (via the embedded io.Writer interface) adds more data to the running hash.
-// It never returns an error.
 func (bc *blake2b128Concat) Write(p []byte) (n int, err error) {
 	bc.data = append(bc.data, p...)
-	return len(p), nil
+	return bc.hasher.Write(p)
 }
 
 // Sum appends the current hash to b and returns the resulting slice.
 // It does not change the underlying hash state.
 func (bc *blake2b128Concat) Sum(b []byte) []byte {
-	res := make([]byte, 0, 8)
-
-	h, err := blake2b.New(16, nil)
-	if err != nil {
-		panic(err)
-	}
-	_, err = h.Write(bc.data)
-	if err != nil {
-		panic(err)
-	}
-	res = append(res, h.Sum(nil)...)
-	res = append(res, bc.data...)
-
-	return append(b, res...)
+	return append(bc.hasher.Sum(b), bc.data...)
 }
 
 // Reset resets the Hash to its initial state.
 func (bc *blake2b128Concat) Reset() {
-	bc.data = make([]byte, 0)
+	bc.data = nil
+	bc.hasher.Reset()
 }
 
 // Size returns the number of bytes Sum will return.
@@ -71,5 +64,15 @@ func (bc *blake2b128Concat) Size() int {
 // of data, but it may operate more efficiently if all writes
 // are a multiple of the block size.
 func (bc *blake2b128Concat) BlockSize() int {
-	return blake2b.BlockSize
+	return bc.hasher.BlockSize()
+}
+
+// NewBlake2b128 returns blake2b-128 hasher
+func NewBlake2b128(k []byte) (hash.Hash, error) {
+	return blake2b.New(16, k)
+}
+
+// NewBlake2b256 returns blake2b-256 hasher
+func NewBlake2b256(k []byte) (hash.Hash, error) {
+	return blake2b.New256(k)
 }
