@@ -282,9 +282,10 @@ func (h *handler) handleResponse(msg *jsonrpcMessage) {
 		op.err = msg.Error
 		return
 	}
-	var subid int
+	var subid string
+
 	if op.err = json.Unmarshal(msg.Result, &subid); op.err == nil {
-		op.sub.subid = fmt.Sprintf("%v", subid)
+		op.sub.subid = subid
 		go op.sub.start()
 		h.clientSubs[op.sub.subid] = op.sub
 	}

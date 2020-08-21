@@ -95,6 +95,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		GenesisHash: genesisHash,
 		Nonce:       types.NewUCompactFromUInt(uint64(nonce)),
 		SpecVersion: rv.SpecVersion,
+		TxVersion:   1,
 		Tip:         types.NewUCompactFromUInt(0),
 	}
 
