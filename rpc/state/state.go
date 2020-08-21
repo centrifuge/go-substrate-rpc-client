@@ -16,7 +16,7 @@
 
 package state
 
-import "github.com/Snowfork/go-substrate-rpc-client/client"
+import "github.com/centrifuge/go-substrate-rpc-client/client"
 
 // State exposes methods for querying state
 type State struct {

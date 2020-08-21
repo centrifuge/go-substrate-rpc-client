@@ -17,7 +17,7 @@
 package chain
 
 import (
-	"github.com/Snowfork/go-substrate-rpc-client/types"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
 // GetFinalizedHead returns the hash of the last finalized block in the canon chain

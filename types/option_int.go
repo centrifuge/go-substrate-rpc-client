@@ -16,7 +16,7 @@
 
 package types
 
-import "github.com/Snowfork/go-substrate-rpc-client/scale"
+import "github.com/centrifuge/go-substrate-rpc-client/scale"
 
 // OptionI8 is a structure that can store a I8 or a missing value
 type OptionI8 struct {

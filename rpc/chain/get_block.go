@@ -17,8 +17,8 @@
 package chain
 
 import (
-	"github.com/Snowfork/go-substrate-rpc-client/client"
-	"github.com/Snowfork/go-substrate-rpc-client/types"
+	"github.com/centrifuge/go-substrate-rpc-client/client"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
 // GetBlock returns the header and body of the relay chain block with the given hash

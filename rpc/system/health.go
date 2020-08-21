@@ -17,7 +17,7 @@
 package system
 
 import (
-	"github.com/Snowfork/go-substrate-rpc-client/types"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
 // Health retrieves the health status of the connected node

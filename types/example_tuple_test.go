@@ -19,7 +19,7 @@ package types_test
 import (
 	"fmt"
 
-	. "github.com/Snowfork/go-substrate-rpc-client/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/types"
 
 	"golang.org/x/crypto/blake2b"
 )

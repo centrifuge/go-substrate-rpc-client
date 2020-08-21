@@ -1,10 +1,10 @@
 # Go Substrate RPC Client (GSRPC)
 
 [![License: Apache v2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![GoDoc Reference](https://godoc.org/github.com/Snowfork/go-substrate-rpc-client?status.svg)](https://godoc.org/github.com/Snowfork/go-substrate-rpc-client)
+[![GoDoc Reference](https://godoc.org/github.com/centrifuge/go-substrate-rpc-client?status.svg)](https://godoc.org/github.com/centrifuge/go-substrate-rpc-client)
 [![Build Status](https://travis-ci.com/centrifuge/go-substrate-rpc-client.svg?branch=master)](https://travis-ci.com/centrifuge/go-substrate-rpc-client)
 [![codecov](https://codecov.io/gh/centrifuge/go-substrate-rpc-client/branch/master/graph/badge.svg)](https://codecov.io/gh/centrifuge/go-substrate-rpc-client)
-[![Go Report Card](https://goreportcard.com/badge/github.com/Snowfork/go-substrate-rpc-client)](https://goreportcard.com/report/github.com/Snowfork/go-substrate-rpc-client)
+[![Go Report Card](https://goreportcard.com/badge/github.com/centrifuge/go-substrate-rpc-client)](https://goreportcard.com/report/github.com/centrifuge/go-substrate-rpc-client)
 
 Substrate RPC client in Go. It provides APIs and types around Polkadot and any Substrate-based chain RPC calls.
 This client is modelled after [polkadot-js/api](https://github.com/polkadot-js/api).
@@ -15,7 +15,7 @@ This package is feature complete, but it is relatively new and might still conta
 
 ## Documentation & Usage Examples
 
-Please refer to https://godoc.org/github.com/Snowfork/go-substrate-rpc-client
+Please refer to https://godoc.org/github.com/centrifuge/go-substrate-rpc-client
 
 ## Contributing
 

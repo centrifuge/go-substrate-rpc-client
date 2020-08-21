@@ -17,8 +17,8 @@
 package state
 
 import (
-	"github.com/Snowfork/go-substrate-rpc-client/client"
-	"github.com/Snowfork/go-substrate-rpc-client/types"
+	"github.com/centrifuge/go-substrate-rpc-client/client"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
 // GetStorageSize retreives the storage size for the given key
