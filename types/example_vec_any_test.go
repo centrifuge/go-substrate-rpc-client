@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/mailchain/go-substrate-rpc-client/scale"
-	. "github.com/mailchain/go-substrate-rpc-client/types"
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	. "github.com/centrifuge/go-substrate-rpc-client/types"
 )
 
 // MyVal is a custom type that is used to hold arbitrarily encoded data. In this example, we encode uint8s with a 0x00

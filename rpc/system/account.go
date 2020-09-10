@@ -1,6 +1,6 @@
 package system
 
-import "github.com/mailchain/go-substrate-rpc-client/types"
+import "github.com/centrifuge/go-substrate-rpc-client/types"
 
 func (c *System) AccountNextIndex(address string) (types.U32, error) {
 	var res types.U32

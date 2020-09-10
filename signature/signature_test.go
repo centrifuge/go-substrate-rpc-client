@@ -20,8 +20,8 @@ import (
 	"crypto/rand"
 	"testing"
 
-	. "github.com/mailchain/go-substrate-rpc-client/signature"
-	"github.com/mailchain/go-substrate-rpc-client/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/signature"
+	"github.com/centrifuge/go-substrate-rpc-client/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -58,8 +58,8 @@ func TestKeyringPairFromSecretSeedAndNetwork(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, KeyringPair{
-		URI: testSecretSeed,
-		Address: testKusamaAddressSS58,
+		URI:       testSecretSeed,
+		Address:   testKusamaAddressSS58,
 		PublicKey: types.MustHexDecodeString(testPubKey),
 	}, p)
 }

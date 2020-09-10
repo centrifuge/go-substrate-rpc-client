@@ -17,7 +17,7 @@
 package chain
 
 import (
-	"github.com/mailchain/go-substrate-rpc-client/client"
+	"github.com/centrifuge/go-substrate-rpc-client/client"
 )
 
 // Chain exposes methods for retrieval of chain data
