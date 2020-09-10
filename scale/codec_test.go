@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"fmt"
 	"math"
+	"math/big"
 	"reflect"
 	"strings"
 	"testing"
@@ -248,10 +249,11 @@ func TestCompactIntegersEncodedAsExpected(t *testing.T) {
 		math.MaxUint64: "13 ff ff ff ff ff ff ff ff"}
 	for value, expectedHex := range tests {
 		var buffer = bytes.Buffer{}
-		err := Encoder{writer: &buffer}.EncodeUintCompact(value)
+		valueBig := new(big.Int).SetUint64(value)
+		err := Encoder{writer: &buffer}.EncodeUintCompact(*valueBig)
 		assert.NoError(t, err)
 		assertEqual(t, hexify(buffer.Bytes()), expectedHex)
 		decoded, _ := Decoder{reader: &buffer}.DecodeUintCompact()
-		assertEqual(t, decoded, value)
+		assertEqual(t, decoded, big.NewInt(0).SetUint64(value))
 	}
 }

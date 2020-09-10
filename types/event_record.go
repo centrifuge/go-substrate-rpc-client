@@ -180,7 +180,7 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
 	log.Debug(fmt.Sprintf("found %v events", n))
 
 	// iterate over events
-	for i := uint64(0); i < n; i++ {
+	for i := uint64(0); i < n.Uint64(); i++ {
 		log.Debug(fmt.Sprintf("decoding event #%v", i))
 
 		// decode Phase
@@ -313,7 +313,10 @@ func (d *DispatchError) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	if b == 1 {
+	// https://github.com/paritytech/substrate/blob/4da29261bfdc13057a425c1721aeb4ec68092d42/primitives/runtime/src/lib.rs
+	// Line 391
+	// Enum index 3 for Module Error
+	if b == 3 {
 		d.HasModule = true
 		err = decoder.Decode(&d.Module)
 	}
@@ -327,7 +330,7 @@ func (d *DispatchError) Decode(decoder scale.Decoder) error {
 func (d DispatchError) Encode(encoder scale.Encoder) error {
 	var err error
 	if d.HasModule {
-		err = encoder.PushByte(1)
+		err = encoder.PushByte(3)
 		if err != nil {
 			return err
 		}

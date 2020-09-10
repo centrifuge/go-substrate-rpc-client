@@ -40,7 +40,7 @@ func TestDispatchResult_Decode(t *testing.T) {
 	assert.True(t, res.Ok)
 
 	// Dispatch Error
-	decoder = scale.NewDecoder(bytes.NewReader([]byte{1, 1, 1, 1}))
+	decoder = scale.NewDecoder(bytes.NewReader([]byte{1, 3, 1, 1}))
 	res = DispatchResult{}
 	assert.NoError(t, decoder.Decode(&res))
 	assert.False(t, res.Ok)
@@ -49,7 +49,7 @@ func TestDispatchResult_Decode(t *testing.T) {
 	assert.Equal(t, res.Error.Error, byte(1))
 
 	// decoder error
-	decoder = scale.NewDecoder(bytes.NewReader([]byte{1, 1, 1}))
+	decoder = scale.NewDecoder(bytes.NewReader([]byte{1, 3, 1}))
 	res = DispatchResult{}
 	assert.Error(t, decoder.Decode(&res))
 }

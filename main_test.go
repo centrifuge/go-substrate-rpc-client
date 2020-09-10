@@ -203,7 +203,7 @@ func Example_makeASimpleTransfer() {
 		panic(err)
 	}
 
-	c, err := types.NewCall(meta, "Balances.transfer", bob, types.UCompact(12345))
+	c, err := types.NewCall(meta, "Balances.transfer", bob, types.NewUCompactFromUInt(12345))
 	if err != nil {
 		panic(err)
 	}
@@ -238,9 +238,9 @@ func Example_makeASimpleTransfer() {
 		BlockHash:   genesisHash,
 		Era:         types.ExtrinsicEra{IsMortalEra: false},
 		GenesisHash: genesisHash,
-		Nonce:       types.UCompact(nonce),
+		Nonce:       types.NewUCompactFromUInt(uint64(nonce)),
 		SpecVersion: rv.SpecVersion,
-		Tip:         0,
+		Tip:         types.NewUCompactFromUInt(0),
 	}
 
 	// Sign the transaction using Alice's default account
@@ -413,7 +413,7 @@ func Example_transactionWithEvents() {
 		panic(err)
 	}
 
-	amount := types.UCompact(12345)
+	amount := types.NewUCompactFromUInt(12345)
 
 	c, err := types.NewCall(meta, "Balances.transfer", bob, amount)
 	if err != nil {
@@ -454,9 +454,9 @@ func Example_transactionWithEvents() {
 		BlockHash:   genesisHash,
 		Era:         types.ExtrinsicEra{IsMortalEra: false},
 		GenesisHash: genesisHash,
-		Nonce:       types.UCompact(nonce),
+		Nonce:       types.NewUCompactFromUInt(uint64(nonce)),
 		SpecVersion: rv.SpecVersion,
-		Tip:         0,
+		Tip:         types.NewUCompactFromUInt(0),
 	}
 
 	fmt.Printf("Sending %v from %#x to %#x with nonce %v", amount, signature.TestKeyringPairAlice.PublicKey, bob.AsAccountID, nonce)

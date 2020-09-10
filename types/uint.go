@@ -134,7 +134,7 @@ func (i *U128) Decode(decoder scale.Decoder) error {
 		return err
 	}
 	// reverse bytes, scale uses little-endian encoding, big.int's bytes are expected in big-endian
-	reverse(bs)
+	scale.Reverse(bs)
 
 	b, err := UintBytesToBigInt(bs)
 	if err != nil {
@@ -159,7 +159,7 @@ func (i U128) Encode(encoder scale.Encoder) error {
 	}
 
 	// reverse bytes, scale uses little-endian encoding, big.int's bytes are expected in big-endian
-	reverse(b)
+	scale.Reverse(b)
 
 	return encoder.Write(b)
 }
@@ -182,7 +182,7 @@ func (i *U256) Decode(decoder scale.Decoder) error {
 		return err
 	}
 	// reverse bytes, scale uses little-endian encoding, big.int's bytes are expected in big-endian
-	reverse(bs)
+	scale.Reverse(bs)
 
 	b, err := UintBytesToBigInt(bs)
 	if err != nil {
@@ -207,7 +207,7 @@ func (i U256) Encode(encoder scale.Encoder) error {
 	}
 
 	// reverse bytes, scale uses little-endian encoding, big.int's bytes are expected in big-endian
-	reverse(b)
+	scale.Reverse(b)
 
 	return encoder.Write(b)
 }

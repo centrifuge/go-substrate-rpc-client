@@ -14,38 +14,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package types
+package hash
 
 import (
-	"math/big"
+	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/stretchr/testify/assert"
 )
 
-type UCompact big.Int
-
-func NewUCompact(value *big.Int) UCompact {
-	return UCompact(*value)
-}
-
-func NewUCompactFromUInt(value uint64) UCompact {
-	return NewUCompact(new(big.Int).SetUint64(value))
-}
-
-func (u *UCompact) Decode(decoder scale.Decoder) error {
-	ui, err := decoder.DecodeUintCompact()
-	if err != nil {
-		return err
-	}
-
-	*u = UCompact(*ui)
-	return nil
-}
-
-func (u UCompact) Encode(encoder scale.Encoder) error {
-	err := encoder.EncodeUintCompact(big.Int(u))
-	if err != nil {
-		return err
-	}
-	return nil
+func TestBlake2_128Concat(t *testing.T) {
+	h, err := NewBlake2b128Concat(nil)
+	assert.NoError(t, err)
+	n, err := h.Write([]byte("abc"))
+	assert.NoError(t, err)
+	assert.Equal(t, 3, n)
+	assert.Equal(t, []byte{
+		0xcf, 0x4a, 0xb7, 0x91, 0xc6, 0x2b, 0x8d, 0x2b, 0x21, 0x9, 0xc9, 0x2, 0x75, 0x28, 0x78, 0x16, 0x61, 0x62, 0x63,
+	}, h.Sum(nil))
+	assert.Equal(t, 128, h.BlockSize())
+	assert.Equal(t, 19, h.Size())
+	h.Reset()
+	assert.Equal(t, 16, h.Size())
 }

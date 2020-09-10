@@ -18,6 +18,7 @@ package types
 
 import (
 	"encoding/json"
+	"math/big"
 	"strconv"
 	"strings"
 
@@ -56,7 +57,7 @@ func (b BlockNumber) MarshalJSON() ([]byte, error) {
 
 // Encode implements encoding for BlockNumber, which just unwraps the bytes of BlockNumber
 func (b BlockNumber) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeUintCompact(uint64(b))
+	return encoder.EncodeUintCompact(*big.NewInt(0).SetUint64(uint64(b)))
 }
 
 // Decode implements decoding for BlockNumber, which just wraps the bytes in BlockNumber
@@ -65,6 +66,6 @@ func (b *BlockNumber) Decode(decoder scale.Decoder) error {
 	if err != nil {
 		return err
 	}
-	*b = BlockNumber(u)
+	*b = BlockNumber(u.Uint64())
 	return err
 }
