@@ -28,7 +28,7 @@ install:
 
 script:
   - make lint
-  - make test-dockerized
+  # - make test-dockerized
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
