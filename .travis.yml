@@ -3,8 +3,12 @@ dist: xenial
 
 language: go
 
-go:
-  - 1.11.x
+matrix:
+  include:
+    - go: 1.11.x
+      env: 
+      - DEPLOY=true
+      - GO111MODULE=on  
 
 # Only clone the most recent commit.
 git:
