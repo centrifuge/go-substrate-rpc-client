@@ -154,3 +154,8 @@ func (e ExtrinsicPayloadV4) Encode(encoder scale.Encoder) error {
 
 	return nil
 }
+
+// Decode does nothing and always returns an error. ExtrinsicPayloadV4 is only used for encoding, not for decoding
+func (e *ExtrinsicPayloadV4) Decode(decoder scale.Decoder) error {
+	return fmt.Errorf("decoding of ExtrinsicPayloadV4 is not supported")
+}
