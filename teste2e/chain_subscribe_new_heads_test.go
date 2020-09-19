@@ -27,6 +27,7 @@ import (
 )
 
 func TestChain_SubscribeNewHeads(t *testing.T) {
+	t.SkipNow()
 	if testing.Short() {
 		t.Skip("skipping end-to-end test in short mode.")
 	}

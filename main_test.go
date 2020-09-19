@@ -50,7 +50,7 @@ func Example_simpleConnect() {
 
 	fmt.Printf("You are connected to chain %v using %v v%v\n", chain, nodeName, nodeVersion)
 
-	// Output: You are connected to chain Development using Substrate Node v2.0.0-alpha.3
+	// Output: You are connected to chain Development using Substrate Node v2.0.0-rc6-be8bb186-x86_64-linux-gnu
 }
 
 func Example_listenToNewBlocks() {
@@ -361,7 +361,7 @@ func Example_displaySystemEvents() {
 			}
 			for _, e := range events.Staking_Reward {
 				fmt.Printf("\tStaking:Reward:: (phase=%#v)\n", e.Phase)
-				fmt.Printf("\t\t%v\n", e.Balance)
+				fmt.Printf("\t\t%v\n", e.Amount)
 			}
 			for _, e := range events.Staking_Slash {
 				fmt.Printf("\tStaking:Slash:: (phase=%#v)\n", e.Phase)

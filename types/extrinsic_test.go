@@ -80,6 +80,7 @@ func TestExtrinsic_Sign(t *testing.T) {
 		Nonce:       NewUCompactFromUInt(1),
 		SpecVersion: 123,
 		Tip:         NewUCompactFromUInt(2),
+		TransactionVersion: 1,
 	}
 
 	assert.False(t, ext.IsSigned())
@@ -119,14 +120,17 @@ func TestExtrinsic_Sign(t *testing.T) {
 	mb, err := EncodeToBytes(extDec.Method)
 	assert.NoError(t, err)
 
-	verifyPayload := ExtrinsicPayloadV3{
-		Method:      mb,
-		Era:         extDec.Signature.Era,
-		Nonce:       extDec.Signature.Nonce,
-		Tip:         extDec.Signature.Tip,
-		SpecVersion: o.SpecVersion,
-		GenesisHash: o.GenesisHash,
-		BlockHash:   o.BlockHash,
+	verifyPayload := ExtrinsicPayloadV4{
+		ExtrinsicPayloadV3: ExtrinsicPayloadV3{
+			Method:      mb,
+			Era:         extDec.Signature.Era,
+			Nonce:       extDec.Signature.Nonce,
+			Tip:         extDec.Signature.Tip,
+			SpecVersion: o.SpecVersion,
+			GenesisHash: o.GenesisHash,
+			BlockHash:   o.BlockHash,
+		},
+		TransactionVersion: 1,
 	}
 
 	// verify sig
