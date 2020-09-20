@@ -46,10 +46,11 @@ var reAddressNew = regexp.MustCompile(`SS58 Address:\s+([a-zA-Z0-9]*)\n`)
 // Leave network empty for default behavior
 func KeyringPairFromSecret(seedOrPhrase, network string) (KeyringPair, error) {
 	var args []string
+
+	args = []string{"inspect-key", seedOrPhrase}
 	if network != "" {
-		args = []string{"-n", network}
+		args = append(args, []string{"--network", network}...)
 	}
-	args = append(args, []string{"inspect", seedOrPhrase}...)
 
 	// use "subkey" command for creation of public key and address
 	cmd := exec.Command(subkeyCmd, args...)
@@ -77,9 +78,7 @@ func KeyringPairFromSecret(seedOrPhrase, network string) (KeyringPair, error) {
 
 	// find the address
 	addr := reAddressNew.FindStringSubmatch(string(out))
-	if len(addr) != 2 {
-		addr = reAddressOld.FindStringSubmatch(string(out))
-	}
+
 	if len(addr) != 2 {
 		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret, address not found in output: %v", addr)
 	}
@@ -107,7 +106,7 @@ func Sign(data []byte, privateKeyURI string) ([]byte, error) {
 	}
 
 	// use "subkey" command for signature
-	cmd := exec.Command(subkeyCmd, "sign", privateKeyURI, "--hex")
+	cmd := exec.Command(subkeyCmd, "sign", "--suri", privateKeyURI, "--hex")
 
 	// data to stdin
 	dataHex := hex.EncodeToString(data)
@@ -146,7 +145,7 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 	sigHex := hex.EncodeToString(sig)
 
 	// use "subkey" command for signature
-	cmd := exec.Command(subkeyCmd, "verify", sigHex, privateKeyURI, "--hex")
+	cmd := exec.Command(subkeyCmd, "verify", "--hex", sigHex, privateKeyURI)
 
 	// data to stdin
 	dataHex := hex.EncodeToString(data)
