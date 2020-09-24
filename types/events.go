@@ -84,11 +84,12 @@ type EventBalancesUnreserved struct {
 // EventBalancesReserveRepatriated is emitted when some balance was moved from the reserve of the first account to the
 // second account.
 type EventBalancesReserveRepatriated struct {
-	Phase   Phase
-	From    AccountID
-	To      AccountID
-	Balance U128
-	Topics  []Hash
+	Phase             Phase
+	From              AccountID
+	To                AccountID
+	Balance           U128
+	DestinationStatus BalanceStatus
+	Topics            []Hash
 }
 
 // EventGrandpaNewAuthorities is emitted when a new authority set has been applied
@@ -166,11 +167,10 @@ type EventIndicesIndexFreed struct {
 
 // EventIndicesIndexFrozen is emitted when an index is frozen to its current account ID.
 type EventIndicesIndexFrozen struct {
-	Phase             Phase
-	AccountIndex      AccountIndex
-	AccountID         AccountID
-	DestinationStatus Status
-	Topics            []Hash
+	Phase        Phase
+	AccountIndex AccountIndex
+	AccountID    AccountID
+	Topics       []Hash
 }
 
 // EventOffencesOffence is emitted when there is an offence reported of the given kind happened at the session_index
@@ -192,19 +192,19 @@ type EventSessionNewSession struct {
 
 // EventStakingEraPayout is emitted when the era payout has been set;
 type EventStakingEraPayout struct {
-	Phase             Phase
-	EraIndex          U32
-	ValidatorPayout   U128
-	Remainder         U128
-	Topics            []Hash
+	Phase           Phase
+	EraIndex        U32
+	ValidatorPayout U128
+	Remainder       U128
+	Topics          []Hash
 }
 
 // EventStakingReward is emitted when the staker has been rewarded by this amount.
 type EventStakingReward struct {
-	Phase     Phase
-	Stash     AccountID
-	Amount    U128
-	Topics    []Hash
+	Phase  Phase
+	Stash  AccountID
+	Amount U128
+	Topics []Hash
 }
 
 // EventStakingSlash is emitted when one validator (and its nominators) has been slashed by the given amount
@@ -225,41 +225,41 @@ type EventStakingOldSlashingReportDiscarded struct {
 
 // EventStakingStakingElection is emitted when a new set of stakers was elected with the given
 type EventStakingStakingElection struct {
-	Phase        Phase
-	Compute      ElectionCompute
-	Topics       []Hash
+	Phase   Phase
+	Compute ElectionCompute
+	Topics  []Hash
 }
 
 // EventStakingSolutionStored is emitted when a new solution for the upcoming election has been stored
 type EventStakingSolutionStored struct {
-	Phase        Phase
-	Compute      ElectionCompute
-	Topics       []Hash
+	Phase   Phase
+	Compute ElectionCompute
+	Topics  []Hash
 }
 
 // EventStakingBonded is emitted when an account has bonded this amount
 type EventStakingBonded struct {
-	Phase     Phase
-	Stash     AccountID
-	Amount    U128
-	Topics    []Hash
+	Phase  Phase
+	Stash  AccountID
+	Amount U128
+	Topics []Hash
 }
 
 // EventStakingUnbonded is emitted when an account has unbonded this amount
 type EventStakingUnbonded struct {
-	Phase     Phase
-	Stash     AccountID
-	Amount    U128
-	Topics    []Hash
+	Phase  Phase
+	Stash  AccountID
+	Amount U128
+	Topics []Hash
 }
 
 // EventStakingWithdrawn is emitted when an account has called `withdraw_unbonded` and removed unbonding chunks
 // worth `Balance` from the unlocking queue.
 type EventStakingWithdrawn struct {
-	Phase     Phase
-	Stash     AccountID
-	Amount    U128
-	Topics    []Hash
+	Phase  Phase
+	Stash  AccountID
+	Amount U128
+	Topics []Hash
 }
 
 // EventSystemExtrinsicSuccessV8 is emitted when an extrinsic completed successfully
@@ -624,54 +624,55 @@ type EventTechnicalCommitteeProposed struct {
 // EventTechnicalCommitteeVoted is emitted when a motion (given hash) has been voted on by given account, leaving,
 // a tally (yes votes and no votes given respectively as `MemberCount`).
 type EventTechnicalCommitteeVoted struct {
-	Phase         Phase
-	Account       AccountID
-	Proposal      Hash
-	Voted         bool
-	YesCount      U32
-	NoCount       U32
-	Topics        []Hash
+	Phase    Phase
+	Account  AccountID
+	Proposal Hash
+	Voted    bool
+	YesCount U32
+	NoCount  U32
+	Topics   []Hash
 }
 
 // EventTechnicalCommitteeApproved is emitted when a motion was approved by the required threshold.
 type EventTechnicalCommitteeApproved struct {
-	Phase         Phase
-	Proposal      Hash
-	Topics        []Hash
+	Phase    Phase
+	Proposal Hash
+	Topics   []Hash
 }
 
 // EventTechnicalCommitteeDisapproved is emitted when a motion was not approved by the required threshold.
 type EventTechnicalCommitteeDisapproved struct {
-	Phase         Phase
-	Proposal      Hash
-	Topics        []Hash
+	Phase    Phase
+	Proposal Hash
+	Topics   []Hash
 }
 
-// EventTechnicalCommitteeExecuted is emitted when a motion was executed; result will be `Ok` if it returned without error.
+// EventTechnicalCommitteeExecuted is emitted when a motion was executed;
+// result will be `Ok` if it returned without error.
 type EventTechnicalCommitteeExecuted struct {
-	Phase         Phase
-	Proposal      Hash
-	Result        DispatchResult
-	Topics        []Hash
+	Phase    Phase
+	Proposal Hash
+	Result   DispatchResult
+	Topics   []Hash
 }
 
 // EventTechnicalCommitteeMemberExecuted is emitted when a single member did some action;
 // result will be `Ok` if it returned without error
 type EventTechnicalCommitteeMemberExecuted struct {
-	Phase         Phase
-	Proposal      Hash
-	Result        DispatchResult
-	Topics        []Hash
+	Phase    Phase
+	Proposal Hash
+	Result   DispatchResult
+	Topics   []Hash
 }
 
 // EventTechnicalCommitteeClosed is emitted when A proposal was closed because its threshold was reached
 // or after its duration was up
 type EventTechnicalCommitteeClosed struct {
-	Phase         Phase
-	Proposal      Hash
-	YesCount      U32
-	NoCount       U32
-	Topics        []Hash
+	Phase    Phase
+	Proposal Hash
+	YesCount U32
+	NoCount  U32
+	Topics   []Hash
 }
 
 // EventElectionsNewTerm is emitted when a new term with new members.
@@ -772,37 +773,37 @@ type EventIdentityRegistrarAdded struct {
 
 // EventIdentitySubIdentityAdded is emitted when a sub-identity was added to an identity and the deposit paid
 type EventIdentitySubIdentityAdded struct {
-	Phase     Phase
-	Sub       AccountID
-	Main      AccountID
-	Deposit   U128
-	Topics    []Hash
+	Phase   Phase
+	Sub     AccountID
+	Main    AccountID
+	Deposit U128
+	Topics  []Hash
 }
 
 // EventIdentitySubIdentityRemoved is emitted when a sub-identity was removed from an identity and the deposit freed
 type EventIdentitySubIdentityRemoved struct {
-	Phase     Phase
-	Sub       AccountID
-	Main      AccountID
-	Deposit   U128
-	Topics    []Hash
+	Phase   Phase
+	Sub     AccountID
+	Main    AccountID
+	Deposit U128
+	Topics  []Hash
 }
 
 // EventIdentitySubIdentityRevoked is emitted when a sub-identity was cleared, and the given deposit repatriated from
 // the main identity account to the sub-identity account.
 type EventIdentitySubIdentityRevoked struct {
-	Phase     Phase
-	Sub       AccountID
-	Main      AccountID
-	Deposit   U128
-	Topics    []Hash
+	Phase   Phase
+	Sub     AccountID
+	Main    AccountID
+	Deposit U128
+	Topics  []Hash
 }
 
 // EventSocietyFounded is emitted when the society is founded by the given identity
 type EventSocietyFounded struct {
-	Phase     Phase
-	Founder   AccountID
-	Topics    []Hash
+	Phase   Phase
+	Founder AccountID
+	Topics  []Hash
 }
 
 // EventSocietyBid is emitted when a membership bid just happened. The given account is the candidate's ID
@@ -812,6 +813,113 @@ type EventSocietyBid struct {
 	Candidate AccountID
 	Offer     U128
 	Topics    []Hash
+}
+
+// EventSocietyVouch is emitted when a membership bid just happened by vouching.
+// The given account is the candidate's ID and, their offer is the second. The vouching party is the third.
+type EventSocietyVouch struct {
+	Phase     Phase
+	Candidate AccountID
+	Offer     U128
+	Vouching  AccountID
+	Topics    []Hash
+}
+
+// EventSocietyAutoUnbid is emitted when a [candidate] was dropped (due to an excess of bids in the system)
+type EventSocietyAutoUnbid struct {
+	Phase     Phase
+	Candidate AccountID
+	Topics    []Hash
+}
+
+// EventSocietyUnbid is emitted when a [candidate] was dropped (by their request)
+type EventSocietyUnbid struct {
+	Phase     Phase
+	Candidate AccountID
+	Topics    []Hash
+}
+
+// EventSocietyUnvouch is emitted when a [candidate] was dropped (by request of who vouched for them)
+type EventSocietyUnvouch struct {
+	Phase     Phase
+	Candidate AccountID
+	Topics    []Hash
+}
+
+// EventSocietyInducted is emitted when a group of candidates have been inducted.
+// The batch's primary is the first value, the batch in full is the second.
+type EventSocietyInducted struct {
+	Phase      Phase
+	Primary    AccountID
+	Candidates []AccountID
+	Topics     []Hash
+}
+
+// EventSocietySuspendedMemberJudgement is emitted when a suspended member has been judged
+type EventSocietySuspendedMemberJudgement struct {
+	Phase  Phase
+	Who    AccountID
+	Judged bool
+	Topics []Hash
+}
+
+// EventSocietyCandidateSuspended is emitted when a [candidate] has been suspended
+type EventSocietyCandidateSuspended struct {
+	Phase     Phase
+	Candidate AccountID
+	Topics    []Hash
+}
+
+// EventSocietyMemberSuspended is emitted when a [member] has been suspended
+type EventSocietyMemberSuspended struct {
+	Phase  Phase
+	Member AccountID
+	Topics []Hash
+}
+
+// EventSocietyChallenged is emitted when a [member] has been challenged
+type EventSocietyChallenged struct {
+	Phase  Phase
+	Member AccountID
+	Topics []Hash
+}
+
+// EventSocietyVote is emitted when a vote has been placed
+type EventSocietyVote struct {
+	Phase     Phase
+	Candidate AccountID
+	Voter     AccountID
+	Vote      bool
+	Topics    []Hash
+}
+
+// EventSocietyDefenderVote is emitted when a vote has been placed for a defending member
+type EventSocietyDefenderVote struct {
+	Phase  Phase
+	Voter  AccountID
+	Vote   bool
+	Topics []Hash
+}
+
+// EventSocietyNewMaxMembers is emitted when a new [max] member count has been set
+type EventSocietyNewMaxMembers struct {
+	Phase  Phase
+	Max    U32
+	Topics []Hash
+}
+
+// EventSocietyUnfounded is emitted when society is unfounded
+type EventSocietyUnfounded struct {
+	Phase   Phase
+	Founder AccountID
+	Topics  []Hash
+}
+
+// EventSocietyDeposit is emitted when some funds were deposited into the society account
+type EventSocietyDeposit struct {
+	Phase  Phase
+	Value  U128
+	Topics []Hash
 }
 
 // EventRecoveryCreated is emitted when a recovery process has been set up for an account
@@ -859,6 +967,91 @@ type EventRecoveryRemoved struct {
 	Phase  Phase
 	Who    AccountID
 	Topics []Hash
+}
+
+// EventVestingVestingUpdated is emitted when the amount vested has been updated.
+// This could indicate more funds are available.
+// The balance given is the amount which is left unvested (and thus locked)
+type EventVestingVestingUpdated struct {
+	Phase    Phase
+	Account  AccountID
+	Unvested U128
+	Topics   []Hash
+}
+
+// EventVestingVestingCompleted is emitted when an [account] has become fully vested. No further vesting can happen
+type EventVestingVestingCompleted struct {
+	Phase   Phase
+	Account AccountID
+	Topics  []Hash
+}
+
+// EventSchedulerScheduled is emitted when scheduled some task
+type EventSchedulerScheduled struct {
+	Phase  Phase
+	When   BlockNumber
+	Index  U32
+	Topics []Hash
+}
+
+// EventSchedulerCanceled is emitted when canceled some task
+type EventSchedulerCanceled struct {
+	Phase  Phase
+	When   BlockNumber
+	Index  U32
+	Topics []Hash
+}
+
+// EventSchedulerDispatched is emitted when dispatched some task
+type EventSchedulerDispatched struct {
+	Phase  Phase
+	Task   TaskAddress
+	ID     OptionBytes
+	Result DispatchResult
+	Topics []Hash
+}
+
+type ProxyType byte
+
+const (
+	Any         ProxyType = 0
+	NonTransfer ProxyType = 1
+	Governance  ProxyType = 2
+	Staking     ProxyType = 3
+)
+
+func (pt *ProxyType) Decode(decoder scale.Decoder) error {
+	b, err := decoder.ReadOneByte()
+	vb := ProxyType(b)
+	switch vb {
+	case Any, NonTransfer, Governance, Staking:
+		*pt = vb
+	default:
+		return fmt.Errorf("unknown ProxyType enum: %v", vb)
+	}
+	return err
+}
+
+func (pt ProxyType) Encode(encoder scale.Encoder) error {
+	return encoder.PushByte(byte(pt))
+}
+
+// EventProxyProxyExecuted is emitted when a proxy was executed correctly, with the given [result]
+type EventProxyProxyExecuted struct {
+	Phase  Phase
+	Result DispatchResult
+	Topics []Hash
+}
+
+// EventProxyAnonymousCreated is emitted when an anonymous account has been created by new proxy with given,
+// disambiguation index and proxy type.
+type EventProxyAnonymousCreated struct {
+	Phase               Phase
+	Anonymous           AccountID
+	Who                 AccountID
+	ProxyType           ProxyType
+	DisambiguationIndex U16
+	Topics              []Hash
 }
 
 // EventSudoSudid is emitted when a sudo just took place.
@@ -992,24 +1185,24 @@ type EventContractsRestored struct {
 
 // EventContractsCodeStored is emitted when code with the specified hash has been stored
 type EventContractsCodeStored struct {
-	Phase         Phase
-	CodeHash      Hash
-	Topics        []Hash
+	Phase    Phase
+	CodeHash Hash
+	Topics   []Hash
 }
 
 // EventContractsScheduleUpdated is triggered when the current [schedule] is updated
 type EventContractsScheduleUpdated struct {
-	Phase         Phase
-	Schedule      U32
-	Topics        []Hash
+	Phase    Phase
+	Schedule U32
+	Topics   []Hash
 }
 
 // EventContractsContractExecution is triggered when an event deposited upon execution of a contract from the account
 type EventContractsContractExecution struct {
-	Phase     Phase
-	Account   AccountID
-	Data      Bytes
-	Topics    []Hash
+	Phase   Phase
+	Account AccountID
+	Data    Bytes
+	Topics  []Hash
 }
 
 // EventUtilityBatchInterrupted is emitted when a batch of dispatches did not complete fully.
@@ -1030,10 +1223,10 @@ type EventUtilityBatchCompleted struct {
 // EventUtilityNewMultisig is emitted when a new multisig operation has begun.
 // First param is the account that is approving, second is the multisig account, third is hash of the call.
 type EventMultisigNewMultisig struct {
-	Phase   Phase
-	Who, ID AccountID
+	Phase    Phase
+	Who, ID  AccountID
 	CallHash Hash
-	Topics []Hash
+	Topics   []Hash
 }
 
 // TimePoint is a global extrinsic index, formed as the extrinsic index within a block,
@@ -1041,6 +1234,12 @@ type EventMultisigNewMultisig struct {
 type TimePoint struct {
 	Height U32
 	Index  U32
+}
+
+// TaskAddress holds the location of a scheduled task that can be used to remove it
+type TaskAddress struct {
+	When  BlockNumber
+	Index U32
 }
 
 // EventUtility is emitted when a multisig operation has been approved by someone. First param is the account that is
@@ -1051,7 +1250,7 @@ type EventMultisigApproval struct {
 	TimePoint TimePoint
 	ID        AccountID
 	CallHash  Hash
-	Topics []Hash
+	Topics    []Hash
 }
 
 // DispatchResult can be returned from dispatchable functions
@@ -1096,8 +1295,8 @@ type EventMultisigExecuted struct {
 	TimePoint TimePoint
 	ID        AccountID
 	CallHash  Hash
-	Result DispatchResult
-	Topics []Hash
+	Result    DispatchResult
+	Topics    []Hash
 }
 
 // EventUtility is emitted when a multisig operation has been cancelled. First param is the account that is
@@ -1108,5 +1307,5 @@ type EventMultisigCancelled struct {
 	TimePoint TimePoint
 	ID        AccountID
 	CallHash  Hash
-	Topics []Hash
+	Topics    []Hash
 }

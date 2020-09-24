@@ -140,14 +140,35 @@ type EventRecords struct {
 	Identity_SubIdentityAdded          []EventIdentitySubIdentityAdded          //nolint:stylecheck,golint
 	Identity_SubIdentityRemoved        []EventIdentitySubIdentityRemoved        //nolint:stylecheck,golint
 	Identity_SubIdentityRevoked        []EventIdentitySubIdentityRevoked        //nolint:stylecheck,golint
-	Society_Founded        						 []EventSocietyFounded                    //nolint:stylecheck,golint
-	Society_Bid        						     []EventSocietyBid                        //nolint:stylecheck,golint
+	Society_Founded                    []EventSocietyFounded                    //nolint:stylecheck,golint
+	Society_Bid                        []EventSocietyBid                        //nolint:stylecheck,golint
+	Society_Vouch                      []EventSocietyVouch                      //nolint:stylecheck,golint
+	Society_AutoUnbid                  []EventSocietyAutoUnbid                  //nolint:stylecheck,golint
+	Society_Unbid                      []EventSocietyUnbid                      //nolint:stylecheck,golint
+	Society_Unvouch                    []EventSocietyUnvouch                    //nolint:stylecheck,golint
+	Society_Inducted                   []EventSocietyInducted                   //nolint:stylecheck,golint
+	Society_SuspendedMemberJudgement   []EventSocietySuspendedMemberJudgement   //nolint:stylecheck,golint
+	Society_CandidateSuspended         []EventSocietyCandidateSuspended         //nolint:stylecheck,golint
+	Society_MemberSuspended            []EventSocietyMemberSuspended            //nolint:stylecheck,golint
+	Society_Challenged                 []EventSocietyChallenged                 //nolint:stylecheck,golint
+	Society_Vote                       []EventSocietyVote                       //nolint:stylecheck,golint
+	Society_DefenderVote               []EventSocietyDefenderVote               //nolint:stylecheck,golint
+	Society_NewMaxMembers              []EventSocietyNewMaxMembers              //nolint:stylecheck,golint
+	Society_Unfounded                  []EventSocietyUnfounded                  //nolint:stylecheck,golint
+	Society_Deposit                    []EventSocietyDeposit                    //nolint:stylecheck,golint
 	Recovery_RecoveryCreated           []EventRecoveryCreated                   //nolint:stylecheck,golint
 	Recovery_RecoveryInitiated         []EventRecoveryInitiated                 //nolint:stylecheck,golint
 	Recovery_RecoveryVouched           []EventRecoveryVouched                   //nolint:stylecheck,golint
 	Recovery_RecoveryClosed            []EventRecoveryClosed                    //nolint:stylecheck,golint
 	Recovery_AccountRecovered          []EventRecoveryAccountRecovered          //nolint:stylecheck,golint
 	Recovery_RecoveryRemoved           []EventRecoveryRemoved                   //nolint:stylecheck,golint
+	Vesting_VestingUpdated             []EventVestingVestingUpdated             //nolint:stylecheck,golint
+	Vesting_VestingCompleted           []EventVestingVestingCompleted           //nolint:stylecheck,golint
+	Scheduler_Scheduled                []EventSchedulerScheduled                //nolint:stylecheck,golint
+	Scheduler_Canceled                 []EventSchedulerCanceled                 //nolint:stylecheck,golint
+	Scheduler_Dispatched               []EventSchedulerDispatched               //nolint:stylecheck,golint
+	Proxy_ProxyExecuted                []EventProxyProxyExecuted                //nolint:stylecheck,golint
+	Proxy_AnonymousCreated             []EventProxyAnonymousCreated             //nolint:stylecheck,golint
 	Sudo_Sudid                         []EventSudoSudid                         //nolint:stylecheck,golint
 	Sudo_KeyChanged                    []EventSudoKeyChanged                    //nolint:stylecheck,golint
 	Sudo_SudoAsDone                    []EventSudoAsDone                        //nolint:stylecheck,golint
