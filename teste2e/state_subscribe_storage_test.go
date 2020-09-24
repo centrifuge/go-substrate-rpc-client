@@ -28,7 +28,6 @@ import (
 )
 
 func TestState_SubscribeStorage_EventsRaw(t *testing.T) {
-	t.SkipNow()
 	if testing.Short() {
 		t.Skip("skipping end-to-end test in short mode.")
 	}
