@@ -2,7 +2,7 @@
 # preventing them from being used to build Substrate/Polkadot.
 
 # First Phase - Load Subkey
-FROM parity/subkey:2.0.0-rc6 as subkey
+FROM parity/subkey:2.0.0 as subkey
 RUN subkey --version
 
 ## Second Phase - Build context for tests

@@ -47,9 +47,9 @@ var reAddressNew = regexp.MustCompile(`SS58 Address:\s+([a-zA-Z0-9]*)\n`)
 func KeyringPairFromSecret(seedOrPhrase, network string) (KeyringPair, error) {
 	var args []string
 	if network != "" {
-		args = []string{"-n", network}
+		args = []string{"--network", network}
 	}
-	args = append([]string{"inspect-key", seedOrPhrase}, args...)
+	args = append([]string{"inspect", seedOrPhrase}, args...)
 
 	// use "subkey" command for creation of public key and address
 	cmd := exec.Command(subkeyCmd, args...)
