@@ -18,7 +18,6 @@ package types_test
 
 import (
 	"bytes"
-	"fmt"
 	"math/big"
 	"testing"
 
@@ -175,16 +174,12 @@ func TestU64_Hex(t *testing.T) {
 }
 
 func TestUCompact_EncodeDecode(t *testing.T) {
-	uc1 := NewUCompactFromUInt(15)
-	var buffer1 = bytes.Buffer{}
-	err := scale.NewEncoder(&buffer1).Encode(uc1)
-	fmt.Printf("%x\n", buffer1.Bytes())
 	bn := MustHexDecodeString("0x5C2D3BE75CEF559F050") //27205758526767196926032
 	uc := NewUCompact(big.NewInt(0).SetBytes(bn))
 
 	// Encode
 	var buffer = bytes.Buffer{}
-	err = scale.NewEncoder(&buffer).Encode(uc)
+	err := scale.NewEncoder(&buffer).Encode(uc)
 	assert.NoError(t, err)
 	assert.Equal(t, buffer.Bytes(), MustHexDecodeString("0x1b50f059f5ce75bed3c205")) // Encoded number above
 
