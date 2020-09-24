@@ -281,7 +281,7 @@ type EventSystemExtrinsicSuccess struct {
 // DispatchInfo contains a bundle of static information collected from the `#[weight = $x]` attributes.
 type DispatchInfo struct {
 	// Weight of this transaction
-	Weight U32
+	Weight Weight
 	// Class of this transaction
 	Class DispatchClass
 	// PaysFee indicates whether this transaction pays fees
