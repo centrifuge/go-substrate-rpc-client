@@ -39,7 +39,7 @@ const (
 var null = json.RawMessage("null")
 
 type subscriptionResult struct {
-	ID     int             `json:"subscription"`
+	ID     string          `json:"subscription"`
 	Result json.RawMessage `json:"result,omitempty"`
 }
 

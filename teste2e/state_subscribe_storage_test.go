@@ -111,6 +111,7 @@ func TestState_SubscribeStorage_Events(t *testing.T) {
 					continue
 				}
 
+				fmt.Printf("%s\n", chng.StorageKey.Hex())
 				fmt.Printf("%#x\n", chng.StorageData)
 
 				events := types.EventRecords{}
