@@ -2,11 +2,11 @@
 # preventing them from being used to build Substrate/Polkadot.
 
 # First Phase - Load Subkey
-FROM parity/subkey:2.0.0-alpha.3 as subkey
+FROM parity/subkey:2.0.0 as subkey
 RUN subkey --version
 
 ## Second Phase - Build context for tests
-FROM parity/substrate:v2.0.0-alpha.3
+FROM parity/substrate:v2.0.0-rc6
 
 USER root
 
@@ -22,20 +22,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		git-core \
 	&& rm -rf /var/lib/apt/lists/*
 
-ENV GOLANG_VERSION 1.12.9
+ENV GOLANG_VERSION 1.14.9
 
 RUN set -eux; \
 	\
 # this "case" statement is generated via "update.sh"
 	dpkgArch="$(dpkg --print-architecture)"; \
 	case "${dpkgArch##*-}" in \
-		amd64) goRelArch='linux-amd64'; goRelSha256='ac2a6efcc1f5ec8bdc0db0a988bb1d301d64b6d61b7e8d9e42f662fbb75a2b9b' ;; \
-		armhf) goRelArch='linux-armv6l'; goRelSha256='0d9be0efa9cd296d6f8ab47de45356ba45cb82102bc5df2614f7af52e3fb5842' ;; \
-		arm64) goRelArch='linux-arm64'; goRelSha256='3606dc6ce8b4a5faad81d7365714a86b3162df041a32f44568418c9efbd7f646' ;; \
-		i386) goRelArch='linux-386'; goRelSha256='c40824a3e6c948b8ecad8fe9095b620c488b3d8d6694bdd48084a4798db4799a' ;; \
-		ppc64el) goRelArch='linux-ppc64le'; goRelSha256='2e74c071c6a68446c9b00c1717ceeb59a826025b9202b3b0efed4f128e868b30' ;; \
-		s390x) goRelArch='linux-s390x'; goRelSha256='2aac6de8e83b253b8413781a2f9a0733384d859cff1b89a2ad0d13814541c336' ;; \
-		*) goRelArch='src'; goRelSha256='ab0e56ed9c4732a653ed22e232652709afbf573e710f56a07f7fdeca578d62fc'; \
+		amd64) goRelArch='linux-amd64'; goRelSha256='f0d26ff572c72c9823ae752d3c81819a81a60c753201f51f89637482531c110a' ;; \
+		armhf) goRelArch='linux-armv6l'; goRelSha256='e85dc09608dc9fc245ebc5daea0826898ac0eb0d48ed24e2300427850876c442' ;; \
+		arm64) goRelArch='linux-arm64'; goRelSha256='65e6cef5c474a3514e754f6a7987c49388bb85a7b370370c1318087ac35427fa' ;; \
+		i386) goRelArch='linux-386'; goRelSha256='14982ef997ec323023a11cffe1a4afc3aacd1b5edebf70a00e17b67f888d8cdb' ;; \
+		ppc64el) goRelArch='linux-ppc64le'; goRelSha256='5880a37faf93b2396edc3ff231e0f8df14d0520505cc13d01116e24d7d1d0147' ;; \
+		s390x) goRelArch='linux-s390x'; goRelSha256='381fc24aff153c4affcb00f4547683212157af29b8f9e3de5952d78ac35f5a0f' ;; \
+		*) goRelArch='src'; goRelSha256='c687c848cc09bcabf2b5e534c3fc4259abebbfc9014dd05a1a2dc6106f404554'; \
 			echo >&2; echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; echo >&2 ;; \
 	esac; \
 	\

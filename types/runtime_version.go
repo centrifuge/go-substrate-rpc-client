@@ -24,12 +24,13 @@ import (
 )
 
 type RuntimeVersion struct {
-	APIs             []RuntimeVersionAPI `json:"apis"`
-	AuthoringVersion U32                 `json:"authoringVersion"`
-	ImplName         string              `json:"implName"`
-	ImplVersion      U32                 `json:"implVersion"`
-	SpecName         string              `json:"specName"`
-	SpecVersion      U32                 `json:"specVersion"`
+	APIs               []RuntimeVersionAPI `json:"apis"`
+	AuthoringVersion   U32                 `json:"authoringVersion"`
+	ImplName           string              `json:"implName"`
+	ImplVersion        U32                 `json:"implVersion"`
+	SpecName           string              `json:"specName"`
+	SpecVersion        U32                 `json:"specVersion"`
+	TransactionVersion U32                 `json:"transactionVersion"`
 }
 
 func NewRuntimeVersion() *RuntimeVersion {

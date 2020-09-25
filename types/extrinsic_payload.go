@@ -94,3 +94,68 @@ func (e ExtrinsicPayloadV3) Encode(encoder scale.Encoder) error {
 func (e *ExtrinsicPayloadV3) Decode(decoder scale.Decoder) error {
 	return fmt.Errorf("decoding of ExtrinsicPayloadV3 is not supported")
 }
+
+type ExtrinsicPayloadV4 struct {
+	ExtrinsicPayloadV3
+	TransactionVersion U32
+}
+
+// Sign the extrinsic payload with the given derivation path
+func (e ExtrinsicPayloadV4) Sign(signer signature.KeyringPair) (Signature, error) {
+	b, err := EncodeToBytes(e)
+	if err != nil {
+		return Signature{}, err
+	}
+
+	sig, err := signature.Sign(b, signer.URI)
+	return NewSignature(sig), err
+}
+
+func (e ExtrinsicPayloadV4) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(e.Method)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.Era)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.Nonce)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.Tip)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.SpecVersion)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.TransactionVersion)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.GenesisHash)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.BlockHash)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Decode does nothing and always returns an error. ExtrinsicPayloadV4 is only used for encoding, not for decoding
+func (e *ExtrinsicPayloadV4) Decode(decoder scale.Decoder) error {
+	return fmt.Errorf("decoding of ExtrinsicPayloadV4 is not supported")
+}

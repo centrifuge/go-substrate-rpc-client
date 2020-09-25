@@ -63,6 +63,9 @@ type EventRecords struct {
 	Balances_Transfer                  []EventBalancesTransfer                  //nolint:stylecheck,golint
 	Balances_BalanceSet                []EventBalancesBalanceSet                //nolint:stylecheck,golint
 	Balances_Deposit                   []EventBalancesDeposit                   //nolint:stylecheck,golint
+	Balances_Reserved                  []EventBalancesReserved                  //nolint:stylecheck,golint
+	Balances_Unreserved                []EventBalancesUnreserved                //nolint:stylecheck,golint
+	Balances_ReservedRepatriated       []EventBalancesReserveRepatriated        //nolint:stylecheck,golint
 	Grandpa_NewAuthorities             []EventGrandpaNewAuthorities             //nolint:stylecheck,golint
 	Grandpa_Paused                     []EventGrandpaPaused                     //nolint:stylecheck,golint
 	Grandpa_Resumed                    []EventGrandpaResumed                    //nolint:stylecheck,golint
@@ -71,11 +74,18 @@ type EventRecords struct {
 	ImOnline_SomeOffline               []EventImOnlineSomeOffline               //nolint:stylecheck,golint
 	Indices_IndexAssigned              []EventIndicesIndexAssigned              //nolint:stylecheck,golint
 	Indices_IndexFreed                 []EventIndicesIndexFreed                 //nolint:stylecheck,golint
+	Indices_IndexFrozen                []EventIndicesIndexFrozen                //nolint:stylecheck,golint
 	Offences_Offence                   []EventOffencesOffence                   //nolint:stylecheck,golint
 	Session_NewSession                 []EventSessionNewSession                 //nolint:stylecheck,golint
+	Staking_EraPayout                  []EventStakingEraPayout                  //nolint:stylecheck,golint
 	Staking_Reward                     []EventStakingReward                     //nolint:stylecheck,golint
 	Staking_Slash                      []EventStakingSlash                      //nolint:stylecheck,golint
 	Staking_OldSlashingReportDiscarded []EventStakingOldSlashingReportDiscarded //nolint:stylecheck,golint
+	Staking_StakingElection            []EventStakingStakingElection            //nolint:stylecheck,golint
+	Staking_SolutionStored             []EventStakingSolutionStored             //nolint:stylecheck,golint
+	Staking_Bonded                     []EventStakingBonded                     //nolint:stylecheck,golint
+	Staking_Unbonded                   []EventStakingUnbonded                   //nolint:stylecheck,golint
+	Staking_Withdrawn                  []EventStakingWithdrawn                  //nolint:stylecheck,golint
 	System_ExtrinsicSuccess            []EventSystemExtrinsicSuccess            //nolint:stylecheck,golint
 	System_ExtrinsicFailed             []EventSystemExtrinsicFailed             //nolint:stylecheck,golint
 	System_CodeUpdated                 []EventSystemCodeUpdated                 //nolint:stylecheck,golint
@@ -101,6 +111,20 @@ type EventRecords struct {
 	Democracy_PreimageMissing          []EventDemocracyPreimageMissing          //nolint:stylecheck,golint
 	Democracy_PreimageReaped           []EventDemocracyPreimageReaped           //nolint:stylecheck,golint
 	Democracy_Unlocked                 []EventDemocracyUnlocked                 //nolint:stylecheck,golint
+	Council_Proposed                   []EventCollectiveProposed                //nolint:stylecheck,golint
+	Council_Voted                      []EventCollectiveProposed                //nolint:stylecheck,golint
+	Council_Approved                   []EventCollectiveApproved                //nolint:stylecheck,golint
+	Council_Disapproved                []EventCollectiveDisapproved             //nolint:stylecheck,golint
+	Council_Executed                   []EventCollectiveExecuted                //nolint:stylecheck,golint
+	Council_MemberExecuted             []EventCollectiveMemberExecuted          //nolint:stylecheck,golint
+	Council_Closed                     []EventCollectiveClosed                  //nolint:stylecheck,golint
+	TechnicalCommittee_Proposed        []EventTechnicalCommitteeProposed        //nolint:stylecheck,golint
+	TechnicalCommittee_Voted           []EventTechnicalCommitteeVoted           //nolint:stylecheck,golint
+	TechnicalCommittee_Approved        []EventTechnicalCommitteeApproved        //nolint:stylecheck,golint
+	TechnicalCommittee_Disapproved     []EventTechnicalCommitteeDisapproved     //nolint:stylecheck,golint
+	TechnicalCommittee_Executed        []EventTechnicalCommitteeExecuted        //nolint:stylecheck,golint
+	TechnicalCommittee_MemberExecuted  []EventTechnicalCommitteeMemberExecuted  //nolint:stylecheck,golint
+	TechnicalCommittee_Closed          []EventTechnicalCommitteeClosed          //nolint:stylecheck,golint
 	Elections_NewTerm                  []EventElectionsNewTerm                  //nolint:stylecheck,golint
 	Elections_EmptyTerm                []EventElectionsEmptyTerm                //nolint:stylecheck,golint
 	Elections_MemberKicked             []EventElectionsMemberKicked             //nolint:stylecheck,golint
@@ -113,12 +137,38 @@ type EventRecords struct {
 	Identity_JudgementUnrequested      []EventIdentityJudgementUnrequested      //nolint:stylecheck,golint
 	Identity_JudgementGiven            []EventIdentityJudgementGiven            //nolint:stylecheck,golint
 	Identity_RegistrarAdded            []EventIdentityRegistrarAdded            //nolint:stylecheck,golint
+	Identity_SubIdentityAdded          []EventIdentitySubIdentityAdded          //nolint:stylecheck,golint
+	Identity_SubIdentityRemoved        []EventIdentitySubIdentityRemoved        //nolint:stylecheck,golint
+	Identity_SubIdentityRevoked        []EventIdentitySubIdentityRevoked        //nolint:stylecheck,golint
+	Society_Founded                    []EventSocietyFounded                    //nolint:stylecheck,golint
+	Society_Bid                        []EventSocietyBid                        //nolint:stylecheck,golint
+	Society_Vouch                      []EventSocietyVouch                      //nolint:stylecheck,golint
+	Society_AutoUnbid                  []EventSocietyAutoUnbid                  //nolint:stylecheck,golint
+	Society_Unbid                      []EventSocietyUnbid                      //nolint:stylecheck,golint
+	Society_Unvouch                    []EventSocietyUnvouch                    //nolint:stylecheck,golint
+	Society_Inducted                   []EventSocietyInducted                   //nolint:stylecheck,golint
+	Society_SuspendedMemberJudgement   []EventSocietySuspendedMemberJudgement   //nolint:stylecheck,golint
+	Society_CandidateSuspended         []EventSocietyCandidateSuspended         //nolint:stylecheck,golint
+	Society_MemberSuspended            []EventSocietyMemberSuspended            //nolint:stylecheck,golint
+	Society_Challenged                 []EventSocietyChallenged                 //nolint:stylecheck,golint
+	Society_Vote                       []EventSocietyVote                       //nolint:stylecheck,golint
+	Society_DefenderVote               []EventSocietyDefenderVote               //nolint:stylecheck,golint
+	Society_NewMaxMembers              []EventSocietyNewMaxMembers              //nolint:stylecheck,golint
+	Society_Unfounded                  []EventSocietyUnfounded                  //nolint:stylecheck,golint
+	Society_Deposit                    []EventSocietyDeposit                    //nolint:stylecheck,golint
 	Recovery_RecoveryCreated           []EventRecoveryCreated                   //nolint:stylecheck,golint
 	Recovery_RecoveryInitiated         []EventRecoveryInitiated                 //nolint:stylecheck,golint
 	Recovery_RecoveryVouched           []EventRecoveryVouched                   //nolint:stylecheck,golint
 	Recovery_RecoveryClosed            []EventRecoveryClosed                    //nolint:stylecheck,golint
 	Recovery_AccountRecovered          []EventRecoveryAccountRecovered          //nolint:stylecheck,golint
 	Recovery_RecoveryRemoved           []EventRecoveryRemoved                   //nolint:stylecheck,golint
+	Vesting_VestingUpdated             []EventVestingVestingUpdated             //nolint:stylecheck,golint
+	Vesting_VestingCompleted           []EventVestingVestingCompleted           //nolint:stylecheck,golint
+	Scheduler_Scheduled                []EventSchedulerScheduled                //nolint:stylecheck,golint
+	Scheduler_Canceled                 []EventSchedulerCanceled                 //nolint:stylecheck,golint
+	Scheduler_Dispatched               []EventSchedulerDispatched               //nolint:stylecheck,golint
+	Proxy_ProxyExecuted                []EventProxyProxyExecuted                //nolint:stylecheck,golint
+	Proxy_AnonymousCreated             []EventProxyAnonymousCreated             //nolint:stylecheck,golint
 	Sudo_Sudid                         []EventSudoSudid                         //nolint:stylecheck,golint
 	Sudo_KeyChanged                    []EventSudoKeyChanged                    //nolint:stylecheck,golint
 	Sudo_SudoAsDone                    []EventSudoAsDone                        //nolint:stylecheck,golint
@@ -133,12 +183,18 @@ type EventRecords struct {
 	Treasury_TipClosing                []EventTreasuryTipClosing                //nolint:stylecheck,golint
 	Treasury_TipClosed                 []EventTreasuryTipClosed                 //nolint:stylecheck,golint
 	Treasury_TipRetracted              []EventTreasuryTipRetracted              //nolint:stylecheck,golint
+	Contracts_Instantiated             []EventContractsInstantiated             //nolint:stylecheck,golint
+	Contracts_Evicted                  []EventContractsEvicted                  //nolint:stylecheck,golint
+	Contracts_Restored                 []EventContractsRestored                 //nolint:stylecheck,golint
+	Contracts_CodeStored               []EventContractsCodeStored               //nolint:stylecheck,golint
+	Contracts_ScheduleUpdated          []EventContractsScheduleUpdated          //nolint:stylecheck,golint
+	Contracts_ContractExecution        []EventContractsContractExecution        //nolint:stylecheck,golint
 	Utility_BatchInterrupted           []EventUtilityBatchInterrupted           //nolint:stylecheck,golint
 	Utility_BatchCompleted             []EventUtilityBatchCompleted             //nolint:stylecheck,golint
-	Utility_NewMultisig                []EventUtilityNewMultisig                //nolint:stylecheck,golint
-	Utility_MultisigApproval           []EventUtilityMultisigApproval           //nolint:stylecheck,golint
-	Utility_MultisigExecuted           []EventUtilityMultisigExecuted           //nolint:stylecheck,golint
-	Utility_MultisigCancelled          []EventUtilityMultisigCancelled          //nolint:stylecheck,golint
+	Multisig_New                       []EventMultisigNewMultisig               //nolint:stylecheck,golint
+	Multisig_Approval                  []EventMultisigApproval                  //nolint:stylecheck,golint
+	Multisig_Executed                  []EventMultisigExecuted                  //nolint:stylecheck,golint
+	Multisig_Cancelled                 []EventMultisigCancelled                 //nolint:stylecheck,golint
 }
 
 // DecodeEventRecords decodes the events records from an EventRecordRaw into a target t using the given Metadata m
