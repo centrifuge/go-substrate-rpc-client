@@ -18,10 +18,10 @@ package signature
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
-	"regexp"
 	"strings"
 
 	"golang.org/x/crypto/blake2b"
@@ -38,9 +38,14 @@ type KeyringPair struct {
 	PublicKey []byte
 }
 
-var rePubKey = regexp.MustCompile(`Public key \(hex\): 0x([a-f0-9]*)\n`)
-var reAddressOld = regexp.MustCompile(`Address \(SS58\): ([a-zA-Z0-9]*)\n`)
-var reAddressNew = regexp.MustCompile(`SS58 Address:\s+([a-zA-Z0-9]*)\n`)
+// InspectKeyInfo type is used as target from `subkey` inspect JSON output
+type InspectKeyInfo struct {
+	AccountID    string `json:"accountId"`
+	PublicKey    string `json:"publicKey"`
+	SecretPhrase string `json:"secretPhrase"`
+	SecretSeed   string `json:"secretSeed"`
+	SS58Address  string `json:"ss58Address"`
+}
 
 // KeyringPairFromSecret creates KeyPair based on seed/phrase and network
 // Leave network empty for default behavior
@@ -49,7 +54,7 @@ func KeyringPairFromSecret(seedOrPhrase, network string) (KeyringPair, error) {
 	if network != "" {
 		args = []string{"--network", network}
 	}
-	args = append([]string{"inspect", seedOrPhrase}, args...)
+	args = append([]string{"inspect", "--output-type", "Json", seedOrPhrase}, args...)
 
 	// use "subkey" command for creation of public key and address
 	cmd := exec.Command(subkeyCmd, args...)
@@ -64,29 +69,21 @@ func KeyringPairFromSecret(seedOrPhrase, network string) (KeyringPair, error) {
 		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret: invalid phrase/URI given")
 	}
 
-	// find the pub key
-	resPk := rePubKey.FindStringSubmatch(string(out))
-	if len(resPk) != 2 {
-		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret, pubkey not found in output: %v", resPk)
-	}
-	pk, err := hex.DecodeString(resPk[1])
+	var keyInfo InspectKeyInfo
+	err = json.Unmarshal(out, &keyInfo)
 	if err != nil {
-		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret, could not hex decode pubkey: %v",
-			resPk[1])
+		return KeyringPair{}, fmt.Errorf("failed to deserialize key info JSON output: %v", err.Error())
 	}
 
-	// find the address
-	addr := reAddressNew.FindStringSubmatch(string(out))
-	if len(addr) != 2 {
-		addr = reAddressOld.FindStringSubmatch(string(out))
-	}
-	if len(addr) != 2 {
-		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret, address not found in output: %v", addr)
+	pk, err := hex.DecodeString(strings.Replace(keyInfo.PublicKey, "0x", "", 1))
+	if err != nil {
+		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret, could not hex decode pubkey: "+
+			"%v with error: %v", keyInfo.PublicKey, err.Error())
 	}
 
 	return KeyringPair{
 		URI:       seedOrPhrase,
-		Address:   addr[1],
+		Address:   keyInfo.SS58Address,
 		PublicKey: pk,
 	}, nil
 }
