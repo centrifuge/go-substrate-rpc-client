@@ -17,9 +17,9 @@
 package types
 
 // Weight is a numeric range of a transaction weight
-type Weight uint32
+type Weight uint64
 
 // NewWeight creates a new Weight type
-func NewWeight(u uint32) Weight {
+func NewWeight(u uint64) Weight {
 	return Weight(u)
 }
