@@ -30,18 +30,16 @@ func (m MetadataV12) Encode(encoder scale.Encoder) error {
 
 func (m *MetadataV12) FindCallIndex(call string) (CallIndex, error) {
 	s := strings.Split(call, ".")
-	mi := uint8(0)
 	for _, mod := range m.Modules {
 		if !mod.HasCalls {
 			continue
 		}
 		if string(mod.Name) != s[0] {
-			mi++
 			continue
 		}
 		for ci, f := range mod.Calls {
 			if string(f.Name) == s[1] {
-				return CallIndex{mi, uint8(ci)}, nil
+				return CallIndex{mod.Index, uint8(ci)}, nil
 			}
 		}
 		return CallIndex{}, fmt.Errorf("method %v not found within module %v for call %v", s[1], mod.Name, call)
