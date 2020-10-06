@@ -46,13 +46,10 @@ test-e2e-deployed: 		## runs only end-to-end (e2e) tests against a deployed test
 	@docker build . -t gsrpc-test
 	@docker run --rm -e RPC_URL -e TEST_PRIV_KEY gsrpc-test go test -v github.com/centrifuge/go-substrate-rpc-client/teste2e
 
-run-substrate-docker: 		## runs the Substrate 1.0 Default Docker image, this can be used to run the tests
-	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:latest-v1.0 --dev --rpc-external --ws-external
-
-run-substrate-docker-v2: 	## runs the Substrate 2.0 Default Docker image, this can be used to run the tests
-	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:v2.0.0-rc6 --dev --rpc-external --ws-external
+run-substrate-docker: 	## runs the Substrate 2.0 Default Docker image, this can be used to run the tests
+	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:v2.0.0 --dev --rpc-external --ws-external
 
 help: 				## shows this help
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
 
-.PHONY: clean install lint lint-fix test test-dockerized run-substrate-docker run-substrate-docker-v2
+.PHONY: clean install lint lint-fix test test-dockerized run-substrate-docker
