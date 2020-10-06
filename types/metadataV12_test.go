@@ -84,3 +84,39 @@ func TestMetadataV12_ExistsModuleMetadata(t *testing.T) {
 	assert.True(t, exampleMetadataV12.ExistsModuleMetadata("EmptyModule"))
 	assert.False(t, exampleMetadataV12.ExistsModuleMetadata("NotExistModule"))
 }
+
+func TestMetadataV12_FindEventNamesForEventID(t *testing.T) {
+	module, event, err := exampleMetadataV12.FindEventNamesForEventID(EventID([2]byte{1, 0}))
+
+	assert.NoError(t, err)
+	assert.Equal(t, exampleModuleMetadataV121.Name, module)
+	assert.Equal(t, exampleEventMetadataV4.Name, event)
+}
+
+func TestMetadataV12_FindEventNamesForUnknownModule(t *testing.T) {
+	_, _, err := exampleMetadataV12.FindEventNamesForEventID(EventID([2]byte{1, 18}))
+
+	assert.Error(t, err)
+}
+
+func TestMetadataV12_TestFindStorageEntryMetadata(t *testing.T) {
+	_, err := exampleMetadataV12.FindStorageEntryMetadata("myStoragePrefix", "myStorageFunc2")
+	assert.NoError(t, err)
+}
+
+func TestMetadataV12_TestFindCallIndex(t *testing.T) {
+	callIndex, err := exampleMetadataV12.FindCallIndex("Module2.my function")
+	assert.NoError(t, err)
+	assert.Equal(t, exampleModuleMetadataV122.Index, callIndex.SectionIndex)
+	assert.Equal(t, uint8(0), callIndex.MethodIndex)
+}
+
+func TestMetadataV12_TestFindCallIndexWithUnknownModule(t *testing.T) {
+	_, err := exampleMetadataV12.FindCallIndex("UnknownModule.my function")
+	assert.Error(t, err)
+}
+
+func TestMetadataV12_TestFindCallIndexWithUnknownFunction(t *testing.T) {
+	_, err := exampleMetadataV12.FindCallIndex("Module2.unknownFunction")
+	assert.Error(t, err)
+}
