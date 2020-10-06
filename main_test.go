@@ -50,7 +50,7 @@ func Example_simpleConnect() {
 
 	fmt.Printf("You are connected to chain %v using %v v%v\n", chain, nodeName, nodeVersion)
 
-	// Output: You are connected to chain Development using Substrate Node v2.0.0-rc6-be8bb186-x86_64-linux-gnu
+	// Output: You are connected to chain Development using Substrate Node v2.0.0-a200cdb9-x86_64-linux-gnu
 }
 
 func Example_listenToNewBlocks() {
