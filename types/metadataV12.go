@@ -2,8 +2,9 @@ package types
 
 import (
 	"fmt"
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
 	"strings"
+
+	"github.com/centrifuge/go-substrate-rpc-client/scale"
 )
 
 // Modelled after packages/types/src/Metadata/v11/toV12.ts
