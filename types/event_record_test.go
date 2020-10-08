@@ -292,3 +292,9 @@ func TestDispatchError(t *testing.T) {
 	assertRoundtrip(t, DispatchError{HasModule: true, Module: 0xf1, Error: 0xa2})
 	assertRoundtrip(t, DispatchError{HasModule: false, Error: 0xa2})
 }
+
+func TestPhase(t *testing.T) {
+	assertRoundtrip(t, Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 43})
+	assertRoundtrip(t, Phase{IsFinalization: true})
+	assertRoundtrip(t, Phase{IsInitialization: true})
+}

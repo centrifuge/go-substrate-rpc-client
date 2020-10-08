@@ -315,6 +315,7 @@ type Phase struct {
 	IsApplyExtrinsic bool
 	AsApplyExtrinsic uint32
 	IsFinalization   bool
+	IsInitialization bool
 }
 
 func (p *Phase) Decode(decoder scale.Decoder) error {
@@ -323,11 +324,14 @@ func (p *Phase) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	if b == 0 {
+	switch b {
+	case 0:
 		p.IsApplyExtrinsic = true
 		err = decoder.Decode(&p.AsApplyExtrinsic)
-	} else if b == 1 {
+	case 1:
 		p.IsFinalization = true
+	case 2:
+		p.IsInitialization = true
 	}
 
 	if err != nil {
@@ -339,11 +343,15 @@ func (p *Phase) Decode(decoder scale.Decoder) error {
 
 func (p Phase) Encode(encoder scale.Encoder) error {
 	var err1, err2 error
-	if p.IsApplyExtrinsic {
+
+	switch {
+	case p.IsApplyExtrinsic:
 		err1 = encoder.PushByte(0)
 		err2 = encoder.Encode(p.AsApplyExtrinsic)
-	} else if p.IsFinalization {
+	case p.IsFinalization:
 		err1 = encoder.PushByte(1)
+	case p.IsInitialization:
+		err1 = encoder.PushByte(2)
 	}
 
 	if err1 != nil {
