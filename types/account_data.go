@@ -19,7 +19,7 @@ package types
 // AccountInfo contains information of an account
 type AccountInfo struct {
 	Nonce    U32
-	Refcount U8
+	Refcount U32
 	Data     struct {
 		Free       U128
 		Reserved   U128

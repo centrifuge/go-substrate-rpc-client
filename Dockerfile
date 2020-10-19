@@ -6,7 +6,7 @@ FROM parity/subkey:2.0.0 as subkey
 RUN subkey --version
 
 ## Second Phase - Build context for tests
-FROM parity/substrate:v2.0.0-rc6
+FROM parity/substrate:v2.0.0
 
 USER root
 
