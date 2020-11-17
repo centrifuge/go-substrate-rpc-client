@@ -18,7 +18,6 @@ package types_test
 
 import (
 	"encoding/binary"
-	"fmt"
 	"testing"
 
 	"github.com/btcsuite/btcutil/base58"
@@ -31,16 +30,13 @@ func TestChecksum(t *testing.T) {
 	//verify checksum from ss58
 	contextPrefix := []byte("SS58PRE")
 	ss58d := base58.Decode("4ecQzsMCwbJXu6Cad597T7gZx1MTZWQi8jZZC2DmsQq72knj")
-	fmt.Printf("%x\n",ss58d)
 	assert.Equal(t, uint8(36), ss58d[0]) // Centrifuge network version check
 	noSum := ss58d[:len(ss58d)-2]
-	fmt.Printf("%x\n",noSum)
 	all := append(contextPrefix, noSum...)
 	checksum, err := hash.NewBlake2b512(nil)
 	assert.NoError(t, err)
 	checksum.Write(all)
 	res := checksum.Sum(nil)
-	fmt.Printf("%x\n",res)
 	assert.Equal(t, ss58d[len(ss58d)-2:], res[:2]) // Verified checksum
 }
 
