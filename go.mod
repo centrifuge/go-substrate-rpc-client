@@ -12,9 +12,9 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pierrec/xxHash v0.1.5
 	github.com/rs/cors v1.6.0
-	github.com/stretchr/testify v1.3.0
-	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
-	golang.org/x/sys v0.0.0-20190712062909-fae7ac547cb7 // indirect
+	github.com/stretchr/testify v1.4.0
+	github.com/vedhavyas/go-subkey v0.0.0-20200211154731-4cce0189eaa4
+	golang.org/x/crypto v0.0.0-20200109152110-61a87790db17
 	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 )
