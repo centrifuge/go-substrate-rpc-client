@@ -52,15 +52,12 @@ func KeyringPairFromSecret(seedOrPhrase, network string) (KeyringPair, error) {
 		return KeyringPair{}, err
 	}
 
-	var pk []byte
-	for _, b := range kyr.Public() {
-		pk = append(pk, b)
-	}
+	var pk = kyr.Public()
 
 	return KeyringPair{
 		URI:       seedOrPhrase,
 		Address:   ss58Address,
-		PublicKey: pk,
+		PublicKey: pk[:],
 	}, nil
 }
 
@@ -89,12 +86,7 @@ func Sign(data []byte, privateKeyURI string) ([]byte, error) {
 		return nil, err
 	}
 
-	var sgn []byte
-	for _, b := range signature {
-		sgn = append(sgn, b)
-	}
-
-	return sgn, nil
+	return signature[:], nil
 }
 
 // Verify verifies data using the provided signature and the key under the derivation path. Requires the subkey
