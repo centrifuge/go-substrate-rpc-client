@@ -241,6 +241,7 @@ func Example_makeASimpleTransfer() {
 		Nonce:       types.NewUCompactFromUInt(uint64(nonce)),
 		SpecVersion: rv.SpecVersion,
 		Tip:         types.NewUCompactFromUInt(0),
+		TransactionVersion: rv.TransactionVersion,
 	}
 
 	// Sign the transaction using Alice's default account
@@ -375,7 +376,7 @@ func Example_displaySystemEvents() {
 				fmt.Printf("\tSystem:ExtrinsicSuccess:: (phase=%#v)\n", e.Phase)
 			}
 			for _, e := range events.System_ExtrinsicFailed {
-				fmt.Printf("\tSystem:ErtrinsicFailed:: (phase=%#v)\n", e.Phase)
+				fmt.Printf("\tSystem:ExtrinsicFailed:: (phase=%#v)\n", e.Phase)
 				fmt.Printf("\t\t%v\n", e.DispatchError)
 			}
 			for _, e := range events.System_CodeUpdated {
@@ -422,9 +423,6 @@ func Example_transactionWithEvents() {
 
 	// Create the extrinsic
 	ext := types.NewExtrinsic(c)
-	if err != nil {
-		panic(err)
-	}
 
 	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
 	if err != nil {
@@ -457,6 +455,7 @@ func Example_transactionWithEvents() {
 		Nonce:       types.NewUCompactFromUInt(uint64(nonce)),
 		SpecVersion: rv.SpecVersion,
 		Tip:         types.NewUCompactFromUInt(0),
+		TransactionVersion: rv.TransactionVersion,
 	}
 
 	fmt.Printf("Sending %v from %#x to %#x with nonce %v", amount, signature.TestKeyringPairAlice.PublicKey, bob.AsAccountID, nonce)

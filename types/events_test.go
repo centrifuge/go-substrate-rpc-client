@@ -76,3 +76,47 @@ func TestProxyTypeEncodeDecode(t *testing.T) {
 	err = decoder.Decode(&pt0)
 	assert.Error(t, err)
 }
+
+func TestPaysEncodeDecode(t *testing.T) {
+	// encode
+	pt := Pays{IsNo: true}
+	var buf bytes.Buffer
+	encoder := scale.NewEncoder(&buf)
+	assert.NoError(t, encoder.Encode(pt))
+	assert.Equal(t, buf.Len(), 1)
+	assert.Equal(t, buf.Bytes(), []byte{1})
+
+	// decode unsupported
+	var pays Pays
+	decoder := scale.NewDecoder(bytes.NewReader([]byte{2}))
+	err := decoder.Decode(&pays)
+	assert.Error(t, err)
+
+	// decode supported
+	decoder = scale.NewDecoder(bytes.NewReader(buf.Bytes()))
+	err = decoder.Decode(&pays)
+	assert.NoError(t, err)
+	assert.True(t, pays.IsNo)
+}
+
+func TestDispatchClassEncodeDecode(t *testing.T) {
+	// encode
+	dc := DispatchClass{IsMandatory: true}
+	var buf bytes.Buffer
+	encoder := scale.NewEncoder(&buf)
+	assert.NoError(t, encoder.Encode(dc))
+	assert.Equal(t, buf.Len(), 1)
+	assert.Equal(t, buf.Bytes(), []byte{2})
+
+	// decode unsupported
+	var dcc DispatchClass
+	decoder := scale.NewDecoder(bytes.NewReader([]byte{3}))
+	err := decoder.Decode(&dcc)
+	assert.Error(t, err)
+
+	// decode supported
+	decoder = scale.NewDecoder(bytes.NewReader(buf.Bytes()))
+	err = decoder.Decode(&dcc)
+	assert.NoError(t, err)
+	assert.True(t, dcc.IsMandatory)
+}

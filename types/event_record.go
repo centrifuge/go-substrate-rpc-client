@@ -111,6 +111,7 @@ type EventRecords struct {
 	Democracy_PreimageMissing          []EventDemocracyPreimageMissing          //nolint:stylecheck,golint
 	Democracy_PreimageReaped           []EventDemocracyPreimageReaped           //nolint:stylecheck,golint
 	Democracy_Unlocked                 []EventDemocracyUnlocked                 //nolint:stylecheck,golint
+	Democracy_Blacklisted              []EventDemocracyBlacklisted              //nolint:stylecheck,golint
 	Council_Proposed                   []EventCollectiveProposed                //nolint:stylecheck,golint
 	Council_Voted                      []EventCollectiveProposed                //nolint:stylecheck,golint
 	Council_Approved                   []EventCollectiveApproved                //nolint:stylecheck,golint
@@ -125,8 +126,15 @@ type EventRecords struct {
 	TechnicalCommittee_Executed        []EventTechnicalCommitteeExecuted        //nolint:stylecheck,golint
 	TechnicalCommittee_MemberExecuted  []EventTechnicalCommitteeMemberExecuted  //nolint:stylecheck,golint
 	TechnicalCommittee_Closed          []EventTechnicalCommitteeClosed          //nolint:stylecheck,golint
+	TechnicalMembership_MemberAdded    []EventTechnicalMembershipMemberAdded    //nolint:stylecheck,golint
+	TechnicalMembership_MemberRemoved  []EventTechnicalMembershipMemberRemoved  //nolint:stylecheck,golint
+	TechnicalMembership_MembersSwapped []EventTechnicalMembershipMembersSwapped //nolint:stylecheck,golint
+	TechnicalMembership_MembersReset   []EventTechnicalMembershipMembersReset   //nolint:stylecheck,golint
+	TechnicalMembership_KeyChanged     []EventTechnicalMembershipKeyChanged     //nolint:stylecheck,golint
+	TechnicalMembership_Dummy          []EventTechnicalMembershipDummy          //nolint:stylecheck,golint
 	Elections_NewTerm                  []EventElectionsNewTerm                  //nolint:stylecheck,golint
 	Elections_EmptyTerm                []EventElectionsEmptyTerm                //nolint:stylecheck,golint
+	Elections_ElectionError            []EventElectionsElectionError            //nolint:stylecheck,golint
 	Elections_MemberKicked             []EventElectionsMemberKicked             //nolint:stylecheck,golint
 	Elections_MemberRenounced          []EventElectionsMemberRenounced          //nolint:stylecheck,golint
 	Elections_VoterReported            []EventElectionsVoterReported            //nolint:stylecheck,golint
@@ -169,6 +177,7 @@ type EventRecords struct {
 	Scheduler_Dispatched               []EventSchedulerDispatched               //nolint:stylecheck,golint
 	Proxy_ProxyExecuted                []EventProxyProxyExecuted                //nolint:stylecheck,golint
 	Proxy_AnonymousCreated             []EventProxyAnonymousCreated             //nolint:stylecheck,golint
+	Proxy_Announced                    []EventProxyAnnounced                    //nolint:stylecheck,golint
 	Sudo_Sudid                         []EventSudoSudid                         //nolint:stylecheck,golint
 	Sudo_KeyChanged                    []EventSudoKeyChanged                    //nolint:stylecheck,golint
 	Sudo_SudoAsDone                    []EventSudoAsDone                        //nolint:stylecheck,golint
@@ -183,6 +192,13 @@ type EventRecords struct {
 	Treasury_TipClosing                []EventTreasuryTipClosing                //nolint:stylecheck,golint
 	Treasury_TipClosed                 []EventTreasuryTipClosed                 //nolint:stylecheck,golint
 	Treasury_TipRetracted              []EventTreasuryTipRetracted              //nolint:stylecheck,golint
+	Treasury_BountyProposed            []EventTreasuryBountyProposed            //nolint:stylecheck,golint
+	Treasury_BountyRejected            []EventTreasuryBountyRejected            //nolint:stylecheck,golint
+	Treasury_BountyBecameActive        []EventTreasuryBountyBecameActive        //nolint:stylecheck,golint
+	Treasury_BountyAwarded             []EventTreasuryBountyAwarded             //nolint:stylecheck,golint
+	Treasury_BountyClaimed             []EventTreasuryBountyClaimed             //nolint:stylecheck,golint
+	Treasury_BountyCanceled            []EventTreasuryBountyCanceled            //nolint:stylecheck,golint
+	Treasury_BountyExtended            []EventTreasuryBountyExtended            //nolint:stylecheck,golint
 	Contracts_Instantiated             []EventContractsInstantiated             //nolint:stylecheck,golint
 	Contracts_Evicted                  []EventContractsEvicted                  //nolint:stylecheck,golint
 	Contracts_Restored                 []EventContractsRestored                 //nolint:stylecheck,golint
@@ -191,10 +207,10 @@ type EventRecords struct {
 	Contracts_ContractExecution        []EventContractsContractExecution        //nolint:stylecheck,golint
 	Utility_BatchInterrupted           []EventUtilityBatchInterrupted           //nolint:stylecheck,golint
 	Utility_BatchCompleted             []EventUtilityBatchCompleted             //nolint:stylecheck,golint
-	Multisig_New                       []EventMultisigNewMultisig               //nolint:stylecheck,golint
-	Multisig_Approval                  []EventMultisigApproval                  //nolint:stylecheck,golint
-	Multisig_Executed                  []EventMultisigExecuted                  //nolint:stylecheck,golint
-	Multisig_Cancelled                 []EventMultisigCancelled                 //nolint:stylecheck,golint
+	Multisig_NewMultisig               []EventMultisigNewMultisig               //nolint:stylecheck,golint
+	Multisig_MultisigApproval          []EventMultisigApproval                  //nolint:stylecheck,golint
+	Multisig_MultisigExecuted          []EventMultisigExecuted                  //nolint:stylecheck,golint
+	Multisig_MultisigCancelled         []EventMultisigCancelled                 //nolint:stylecheck,golint
 }
 
 // DecodeEventRecords decodes the events records from an EventRecordRaw into a target t using the given Metadata m
