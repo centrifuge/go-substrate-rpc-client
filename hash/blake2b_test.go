@@ -37,7 +37,7 @@ func TestBlake2_128Concat(t *testing.T) {
 	assert.Equal(t, 16, h.Size())
 }
 
-func TestBlake2b_256(t *testing.T) {
+func TestBlake2b_512(t *testing.T) {
 	h, err := NewBlake2b512(nil)
 	assert.NoError(t, err)
 	n, err := h.Write([]byte("abc"))
