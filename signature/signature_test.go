@@ -42,6 +42,11 @@ func TestKeyRingPairFromSecretPhrase(t *testing.T) {
 	}, p)
 }
 
+func TestKeyRingPairFromSecretPhrase_InvalidSecretPhrase(t *testing.T) {
+	_, err := KeyringPairFromSecret("foo", "")
+	assert.Error(t, err)
+}
+
 func TestKeyringPairFromSecretSeed(t *testing.T) {
 	p, err := KeyringPairFromSecret(testSecretSeed, "")
 	assert.NoError(t, err)
@@ -74,6 +79,30 @@ func TestSignAndVerify(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.True(t, ok)
+}
+
+func TestSign_InvalidSecretPhrase(t *testing.T) {
+	data := []byte("hello!")
+
+	_, err := Sign(data, "foo")
+	assert.Error(t, err)
+}
+
+func TestSignAndVerify_InvalidSecretPhraseOnVerify(t *testing.T) {
+	data := []byte("hello!")
+
+	sig, err := Sign(data, TestKeyringPairAlice.URI)
+	assert.NoError(t, err)
+
+	_, err = Verify(data, sig, "foo")
+	assert.Error(t, err)
+}
+
+func TestVerify_InvalidSignatureLength(t *testing.T) {
+	data := []byte("hello!")
+
+	_, err := Verify(data, []byte{'f', 'o', 'o'}, TestKeyringPairAlice.URI)
+	assert.Error(t, err)
 }
 
 func TestSignAndVerifyLong(t *testing.T) {
