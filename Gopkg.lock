@@ -10,6 +10,14 @@
   revision = "ed1100a1c0154be237da0078e86b19c523c8c661"
 
 [[projects]]
+  digest = "1:95f4fdfbc8d7723bd21e467aabe98d86f06d3e2557b1ba92bf9df8aea6706784"
+  name = "github.com/btcsuite/btcutil"
+  packages = ["base58"]
+  pruneopts = "UT"
+  revision = "b2bf7f89d674a3702182b7e15f52807896051af3"
+  version = "v1.0.2"
+
+[[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
@@ -90,14 +98,14 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:7fa4c2d99cb1ce84ad811966727f8ba6af139c4af20310a9c051cb88a1d27e3d"
+  digest = "1:50c0eda02c5b97d00e2501a3861394c5b6257301aa75ddc68fd4bd1391f34688"
   name = "golang.org/x/crypto"
   packages = [
     "blake2b",
     "sha3",
   ]
   pruneopts = "UT"
-  revision = "4def268fd1a49955bfb3dda92fe3db4f924f2285"
+  revision = "6d4e4cb37c7d6416dfea8472e751c7b6615267a6"
 
 [[projects]]
   branch = "master"
@@ -119,6 +127,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/btcsuite/btcutil/base58",
     "github.com/davecgh/go-spew/spew",
     "github.com/deckarep/golang-set",
     "github.com/ethereum/go-ethereum/common",

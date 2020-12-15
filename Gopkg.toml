@@ -34,7 +34,7 @@
   unused-packages = true
 
 [[constraint]]
-  revision = "4def268fd1a49955bfb3dda92fe3db4f924f2285"
+  revision = "6d4e4cb37c7d6416dfea8472e751c7b6615267a6"
   name = "golang.org/x/crypto"
 
 [[constraint]]
