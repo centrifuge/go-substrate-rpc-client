@@ -629,20 +629,20 @@ type EventCollectiveDisapproved struct {
 	Topics   []Hash
 }
 
-// EventCollectiveExecuted is emitted when a motion was executed; `bool` is true if returned without error.
+// EventCollectiveExecuted is emitted when a motion was executed; `result` is true if returned without error.
 type EventCollectiveExecuted struct {
 	Phase    Phase
 	Proposal Hash
-	Ok       bool
+	Result   DispatchResult
 	Topics   []Hash
 }
 
 // EventCollectiveMemberExecuted is emitted when a single member did some action;
-// `bool` is true if returned without error.
+// `result` is true if returned without error.
 type EventCollectiveMemberExecuted struct {
 	Phase    Phase
 	Proposal Hash
-	Ok       bool
+	Result   DispatchResult
 	Topics   []Hash
 }
 
