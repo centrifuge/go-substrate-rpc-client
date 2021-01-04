@@ -19,7 +19,7 @@ package types
 import (
 	"math/big"
 
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/v2/scale"
 )
 
 type UCompact big.Int
