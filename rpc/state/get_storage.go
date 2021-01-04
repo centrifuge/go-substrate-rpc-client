@@ -17,8 +17,8 @@
 package state
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/client"
-	"github.com/centrifuge/go-substrate-rpc-client/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v2/client"
+	"github.com/centrifuge/go-substrate-rpc-client/v2/types"
 )
 
 // GetStorage retreives the stored data and decodes them into the provided interface. Ok is true if the value is not
