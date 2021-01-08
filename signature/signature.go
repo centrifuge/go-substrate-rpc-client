@@ -55,7 +55,7 @@ func KeyringPairFromSecret(seedOrPhrase string, network uint8) (KeyringPair, err
 	return KeyringPair{
 		URI:       seedOrPhrase,
 		Address:   ss58Address,
-		PublicKey: pk[:],
+		PublicKey: pk,
 	}, nil
 }
 
@@ -85,7 +85,7 @@ func Sign(data []byte, privateKeyURI string) ([]byte, error) {
 		return nil, err
 	}
 
-	return signature[:], nil
+	return signature, nil
 }
 
 // Verify verifies data using the provided signature and the key under the derivation path. Requires the subkey
@@ -120,6 +120,11 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 func LoadKeyringPairFromEnv() (kp KeyringPair, ok bool) {
 	networkString := os.Getenv("TEST_NETWORK")
 	network, err := strconv.ParseInt(networkString, 10, 8)
+	if err != nil {
+		// defaults to generic substrate address
+		// https://github.com/paritytech/substrate/wiki/External-Address-Format-(SS58)#checksum-types
+		network = 42
+	}
 	priv, ok := os.LookupEnv("TEST_PRIV_KEY")
 	if !ok || priv == "" {
 		return kp, false
