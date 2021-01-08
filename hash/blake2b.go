@@ -76,3 +76,8 @@ func NewBlake2b128(k []byte) (hash.Hash, error) {
 func NewBlake2b256(k []byte) (hash.Hash, error) {
 	return blake2b.New256(k)
 }
+
+// NewBlake2b512 returns blake2b-512 hasher
+func NewBlake2b512(k []byte) (hash.Hash, error) {
+	return blake2b.New512(k)
+}

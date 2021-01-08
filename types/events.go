@@ -19,7 +19,7 @@ package types
 import (
 	"fmt"
 
-	"github.com/centrifuge/go-substrate-rpc-client/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/v2/scale"
 )
 
 // EventBalancesEndowed is emitted when an account is created with some free balance
@@ -278,6 +278,34 @@ type EventSystemExtrinsicSuccess struct {
 	Topics       []Hash
 }
 
+type Pays struct {
+	IsYes bool
+	IsNo  bool
+}
+
+func (p *Pays) Decode(decoder scale.Decoder) error {
+	b, err := decoder.ReadOneByte()
+	switch b {
+	case 0:
+		p.IsYes = true
+	case 1:
+		p.IsNo = true
+	default:
+		return fmt.Errorf("unknown DispatchClass enum: %v", b)
+	}
+	return err
+}
+
+func (p Pays) Encode(encoder scale.Encoder) error {
+	var err error
+	if p.IsYes {
+		err = encoder.PushByte(0)
+	} else if p.IsNo {
+		err = encoder.PushByte(1)
+	}
+	return err
+}
+
 // DispatchInfo contains a bundle of static information collected from the `#[weight = $x]` attributes.
 type DispatchInfo struct {
 	// Weight of this transaction
@@ -285,7 +313,7 @@ type DispatchInfo struct {
 	// Class of this transaction
 	Class DispatchClass
 	// PaysFee indicates whether this transaction pays fees
-	PaysFee bool
+	PaysFee Pays
 }
 
 // DispatchClass is a generalized group of dispatch types. This is only distinguishing normal, user-triggered
@@ -295,24 +323,34 @@ type DispatchClass struct {
 	IsNormal bool
 	// An operational dispatch
 	IsOperational bool
+	// A mandatory dispatch
+	IsMandatory bool
 }
 
 func (d *DispatchClass) Decode(decoder scale.Decoder) error {
 	b, err := decoder.ReadOneByte()
-	if b == 0 {
+	switch b {
+	case 0:
 		d.IsNormal = true
-	} else if b == 1 {
+	case 1:
 		d.IsOperational = true
+	case 2:
+		d.IsMandatory = true
+	default:
+		return fmt.Errorf("unknown DispatchClass enum: %v", b)
 	}
 	return err
 }
 
+//nolint:gocritic,golint
 func (d DispatchClass) Encode(encoder scale.Encoder) error {
 	var err error
 	if d.IsNormal {
 		err = encoder.PushByte(0)
 	} else if d.IsOperational {
 		err = encoder.PushByte(1)
+	} else if d.IsMandatory {
+		err = encoder.PushByte(2)
 	}
 	return err
 }
@@ -547,6 +585,13 @@ type EventDemocracyUnlocked struct {
 	Topics    []Hash
 }
 
+// EventDemocracyBlacklisted is emitted when A proposal has been blacklisted permanently
+type EventDemocracyBlacklisted struct {
+	Phase  Phase
+	Hash   Hash
+	Topics []Hash
+}
+
 // EventCollectiveProposed is emitted when a motion (given hash) has been proposed (by given account)
 // with a threshold (given `MemberCount`).
 type EventCollectiveProposed struct {
@@ -584,20 +629,20 @@ type EventCollectiveDisapproved struct {
 	Topics   []Hash
 }
 
-// EventCollectiveExecuted is emitted when a motion was executed; `bool` is true if returned without error.
+// EventCollectiveExecuted is emitted when a motion was executed; `result` is true if returned without error.
 type EventCollectiveExecuted struct {
 	Phase    Phase
 	Proposal Hash
-	Ok       bool
+	Result   DispatchResult
 	Topics   []Hash
 }
 
 // EventCollectiveMemberExecuted is emitted when a single member did some action;
-// `bool` is true if returned without error.
+// `result` is true if returned without error.
 type EventCollectiveMemberExecuted struct {
 	Phase    Phase
 	Proposal Hash
-	Ok       bool
+	Result   DispatchResult
 	Topics   []Hash
 }
 
@@ -675,6 +720,43 @@ type EventTechnicalCommitteeClosed struct {
 	Topics   []Hash
 }
 
+// EventTechnicalMembershipMemberAdded is emitted when the given member was added; see the transaction for who
+type EventTechnicalMembershipMemberAdded struct {
+	Phase  Phase
+	Topics []Hash
+}
+
+// EventTechnicalMembershipMemberRemoved is emitted when the given member was removed; see the transaction for who
+type EventTechnicalMembershipMemberRemoved struct {
+	Phase  Phase
+	Topics []Hash
+}
+
+// EventTechnicalMembershipMembersSwapped is emitted when two members were swapped;; see the transaction for who
+type EventTechnicalMembershipMembersSwapped struct {
+	Phase  Phase
+	Topics []Hash
+}
+
+// EventTechnicalMembershipMembersReset is emitted when the membership was reset;
+// see the transaction for who the new set is.
+type EventTechnicalMembershipMembersReset struct {
+	Phase  Phase
+	Topics []Hash
+}
+
+// EventTechnicalMembershipKeyChanged is emitted when one of the members' keys changed.
+type EventTechnicalMembershipKeyChanged struct {
+	Phase  Phase
+	Topics []Hash
+}
+
+// EventTechnicalMembershipKeyChanged is emitted when - phantom member, never used.
+type EventTechnicalMembershipDummy struct {
+	Phase  Phase
+	Topics []Hash
+}
+
 // EventElectionsNewTerm is emitted when a new term with new members.
 // This indicates that enough candidates existed, not that enough have has been elected.
 // The inner value must be examined for this purpose.
@@ -689,6 +771,12 @@ type EventElectionsNewTerm struct {
 
 // EventElectionsEmpty is emitted when No (or not enough) candidates existed for this round.
 type EventElectionsEmptyTerm struct {
+	Phase  Phase
+	Topics []Hash
+}
+
+// EventElectionsElectionError is emitted when an internal error happened while trying to perform election
+type EventElectionsElectionError struct {
 	Phase  Phase
 	Topics []Hash
 }
@@ -1054,6 +1142,15 @@ type EventProxyAnonymousCreated struct {
 	Topics              []Hash
 }
 
+// EventProxyAnnounced is emitted when an announcement was placed to make a call in the future
+type EventProxyAnnounced struct {
+	Phase    Phase
+	Real     AccountID
+	Proxy    AccountID
+	CallHash Hash
+	Topics   []Hash
+}
+
 // EventSudoSudid is emitted when a sudo just took place.
 type EventSudoSudid struct {
 	Phase  Phase
@@ -1154,6 +1251,61 @@ type EventTreasuryTipClosed struct {
 type EventTreasuryTipRetracted struct {
 	Phase  Phase
 	Hash   Hash
+	Topics []Hash
+}
+
+type BountyIndex U32
+
+// EventTreasuryBountyProposed is emitted for a new bounty proposal.
+type EventTreasuryBountyProposed struct {
+	Phase  Phase
+	Index  BountyIndex
+	Topics []Hash
+}
+
+// EventTreasuryBountyRejected is emitted when a bounty proposal was rejected; funds were slashed.
+type EventTreasuryBountyRejected struct {
+	Phase  Phase
+	Index  BountyIndex
+	Bond   U128
+	Topics []Hash
+}
+
+// EventTreasuryBountyBecameActive is emitted when a bounty proposal is funded and became active
+type EventTreasuryBountyBecameActive struct {
+	Phase  Phase
+	Index  BountyIndex
+	Topics []Hash
+}
+
+// EventTreasuryBountyAwarded is emitted when a bounty is awarded to a beneficiary
+type EventTreasuryBountyAwarded struct {
+	Phase       Phase
+	Index       BountyIndex
+	Beneficiary AccountID
+	Topics      []Hash
+}
+
+// EventTreasuryBountyClaimed is emitted when A bounty is claimed by beneficiary
+type EventTreasuryBountyClaimed struct {
+	Phase       Phase
+	Index       BountyIndex
+	Payout      U128
+	Beneficiary AccountID
+	Topics      []Hash
+}
+
+// EventTreasuryBountyCanceled is emitted when a bounty is cancelled.
+type EventTreasuryBountyCanceled struct {
+	Phase  Phase
+	Index  BountyIndex
+	Topics []Hash
+}
+
+// EventTreasuryBountyExtended is emitted when a bounty is extended.
+type EventTreasuryBountyExtended struct {
+	Phase  Phase
+	Index  BountyIndex
 	Topics []Hash
 }
 

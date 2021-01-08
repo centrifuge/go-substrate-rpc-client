@@ -21,10 +21,10 @@ import (
 	"testing"
 	"time"
 
-	gsrpc "github.com/centrifuge/go-substrate-rpc-client"
-	"github.com/centrifuge/go-substrate-rpc-client/config"
-	"github.com/centrifuge/go-substrate-rpc-client/signature"
-	"github.com/centrifuge/go-substrate-rpc-client/types"
+	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v2"
+	"github.com/centrifuge/go-substrate-rpc-client/v2/config"
+	"github.com/centrifuge/go-substrate-rpc-client/v2/signature"
+	"github.com/centrifuge/go-substrate-rpc-client/v2/types"
 )
 
 func TestChain_Events(t *testing.T) {
@@ -139,7 +139,7 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 			Nonce:       types.NewUCompactFromUInt(uint64(nonce + i)),
 			SpecVersion: rv.SpecVersion,
 			Tip:         types.NewUCompactFromUInt(0),
-			TransactionVersion: 1,
+			TransactionVersion: rv.TransactionVersion,
 		}
 
 		extI := ext
