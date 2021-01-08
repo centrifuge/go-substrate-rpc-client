@@ -20,9 +20,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 
-	"github.com/vedhavyas/go-subkey/common"
-	subkey "github.com/vedhavyas/go-subkey/sr25519"
+	"github.com/vedhavyas/go-subkey"
+	"github.com/vedhavyas/go-subkey/sr25519"
 	"golang.org/x/crypto/blake2b"
 )
 
@@ -37,17 +38,14 @@ type KeyringPair struct {
 
 // KeyringPairFromSecret creates KeyPair based on seed/phrase and network
 // Leave network empty for default behavior
-func KeyringPairFromSecret(seedOrPhrase, network string) (KeyringPair, error) {
-	if network == "" {
-		network = "substrate"
-	}
-
-	kyr, err := subkey.KeyRingFromURI(seedOrPhrase)
+func KeyringPairFromSecret(seedOrPhrase string, network uint8) (KeyringPair, error) {
+	scheme := sr25519.Scheme{}
+	kyr, err := subkey.DeriveKeyPair(scheme, seedOrPhrase)
 	if err != nil {
 		return KeyringPair{}, err
 	}
 
-	ss58Address, err := kyr.SS58Address(network, common.SS58Checksum)
+	ss58Address, err := kyr.SS58Address(network)
 	if err != nil {
 		return KeyringPair{}, err
 	}
@@ -76,7 +74,8 @@ func Sign(data []byte, privateKeyURI string) ([]byte, error) {
 		data = h[:]
 	}
 
-	kyr, err := subkey.KeyRingFromURI(privateKeyURI)
+	scheme := sr25519.Scheme{}
+	kyr, err := subkey.DeriveKeyPair(scheme, privateKeyURI)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +97,8 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 		data = h[:]
 	}
 
-	kyr, err := subkey.KeyRingFromURI(privateKeyURI)
+	scheme := sr25519.Scheme{}
+	kyr, err := subkey.DeriveKeyPair(scheme, privateKeyURI)
 	if err != nil {
 		return false, err
 	}
@@ -106,10 +106,8 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 	if len(sig) != 64 {
 		return false, errors.New("wrong signature length")
 	}
-	var sig64 [64]byte
-	copy(sig64[:], sig)
 
-	v := kyr.Verify(data, sig64)
+	v := kyr.Verify(data, sig)
 
 	return v, nil
 }
@@ -120,12 +118,13 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 // Loads Network from TEST_NETWORK variable
 // Leave TEST_NETWORK empty or unset for default
 func LoadKeyringPairFromEnv() (kp KeyringPair, ok bool) {
-	network := os.Getenv("TEST_NETWORK")
+	networkString := os.Getenv("TEST_NETWORK")
+	network, err := strconv.ParseInt(networkString, 10, 8)
 	priv, ok := os.LookupEnv("TEST_PRIV_KEY")
 	if !ok || priv == "" {
 		return kp, false
 	}
-	kp, err := KeyringPairFromSecret(priv, network)
+	kp, err = KeyringPairFromSecret(priv, uint8(network))
 	if err != nil {
 		panic(fmt.Errorf("cannot load keyring pair from env or use fallback: %v", err))
 	}

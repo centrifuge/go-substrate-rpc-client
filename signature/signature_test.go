@@ -30,9 +30,10 @@ var testSecretSeed = "0x167d9a020688544ea246b056799d6a771e97c9da057e4d0b87024537
 var testPubKey = "0xdc64bef918ddda3126a39a11113767741ddfdf91399f055e1d963f2ae1ec2535"
 var testAddressSS58 = "5H3gKVQU7DfNFfNGkgTrD7p715jjg7QXtat8X3UxiSyw7APW"
 var testKusamaAddressSS58 = "HZHyokLjagJ1KBiXPGu75B79g1yUnDiLxisuhkvCFCRrWBk"
+var testPolkadotAddressSS58 = "15yyTpfXxzvqhCNniKWrMGeFrhjPNQxfy5ccgLUKGY1THbTW"
 
-func TestKeyRingPairFromSecretPhrase(t *testing.T) {
-	p, err := KeyringPairFromSecret(testSecretPhrase, "")
+func TestKeyRingPairFromSecretPhrase_SubstrateAddress(t *testing.T) {
+	p, err := KeyringPairFromSecret(testSecretPhrase, 42)
 	assert.NoError(t, err)
 
 	assert.Equal(t, KeyringPair{
@@ -42,13 +43,35 @@ func TestKeyRingPairFromSecretPhrase(t *testing.T) {
 	}, p)
 }
 
+func TestKeyRingPairFromSecretPhrase_PolkadotAddress(t *testing.T) {
+	p, err := KeyringPairFromSecret(testSecretPhrase, 0)
+	assert.NoError(t, err)
+
+	assert.Equal(t, KeyringPair{
+		URI:       testSecretPhrase,
+		Address:   testPolkadotAddressSS58,
+		PublicKey: types.MustHexDecodeString(testPubKey),
+	}, p)
+}
+
+func TestKeyRingPairFromSecretPhrase_KusamaAddress(t *testing.T) {
+	p, err := KeyringPairFromSecret(testSecretPhrase, 2)
+	assert.NoError(t, err)
+
+	assert.Equal(t, KeyringPair{
+		URI:       testSecretPhrase,
+		Address:   testKusamaAddressSS58,
+		PublicKey: types.MustHexDecodeString(testPubKey),
+	}, p)
+}
+
 func TestKeyRingPairFromSecretPhrase_InvalidSecretPhrase(t *testing.T) {
-	_, err := KeyringPairFromSecret("foo", "")
+	_, err := KeyringPairFromSecret("foo", 42)
 	assert.Error(t, err)
 }
 
 func TestKeyringPairFromSecretSeed(t *testing.T) {
-	p, err := KeyringPairFromSecret(testSecretSeed, "")
+	p, err := KeyringPairFromSecret(testSecretSeed, 42)
 	assert.NoError(t, err)
 
 	assert.Equal(t, KeyringPair{
@@ -59,12 +82,12 @@ func TestKeyringPairFromSecretSeed(t *testing.T) {
 }
 
 func TestKeyringPairFromSecretSeedAndNetwork(t *testing.T) {
-	p, err := KeyringPairFromSecret(testSecretSeed, "kusama")
+	p, err := KeyringPairFromSecret(testSecretSeed, 42)
 	assert.NoError(t, err)
 
 	assert.Equal(t, KeyringPair{
 		URI:       testSecretSeed,
-		Address:   testKusamaAddressSS58,
+		Address:   testAddressSS58,
 		PublicKey: types.MustHexDecodeString(testPubKey),
 	}, p)
 }
