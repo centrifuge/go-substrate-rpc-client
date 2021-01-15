@@ -21,8 +21,8 @@ import (
 	"testing"
 
 	"github.com/btcsuite/btcutil/base58"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/hash"
-	. "github.com/centrifuge/go-substrate-rpc-client/v2/types"
+	"github.com/snowfork/go-substrate-rpc-client/v2/hash"
+	. "github.com/snowfork/go-substrate-rpc-client/v2/types"
 	"github.com/stretchr/testify/assert"
 )
 

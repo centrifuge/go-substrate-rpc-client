@@ -21,10 +21,10 @@ import (
 	"testing"
 	"time"
 
-	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v2"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/config"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/signature"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/types"
+	gsrpc "github.com/snowfork/go-substrate-rpc-client/v2"
+	"github.com/snowfork/go-substrate-rpc-client/v2/config"
+	"github.com/snowfork/go-substrate-rpc-client/v2/signature"
+	"github.com/snowfork/go-substrate-rpc-client/v2/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -90,12 +90,12 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 
 	o := types.SignatureOptions{
 		// BlockHash:   blockHash,
-		BlockHash:   genesisHash, // BlockHash needs to == GenesisHash if era is immortal. // TODO: add an error?
-		Era:         era,
-		GenesisHash: genesisHash,
-		Nonce:       types.NewUCompactFromUInt(uint64(nonce)),
-		SpecVersion: rv.SpecVersion,
-		Tip:         types.NewUCompactFromUInt(0),
+		BlockHash:          genesisHash, // BlockHash needs to == GenesisHash if era is immortal. // TODO: add an error?
+		Era:                era,
+		GenesisHash:        genesisHash,
+		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+		SpecVersion:        rv.SpecVersion,
+		Tip:                types.NewUCompactFromUInt(0),
 		TransactionVersion: rv.TransactionVersion,
 	}
 

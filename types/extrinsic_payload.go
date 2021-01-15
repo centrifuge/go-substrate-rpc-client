@@ -19,8 +19,8 @@ package types
 import (
 	"fmt"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v2/scale"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/signature"
+	"github.com/snowfork/go-substrate-rpc-client/v2/scale"
+	"github.com/snowfork/go-substrate-rpc-client/v2/signature"
 )
 
 // ExtrinsicPayloadV3 is a signing payload for an Extrinsic. For the final encoding, it is variable length based on

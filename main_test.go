@@ -21,10 +21,10 @@ import (
 	"math/big"
 	"time"
 
-	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v2"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/config"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/signature"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/types"
+	gsrpc "github.com/snowfork/go-substrate-rpc-client/v2"
+	"github.com/snowfork/go-substrate-rpc-client/v2/config"
+	"github.com/snowfork/go-substrate-rpc-client/v2/signature"
+	"github.com/snowfork/go-substrate-rpc-client/v2/types"
 )
 
 func Example_simpleConnect() {
@@ -235,12 +235,12 @@ func Example_makeASimpleTransfer() {
 	nonce := uint32(accountInfo.Nonce)
 
 	o := types.SignatureOptions{
-		BlockHash:   genesisHash,
-		Era:         types.ExtrinsicEra{IsMortalEra: false},
-		GenesisHash: genesisHash,
-		Nonce:       types.NewUCompactFromUInt(uint64(nonce)),
-		SpecVersion: rv.SpecVersion,
-		Tip:         types.NewUCompactFromUInt(0),
+		BlockHash:          genesisHash,
+		Era:                types.ExtrinsicEra{IsMortalEra: false},
+		GenesisHash:        genesisHash,
+		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+		SpecVersion:        rv.SpecVersion,
+		Tip:                types.NewUCompactFromUInt(0),
 		TransactionVersion: rv.TransactionVersion,
 	}
 
@@ -449,12 +449,12 @@ func Example_transactionWithEvents() {
 	nonce := uint32(accountInfo.Nonce)
 
 	o := types.SignatureOptions{
-		BlockHash:   genesisHash,
-		Era:         types.ExtrinsicEra{IsMortalEra: false},
-		GenesisHash: genesisHash,
-		Nonce:       types.NewUCompactFromUInt(uint64(nonce)),
-		SpecVersion: rv.SpecVersion,
-		Tip:         types.NewUCompactFromUInt(0),
+		BlockHash:          genesisHash,
+		Era:                types.ExtrinsicEra{IsMortalEra: false},
+		GenesisHash:        genesisHash,
+		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+		SpecVersion:        rv.SpecVersion,
+		Tip:                types.NewUCompactFromUInt(0),
 		TransactionVersion: rv.TransactionVersion,
 	}
 

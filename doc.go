@@ -36,15 +36,15 @@ In order to sign extrinsics, you need to have [subkey](https://github.com/parity
 
 Types
 
-The package [types](https://godoc.org/github.com/centrifuge/go-substrate-rpc-client/v2/types/) exports a number
+The package [types](https://godoc.org/github.com/snowfork/go-substrate-rpc-client/v2/types/) exports a number
 of useful basic types including functions for encoding and decoding them.
 
 To use your own custom types, you can simply create structs and arrays composing those basic types. Here are some
 examples using composition of a mix of these basic and builtin Go types:
 
-1. Vectors, lists, series, sets, arrays, slices: https://godoc.org/github.com/centrifuge/go-substrate-rpc-client/v2/types/#example_Vec_simple
+1. Vectors, lists, series, sets, arrays, slices: https://godoc.org/github.com/snowfork/go-substrate-rpc-client/v2/types/#example_Vec_simple
 
-2. Structs: https://godoc.org/github.com/centrifuge/go-substrate-rpc-client/v2/types/#example_Struct_simple
+2. Structs: https://godoc.org/github.com/snowfork/go-substrate-rpc-client/v2/types/#example_Struct_simple
 
 There are some caveats though that you should be aware of:
 
@@ -56,6 +56,6 @@ methods that implement the Encodeable/Decodeable interfaces. Examples for that a
 types, you can find reference implementations of those here: types/enum_test.go , types/tuple_test.go and
 types/vec_any_test.go
 
-For more information about the types sub-package, see https://godoc.org/github.com/centrifuge/go-substrate-rpc-client/v2/types
+For more information about the types sub-package, see https://godoc.org/github.com/snowfork/go-substrate-rpc-client/v2/types
 */
 package gsrpc

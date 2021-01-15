@@ -21,10 +21,10 @@ import (
 	"testing"
 	"time"
 
-	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v2"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/config"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/signature"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/types"
+	gsrpc "github.com/snowfork/go-substrate-rpc-client/v2"
+	"github.com/snowfork/go-substrate-rpc-client/v2/config"
+	"github.com/snowfork/go-substrate-rpc-client/v2/signature"
+	"github.com/snowfork/go-substrate-rpc-client/v2/types"
 )
 
 func TestChain_Events(t *testing.T) {

@@ -21,8 +21,8 @@ import (
 	"hash"
 	"strings"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v2/scale"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/xxhash"
+	"github.com/snowfork/go-substrate-rpc-client/v2/scale"
+	"github.com/snowfork/go-substrate-rpc-client/v2/xxhash"
 )
 
 // Modelled after packages/types/src/Metadata/v7/Metadata.ts

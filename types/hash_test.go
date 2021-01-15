@@ -19,7 +19,7 @@ package types_test
 import (
 	"testing"
 
-	. "github.com/centrifuge/go-substrate-rpc-client/v2/types"
+	. "github.com/snowfork/go-substrate-rpc-client/v2/types"
 )
 
 var hash20 = []byte{

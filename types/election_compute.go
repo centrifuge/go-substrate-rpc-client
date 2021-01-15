@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v2/scale"
+	"github.com/snowfork/go-substrate-rpc-client/v2/scale"
 )
 
 type ElectionCompute byte
