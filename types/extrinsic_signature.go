@@ -25,7 +25,7 @@ type ExtrinsicSignatureV3 struct {
 }
 
 type ExtrinsicSignatureV4 struct {
-	Signer    Address
+	Signer    MultiAddress
 	Signature MultiSignature
 	Era       ExtrinsicEra // extra via system::CheckEra
 	Nonce     UCompact     // extra via system::CheckNonce (Compact<Index> where Index is u32))
