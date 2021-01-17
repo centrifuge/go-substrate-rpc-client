@@ -20,17 +20,19 @@ import (
 	"github.com/snowfork/go-substrate-rpc-client/v2/client"
 	"github.com/snowfork/go-substrate-rpc-client/v2/rpc/author"
 	"github.com/snowfork/go-substrate-rpc-client/v2/rpc/chain"
+	"github.com/snowfork/go-substrate-rpc-client/v2/rpc/offchain"
 	"github.com/snowfork/go-substrate-rpc-client/v2/rpc/state"
 	"github.com/snowfork/go-substrate-rpc-client/v2/rpc/system"
 	"github.com/snowfork/go-substrate-rpc-client/v2/types"
 )
 
 type RPC struct {
-	Author *author.Author
-	Chain  *chain.Chain
-	State  *state.State
-	System *system.System
-	client client.Client
+	Author   *author.Author
+	Chain    *chain.Chain
+	Offchain *offchain.Offchain
+	State    *state.State
+	System   *system.System
+	client   client.Client
 }
 
 func NewRPC(cl client.Client) (*RPC, error) {
