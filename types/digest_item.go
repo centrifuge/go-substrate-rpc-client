@@ -20,17 +20,17 @@ import "github.com/snowfork/go-substrate-rpc-client/v2/scale"
 
 // DigestItem specifies the item in the logs of a digest
 type DigestItem struct {
-	IsChangesTrieRoot   bool // 0
+	IsChangesTrieRoot   bool // 2
 	AsChangesTrieRoot   Hash
-	IsPreRuntime        bool // 1
+	IsPreRuntime        bool // 6
 	AsPreRuntime        PreRuntime
-	IsConsensus         bool // 2
+	IsConsensus         bool // 4
 	AsConsensus         Consensus
-	IsSeal              bool // 3
+	IsSeal              bool // 5
 	AsSeal              Seal
-	IsChangesTrieSignal bool // 4
+	IsChangesTrieSignal bool // 7
 	AsChangesTrieSignal ChangesTrieSignal
-	IsOther             bool // 5
+	IsOther             bool // 0
 	AsOther             Bytes
 }
 
@@ -42,22 +42,22 @@ func (m *DigestItem) Decode(decoder scale.Decoder) error {
 	}
 
 	switch b {
-	case 0:
+	case 2:
 		m.IsChangesTrieRoot = true
 		err = decoder.Decode(&m.AsChangesTrieRoot)
-	case 1:
+	case 6:
 		m.IsPreRuntime = true
 		err = decoder.Decode(&m.AsPreRuntime)
-	case 2:
+	case 4:
 		m.IsConsensus = true
 		err = decoder.Decode(&m.AsConsensus)
-	case 3:
+	case 5:
 		m.IsSeal = true
 		err = decoder.Decode(&m.AsSeal)
-	case 4:
+	case 7:
 		m.IsChangesTrieSignal = true
 		err = decoder.Decode(&m.AsChangesTrieSignal)
-	case 5:
+	case 0:
 		m.IsOther = true
 		err = decoder.Decode(&m.AsOther)
 	}
