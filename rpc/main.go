@@ -46,10 +46,11 @@ func NewRPC(cl client.Client) (*RPC, error) {
 	types.SetSerDeOptions(opts)
 
 	return &RPC{
-		Author: author.NewAuthor(cl),
-		Chain:  chain.NewChain(cl),
-		State:  st,
-		System: system.NewSystem(cl),
-		client: cl,
+		Author:   author.NewAuthor(cl),
+		Chain:    chain.NewChain(cl),
+		Offchain: offchain.NewOffchain(cl),
+		State:    st,
+		System:   system.NewSystem(cl),
+		client:   cl,
 	}, nil
 }
