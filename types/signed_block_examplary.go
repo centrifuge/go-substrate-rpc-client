@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// +build test
+
 package types
 
 var ExamplarySignedBlock = SignedBlock{Block: Block{Header: ExamplaryHeader, Extrinsics: nil}, Justification: Justification{0xc1, 0x13}} //nolint:lll

@@ -20,20 +20,18 @@ import "github.com/snowfork/go-substrate-rpc-client/v2/scale"
 
 // DigestItem specifies the item in the logs of a digest
 type DigestItem struct {
-	IsOther             bool
-	AsOther             Bytes // 0
-	IsAuthoritiesChange bool
-	AsAuthoritiesChange []AuthorityID // 1
-	IsChangesTrieRoot   bool
-	AsChangesTrieRoot   Hash // 2
-	IsSealV0            bool
-	AsSealV0            SealV0 // 3
-	IsConsensus         bool
-	AsConsensus         Consensus // 4
-	IsSeal              bool
-	AsSeal              Seal // 5
-	IsPreRuntime        bool
-	AsPreRuntime        PreRuntime // 6
+	IsChangesTrieRoot   bool // 0
+	AsChangesTrieRoot   Hash
+	IsPreRuntime        bool // 1
+	AsPreRuntime        PreRuntime
+	IsConsensus         bool // 2
+	AsConsensus         Consensus
+	IsSeal              bool // 3
+	AsSeal              Seal
+	IsChangesTrieSignal bool // 4
+	AsChangesTrieSignal ChangesTrieSignal
+	IsOther             bool // 5
+	AsOther             Bytes
 }
 
 func (m *DigestItem) Decode(decoder scale.Decoder) error {
@@ -45,26 +43,23 @@ func (m *DigestItem) Decode(decoder scale.Decoder) error {
 
 	switch b {
 	case 0:
-		m.IsOther = true
-		err = decoder.Decode(&m.AsOther)
-	case 1:
-		m.IsAuthoritiesChange = true
-		err = decoder.Decode(&m.AsAuthoritiesChange)
-	case 2:
 		m.IsChangesTrieRoot = true
 		err = decoder.Decode(&m.AsChangesTrieRoot)
-	case 3:
-		m.IsSealV0 = true
-		err = decoder.Decode(&m.AsSealV0)
-	case 4:
-		m.IsConsensus = true
-		err = decoder.Decode(&m.AsConsensus)
-	case 5:
-		m.IsSeal = true
-		err = decoder.Decode(&m.AsSeal)
-	case 6:
+	case 1:
 		m.IsPreRuntime = true
 		err = decoder.Decode(&m.AsPreRuntime)
+	case 2:
+		m.IsConsensus = true
+		err = decoder.Decode(&m.AsConsensus)
+	case 3:
+		m.IsSeal = true
+		err = decoder.Decode(&m.AsSeal)
+	case 4:
+		m.IsChangesTrieSignal = true
+		err = decoder.Decode(&m.AsChangesTrieSignal)
+	case 5:
+		m.IsOther = true
+		err = decoder.Decode(&m.AsOther)
 	}
 
 	if err != nil {
@@ -80,15 +75,9 @@ func (m DigestItem) Encode(encoder scale.Encoder) error {
 	case m.IsOther:
 		err1 = encoder.PushByte(0)
 		err2 = encoder.Encode(m.AsOther)
-	case m.IsAuthoritiesChange:
-		err1 = encoder.PushByte(1)
-		err2 = encoder.Encode(m.AsAuthoritiesChange)
 	case m.IsChangesTrieRoot:
 		err1 = encoder.PushByte(2)
 		err2 = encoder.Encode(m.AsChangesTrieRoot)
-	case m.IsSealV0:
-		err1 = encoder.PushByte(3)
-		err2 = encoder.Encode(m.AsSealV0)
 	case m.IsConsensus:
 		err1 = encoder.PushByte(4)
 		err2 = encoder.Encode(m.AsConsensus)
@@ -140,4 +129,14 @@ type Consensus struct {
 type PreRuntime struct {
 	ConsensusEngineID ConsensusEngineID
 	Bytes             Bytes
+}
+
+type ChangesTrieSignal struct {
+	IsNewConfiguration bool
+	AsNewConfiguration Bytes
+}
+
+type ChangesTrieConfiguration struct {
+	DigestInterval U32
+	DigestLevels   U32
 }
