@@ -16,7 +16,11 @@
 
 package types
 
-import "github.com/centrifuge/go-substrate-rpc-client/v2/scale"
+import (
+	"fmt"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v2/scale"
+)
 
 // ExtrinsicEra indicates either a mortal or immortal extrinsic
 type ExtrinsicEra struct {
@@ -26,49 +30,66 @@ type ExtrinsicEra struct {
 	AsMortalEra MortalEra
 }
 
+// MortalEra for an extrinsic, indicating period and phase
+type MortalEra struct {
+	First  U64
+	Second U64
+}
+
 func (e *ExtrinsicEra) Decode(decoder scale.Decoder) error {
-	first, err := decoder.ReadOneByte()
+	tag, err := decoder.ReadOneByte()
 	if err != nil {
 		return err
 	}
 
-	if first == 0 {
+	switch tag {
+	case 0:
 		e.IsImmortalEra = true
-		return nil
+	case 1:
+		e.IsMortalEra = true
+
+		err = decoder.Decode(&e.AsMortalEra.First)
+		if err != nil {
+			return err
+		}
+
+		err = decoder.Decode(&e.AsMortalEra.Second)
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("No such variant for ExtrinsicEra")
 	}
-
-	e.IsMortalEra = true
-
-	second, err := decoder.ReadOneByte()
-	if err != nil {
-		return err
-	}
-
-	e.AsMortalEra = MortalEra{first, second}
 
 	return nil
 }
 
 func (e ExtrinsicEra) Encode(encoder scale.Encoder) error {
-	if e.IsImmortalEra {
-		return encoder.PushByte(0)
-	}
+	var err error
+	switch {
+	case e.IsImmortalEra:
+		err = encoder.PushByte(0)
+		if err != nil {
+			return err
+		}
+	case e.IsMortalEra:
+		err = encoder.PushByte(1)
+		if err != nil {
+			return err
+		}
 
-	err := encoder.PushByte(e.AsMortalEra.First)
-	if err != nil {
-		return err
-	}
+		err = encoder.Encode(e.AsMortalEra.First)
+		if err != nil {
+			return err
+		}
 
-	err = encoder.PushByte(e.AsMortalEra.Second)
-	if err != nil {
-		return err
+		err = encoder.Encode(e.AsMortalEra.Second)
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("No such variant for ExtrinsicEra")
 	}
 
 	return nil
-}
-
-// MortalEra for an extrinsic, indicating period and phase
-type MortalEra struct {
-	First  byte
-	Second byte
 }
