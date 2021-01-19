@@ -17,17 +17,15 @@
 package signature
 
 import (
-	"encoding/hex"
-	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
-	"os/exec"
-	"strings"
+	"strconv"
 
+	"github.com/vedhavyas/go-subkey"
+	"github.com/vedhavyas/go-subkey/sr25519"
 	"golang.org/x/crypto/blake2b"
 )
-
-const subkeyCmd = "subkey"
 
 type KeyringPair struct {
 	// URI is the derivation path for the private key in subkey
@@ -38,52 +36,25 @@ type KeyringPair struct {
 	PublicKey []byte
 }
 
-// InspectKeyInfo type is used as target from `subkey` inspect JSON output
-type InspectKeyInfo struct {
-	AccountID    string `json:"accountId"`
-	PublicKey    string `json:"publicKey"`
-	SecretPhrase string `json:"secretPhrase"`
-	SecretSeed   string `json:"secretSeed"`
-	SS58Address  string `json:"ss58Address"`
-}
-
 // KeyringPairFromSecret creates KeyPair based on seed/phrase and network
 // Leave network empty for default behavior
-func KeyringPairFromSecret(seedOrPhrase, network string) (KeyringPair, error) {
-	var args []string
-	if network != "" {
-		args = []string{"--network", network}
-	}
-	args = append([]string{"inspect", "--output-type", "Json", seedOrPhrase}, args...)
-
-	// use "subkey" command for creation of public key and address
-	cmd := exec.Command(subkeyCmd, args...)
-
-	// execute the command, get the output
-	out, err := cmd.Output()
+func KeyringPairFromSecret(seedOrPhrase string, network uint8) (KeyringPair, error) {
+	scheme := sr25519.Scheme{}
+	kyr, err := subkey.DeriveKeyPair(scheme, seedOrPhrase)
 	if err != nil {
-		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret: %v", err.Error())
+		return KeyringPair{}, err
 	}
 
-	if string(out) == "Invalid phrase/URI given" {
-		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret: invalid phrase/URI given")
-	}
-
-	var keyInfo InspectKeyInfo
-	err = json.Unmarshal(out, &keyInfo)
+	ss58Address, err := kyr.SS58Address(network)
 	if err != nil {
-		return KeyringPair{}, fmt.Errorf("failed to deserialize key info JSON output: %v", err.Error())
+		return KeyringPair{}, err
 	}
 
-	pk, err := hex.DecodeString(strings.Replace(keyInfo.PublicKey, "0x", "", 1))
-	if err != nil {
-		return KeyringPair{}, fmt.Errorf("failed to generate keyring pair from secret, could not hex decode pubkey: "+
-			"%v with error: %v", keyInfo.PublicKey, err.Error())
-	}
+	var pk = kyr.Public()
 
 	return KeyringPair{
 		URI:       seedOrPhrase,
-		Address:   keyInfo.SS58Address,
+		Address:   ss58Address,
 		PublicKey: pk,
 	}, nil
 }
@@ -103,31 +74,18 @@ func Sign(data []byte, privateKeyURI string) ([]byte, error) {
 		data = h[:]
 	}
 
-	// use "subkey" command for signature
-	cmd := exec.Command(subkeyCmd, "sign", "--suri", privateKeyURI, "--hex")
-
-	// data to stdin
-	dataHex := hex.EncodeToString(data)
-	cmd.Stdin = strings.NewReader(dataHex)
-
-	// log.Printf("echo -n \"%v\" | %v sign %v --hex", dataHex, subkeyCmd, privateKeyURI)
-
-	// execute the command, get the output
-	out, err := cmd.Output()
+	scheme := sr25519.Scheme{}
+	kyr, err := subkey.DeriveKeyPair(scheme, privateKeyURI)
 	if err != nil {
-		return nil, fmt.Errorf("failed to sign with subkey: %v", err.Error())
+		return nil, err
 	}
 
-	// remove line feed
-	if len(out) > 0 && out[len(out)-1] == 10 {
-		out = out[:len(out)-1]
+	signature, err := kyr.Sign(data)
+	if err != nil {
+		return nil, err
 	}
 
-	outStr := string(out)
-
-	dec, err := hex.DecodeString(outStr)
-
-	return dec, err
+	return signature, nil
 }
 
 // Verify verifies data using the provided signature and the key under the derivation path. Requires the subkey
@@ -139,32 +97,19 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 		data = h[:]
 	}
 
-	// hexify the sig
-	sigHex := hex.EncodeToString(sig)
-
-	// use "subkey" command for signature
-	cmd := exec.Command(subkeyCmd, "verify", "--hex", sigHex, privateKeyURI)
-
-	// data to stdin
-	dataHex := hex.EncodeToString(data)
-	cmd.Stdin = strings.NewReader(dataHex)
-
-	//log.Printf("echo -n \"%v\" | %v verify --hex %v %v", dataHex, subkeyCmd, sigHex, privateKeyURI)
-
-	// execute the command, get the output
-	out, err := cmd.Output()
+	scheme := sr25519.Scheme{}
+	kyr, err := subkey.DeriveKeyPair(scheme, privateKeyURI)
 	if err != nil {
-		return false, fmt.Errorf("failed to verify with subkey: %v", err.Error())
+		return false, err
 	}
 
-	// remove line feed
-	if len(out) > 0 && out[len(out)-1] == 10 {
-		out = out[:len(out)-1]
+	if len(sig) != 64 {
+		return false, errors.New("wrong signature length")
 	}
 
-	outStr := string(out)
-	valid := outStr == "Signature verifies correctly."
-	return valid, nil
+	v := kyr.Verify(data, sig)
+
+	return v, nil
 }
 
 // LoadKeyringPairFromEnv looks up whether the env variable TEST_PRIV_KEY is set and is not empty and tries to use its
@@ -173,12 +118,18 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 // Loads Network from TEST_NETWORK variable
 // Leave TEST_NETWORK empty or unset for default
 func LoadKeyringPairFromEnv() (kp KeyringPair, ok bool) {
-	network := os.Getenv("TEST_NETWORK")
+	networkString := os.Getenv("TEST_NETWORK")
+	network, err := strconv.ParseInt(networkString, 10, 8)
+	if err != nil {
+		// defaults to generic substrate address
+		// https://github.com/paritytech/substrate/wiki/External-Address-Format-(SS58)#checksum-types
+		network = 42
+	}
 	priv, ok := os.LookupEnv("TEST_PRIV_KEY")
 	if !ok || priv == "" {
 		return kp, false
 	}
-	kp, err := KeyringPairFromSecret(priv, network)
+	kp, err = KeyringPairFromSecret(priv, uint8(network))
 	if err != nil {
 		panic(fmt.Errorf("cannot load keyring pair from env or use fallback: %v", err))
 	}

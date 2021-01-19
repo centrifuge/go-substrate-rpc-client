@@ -1,16 +1,10 @@
 # Note: We don't use Alpine and its packaged Rust/Cargo because they're too often out of date,
 # preventing them from being used to build Substrate/Polkadot.
 
-# First Phase - Load Subkey
-FROM parity/subkey:2.0.0 as subkey
-RUN subkey --version
-
-## Second Phase - Build context for tests
+## First Phase - Build context for tests
 FROM parity/substrate:v2.0.0
 
 USER root
-
-COPY --from=subkey /usr/local/bin/subkey  /usr/local/bin/subkey
 
 # gcc for cgo
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -64,9 +58,6 @@ WORKDIR $GOPATH
 RUN mkdir -p $GOPATH/src/github.com/centrifuge/go-substrate-rpc-client
 WORKDIR $GOPATH/src/github.com/centrifuge/go-substrate-rpc-client
 COPY . .
-
-# Ensuring Subkey is available
-RUN subkey --version
 
 RUN make install
 

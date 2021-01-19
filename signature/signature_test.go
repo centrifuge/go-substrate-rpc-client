@@ -30,36 +30,64 @@ var testSecretSeed = "0x167d9a020688544ea246b056799d6a771e97c9da057e4d0b87024537
 var testPubKey = "0xdc64bef918ddda3126a39a11113767741ddfdf91399f055e1d963f2ae1ec2535"
 var testAddressSS58 = "5H3gKVQU7DfNFfNGkgTrD7p715jjg7QXtat8X3UxiSyw7APW"
 var testKusamaAddressSS58 = "HZHyokLjagJ1KBiXPGu75B79g1yUnDiLxisuhkvCFCRrWBk"
+var testPolkadotAddressSS58 = "15yyTpfXxzvqhCNniKWrMGeFrhjPNQxfy5ccgLUKGY1THbTW"
 
-func TestKeyRingPairFromSecretPhrase(t *testing.T) {
-	p, err := KeyringPairFromSecret(testSecretPhrase, "")
+func TestKeyRingPairFromSecretPhrase_SubstrateAddress(t *testing.T) {
+	p, err := KeyringPairFromSecret(testSecretPhrase, 42)
 	assert.NoError(t, err)
 
 	assert.Equal(t, KeyringPair{
-		URI: testSecretPhrase,
-		Address: testAddressSS58,
+		URI:       testSecretPhrase,
+		Address:   testAddressSS58,
 		PublicKey: types.MustHexDecodeString(testPubKey),
 	}, p)
 }
 
-func TestKeyringPairFromSecretSeed(t *testing.T) {
-	p, err := KeyringPairFromSecret(testSecretSeed, "")
+func TestKeyRingPairFromSecretPhrase_PolkadotAddress(t *testing.T) {
+	p, err := KeyringPairFromSecret(testSecretPhrase, 0)
 	assert.NoError(t, err)
 
 	assert.Equal(t, KeyringPair{
-		URI: testSecretSeed,
-		Address: testAddressSS58,
+		URI:       testSecretPhrase,
+		Address:   testPolkadotAddressSS58,
+		PublicKey: types.MustHexDecodeString(testPubKey),
+	}, p)
+}
+
+func TestKeyRingPairFromSecretPhrase_KusamaAddress(t *testing.T) {
+	p, err := KeyringPairFromSecret(testSecretPhrase, 2)
+	assert.NoError(t, err)
+
+	assert.Equal(t, KeyringPair{
+		URI:       testSecretPhrase,
+		Address:   testKusamaAddressSS58,
+		PublicKey: types.MustHexDecodeString(testPubKey),
+	}, p)
+}
+
+func TestKeyRingPairFromSecretPhrase_InvalidSecretPhrase(t *testing.T) {
+	_, err := KeyringPairFromSecret("foo", 42)
+	assert.Error(t, err)
+}
+
+func TestKeyringPairFromSecretSeed(t *testing.T) {
+	p, err := KeyringPairFromSecret(testSecretSeed, 42)
+	assert.NoError(t, err)
+
+	assert.Equal(t, KeyringPair{
+		URI:       testSecretSeed,
+		Address:   testAddressSS58,
 		PublicKey: types.MustHexDecodeString(testPubKey),
 	}, p)
 }
 
 func TestKeyringPairFromSecretSeedAndNetwork(t *testing.T) {
-	p, err := KeyringPairFromSecret(testSecretSeed, "kusama")
+	p, err := KeyringPairFromSecret(testSecretSeed, 42)
 	assert.NoError(t, err)
 
 	assert.Equal(t, KeyringPair{
-		URI: testSecretSeed,
-		Address: testKusamaAddressSS58,
+		URI:       testSecretSeed,
+		Address:   testAddressSS58,
 		PublicKey: types.MustHexDecodeString(testPubKey),
 	}, p)
 }
@@ -70,10 +98,34 @@ func TestSignAndVerify(t *testing.T) {
 	sig, err := Sign(data, TestKeyringPairAlice.URI)
 	assert.NoError(t, err)
 
-	ok, err := Verify(data, sig, types.HexEncodeToString(TestKeyringPairAlice.PublicKey))
+	ok, err := Verify(data, sig, TestKeyringPairAlice.URI)
 	assert.NoError(t, err)
 
 	assert.True(t, ok)
+}
+
+func TestSign_InvalidSecretPhrase(t *testing.T) {
+	data := []byte("hello!")
+
+	_, err := Sign(data, "foo")
+	assert.Error(t, err)
+}
+
+func TestSignAndVerify_InvalidSecretPhraseOnVerify(t *testing.T) {
+	data := []byte("hello!")
+
+	sig, err := Sign(data, TestKeyringPairAlice.URI)
+	assert.NoError(t, err)
+
+	_, err = Verify(data, sig, "foo")
+	assert.Error(t, err)
+}
+
+func TestVerify_InvalidSignatureLength(t *testing.T) {
+	data := []byte("hello!")
+
+	_, err := Verify(data, []byte{'f', 'o', 'o'}, TestKeyringPairAlice.URI)
+	assert.Error(t, err)
 }
 
 func TestSignAndVerifyLong(t *testing.T) {
@@ -84,7 +136,7 @@ func TestSignAndVerifyLong(t *testing.T) {
 	sig, err := Sign(data, TestKeyringPairAlice.URI)
 	assert.NoError(t, err)
 
-	ok, err := Verify(data, sig, types.HexEncodeToString(TestKeyringPairAlice.PublicKey))
+	ok, err := Verify(data, sig, TestKeyringPairAlice.URI)
 	assert.NoError(t, err)
 
 	assert.True(t, ok)
