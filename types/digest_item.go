@@ -16,7 +16,11 @@
 
 package types
 
-import "github.com/centrifuge/go-substrate-rpc-client/v2/scale"
+import (
+	"fmt"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v2/scale"
+)
 
 // DigestItem specifies the item in the logs of a digest
 type DigestItem struct {
@@ -107,11 +111,6 @@ func NewAuthorityID(b [32]byte) AuthorityID {
 	return AuthorityID(b)
 }
 
-type SealV0 struct {
-	Signer    U64
-	Signature Signature
-}
-
 type Seal struct {
 	ConsensusEngineID ConsensusEngineID
 	Bytes             Bytes
@@ -134,6 +133,44 @@ type PreRuntime struct {
 type ChangesTrieSignal struct {
 	IsNewConfiguration bool
 	AsNewConfiguration Bytes
+}
+
+func (c ChangesTrieSignal) Encode(encoder scale.Encoder) error {
+	switch {
+	case c.IsNewConfiguration:
+		err := encoder.PushByte(0)
+		if err != nil {
+			return err
+		}
+		err = encoder.Encode(c.AsNewConfiguration)
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("No such variant for ChangesTrieSignal")
+	}
+
+	return nil
+}
+
+func (c *ChangesTrieSignal) Decode(decoder scale.Decoder) error {
+	tag, err := decoder.ReadOneByte()
+	if err != nil {
+		return err
+	}
+
+	switch tag {
+	case 0:
+		c.IsNewConfiguration = true
+		err = decoder.Decode(&c.AsNewConfiguration)
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("No such variant for ChangesTrieSignal")
+	}
+
+	return nil
 }
 
 type ChangesTrieConfiguration struct {
