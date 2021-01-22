@@ -25,6 +25,10 @@ func (c *Offchain) LocalStorageGet(kind StorageKind, key []byte) (*types.Storage
 		return nil, err
 	}
 
+	if len(res) == 0 {
+		return nil, nil
+	}
+
 	b, err := types.HexDecodeString(res)
 	if err != nil {
 		return nil, err
