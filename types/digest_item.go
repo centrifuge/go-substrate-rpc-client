@@ -16,24 +16,26 @@
 
 package types
 
-import "github.com/snowfork/go-substrate-rpc-client/v2/scale"
+import (
+	"fmt"
+
+	"github.com/snowfork/go-substrate-rpc-client/v2/scale"
+)
 
 // DigestItem specifies the item in the logs of a digest
 type DigestItem struct {
-	IsOther             bool
-	AsOther             Bytes // 0
-	IsAuthoritiesChange bool
-	AsAuthoritiesChange []AuthorityID // 1
-	IsChangesTrieRoot   bool
-	AsChangesTrieRoot   Hash // 2
-	IsSealV0            bool
-	AsSealV0            SealV0 // 3
-	IsConsensus         bool
-	AsConsensus         Consensus // 4
-	IsSeal              bool
-	AsSeal              Seal // 5
-	IsPreRuntime        bool
-	AsPreRuntime        PreRuntime // 6
+	IsChangesTrieRoot   bool // 2
+	AsChangesTrieRoot   Hash
+	IsPreRuntime        bool // 6
+	AsPreRuntime        PreRuntime
+	IsConsensus         bool // 4
+	AsConsensus         Consensus
+	IsSeal              bool // 5
+	AsSeal              Seal
+	IsChangesTrieSignal bool // 7
+	AsChangesTrieSignal ChangesTrieSignal
+	IsOther             bool // 0
+	AsOther             Bytes
 }
 
 func (m *DigestItem) Decode(decoder scale.Decoder) error {
@@ -44,27 +46,24 @@ func (m *DigestItem) Decode(decoder scale.Decoder) error {
 	}
 
 	switch b {
-	case 0:
-		m.IsOther = true
-		err = decoder.Decode(&m.AsOther)
-	case 1:
-		m.IsAuthoritiesChange = true
-		err = decoder.Decode(&m.AsAuthoritiesChange)
 	case 2:
 		m.IsChangesTrieRoot = true
 		err = decoder.Decode(&m.AsChangesTrieRoot)
-	case 3:
-		m.IsSealV0 = true
-		err = decoder.Decode(&m.AsSealV0)
+	case 6:
+		m.IsPreRuntime = true
+		err = decoder.Decode(&m.AsPreRuntime)
 	case 4:
 		m.IsConsensus = true
 		err = decoder.Decode(&m.AsConsensus)
 	case 5:
 		m.IsSeal = true
 		err = decoder.Decode(&m.AsSeal)
-	case 6:
-		m.IsPreRuntime = true
-		err = decoder.Decode(&m.AsPreRuntime)
+	case 7:
+		m.IsChangesTrieSignal = true
+		err = decoder.Decode(&m.AsChangesTrieSignal)
+	case 0:
+		m.IsOther = true
+		err = decoder.Decode(&m.AsOther)
 	}
 
 	if err != nil {
@@ -80,15 +79,9 @@ func (m DigestItem) Encode(encoder scale.Encoder) error {
 	case m.IsOther:
 		err1 = encoder.PushByte(0)
 		err2 = encoder.Encode(m.AsOther)
-	case m.IsAuthoritiesChange:
-		err1 = encoder.PushByte(1)
-		err2 = encoder.Encode(m.AsAuthoritiesChange)
 	case m.IsChangesTrieRoot:
 		err1 = encoder.PushByte(2)
 		err2 = encoder.Encode(m.AsChangesTrieRoot)
-	case m.IsSealV0:
-		err1 = encoder.PushByte(3)
-		err2 = encoder.Encode(m.AsSealV0)
 	case m.IsConsensus:
 		err1 = encoder.PushByte(4)
 		err2 = encoder.Encode(m.AsConsensus)
@@ -118,11 +111,6 @@ func NewAuthorityID(b [32]byte) AuthorityID {
 	return AuthorityID(b)
 }
 
-type SealV0 struct {
-	Signer    U64
-	Signature Signature
-}
-
 type Seal struct {
 	ConsensusEngineID ConsensusEngineID
 	Bytes             Bytes
@@ -140,4 +128,52 @@ type Consensus struct {
 type PreRuntime struct {
 	ConsensusEngineID ConsensusEngineID
 	Bytes             Bytes
+}
+
+type ChangesTrieSignal struct {
+	IsNewConfiguration bool
+	AsNewConfiguration Bytes
+}
+
+func (c ChangesTrieSignal) Encode(encoder scale.Encoder) error {
+	switch {
+	case c.IsNewConfiguration:
+		err := encoder.PushByte(0)
+		if err != nil {
+			return err
+		}
+		err = encoder.Encode(c.AsNewConfiguration)
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("No such variant for ChangesTrieSignal")
+	}
+
+	return nil
+}
+
+func (c *ChangesTrieSignal) Decode(decoder scale.Decoder) error {
+	tag, err := decoder.ReadOneByte()
+	if err != nil {
+		return err
+	}
+
+	switch tag {
+	case 0:
+		c.IsNewConfiguration = true
+		err = decoder.Decode(&c.AsNewConfiguration)
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("No such variant for ChangesTrieSignal")
+	}
+
+	return nil
+}
+
+type ChangesTrieConfiguration struct {
+	DigestInterval U32
+	DigestLevels   U32
 }
