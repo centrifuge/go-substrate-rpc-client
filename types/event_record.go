@@ -58,6 +58,7 @@ func (e *EventRecordsRaw) Decode(decoder scale.Decoder) error {
 // EventRecords is a default set of possible event records that can be used as a target for
 // `func (e EventRecordsRaw) Decode(...`
 type EventRecords struct {
+	Claims_Claimed                     []EventClaimsClaimed                     //nolint:stylecheck,golint
 	Balances_Endowed                   []EventBalancesEndowed                   //nolint:stylecheck,golint
 	Balances_DustLost                  []EventBalancesDustLost                  //nolint:stylecheck,golint
 	Balances_Transfer                  []EventBalancesTransfer                  //nolint:stylecheck,golint
