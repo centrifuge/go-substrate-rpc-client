@@ -1,19 +1,3 @@
-// Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
-//
-// Copyright 2019 Centrifuge GmbH
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package author_test
 
 import (
@@ -22,12 +6,13 @@ import (
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v2"
 	"github.com/centrifuge/go-substrate-rpc-client/v2/config"
+	"github.com/centrifuge/go-substrate-rpc-client/v2/rpc/author"
 	"github.com/centrifuge/go-substrate-rpc-client/v2/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/v2/types"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAuthor_SubmitExtrinsic(t *testing.T) {
+func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 	// Instantiate the API
 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
 	assert.NoError(t, err)
@@ -43,6 +28,7 @@ func TestAuthor_SubmitExtrinsic(t *testing.T) {
 	c, err := types.NewCall(meta, "Balances.transfer", bob, amount)
 	assert.NoError(t, err)
 
+	var sub *author.ExtrinsicStatusSubscription
 	for {
 		// Create the extrinsic
 		ext := types.NewExtrinsic(c)
@@ -71,21 +57,28 @@ func TestAuthor_SubmitExtrinsic(t *testing.T) {
 			TransactionVersion: rv.TransactionVersion,
 		}
 
-		fmt.Printf("Sending %v from %#x to %#x with nonce %v\n", amount, signature.TestKeyringPairAlice.PublicKey,
-			bob.AsID, nonce)
+		fmt.Printf("Sending %v from %#x to %#x with nonce %v\n", amount, signature.TestKeyringPairAlice.PublicKey, bob.AsID, nonce)
 
 		// Sign the transaction using Alice's default account
 		err = ext.Sign(signature.TestKeyringPairAlice, o)
 		assert.NoError(t, err)
 
-		res, err := api.RPC.Author.SubmitExtrinsic(ext)
+		// Do the transfer and track the actual status
+		sub, err = api.RPC.Author.SubmitAndWatchExtrinsic(ext)
 		if err != nil {
 			continue
 		}
 
-		hex, err := types.Hex(res)
-		assert.NoError(t, err)
-		assert.NotEmpty(t, hex)
 		break
 	}
+	defer sub.Unsubscribe()
+	for {
+		status := <-sub.Chan()
+
+		// wait until finalisation
+		if status.IsFinalized {
+			break
+		}
+	}
+
 }

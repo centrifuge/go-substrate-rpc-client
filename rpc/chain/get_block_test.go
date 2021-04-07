@@ -25,11 +25,16 @@ import (
 func TestChain_GetBlockLatest(t *testing.T) {
 	rv, err := chain.GetBlockLatest()
 	assert.NoError(t, err)
-	assert.Equal(t, &mockSrv.signedBlock, rv)
+	assert.True(t, rv.Block.Header.Number > 0)
 }
 
 func TestChain_GetBlock(t *testing.T) {
-	rv, err := chain.GetBlock(mockSrv.blockHashLatest)
+	rv, err := chain.GetBlockLatest()
 	assert.NoError(t, err)
-	assert.Equal(t, &mockSrv.signedBlock, rv)
+
+	// fetch previous block and verify the number
+	latest := rv.Block.Header.Number
+	rv, err = chain.GetBlock(rv.Block.Header.ParentHash)
+	assert.NoError(t, err)
+	assert.Equal(t, latest-1, rv.Block.Header.Number)
 }

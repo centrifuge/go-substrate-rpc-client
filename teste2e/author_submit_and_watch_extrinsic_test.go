@@ -23,6 +23,7 @@ import (
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v2"
 	"github.com/centrifuge/go-substrate-rpc-client/v2/config"
+	"github.com/centrifuge/go-substrate-rpc-client/v2/rpc/author"
 	"github.com/centrifuge/go-substrate-rpc-client/v2/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/v2/types"
 	"github.com/stretchr/testify/assert"
@@ -39,79 +40,63 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 	}
 
 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	meta, err := api.RPC.State.GetMetadataLatest()
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
-	bob, err := types.NewAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
-	if err != nil {
-		panic(err)
-	}
+	bob, err := types.NewMultiAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
+	assert.NoError(t, err)
 
 	c, err := types.NewCall(meta, "Balances.transfer", bob, types.NewUCompactFromUInt(6969))
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	ext := types.NewExtrinsic(c)
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	era := types.ExtrinsicEra{IsMortalEra: false}
-
 	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	rv, err := api.RPC.State.GetRuntimeVersionLatest()
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	key, err := types.CreateStorageKey(meta, "System", "Account", from.PublicKey, nil)
-	if err != nil {
-		panic(err)
+	assert.NoError(t, err)
+
+	var sub *author.ExtrinsicStatusSubscription
+	for {
+
+		var accountInfo types.AccountInfo
+		ok, err = api.RPC.State.GetStorageLatest(key, &accountInfo)
+		assert.NoError(t, err)
+		assert.True(t, ok)
+
+		nonce := uint32(accountInfo.Nonce)
+		o := types.SignatureOptions{
+			// BlockHash:   blockHash,
+			BlockHash:          genesisHash, // BlockHash needs to == GenesisHash if era is immortal. // TODO: add an error?
+			Era:                era,
+			GenesisHash:        genesisHash,
+			Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+			SpecVersion:        rv.SpecVersion,
+			Tip:                types.NewUCompactFromUInt(0),
+			TransactionVersion: rv.TransactionVersion,
+		}
+
+		err = ext.Sign(from, o)
+		assert.NoError(t, err)
+
+		sub, err = api.RPC.Author.SubmitAndWatchExtrinsic(ext)
+		if err != nil {
+			continue
+		}
+
+		break
 	}
 
-	var accountInfo types.AccountInfo
-	ok, err = api.RPC.State.GetStorageLatest(key, &accountInfo)
-	if err != nil || !ok {
-		panic(err)
-	}
-
-	nonce := uint32(accountInfo.Nonce)
-
-	o := types.SignatureOptions{
-		// BlockHash:   blockHash,
-		BlockHash:   genesisHash, // BlockHash needs to == GenesisHash if era is immortal. // TODO: add an error?
-		Era:         era,
-		GenesisHash: genesisHash,
-		Nonce:       types.NewUCompactFromUInt(uint64(nonce)),
-		SpecVersion: rv.SpecVersion,
-		Tip:         types.NewUCompactFromUInt(0),
-		TransactionVersion: rv.TransactionVersion,
-	}
-
-	err = ext.Sign(from, o)
-	if err != nil {
-		panic(err)
-	}
-
-	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(ext)
-	if err != nil {
-		panic(err)
-	}
 	defer sub.Unsubscribe()
-
 	timeout := time.After(10 * time.Second)
-
 	for {
 		select {
 		case status := <-sub.Chan():

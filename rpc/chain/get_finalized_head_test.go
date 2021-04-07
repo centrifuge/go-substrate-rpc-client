@@ -19,14 +19,18 @@ package chain
 import (
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v2/types"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestChain_GetFinalizedHead(t *testing.T) {
 	res, err := chain.GetFinalizedHead()
 	assert.NoError(t, err)
-	hex, err := types.Hex(res)
+
+	header, err := chain.GetHeaderLatest()
 	assert.NoError(t, err)
-	assert.Equal(t, mockSrv.blockHashLatest.Hex(), hex)
+
+	fheader, err := chain.GetHeader(res)
+	assert.NoError(t, err)
+
+	assert.True(t, header.Number > fheader.Number)
 }

@@ -26,15 +26,17 @@ import (
 func TestChain_GetBlockHash(t *testing.T) {
 	res, err := chain.GetBlockHash(1)
 	assert.NoError(t, err)
-	hex, err := types.Hex(res)
+
+	blk, err := chain.GetBlock(res)
 	assert.NoError(t, err)
-	assert.Equal(t, mockSrv.blockHash.Hex(), hex)
+	assert.Equal(t, types.BlockNumber(1), blk.Block.Header.Number)
 }
 
 func TestChain_GetBlockHashLatest(t *testing.T) {
 	res, err := chain.GetBlockHashLatest()
 	assert.NoError(t, err)
-	hex, err := types.Hex(res)
+
+	blk, err := chain.GetBlock(res)
 	assert.NoError(t, err)
-	assert.Equal(t, mockSrv.blockHashLatest.Hex(), hex)
+	assert.True(t, blk.Block.Header.Number > 0)
 }

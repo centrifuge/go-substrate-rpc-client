@@ -28,10 +28,7 @@ func (a *Author) PendingExtrinsics() ([]types.Extrinsic, error) {
 		return nil, err
 	}
 
-	// fmt.Println(res)
-
 	xts := make([]types.Extrinsic, len(res))
-
 	for i, re := range res {
 		err = types.DecodeFromHexString(re, &xts[i])
 		if err != nil {

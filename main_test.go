@@ -198,7 +198,7 @@ func Example_makeASimpleTransfer() {
 	}
 
 	// Create a call, transferring 12345 units to Bob
-	bob, err := types.NewAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
+	bob, err := types.NewMultiAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
 	if err != nil {
 		panic(err)
 	}

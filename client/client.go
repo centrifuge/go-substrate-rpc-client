@@ -26,6 +26,7 @@ import (
 )
 
 type Client interface {
+	// TODO(ved): override this function to scale encode the args
 	Call(result interface{}, method string, args ...interface{}) error
 
 	Subscribe(ctx context.Context, namespace, subscribeMethodSuffix, unsubscribeMethodSuffix,

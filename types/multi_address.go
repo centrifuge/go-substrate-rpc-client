@@ -85,13 +85,13 @@ func (m MultiAddress) Encode(encoder scale.Encoder) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("Invalid variant for MultiAddress")
+		return fmt.Errorf("invalid variant for MultiAddress")
 	}
 
 	return nil
 }
 
-func (m MultiAddress) Decode(decoder scale.Decoder) error {
+func (m *MultiAddress) Decode(decoder scale.Decoder) error {
 	tag, err := decoder.ReadOneByte()
 	if err != nil {
 		return err
@@ -114,12 +114,8 @@ func (m MultiAddress) Decode(decoder scale.Decoder) error {
 		m.IsAddress20 = true
 		err = decoder.Decode(&m.AsAddress20)
 	default:
-		return fmt.Errorf("Invalid variant for MultiAddress")
+		err = fmt.Errorf("invalid variant for MultiAddress: %v", tag)
 	}
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }

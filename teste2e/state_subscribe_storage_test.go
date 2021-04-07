@@ -33,24 +33,16 @@ func TestState_SubscribeStorage_EventsRaw(t *testing.T) {
 	}
 
 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	meta, err := api.RPC.State.GetMetadataLatest()
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	key, err := types.CreateStorageKey(meta, "System", "Events", nil, nil)
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	sub, err := api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key})
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 	defer sub.Unsubscribe()
 
 	timeout := time.After(10 * time.Second)
@@ -78,24 +70,16 @@ func TestState_SubscribeStorage_Events(t *testing.T) {
 	}
 
 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	meta, err := api.RPC.State.GetMetadataLatest()
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	key, err := types.CreateStorageKey(meta, "System", "Events", nil, nil)
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	sub, err := api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key})
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 	defer sub.Unsubscribe()
 
 	timeout := time.After(10 * time.Second)
@@ -116,9 +100,7 @@ func TestState_SubscribeStorage_Events(t *testing.T) {
 
 				events := types.EventRecords{}
 				err = types.EventRecordsRaw(chng.StorageData).DecodeEventRecords(meta, &events)
-				if err != nil {
-					panic(err)
-				}
+				assert.NoError(t, err)
 
 				fmt.Printf("%#v\n", events)
 			}

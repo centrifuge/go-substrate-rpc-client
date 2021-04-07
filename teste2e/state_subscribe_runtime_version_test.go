@@ -32,14 +32,10 @@ func TestState_SubscribeRuntimeVersion(t *testing.T) {
 	}
 
 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	sub, err := api.RPC.State.SubscribeRuntimeVersion()
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 	defer sub.Unsubscribe()
 
 	timeout := time.After(10 * time.Second)

@@ -40,7 +40,7 @@ func Default() Config {
 }
 
 // ExtractDefaultRPCURL reads the env variable RPC_URL and returns it. If that variable is unset or empty,
-// it will fallback to "http://127.0.0.1:9933"
+// it will fallback to "ws://127.0.0.1:9944"
 func extractDefaultRPCURL() string {
 	if url, ok := os.LookupEnv("RPC_URL"); ok {
 		return url
