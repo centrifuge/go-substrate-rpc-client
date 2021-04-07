@@ -50,7 +50,7 @@ func Example_simpleConnect() {
 
 	fmt.Printf("You are connected to chain %v using %v v%v\n", chain, nodeName, nodeVersion)
 
-	// Output: You are connected to chain Development using Substrate Node v2.0.0-a200cdb9-x86_64-linux-gnu
+	// Output: You are connected to chain Development using Substrate Node v2.0.0-49a4103f4b-x86_64-linux-gnu
 }
 
 func Example_listenToNewBlocks() {
@@ -101,24 +101,19 @@ func Example_listenToBalanceChange() {
 		panic(err)
 	}
 
-	// Known account we want to use (available on dev chain, with funds)
-	alice, err := types.HexDecodeString("0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")
+	alice := signature.TestKeyringPairAlice.PublicKey
+	key, err := types.CreateStorageKey(meta, "System", "Account", alice, nil)
 	if err != nil {
 		panic(err)
 	}
 
-	key, err := types.CreateStorageKey(meta, "Balances", "FreeBalance", alice, nil)
-	if err != nil {
-		panic(err)
-	}
-
-	// Retrieve the initial balance
-	var previous types.U128
-	ok, err := api.RPC.State.GetStorageLatest(key, &previous)
+	var accountInfo types.AccountInfo
+	ok, err := api.RPC.State.GetStorageLatest(key, &accountInfo)
 	if err != nil || !ok {
 		panic(err)
 	}
 
+	previous := accountInfo.Data.Free
 	fmt.Printf("%#x has a balance of %v\n", alice, previous)
 	fmt.Printf("You may leave this example running and transfer any value to %#x\n", alice)
 
@@ -133,19 +128,24 @@ func Example_listenToBalanceChange() {
 	for {
 		// inner loop for the changes within one of those notifications
 		for _, chng := range (<-sub.Chan()).Changes {
-			var current types.U128
-			if err = types.DecodeFromBytes(chng.StorageData, &current); err != nil {
+			if !chng.HasStorageData {
+				continue
+			}
+
+			var acc types.AccountInfo
+			if err = types.DecodeFromBytes(chng.StorageData, &acc); err != nil {
 				panic(err)
 			}
 
 			// Calculate the delta
+			current := acc.Data.Free
 			var change = types.U128{Int: big.NewInt(0).Sub(current.Int, previous.Int)}
 
 			// Only display positive value changes (Since we are pulling `previous` above already,
 			// the initial balance change will also be zero)
 			if change.Cmp(big.NewInt(0)) != 0 {
+				fmt.Printf("New balance change of: %v %v %v\n", change, previous, current)
 				previous = current
-				fmt.Printf("New balance change of: %v\n", change)
 				return
 			}
 		}
@@ -203,7 +203,13 @@ func Example_makeASimpleTransfer() {
 		panic(err)
 	}
 
-	c, err := types.NewCall(meta, "Balances.transfer", bob, types.NewUCompactFromUInt(12345))
+	// 1 unit of transfer
+	bal, ok := new(big.Int).SetString("100000000000000", 10)
+	if !ok {
+		panic(fmt.Errorf("failed to convert balance"))
+	}
+
+	c, err := types.NewCall(meta, "Balances.transfer", bob, types.NewUCompact(bal))
 	if err != nil {
 		panic(err)
 	}
@@ -227,20 +233,19 @@ func Example_makeASimpleTransfer() {
 	}
 
 	var accountInfo types.AccountInfo
-	ok, err := api.RPC.State.GetStorageLatest(key, &accountInfo)
+	ok, err = api.RPC.State.GetStorageLatest(key, &accountInfo)
 	if err != nil || !ok {
 		panic(err)
 	}
 
 	nonce := uint32(accountInfo.Nonce)
-
 	o := types.SignatureOptions{
-		BlockHash:   genesisHash,
-		Era:         types.ExtrinsicEra{IsMortalEra: false},
-		GenesisHash: genesisHash,
-		Nonce:       types.NewUCompactFromUInt(uint64(nonce)),
-		SpecVersion: rv.SpecVersion,
-		Tip:         types.NewUCompactFromUInt(0),
+		BlockHash:          genesisHash,
+		Era:                types.ExtrinsicEra{IsMortalEra: false},
+		GenesisHash:        genesisHash,
+		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+		SpecVersion:        rv.SpecVersion,
+		Tip:                types.NewUCompactFromUInt(0),
 		TransactionVersion: rv.TransactionVersion,
 	}
 
@@ -251,12 +256,13 @@ func Example_makeASimpleTransfer() {
 	}
 
 	// Send the extrinsic
-	hash, err := api.RPC.Author.SubmitExtrinsic(ext)
+	_, err = api.RPC.Author.SubmitExtrinsic(ext)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("Transfer sent with hash %#x\n", hash)
+	fmt.Printf("Balance transferred from Alice to Bob: %v\n", bal.String())
+	// Output: Balance transferred from Alice to Bob: 100000000000000
 }
 
 func Example_displaySystemEvents() {
@@ -449,12 +455,12 @@ func Example_transactionWithEvents() {
 	nonce := uint32(accountInfo.Nonce)
 
 	o := types.SignatureOptions{
-		BlockHash:   genesisHash,
-		Era:         types.ExtrinsicEra{IsMortalEra: false},
-		GenesisHash: genesisHash,
-		Nonce:       types.NewUCompactFromUInt(uint64(nonce)),
-		SpecVersion: rv.SpecVersion,
-		Tip:         types.NewUCompactFromUInt(0),
+		BlockHash:          genesisHash,
+		Era:                types.ExtrinsicEra{IsMortalEra: false},
+		GenesisHash:        genesisHash,
+		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+		SpecVersion:        rv.SpecVersion,
+		Tip:                types.NewUCompactFromUInt(0),
 		TransactionVersion: rv.TransactionVersion,
 	}
 
