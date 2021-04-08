@@ -34,16 +34,15 @@ func TestChain_SubscribeBeefyJustifications(t *testing.T) {
 	}
 
 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	ch := make(chan interface{})
-
 	sub, err := api.Client.Subscribe(context.Background(), "beefy", "subscribeJustifications", "unsubscribeJustifications", "justifications", ch)
-	if err != nil {
-		panic(err)
+	if err != nil && err.Error() == "Method not found" {
+		t.Skip("skipping since beefy module is not available")
 	}
+
+	assert.NoError(t, err)
 	defer sub.Unsubscribe()
 
 	timeout := time.After(40 * time.Second)

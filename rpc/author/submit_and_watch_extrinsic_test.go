@@ -66,6 +66,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		// Do the transfer and track the actual status
 		sub, err = api.RPC.Author.SubmitAndWatchExtrinsic(ext)
 		if err != nil {
+			t.Logf("extrinsic submit failed: %v", err)
 			continue
 		}
 
@@ -76,9 +77,11 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		status := <-sub.Chan()
 
 		// wait until finalisation
-		if status.IsFinalized {
+		if status.IsInBlock || status.IsFinalized {
 			break
 		}
+
+		t.Log("waiting for the extrinsic to be included/finalized")
 	}
 
 }

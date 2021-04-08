@@ -36,7 +36,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 
 	from, ok := signature.LoadKeyringPairFromEnv()
 	if !ok {
-		t.Skip("skipping end-to-end that requires a private key because TEST_PRIV_KEY is not set or empty")
+		from = signature.TestKeyringPairAlice
 	}
 
 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)

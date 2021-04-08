@@ -80,6 +80,7 @@ func TestAuthor_SubmitExtrinsic(t *testing.T) {
 
 		res, err := api.RPC.Author.SubmitExtrinsic(ext)
 		if err != nil {
+			t.Logf("extrinsic submit failed: %v", err)
 			continue
 		}
 
