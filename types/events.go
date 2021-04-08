@@ -1367,7 +1367,7 @@ type EventContractsContractExecution struct {
 }
 
 // EventUtilityBatchInterrupted is emitted when a batch of dispatches did not complete fully.
-//Index of first failing dispatch given, as well as the error.
+// Index of first failing dispatch given, as well as the error.
 type EventUtilityBatchInterrupted struct {
 	Phase         Phase
 	Index         U32

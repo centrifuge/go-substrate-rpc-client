@@ -2,3 +2,4 @@
 .vscode
 vendor
 playground
+/coverage.txt

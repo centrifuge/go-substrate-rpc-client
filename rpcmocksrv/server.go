@@ -49,6 +49,7 @@ func New() *Server {
 	return &s
 }
 
+//nolint:gosec
 func randomPort() int {
 	rand.Seed(time.Now().UnixNano())
 	min := 10000

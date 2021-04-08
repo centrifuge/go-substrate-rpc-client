@@ -147,7 +147,7 @@ func (c ChangesTrieSignal) Encode(encoder scale.Encoder) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("No such variant for ChangesTrieSignal")
+		return fmt.Errorf("no such variant for ChangesTrieSignal")
 	}
 
 	return nil
@@ -167,7 +167,7 @@ func (c *ChangesTrieSignal) Decode(decoder scale.Decoder) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("No such variant for ChangesTrieSignal")
+		return fmt.Errorf("no such variant for ChangesTrieSignal")
 	}
 
 	return nil
