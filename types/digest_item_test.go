@@ -28,18 +28,20 @@ var testDigestItem2 = DigestItem{IsChangesTrieRoot: true, AsChangesTrieRoot: New
 func TestDigestItem_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, testDigestItem1)
 	assertRoundtrip(t, testDigestItem2)
-}
-
-func TestDigestItem_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
-		{testDigestItem1, []byte{0x00, 0x04, 0xab}},
-		{testDigestItem2, MustHexDecodeString("0x020102030000000000000000000000000000000000000000000000000000000000")},
+	assertRoundtrip(t, DigestItem{
+		IsPreRuntime: true,
+		AsPreRuntime: PreRuntime{},
 	})
-}
-
-func TestDigestItem_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
-		{[]byte{0x00, 0x04, 0xab}, testDigestItem1},
-		{MustHexDecodeString("0x020102030000000000000000000000000000000000000000000000000000000000"), testDigestItem2},
+	assertRoundtrip(t, DigestItem{
+		IsConsensus: true,
+		AsConsensus: Consensus{},
+	})
+	assertRoundtrip(t, DigestItem{
+		IsSeal: true,
+		AsSeal: Seal{},
+	})
+	assertRoundtrip(t, DigestItem{
+		IsChangesTrieSignal: true,
+		AsChangesTrieSignal: ChangesTrieSignal{IsNewConfiguration: true, AsNewConfiguration: NewBytes([]byte{1, 2, 3})},
 	})
 }

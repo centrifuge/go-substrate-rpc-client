@@ -17,5 +17,7 @@ func TestBeefySignature(t *testing.T) {
 	assert.True(t, sig.IsNone())
 	sig.SetSome(types.BeefySignature{})
 	assert.True(t, sig.IsSome())
+	ok, _ := sig.Unwrap()
+	assert.True(t, ok)
 	assertRoundtrip(t, sig)
 }

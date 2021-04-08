@@ -91,11 +91,15 @@ func (m DigestItem) Encode(encoder scale.Encoder) error {
 	case m.IsPreRuntime:
 		err1 = encoder.PushByte(6)
 		err2 = encoder.Encode(m.AsPreRuntime)
+	case m.IsChangesTrieSignal:
+		err1 = encoder.PushByte(7)
+		err2 = encoder.Encode(m.AsChangesTrieSignal)
 	}
 
 	if err1 != nil {
 		return err1
 	}
+
 	if err2 != nil {
 		return err2
 	}

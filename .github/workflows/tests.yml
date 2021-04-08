@@ -14,7 +14,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
         with:
-          fetch-depth: 1
+          fetch-depth: 0
       - name: Run tests
         run: make test-dockerized
       - name: Upload coverage
