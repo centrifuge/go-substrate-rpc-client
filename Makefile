@@ -46,7 +46,8 @@ test-e2e-deployed: 		## runs only end-to-end (e2e) tests against a deployed test
 	@docker run --rm -e RPC_URL -e TEST_PRIV_KEY gsrpc-test
 
 run-substrate-docker: 	## runs the Substrate 2.0 Default Docker image, this can be used to run the tests
-	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:v3.0.0 --dev --rpc-external --ws-external
+	docker run -p 9933:9933 -p 9944:9944 -p 30333:30333 parity/substrate:v3.0.0 --dev \
+			--rpc-external --ws-external --rpc-methods Unsafe --offchain-worker Always
 
 help: 				## shows this help
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)

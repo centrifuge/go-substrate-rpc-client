@@ -20,7 +20,12 @@ const (
 func (c *Offchain) LocalStorageGet(kind StorageKind, key []byte) (*types.StorageDataRaw, error) {
 	var res string
 
-	err := c.client.Call(&res, "offchain_localStorageGet", kind, fmt.Sprintf("%#x", key))
+	kb, err := types.EncodeToHexString(key)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode key: %w", err)
+	}
+
+	err = c.client.Call(&res, "offchain_localStorageGet", kind, kb)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +47,17 @@ func (c *Offchain) LocalStorageGet(kind StorageKind, key []byte) (*types.Storage
 func (c *Offchain) LocalStorageSet(kind StorageKind, key []byte, value []byte) error {
 	var res string
 
-	err := c.client.Call(&res, "offchain_localStorageSet", kind, fmt.Sprintf("%#x", key), value)
+	kb, err := types.EncodeToHexString(key)
+	if err != nil {
+		return fmt.Errorf("failed to encode key: %w", err)
+	}
+
+	vb, err := types.EncodeToHexString(value)
+	if err != nil {
+		return fmt.Errorf("failed to encode value: %w", err)
+	}
+
+	err = c.client.Call(&res, "offchain_localStorageSet", kind, kb, vb)
 	if err != nil {
 		return err
 	}

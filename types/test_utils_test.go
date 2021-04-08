@@ -73,7 +73,6 @@ func assertEncode(t *testing.T, encodingAsserts []encodingAssert) {
 			t.Errorf("Encoding error for input %v: %v\n", test.input, err)
 		}
 
-		fmt.Println(HexEncodeToString(result))
 		if !bytes.Equal(result, test.expected) {
 			t.Errorf("Fail, input %v, expected %#x, result %#x\n", test.input, test.expected, result)
 		}
