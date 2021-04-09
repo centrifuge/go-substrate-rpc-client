@@ -1,0 +1,38 @@
+# release workflow gets triggered when a tag is pushed
+# release job creates a changelog and creates a new draft release
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+name: Release
+jobs:
+  release:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Generate changelog
+        id: changelog-generator
+        uses: vedhavyas/generate-changelog@v4.0.2
+        with:
+          commit-template: '- {hash} → {title}'
+          template: |
+            ### Changelog
+
+            {commits}
+
+            {range}
+
+            ❤
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body: ${{ steps.changelog-generator.outputs.changelog }}
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
