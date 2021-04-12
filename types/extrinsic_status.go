@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v2/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/scale"
 )
 
 // ExtrinsicStatus is an enum containing the result of an extrinsic submission

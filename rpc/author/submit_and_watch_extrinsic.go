@@ -20,9 +20,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v2/config"
-	gethrpc "github.com/centrifuge/go-substrate-rpc-client/v2/gethrpc"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/config"
+	gethrpc "github.com/centrifuge/go-substrate-rpc-client/v3/gethrpc"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
 )
 
 // ExtrinsicStatusSubscription is a subscription established through one of the Client's subscribe methods.
