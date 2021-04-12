@@ -1,33 +1,19 @@
-version: "3.7"
+version: '3'
+
 services:
   substrate:
+    container_name: substrate
     image: parity/substrate:v3.0.0
     ports:
       - 9933:9933
       - 9944:9944
       - 30333:30333
-    expose:
-      - 9933
-      - 9944
-      - 30333
-    networks:
-      gsrpc-network:
-        ipv4_address: 172.42.0.2
     command: --dev --rpc-external --ws-external --rpc-methods Unsafe --offchain-worker Always
   gsrpc-test:
     image: gsrpc-test
     build: .
-    networks:
-      gsrpc-network:
-        ipv4_address: 172.42.0.99
     environment:
-      - RPC_URL=ws://172.42.0.2:9944
+      - RPC_URL=ws://substrate:9944
       - TEST_PRIV_KEY=//Alice
     volumes:
       - "$PWD:/go-substrate-rpc-client"
-networks:
-  gsrpc-network:
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.42.0.0/16
