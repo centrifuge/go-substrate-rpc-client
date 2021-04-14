@@ -19,31 +19,29 @@ package types_test
 import (
 	"testing"
 
-	. "github.com/centrifuge/go-substrate-rpc-client/v2/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v3/types"
 )
 
 var testDigestItem1 = DigestItem{IsOther: true, AsOther: NewBytes([]byte{0xab})}
-var testDigestItem2 = DigestItem{IsAuthoritiesChange: true, AsAuthoritiesChange: []AuthorityID{NewAuthorityID([32]byte{0xab}), NewAuthorityID([32]byte{0xcd})}} //nolint:lll
-var testDigestItem3 = DigestItem{IsChangesTrieRoot: true, AsChangesTrieRoot: NewHash([]byte{0x01, 0x02, 0x03})}
+var testDigestItem2 = DigestItem{IsChangesTrieRoot: true, AsChangesTrieRoot: NewHash([]byte{0x01, 0x02, 0x03})}
 
 func TestDigestItem_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, testDigestItem1)
 	assertRoundtrip(t, testDigestItem2)
-	assertRoundtrip(t, testDigestItem3)
-}
-
-func TestDigestItem_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
-		{testDigestItem1, []byte{0x00, 0x04, 0xab}},
-		{testDigestItem2, MustHexDecodeString("0x0108ab00000000000000000000000000000000000000000000000000000000000000cd00000000000000000000000000000000000000000000000000000000000000")}, //nolint:lll
-		{testDigestItem3, MustHexDecodeString("0x020102030000000000000000000000000000000000000000000000000000000000")},
+	assertRoundtrip(t, DigestItem{
+		IsPreRuntime: true,
+		AsPreRuntime: PreRuntime{},
 	})
-}
-
-func TestDigestItem_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
-		{[]byte{0x00, 0x04, 0xab}, testDigestItem1},
-		{MustHexDecodeString("0x0108ab00000000000000000000000000000000000000000000000000000000000000cd00000000000000000000000000000000000000000000000000000000000000"), testDigestItem2}, //nolint:lll
-		{MustHexDecodeString("0x020102030000000000000000000000000000000000000000000000000000000000"), testDigestItem3},
+	assertRoundtrip(t, DigestItem{
+		IsConsensus: true,
+		AsConsensus: Consensus{},
+	})
+	assertRoundtrip(t, DigestItem{
+		IsSeal: true,
+		AsSeal: Seal{},
+	})
+	assertRoundtrip(t, DigestItem{
+		IsChangesTrieSignal: true,
+		AsChangesTrieSignal: ChangesTrieSignal{IsNewConfiguration: true, AsNewConfiguration: NewBytes([]byte{1, 2, 3})},
 	})
 }

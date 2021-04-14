@@ -521,7 +521,7 @@ func (pd Decoder) DecodeUintCompact() (*big.Int, error) {
 		r := binary.LittleEndian.Uint32(buf)
 		// remove the last 2 mode bits
 		r >>= 2
-		return big.NewInt(0).SetUint64(uint64(r)) , nil
+		return big.NewInt(0).SetUint64(uint64(r)), nil
 	case 3:
 		// remove mode bits
 		l := b >> 2

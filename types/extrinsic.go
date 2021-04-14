@@ -24,8 +24,8 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v2/scale"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/signature"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/signature"
 )
 
 const (
@@ -148,7 +148,7 @@ func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error
 		TransactionVersion: o.TransactionVersion,
 	}
 
-	signerPubKey := NewAddressFromAccountID(signer.PublicKey)
+	signerPubKey := NewMultiAddressFromAccountID(signer.PublicKey)
 
 	sig, err := payload.Sign(signer)
 	if err != nil {

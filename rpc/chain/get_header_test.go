@@ -25,11 +25,14 @@ import (
 func TestChain_GetHeaderLatest(t *testing.T) {
 	header, err := chain.GetHeaderLatest()
 	assert.NoError(t, err)
-	assert.Equal(t, &mockSrv.header, header)
+	assert.NotEmpty(t, header.Number)
 }
 
 func TestChain_GetHeader(t *testing.T) {
-	header, err := chain.GetHeader(mockSrv.blockHashLatest)
+	res, err := chain.GetFinalizedHead()
 	assert.NoError(t, err)
-	assert.Equal(t, &mockSrv.header, header)
+
+	header, err := chain.GetHeader(res)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, header)
 }

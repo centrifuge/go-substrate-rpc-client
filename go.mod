@@ -1,6 +1,6 @@
-module github.com/centrifuge/go-substrate-rpc-client/v2
+module github.com/centrifuge/go-substrate-rpc-client/v3
 
-go 1.15
+go 1.16
 
 require (
 	github.com/aristanetworks/goarista v0.0.0-20190712234253-ed1100a1c015 // indirect

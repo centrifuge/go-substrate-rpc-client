@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v2/signature"
-	. "github.com/centrifuge/go-substrate-rpc-client/v2/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/signature"
+	. "github.com/centrifuge/go-substrate-rpc-client/v3/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -76,10 +76,10 @@ func TestExtrinsic_Sign(t *testing.T) {
 	o := SignatureOptions{
 		BlockHash: NewHash(MustHexDecodeString("0xec7afaf1cca720ce88c1d1b689d81f0583cc15a97d621cf046dd9abf605ef22f")),
 		// Era: ExtrinsicEra{IsImmortalEra: true},
-		GenesisHash: NewHash(MustHexDecodeString("0xdcd1346701ca8396496e52aa2785b1748deb6db09551b72159dcb3e08991025b")),
-		Nonce:       NewUCompactFromUInt(1),
-		SpecVersion: 123,
-		Tip:         NewUCompactFromUInt(2),
+		GenesisHash:        NewHash(MustHexDecodeString("0xdcd1346701ca8396496e52aa2785b1748deb6db09551b72159dcb3e08991025b")),
+		Nonce:              NewUCompactFromUInt(1),
+		SpecVersion:        123,
+		Tip:                NewUCompactFromUInt(2),
 		TransactionVersion: 1,
 	}
 
@@ -115,7 +115,7 @@ func TestExtrinsic_Sign(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, uint8(ExtrinsicVersion4), extDec.Type())
-	assert.Equal(t, signature.TestKeyringPairAlice.PublicKey, extDec.Signature.Signer.AsAccountID[:])
+	assert.Equal(t, signature.TestKeyringPairAlice.PublicKey, extDec.Signature.Signer.AsID[:])
 
 	mb, err := EncodeToBytes(extDec.Method)
 	assert.NoError(t, err)

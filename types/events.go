@@ -19,7 +19,7 @@ package types
 import (
 	"fmt"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v2/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/scale"
 )
 
 // EventClaimsClaimed is emitted when an account claims some DOTs
@@ -1367,7 +1367,7 @@ type EventContractsContractExecution struct {
 }
 
 // EventUtilityBatchInterrupted is emitted when a batch of dispatches did not complete fully.
-//Index of first failing dispatch given, as well as the error.
+// Index of first failing dispatch given, as well as the error.
 type EventUtilityBatchInterrupted struct {
 	Phase         Phase
 	Index         U32

@@ -22,8 +22,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v2/scale"
-	. "github.com/centrifuge/go-substrate-rpc-client/v2/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/scale"
+	. "github.com/centrifuge/go-substrate-rpc-client/v3/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -72,6 +72,7 @@ func assertEncode(t *testing.T, encodingAsserts []encodingAssert) {
 		if err != nil {
 			t.Errorf("Encoding error for input %v: %v\n", test.input, err)
 		}
+
 		if !bytes.Equal(result, test.expected) {
 			t.Errorf("Fail, input %v, expected %#x, result %#x\n", test.input, test.expected, result)
 		}

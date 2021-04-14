@@ -20,12 +20,13 @@ import (
 	"context"
 	"log"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v2/config"
-	gethrpc "github.com/centrifuge/go-substrate-rpc-client/v2/gethrpc"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/config"
+	gethrpc "github.com/centrifuge/go-substrate-rpc-client/v3/gethrpc"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
 )
 
 type Client interface {
+	// TODO(ved): override this function to scale encode the args
 	Call(result interface{}, method string, args ...interface{}) error
 
 	Subscribe(ctx context.Context, namespace, subscribeMethodSuffix, unsubscribeMethodSuffix,
@@ -39,37 +40,12 @@ type client struct {
 	gethrpc.Client
 
 	url string
-
-	// metadataVersioned is the metadata cache to prevent unnecessary requests
-	//metadataVersioned *MetadataVersioned
-
-	//metadataLock sync.RWMutex
 }
 
 // URL returns the URL the client connects to
 func (c client) URL() string {
 	return c.url
 }
-
-// TODO move to State struct
-//func (c *client) MetaData(cache bool) (m *MetadataVersioned, err error) {
-//	if cache && c.metadataVersioned != nil {
-//		c.metadataLock.RLock()
-//		defer c.metadataLock.RUnlock()
-//		m = c.metadataVersioned
-//	} else {
-//		s := NewStateRPC(c)
-//		m, err = s.MetaData(nil)
-//		if err != nil {
-//			return nil, err
-//		}
-//		// set cache
-//		c.metadataLock.Lock()
-//		defer c.metadataLock.Unlock()
-//		c.metadataVersioned = m
-//	}
-//	return
-//}
 
 // Connect connects to the provided url
 func Connect(url string) (Client, error) {

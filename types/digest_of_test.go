@@ -19,23 +19,28 @@ package types_test
 import (
 	"testing"
 
-	. "github.com/centrifuge/go-substrate-rpc-client/v2/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v3/types"
 )
 
 func TestDigestOf_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, DigestOf{testDigestItem1, testDigestItem2, testDigestItem3})
+	assertRoundtrip(t, DigestOf{testDigestItem1, testDigestItem2})
 }
 
 func TestDigestOf_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{DigestOf{testDigestItem1, testDigestItem2, testDigestItem3},
-			MustHexDecodeString("0x0c0004ab0108ab00000000000000000000000000000000000000000000000000000000000000cd00000000000000000000000000000000000000000000000000000000000000020102030000000000000000000000000000000000000000000000000000000000")}, //nolint:lll
+		{
+			input: DigestOf{testDigestItem1, testDigestItem2},
+			expected: MustHexDecodeString(
+				"0x080004ab020102030000000000000000000000000000000000000000000000000000000000"),
+		}, //nolint:lll
 	})
 }
 
 func TestDigestOf_Decode(t *testing.T) {
 	assertDecode(t, []decodingAssert{
-		{MustHexDecodeString("0x0c0004ab0108ab00000000000000000000000000000000000000000000000000000000000000cd00000000000000000000000000000000000000000000000000000000000000020102030000000000000000000000000000000000000000000000000000000000"), //nolint:lll
-			DigestOf{testDigestItem1, testDigestItem2, testDigestItem3}},
+		{
+			input: MustHexDecodeString(
+				"0x080004ab020102030000000000000000000000000000000000000000000000000000000000"), //nolint:lll
+			expected: DigestOf{testDigestItem1, testDigestItem2}},
 	})
 }

@@ -1,0 +1,21 @@
+on:
+  push:
+    branches: [master]
+  pull_request:
+name: Tests
+jobs:
+  tests:
+    name: Run tests
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Run tests
+        run: make test-dockerized
+      - name: Upload coverage
+        run: bash <(curl -s https://codecov.io/bash)

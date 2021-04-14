@@ -17,20 +17,22 @@
 package rpc
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/v2/client"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/rpc/author"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/rpc/chain"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/rpc/state"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/rpc/system"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/client"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/rpc/author"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/rpc/chain"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/rpc/offchain"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/rpc/state"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/rpc/system"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
 )
 
 type RPC struct {
-	Author *author.Author
-	Chain  *chain.Chain
-	State  *state.State
-	System *system.System
-	client client.Client
+	Author   *author.Author
+	Chain    *chain.Chain
+	Offchain *offchain.Offchain
+	State    *state.State
+	System   *system.System
+	client   client.Client
 }
 
 func NewRPC(cl client.Client) (*RPC, error) {
@@ -44,10 +46,11 @@ func NewRPC(cl client.Client) (*RPC, error) {
 	types.SetSerDeOptions(opts)
 
 	return &RPC{
-		Author: author.NewAuthor(cl),
-		Chain:  chain.NewChain(cl),
-		State:  st,
-		System: system.NewSystem(cl),
-		client: cl,
+		Author:   author.NewAuthor(cl),
+		Chain:    chain.NewChain(cl),
+		Offchain: offchain.NewOffchain(cl),
+		State:    st,
+		System:   system.NewSystem(cl),
+		client:   cl,
 	}, nil
 }

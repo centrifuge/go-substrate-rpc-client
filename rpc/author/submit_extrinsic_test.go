@@ -14,20 +14,79 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package author
+package author_test
 
 import (
+	"fmt"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v2/types"
+	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v3"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/config"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/signature"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAuthor_SubmitExtrinsic(t *testing.T) {
-	ext := types.Extrinsic{Version: 0x84, Signature: types.ExtrinsicSignatureV4{Signer: types.Address{IsAccountID: true, AsAccountID: types.AccountID{0xd4, 0x35, 0x93, 0xc7, 0x15, 0xfd, 0xd3, 0x1c, 0x61, 0x14, 0x1a, 0xbd, 0x4, 0xa9, 0x9f, 0xd6, 0x82, 0x2c, 0x85, 0x58, 0x85, 0x4c, 0xcd, 0xe3, 0x9a, 0x56, 0x84, 0xe7, 0xa5, 0x6d, 0xa2, 0x7d}, IsAccountIndex: false, AsAccountIndex: 0x0}, Signature: types.MultiSignature{IsSr25519: true, AsSr25519: types.Signature{0xc0, 0x42, 0x19, 0x5f, 0x93, 0x25, 0xd, 0x3e, 0xda, 0xa2, 0xe4, 0xa4, 0x2d, 0xcf, 0x4e, 0x41, 0xc1, 0x6c, 0xa7, 0x1c, 0xfc, 0x3a, 0x2b, 0x23, 0x99, 0x8a, 0xd4, 0xec, 0x97, 0x4f, 0x8b, 0x1a, 0xcd, 0xcd, 0xad, 0x97, 0xd1, 0x4b, 0x6d, 0xf5, 0xcb, 0x89, 0x6, 0xff, 0x61, 0xc8, 0x92, 0x17, 0x96, 0x54, 0xa5, 0xec, 0xcc, 0xb, 0x66, 0x85, 0xf6, 0xc1, 0x7f, 0xed, 0x49, 0x21, 0x94, 0x0}}, Era: types.ExtrinsicEra{IsImmortalEra: true, IsMortalEra: false, AsMortalEra: types.MortalEra{First: 0x0, Second: 0x0}}, Nonce: types.NewUCompactFromUInt(0x1), Tip: types.NewUCompactFromUInt(0x0)}, Method: types.Call{CallIndex: types.CallIndex{SectionIndex: 0x6, MethodIndex: 0x0}, Args: types.Args{0xff, 0x8e, 0xaf, 0x4, 0x15, 0x16, 0x87, 0x73, 0x63, 0x26, 0xc9, 0xfe, 0xa1, 0x7e, 0x25, 0xfc, 0x52, 0x87, 0x61, 0x36, 0x93, 0xc9, 0x12, 0x90, 0x9c, 0xb2, 0x26, 0xaa, 0x47, 0x94, 0xf2, 0x6a, 0x48, 0xe5, 0x6c}}} //nolint:lll,dupl
-	res, err := author.SubmitExtrinsic(ext)
+	// Instantiate the API
+	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
 	assert.NoError(t, err)
-	hex, err := types.Hex(res)
+
+	meta, err := api.RPC.State.GetMetadataLatest()
 	assert.NoError(t, err)
-	assert.Equal(t, mockSrv.submitExtrinsicHash, hex)
+
+	// Create a call, transferring 12345 units to Bob
+	bob, err := types.NewMultiAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
+	assert.NoError(t, err)
+
+	amount := types.NewUCompactFromUInt(12345)
+	c, err := types.NewCall(meta, "Balances.transfer", bob, amount)
+	assert.NoError(t, err)
+
+	for {
+		// Create the extrinsic
+		ext := types.NewExtrinsic(c)
+		genesisHash, err := api.RPC.Chain.GetBlockHash(0)
+		assert.NoError(t, err)
+
+		rv, err := api.RPC.State.GetRuntimeVersionLatest()
+		assert.NoError(t, err)
+
+		// Get the nonce for Alice
+		key, err := types.CreateStorageKey(meta, "System", "Account", signature.TestKeyringPairAlice.PublicKey, nil)
+		assert.NoError(t, err)
+
+		var accountInfo types.AccountInfo
+		ok, err := api.RPC.State.GetStorageLatest(key, &accountInfo)
+		assert.NoError(t, err)
+		assert.True(t, ok)
+		nonce := uint32(accountInfo.Nonce)
+		o := types.SignatureOptions{
+			BlockHash:          genesisHash,
+			Era:                types.ExtrinsicEra{IsMortalEra: false},
+			GenesisHash:        genesisHash,
+			Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+			SpecVersion:        rv.SpecVersion,
+			Tip:                types.NewUCompactFromUInt(0),
+			TransactionVersion: rv.TransactionVersion,
+		}
+
+		fmt.Printf("Sending %v from %#x to %#x with nonce %v\n", amount, signature.TestKeyringPairAlice.PublicKey,
+			bob.AsID, nonce)
+
+		// Sign the transaction using Alice's default account
+		err = ext.Sign(signature.TestKeyringPairAlice, o)
+		assert.NoError(t, err)
+
+		res, err := api.RPC.Author.SubmitExtrinsic(ext)
+		if err != nil {
+			t.Logf("extrinsic submit failed: %v", err)
+			continue
+		}
+
+		hex, err := types.Hex(res)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, hex)
+		break
+	}
 }

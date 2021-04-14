@@ -17,8 +17,8 @@
 package state
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/v2/client"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/client"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
 )
 
 // GetChildStorageSize retreives the child storage size for the given key

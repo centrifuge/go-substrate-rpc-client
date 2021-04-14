@@ -21,8 +21,8 @@ import (
 	"testing"
 	"time"
 
-	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v2"
-	"github.com/centrifuge/go-substrate-rpc-client/v2/config"
+	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v3"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,14 +32,10 @@ func TestState_SubscribeRuntimeVersion(t *testing.T) {
 	}
 
 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 
 	sub, err := api.RPC.State.SubscribeRuntimeVersion()
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err)
 	defer sub.Unsubscribe()
 
 	timeout := time.After(10 * time.Second)

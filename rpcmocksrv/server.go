@@ -21,7 +21,7 @@ import (
 	"strconv"
 	"time"
 
-	gethrpc "github.com/centrifuge/go-substrate-rpc-client/v2/gethrpc"
+	gethrpc "github.com/centrifuge/go-substrate-rpc-client/v3/gethrpc"
 )
 
 type Server struct {
@@ -49,6 +49,7 @@ func New() *Server {
 	return &s
 }
 
+//nolint:gosec
 func randomPort() int {
 	rand.Seed(time.Now().UnixNano())
 	min := 10000
