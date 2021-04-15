@@ -26,7 +26,8 @@ import (
 )
 
 type Client interface {
-	// TODO(ved): override this function to scale encode the args
+	// Call makes the call to RPC method with the provided args
+	// args must be encoded in the format RPC understands
 	Call(result interface{}, method string, args ...interface{}) error
 
 	Subscribe(ctx context.Context, namespace, subscribeMethodSuffix, unsubscribeMethodSuffix,
