@@ -5,7 +5,8 @@ import (
 	"github.com/snowfork/go-substrate-rpc-client/v2/types"
 )
 
-// GenerateProof retrieves a MMR proof and leaf for the specified leave index
+// GenerateProof retrieves a MMR proof and leaf for the specified leave index, at the given blockHash (useful to query a
+// proof at an earlier block, likely with antoher MMR root)
 func (c *MMR) GenerateProof(leafIndex uint64, blockHash types.Hash) (types.GenerateMMRProofResponse, error) {
 	return c.generateProof(leafIndex, &blockHash)
 }

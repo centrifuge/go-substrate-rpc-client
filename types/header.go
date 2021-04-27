@@ -31,6 +31,8 @@ type Header struct {
 	Digest         Digest      `json:"digest"`
 }
 
+// BlockNumber is represented decoded as a U32, but will be encoded as a compact uint (which has an additinoal length
+// prefix). In most cases, you should use a U32 (or another custom type depending on your chain) instead.
 type BlockNumber U32
 
 // UnmarshalJSON fills BlockNumber with the JSON encoded byte array given by bz
