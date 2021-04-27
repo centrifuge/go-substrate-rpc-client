@@ -20,6 +20,7 @@ import (
 	"github.com/snowfork/go-substrate-rpc-client/v2/client"
 	"github.com/snowfork/go-substrate-rpc-client/v2/rpc/author"
 	"github.com/snowfork/go-substrate-rpc-client/v2/rpc/chain"
+	"github.com/snowfork/go-substrate-rpc-client/v2/rpc/mmr"
 	"github.com/snowfork/go-substrate-rpc-client/v2/rpc/offchain"
 	"github.com/snowfork/go-substrate-rpc-client/v2/rpc/state"
 	"github.com/snowfork/go-substrate-rpc-client/v2/rpc/system"
@@ -29,6 +30,7 @@ import (
 type RPC struct {
 	Author   *author.Author
 	Chain    *chain.Chain
+	MMR      *mmr.MMR
 	Offchain *offchain.Offchain
 	State    *state.State
 	System   *system.System
@@ -48,6 +50,7 @@ func NewRPC(cl client.Client) (*RPC, error) {
 	return &RPC{
 		Author:   author.NewAuthor(cl),
 		Chain:    chain.NewChain(cl),
+		MMR:      mmr.NewMMR(cl),
 		Offchain: offchain.NewOffchain(cl),
 		State:    st,
 		System:   system.NewSystem(cl),
