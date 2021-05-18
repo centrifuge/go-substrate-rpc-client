@@ -21,7 +21,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v3/scale"
+	"github.com/Phala-Network/go-substrate-rpc-client/v3/scale"
 )
 
 const (

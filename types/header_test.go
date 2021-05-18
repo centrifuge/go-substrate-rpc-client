@@ -19,7 +19,7 @@ package types_test
 import (
 	"testing"
 
-	. "github.com/centrifuge/go-substrate-rpc-client/v3/types"
+	. "github.com/Phala-Network/go-substrate-rpc-client/v3/types"
 )
 
 var exampleHeader = Header{

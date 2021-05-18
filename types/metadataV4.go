@@ -22,8 +22,8 @@ import (
 	"hash"
 	"strings"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v3/scale"
-	"github.com/centrifuge/go-substrate-rpc-client/v3/xxhash"
+	"github.com/Phala-Network/go-substrate-rpc-client/v3/scale"
+	"github.com/Phala-Network/go-substrate-rpc-client/v3/xxhash"
 	"golang.org/x/crypto/blake2b"
 )
 

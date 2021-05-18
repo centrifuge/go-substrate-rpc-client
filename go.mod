@@ -4,10 +4,7 @@ go 1.16
 
 require (
 	github.com/ChainSafe/go-schnorrkel v0.0.0-20210318173838-ccb5cd955283 // indirect
-	github.com/Phala-Network/chainbridge-substrate-events v0.0.0-20210518073658-2ed044767d63 // indirect
-	github.com/Phala-Network/chainbridge-utils v1.0.7-0.20210518073402-efba88df1c4b // indirect
 	github.com/btcsuite/btcutil v1.0.2
-	github.com/centrifuge/go-substrate-rpc-client/v3 v3.0.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/deckarep/golang-set v1.7.1
 	github.com/ethereum/go-ethereum v1.10.3
