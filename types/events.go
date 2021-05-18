@@ -234,16 +234,8 @@ type EventStakingOldSlashingReportDiscarded struct {
 
 // EventStakingStakingElection is emitted when a new set of stakers was elected with the given
 type EventStakingStakingElection struct {
-	Phase   Phase
-	Compute ElectionCompute
-	Topics  []Hash
-}
-
-// EventStakingSolutionStored is emitted when a new solution for the upcoming election has been stored
-type EventStakingSolutionStored struct {
-	Phase   Phase
-	Compute ElectionCompute
-	Topics  []Hash
+	Phase  Phase
+	Topics []Hash
 }
 
 // EventStakingBonded is emitted when an account has bonded this amount
@@ -269,6 +261,14 @@ type EventStakingWithdrawn struct {
 	Stash  AccountID
 	Amount U128
 	Topics []Hash
+}
+
+// EventStakingKicked is emitted when a nominator has been kicked from a validator
+type EventStakingKicked struct {
+	Phase     Phase
+	Nominator AccountID
+	Stash     AccountID
+	Topics    []Hash
 }
 
 // EventSystemExtrinsicSuccessV8 is emitted when an extrinsic completed successfully

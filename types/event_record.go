@@ -83,10 +83,10 @@ type EventRecords struct {
 	Staking_Slash                      []EventStakingSlash                      //nolint:stylecheck,golint
 	Staking_OldSlashingReportDiscarded []EventStakingOldSlashingReportDiscarded //nolint:stylecheck,golint
 	Staking_StakingElection            []EventStakingStakingElection            //nolint:stylecheck,golint
-	Staking_SolutionStored             []EventStakingSolutionStored             //nolint:stylecheck,golint
 	Staking_Bonded                     []EventStakingBonded                     //nolint:stylecheck,golint
 	Staking_Unbonded                   []EventStakingUnbonded                   //nolint:stylecheck,golint
 	Staking_Withdrawn                  []EventStakingWithdrawn                  //nolint:stylecheck,golint
+	Staking_Kicked                     []EventStakingKicked                     //nolint:stylecheck,golint
 	System_ExtrinsicSuccess            []EventSystemExtrinsicSuccess            //nolint:stylecheck,golint
 	System_ExtrinsicFailed             []EventSystemExtrinsicFailed             //nolint:stylecheck,golint
 	System_CodeUpdated                 []EventSystemCodeUpdated                 //nolint:stylecheck,golint
