@@ -114,7 +114,7 @@ type EventRecords struct {
 	Democracy_Unlocked                 []EventDemocracyUnlocked                 //nolint:stylecheck,golint
 	Democracy_Blacklisted              []EventDemocracyBlacklisted              //nolint:stylecheck,golint
 	Council_Proposed                   []EventCollectiveProposed                //nolint:stylecheck,golint
-	Council_Voted                      []EventCollectiveProposed                //nolint:stylecheck,golint
+	Council_Voted                      []EventCollectiveVoted                   //nolint:stylecheck,golint
 	Council_Approved                   []EventCollectiveApproved                //nolint:stylecheck,golint
 	Council_Disapproved                []EventCollectiveDisapproved             //nolint:stylecheck,golint
 	Council_Executed                   []EventCollectiveExecuted                //nolint:stylecheck,golint
