@@ -67,13 +67,9 @@ type EventRecords struct {
 	Balances_Reserved                               []EventBalancesReserved                       //nolint:stylecheck,golint
 	Balances_Unreserved                             []EventBalancesUnreserved                     //nolint:stylecheck,golint
 	Balances_ReservedRepatriated                    []EventBalancesReserveRepatriated             //nolint:stylecheck,golint
-	Grandpa_PauseFailed                             []EventGrandpaPauseFailed                     //nolint:stylecheck,golint
-	Grandpa_ResumeFailed                            []EventGrandpaResumeFailed                    //nolint:stylecheck,golint
-	Grandpa_ChangePending                           []EventGrandpaChangePending                   //nolint:stylecheck,golint
-	Grandpa_TooSoon                                 []EventGrandpaTooSoon                         //nolint:stylecheck,golint
-	Grandpa_InvalidKeyOwnershipProof                []EventGrandpaInvalidKeyOwnershipProof        //nolint:stylecheck,golint
-	Grandpa_InvalidEquivocationProof                []EventGrandpaInvalidEquivocationProof        //nolint:stylecheck,golint
-	Grandpa_DuplicateOffenceReport                  []EventGrandpaDuplicateOffenceReport          //nolint:stylecheck,golint
+	Grandpa_NewAuthorities                          []EventGrandpaNewAuthorities                  //nolint:stylecheck,golint
+	Grandpa_Paused                                  []EventGrandpaPaused                          //nolint:stylecheck,golint
+	Grandpa_Resumed                                 []EventGrandpaResumed                         //nolint:stylecheck,golint
 	ImOnline_HeartbeatReceived                      []EventImOnlineHeartbeatReceived              //nolint:stylecheck,golint
 	ImOnline_AllGood                                []EventImOnlineAllGood                        //nolint:stylecheck,golint
 	ImOnline_SomeOffline                            []EventImOnlineSomeOffline                    //nolint:stylecheck,golint

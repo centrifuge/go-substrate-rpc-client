@@ -101,46 +101,24 @@ type EventBalancesReserveRepatriated struct {
 	Topics            []Hash
 }
 
-// EventGrandpaPauseFailed is emitted when attempt to signal GRANDPA pause when the authority set isn't live
-// (either paused or already pending pause).
-type EventGrandpaPauseFailed struct {
+// EventGrandpaNewAuthorities is emitted when new authority set has been applied
+type EventGrandpaNewAuthorities struct {
+	Phase         Phase
+	AuthorityList []struct {
+		AuthorityId     AuthorityID
+		AuthorityWeight U64
+	}
+	Topics []Hash
+}
+
+// EventGrandpaPaused is emitted when current authority set has been paused
+type EventGrandpaPaused struct {
 	Phase  Phase
 	Topics []Hash
 }
 
-// EventGrandpaResumeFailed is emitted when attempt to signal GRANDPA resume when the authority set isn't paused
-// (either live or already pending resume).
-type EventGrandpaResumeFailed struct {
-	Phase  Phase
-	Topics []Hash
-}
-
-// EventGrandpaChangePending is emitted when attempt to signal GRANDPA change with one already pending.
-type EventGrandpaChangePending struct {
-	Phase  Phase
-	Topics []Hash
-}
-
-// EventGrandpaTooSoon is emitted when cannot signal forced change so soon after last.
-type EventGrandpaTooSoon struct {
-	Phase  Phase
-	Topics []Hash
-}
-
-// EventGrandpaInvalidKeyOwnershipProof is emitted when a key ownership proof provided as part of an equivocation report is invalid.
-type EventGrandpaInvalidKeyOwnershipProof struct {
-	Phase  Phase
-	Topics []Hash
-}
-
-// EventGrandpaInvalidEquivocationProof is emitted when an equivocation proof provided as part of an equivocation report is invalid.
-type EventGrandpaInvalidEquivocationProof struct {
-	Phase  Phase
-	Topics []Hash
-}
-
-// EventGrandpaDuplicateOffenceReport is emitted a given equivocation report is valid but already previously reported
-type EventGrandpaDuplicateOffenceReport struct {
+// EventGrandpaPaused is emitted when current authority set has been resumed
+type EventGrandpaResumed struct {
 	Phase  Phase
 	Topics []Hash
 }
