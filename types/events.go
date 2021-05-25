@@ -904,7 +904,7 @@ type EventElectionMultiPhaseSolutionStored struct {
 // EventElectionMultiPhaseElectionFinalized is emitted when - the election has finalized.
 type EventElectionMultiPhaseElectionFinalized struct {
 	Phase   Phase
-	Compute ElectionCompute
+	Compute OptionElectionCompute
 	Topics  []Hash
 }
 

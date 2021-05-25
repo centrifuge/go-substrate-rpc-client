@@ -32,3 +32,38 @@ func (ec *ElectionCompute) Decode(decoder scale.Decoder) error {
 func (ec ElectionCompute) Encode(encoder scale.Encoder) error {
 	return encoder.PushByte(byte(ec))
 }
+
+type OptionElectionCompute struct {
+	option
+	value ElectionCompute
+}
+
+func NewOptionElectionCompute(value ElectionCompute) OptionElectionCompute {
+	return OptionElectionCompute{option{true}, value}
+}
+
+func NewOptionElectionComputeEmpty() OptionElectionCompute {
+	return OptionElectionCompute{option: option{false}}
+}
+
+func (o OptionElectionCompute) Encode(encoder scale.Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
+}
+
+func (o *OptionElectionCompute) Decode(decoder scale.Decoder) error {
+	return decoder.DecodeOption(&o.hasValue, &o.value)
+}
+
+func (o *OptionElectionCompute) SetSome(value ElectionCompute) {
+	o.hasValue = true
+	o.value = value
+}
+
+func (o *OptionElectionCompute) SetNone() {
+	o.hasValue = false
+	o.value = 0
+}
+
+func (o OptionElectionCompute) Unwrap() (ok bool, value ElectionCompute) {
+	return o.hasValue, o.value
+}
