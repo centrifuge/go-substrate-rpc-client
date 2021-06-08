@@ -25,7 +25,7 @@ type MultiSignature struct {
 	IsSr25519 bool      // 1:: Sr25519(Sr25519Signature)
 	AsSr25519 Signature // Sr25519Signature
 	IsEcdsa   bool      // 2:: Ecdsa(EcdsaSignature)
-	AsEcdsa   Bytes     // EcdsaSignature
+	AsEcdsa   Signature // EcdsaSignature
 }
 
 func (m *MultiSignature) Decode(decoder scale.Decoder) error {

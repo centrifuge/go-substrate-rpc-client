@@ -23,6 +23,8 @@ import (
 	"strconv"
 
 	"github.com/vedhavyas/go-subkey"
+	"github.com/vedhavyas/go-subkey/ecdsa"
+	"github.com/vedhavyas/go-subkey/ed25519"
 	"github.com/vedhavyas/go-subkey/sr25519"
 	"golang.org/x/crypto/blake2b"
 )
@@ -34,6 +36,17 @@ type KeyringPair struct {
 	Address string
 	// PublicKey
 	PublicKey []byte
+}
+
+type KeyringPairEcdsa struct {
+	// URI is the derivation path for the private key in subkey
+	URI string
+	// Address is an SS58 address
+	Address string
+	// PublicKey
+	PublicKey []byte
+	//
+	AccountID string
 }
 
 // KeyringPairFromSecret creates KeyPair based on seed/phrase and network
@@ -67,12 +80,74 @@ var TestKeyringPairAlice = KeyringPair{
 
 // Sign signs data with the private key under the given derivation path, returning the signature. Requires the subkey
 // command to be in path
+func SignEd25519(data []byte, privateKeyURI string) ([]byte, error) {
+	// if data is longer than 256 bytes, hash it first
+	if len(data) > 256 {
+		h := blake2b.Sum256(data)
+		data = h[:]
+	}
+	scheme := ed25519.Scheme{}
+	kyr, err := subkey.DeriveKeyPair(scheme, privateKeyURI)
+	if err != nil {
+		return nil, err
+	}
+	// fmt.Println("BXL SignEd25519 kyr:  ", kyr)
+
+	// fmt.Println("BXL SignEd25519 data:  ", hex.EncodeToString(data))
+	signature, err := kyr.Sign(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return signature, nil
+}
+
+// TODO: Does not work
+// Sign signs data with the private key under the given derivation path, returning the signature. Requires the subkey
+// command to be in path
+func SignEcdsa(data []byte, privateKeyURI string) ([]byte, error) {
+
+	// if data is longer than 256 bytes, hash it first
+	if len(data) > 256 {
+		h := blake2b.Sum256(data)
+		data = h[:]
+	}
+
+	// fmt.Println(" BXL signature Sign sr25519.Scheme{}")
+
+	scheme := ecdsa.Scheme{}
+	kyr, err := subkey.DeriveKeyPair(scheme, privateKeyURI)
+	if err != nil {
+		return nil, err
+	}
+	// fmt.Println(" BXL signature SignEcdsa kyr: ", kyr)
+	// fmt.Println(" BXL signature SignEcdsa data: ", hex.EncodeToString(data))
+
+	signature, err := kyr.Sign(data)
+	if err != nil {
+		return nil, err
+	}
+
+	// digest := blake2b.Sum256(data)
+	// fmt.Println(" BXL SignEcdsa digest: ", hex.EncodeToString(digest[:]))
+
+	// sig, _ := secp256k1.Sign(digest[:], kyr.Seed())
+	// fmt.Println(" BXL SignEcdsa sig: ", hex.EncodeToString(sig))
+
+	// fmt.Println("BXL SignEcdsa signature:  ", hex.EncodeToString(signature))
+	return signature, nil
+}
+
+// Sign signs data with the private key under the given derivation path, returning the signature. Requires the subkey
+// command to be in path
 func Sign(data []byte, privateKeyURI string) ([]byte, error) {
 	// if data is longer than 256 bytes, hash it first
 	if len(data) > 256 {
 		h := blake2b.Sum256(data)
 		data = h[:]
 	}
+
+	// fmt.Println(" BXL signature Sign sr25519.Scheme{}")
 
 	scheme := sr25519.Scheme{}
 	kyr, err := subkey.DeriveKeyPair(scheme, privateKeyURI)
