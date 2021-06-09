@@ -61,7 +61,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 	rv, err := api.RPC.State.GetRuntimeVersionLatest()
 	assert.NoError(t, err)
 
-	key, err := types.CreateStorageKey(meta, "System", "Account", from.PublicKey, nil)
+	key, err := types.CreateStorageKey(meta, "System", "Account", from.PublicKey)
 	assert.NoError(t, err)
 
 	var sub *author.ExtrinsicStatusSubscription

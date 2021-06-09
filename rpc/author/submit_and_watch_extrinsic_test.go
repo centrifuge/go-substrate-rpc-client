@@ -39,7 +39,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		assert.NoError(t, err)
 
 		// Get the nonce for Alice
-		key, err := types.CreateStorageKey(meta, "System", "Account", signature.TestKeyringPairAlice.PublicKey, nil)
+		key, err := types.CreateStorageKey(meta, "System", "Account", signature.TestKeyringPairAlice.PublicKey)
 		assert.NoError(t, err)
 
 		var accountInfo types.AccountInfo

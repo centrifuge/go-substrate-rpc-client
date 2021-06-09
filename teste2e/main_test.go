@@ -74,7 +74,7 @@ func TestEnd2end(t *testing.T) {
 	meta, err := api.RPC.State.GetMetadataLatest()
 	assert.NoError(t, err)
 
-	key, err := types.CreateStorageKey(meta, "Session", "Validators", nil, nil)
+	key, err := types.CreateStorageKey(meta, "Session", "Validators", nil)
 	assert.NoError(t, err)
 
 	var validators []types.AccountID
