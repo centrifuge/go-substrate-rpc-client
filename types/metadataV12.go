@@ -83,6 +83,19 @@ func (m *MetadataV12) FindStorageEntryMetadata(module string, fn string) (Storag
 	return nil, fmt.Errorf("module %v not found in metadata", module)
 }
 
+func (m *MetadataV12) FindConstantValue(module Text, constant Text) ([]byte, error) {
+	for _, mod := range m.Modules {
+		if mod.Name == module {
+			for _, cons := range mod.Constants {
+				if cons.Name == constant {
+					return cons.Value, nil
+				}
+			}
+		}
+	}
+	return nil, fmt.Errorf("could not find constant %s.%s", module, constant)
+}
+
 func (m *MetadataV12) ExistsModuleMetadata(module string) bool {
 	for _, mod := range m.Modules {
 		if string(mod.Name) == module {

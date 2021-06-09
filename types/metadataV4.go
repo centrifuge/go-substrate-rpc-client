@@ -87,6 +87,10 @@ func (m *MetadataV4) FindEventNamesForEventID(eventID EventID) (Text, Text, erro
 	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
 }
 
+func (m *MetadataV4) FindConstantValue(_module Text, _constant Text) ([]byte, error) {
+	return nil, fmt.Errorf("constants are only supported from metadata v6 and up")
+}
+
 func (m *MetadataV4) FindStorageEntryMetadata(module string, fn string) (StorageEntryMetadata, error) {
 	for _, mod := range m.Modules {
 		if !mod.HasStorage {
@@ -119,8 +123,10 @@ type StorageEntryMetadata interface {
 	IsPlain() bool
 	IsMap() bool
 	IsDoubleMap() bool
+	IsNMap() bool
 	Hasher() (hash.Hash, error)
 	Hasher2() (hash.Hash, error)
+	Hashers() ([]hash.Hash, error)
 }
 
 type ModuleMetadataV4 struct {
@@ -250,6 +256,14 @@ func (s StorageFunctionMetadataV4) IsMap() bool {
 
 func (s StorageFunctionMetadataV4) IsDoubleMap() bool {
 	return s.Type.IsDoubleMap
+}
+
+func (s StorageFunctionMetadataV4) IsNMap() bool {
+	return false
+}
+
+func (s StorageFunctionMetadataV4) Hashers() ([]hash.Hash, error) {
+	return nil, fmt.Errorf("Hashers is not supported for metadata v4, please upgrade to use metadata v13 or newer")
 }
 
 func (s StorageFunctionMetadataV4) Hasher() (hash.Hash, error) {
