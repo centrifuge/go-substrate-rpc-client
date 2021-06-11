@@ -52,14 +52,14 @@ func CreateStorageKey(meta *Metadata, prefix, method string, args ...[]byte) (St
 
 	if entryMeta.IsDoubleMap() {
 		if len(args) != 2 {
-			return nil, fmt.Errorf("%v is a double map, therefore requires precisely two arguments. " +
+			return nil, fmt.Errorf("%v is a double map, therefore requires precisely two arguments. "+
 				"received: %d", method, len(args))
 		}
 		return createKeyDoubleMap(meta, method, prefix, stringKey, args[0], args[1], entryMeta)
 	}
 
 	if len(args) != 1 {
-		return nil, fmt.Errorf("%v is a map, therefore requires precisely one argument. " +
+		return nil, fmt.Errorf("%v is a map, therefore requires precisely one argument. "+
 			"received: %d", method, len(args))
 	}
 	return createKey(meta, method, prefix, stringKey, args[0], entryMeta)
@@ -102,7 +102,7 @@ func createKeyNMap(meta *Metadata, method, prefix string, args [][]byte,
 	}
 
 	if len(hashers) != len(args) {
-		return nil, fmt.Errorf("number of arguments should exactly match number of hashers in metadata. " +
+		return nil, fmt.Errorf("number of arguments should exactly match number of hashers in metadata. "+
 			"Expected: %d, received: %d", len(hashers), len(args))
 	}
 
