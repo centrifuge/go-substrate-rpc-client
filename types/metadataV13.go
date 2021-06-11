@@ -295,7 +295,7 @@ func (s StorageFunctionMetadataV13) Hashers() ([]hash.Hash, error) {
 	}
 	if s.Type.IsDoubleMap {
 		hashers = make([]hash.Hash, 2)
-		firstDoubleMapHasher, err := s.Type.AsDoubleMap.Hasher.HashFunc();
+		firstDoubleMapHasher, err := s.Type.AsDoubleMap.Hasher.HashFunc()
 		if err != nil {
 			return nil, err
 		}
