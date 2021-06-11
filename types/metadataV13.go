@@ -295,11 +295,11 @@ func (s StorageFunctionMetadataV13) Hashers() ([]hash.Hash, error) {
 	}
 	if s.Type.IsDoubleMap {
 		hashers = make([]hash.Hash, 2)
-		if firstDoubleMapHasher, err := s.Type.AsDoubleMap.Hasher.HashFunc(); err != nil {
+		firstDoubleMapHasher, err := s.Type.AsDoubleMap.Hasher.HashFunc();
+		if err != nil {
 			return nil, err
-		} else {
-			hashers[0] = firstDoubleMapHasher
 		}
+		hashers[0] = firstDoubleMapHasher
 		secondDoubleMapHasher, err := s.Type.AsDoubleMap.Key2Hasher.HashFunc()
 		if err != nil {
 			return nil, err
