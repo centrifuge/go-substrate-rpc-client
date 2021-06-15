@@ -87,6 +87,18 @@ func (m *MetadataV10) FindEventNamesForEventID(eventID EventID) (Text, Text, err
 	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
 }
 
+func (m *MetadataV10) FindConstantValue(module Text, constant Text) ([]byte, error) {
+	for _, mod := range m.Modules {
+		if mod.Name == module {
+			value, err := mod.FindConstantValue(constant)
+			if err == nil {
+				return value, nil
+			}
+		}
+	}
+	return nil, fmt.Errorf("could not find constant %s.%s", module, constant)
+}
+
 func (m *MetadataV10) FindStorageEntryMetadata(module string, fn string) (StorageEntryMetadata, error) {
 	for _, mod := range m.Modules {
 		if !mod.HasStorage {
@@ -227,6 +239,15 @@ func (m ModuleMetadataV10) Encode(encoder scale.Encoder) error {
 	return encoder.Encode(m.Errors)
 }
 
+func (m *ModuleMetadataV10) FindConstantValue(constant Text) ([]byte, error) {
+	for _, cons := range m.Constants {
+		if cons.Name == constant {
+			return cons.Value, nil
+		}
+	}
+	return nil, fmt.Errorf("could not find constant %s", constant)
+}
+
 type StorageMetadataV10 struct {
 	Prefix Text
 	Items  []StorageFunctionMetadataV10
@@ -250,6 +271,14 @@ func (s StorageFunctionMetadataV10) IsMap() bool {
 
 func (s StorageFunctionMetadataV10) IsDoubleMap() bool {
 	return s.Type.IsDoubleMap
+}
+
+func (s StorageFunctionMetadataV10) IsNMap() bool {
+	return false
+}
+
+func (s StorageFunctionMetadataV10) Hashers() ([]hash.Hash, error) {
+	return nil, fmt.Errorf("Hashers is not supported for metadata v10, please upgrade to use metadata v13 or newer")
 }
 
 func (s StorageFunctionMetadataV10) Hasher() (hash.Hash, error) {

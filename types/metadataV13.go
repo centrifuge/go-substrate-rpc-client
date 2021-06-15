@@ -1,19 +1,3 @@
-// Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
-//
-// Copyright 2019 Centrifuge GmbH
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package types
 
 import (
@@ -25,41 +9,39 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v3/xxhash"
 )
 
-// Modelled after packages/types/src/Metadata/v7/Metadata.ts
-type MetadataV7 struct {
-	Modules []ModuleMetadataV7
+type MetadataV13 struct {
+	Modules   []ModuleMetadataV13
+	Extrinsic ExtrinsicV11
 }
 
-func (m *MetadataV7) Decode(decoder scale.Decoder) error {
+func (m *MetadataV13) Decode(decoder scale.Decoder) error {
 	err := decoder.Decode(&m.Modules)
 	if err != nil {
 		return err
 	}
-	return nil
+	return decoder.Decode(&m.Extrinsic)
 }
 
-func (m MetadataV7) Encode(encoder scale.Encoder) error {
+func (m MetadataV13) Encode(encoder scale.Encoder) error {
 	err := encoder.Encode(m.Modules)
 	if err != nil {
 		return err
 	}
-	return nil
+	return encoder.Encode(m.Extrinsic)
 }
 
-func (m *MetadataV7) FindCallIndex(call string) (CallIndex, error) {
+func (m *MetadataV13) FindCallIndex(call string) (CallIndex, error) {
 	s := strings.Split(call, ".")
-	mi := uint8(0)
 	for _, mod := range m.Modules {
 		if !mod.HasCalls {
 			continue
 		}
 		if string(mod.Name) != s[0] {
-			mi++
 			continue
 		}
 		for ci, f := range mod.Calls {
 			if string(f.Name) == s[1] {
-				return CallIndex{mi, uint8(ci)}, nil
+				return CallIndex{mod.Index, uint8(ci)}, nil
 			}
 		}
 		return CallIndex{}, fmt.Errorf("method %v not found within module %v for call %v", s[1], mod.Name, call)
@@ -67,14 +49,12 @@ func (m *MetadataV7) FindCallIndex(call string) (CallIndex, error) {
 	return CallIndex{}, fmt.Errorf("module %v not found in metadata for call %v", s[0], call)
 }
 
-func (m *MetadataV7) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
-	mi := uint8(0)
+func (m *MetadataV13) FindEventNamesForEventID(eventID EventID) (Text, Text, error) {
 	for _, mod := range m.Modules {
 		if !mod.HasEvents {
 			continue
 		}
-		if mi != eventID[0] {
-			mi++
+		if mod.Index != eventID[0] {
 			continue
 		}
 		if int(eventID[1]) >= len(mod.Events) {
@@ -85,20 +65,7 @@ func (m *MetadataV7) FindEventNamesForEventID(eventID EventID) (Text, Text, erro
 	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
 }
 
-func (m *MetadataV7) FindConstantValue(module Text, constant Text) ([]byte, error) {
-	for _, mod := range m.Modules {
-		if mod.Name == module {
-			for _, cons := range mod.Constants {
-				if cons.Name == constant {
-					return cons.Value, nil
-				}
-			}
-		}
-	}
-	return nil, fmt.Errorf("could not find constant %s.%s", module, constant)
-}
-
-func (m *MetadataV7) FindStorageEntryMetadata(module string, fn string) (StorageEntryMetadata, error) {
+func (m *MetadataV13) FindStorageEntryMetadata(module string, fn string) (StorageEntryMetadata, error) {
 	for _, mod := range m.Modules {
 		if !mod.HasStorage {
 			continue
@@ -117,7 +84,19 @@ func (m *MetadataV7) FindStorageEntryMetadata(module string, fn string) (Storage
 	return nil, fmt.Errorf("module %v not found in metadata", module)
 }
 
-func (m *MetadataV7) ExistsModuleMetadata(module string) bool {
+func (m *MetadataV13) FindConstantValue(module Text, constant Text) ([]byte, error) {
+	for _, mod := range m.Modules {
+		if mod.Name == module {
+			value, err := mod.FindConstantValue(constant)
+			if err == nil {
+				return value, nil
+			}
+		}
+	}
+	return nil, fmt.Errorf("could not find constant %s.%s", module, constant)
+}
+
+func (m *MetadataV13) ExistsModuleMetadata(module string) bool {
 	for _, mod := range m.Modules {
 		if string(mod.Name) == module {
 			return true
@@ -126,18 +105,20 @@ func (m *MetadataV7) ExistsModuleMetadata(module string) bool {
 	return false
 }
 
-type ModuleMetadataV7 struct {
+type ModuleMetadataV13 struct {
 	Name       Text
 	HasStorage bool
-	Storage    StorageMetadata
+	Storage    StorageMetadataV13
 	HasCalls   bool
 	Calls      []FunctionMetadataV4
 	HasEvents  bool
 	Events     []EventMetadataV4
 	Constants  []ModuleConstantMetadataV6
+	Errors     []ErrorMetadataV8
+	Index      uint8
 }
 
-func (m *ModuleMetadataV7) Decode(decoder scale.Decoder) error {
+func (m *ModuleMetadataV13) Decode(decoder scale.Decoder) error {
 	err := decoder.Decode(&m.Name)
 	if err != nil {
 		return err
@@ -179,10 +160,20 @@ func (m *ModuleMetadataV7) Decode(decoder scale.Decoder) error {
 		}
 	}
 
-	return decoder.Decode(&m.Constants)
+	err = decoder.Decode(&m.Constants)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Errors)
+	if err != nil {
+		return err
+	}
+
+	return decoder.Decode(&m.Index)
 }
 
-func (m ModuleMetadataV7) Encode(encoder scale.Encoder) error {
+func (m ModuleMetadataV13) Encode(encoder scale.Encoder) error {
 	err := encoder.Encode(m.Name)
 	if err != nil {
 		return err
@@ -224,69 +215,136 @@ func (m ModuleMetadataV7) Encode(encoder scale.Encoder) error {
 		}
 	}
 
-	return encoder.Encode(m.Constants)
+	err = encoder.Encode(m.Constants)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.Errors)
+	if err != nil {
+		return err
+	}
+
+	return encoder.Encode(m.Index)
 }
 
-type StorageMetadata struct {
+func (m *ModuleMetadataV13) FindConstantValue(constant Text) ([]byte, error) {
+	for _, cons := range m.Constants {
+		if cons.Name == constant {
+			return cons.Value, nil
+		}
+	}
+	return nil, fmt.Errorf("could not find constant %s", constant)
+}
+
+type StorageMetadataV13 struct {
 	Prefix Text
-	Items  []StorageFunctionMetadataV5
+	Items  []StorageFunctionMetadataV13
 }
 
-type StorageFunctionMetadataV5 struct {
+type StorageFunctionMetadataV13 struct {
 	Name          Text
 	Modifier      StorageFunctionModifierV0
-	Type          StorageFunctionTypeV5
+	Type          StorageFunctionTypeV13
 	Fallback      Bytes
 	Documentation []Text
 }
 
-func (s StorageFunctionMetadataV5) IsPlain() bool {
+func (s StorageFunctionMetadataV13) IsPlain() bool {
 	return s.Type.IsType
 }
 
-func (s StorageFunctionMetadataV5) IsMap() bool {
+func (s StorageFunctionMetadataV13) IsMap() bool {
 	return s.Type.IsMap
 }
 
-func (s StorageFunctionMetadataV5) IsDoubleMap() bool {
+func (s StorageFunctionMetadataV13) IsDoubleMap() bool {
 	return s.Type.IsDoubleMap
 }
 
-func (s StorageFunctionMetadataV5) IsNMap() bool {
-	return false
+func (s StorageFunctionMetadataV13) IsNMap() bool {
+	return s.Type.IsNMap
 }
 
-func (s StorageFunctionMetadataV5) Hashers() ([]hash.Hash, error) {
-	return nil, fmt.Errorf("Hashers is not supported for metadata v5, please upgrade to use metadata v13 or newer")
-}
-
-func (s StorageFunctionMetadataV5) Hasher() (hash.Hash, error) {
+func (s StorageFunctionMetadataV13) Hasher() (hash.Hash, error) {
 	if s.Type.IsMap {
 		return s.Type.AsMap.Hasher.HashFunc()
 	}
 	if s.Type.IsDoubleMap {
 		return s.Type.AsDoubleMap.Hasher.HashFunc()
 	}
+	if s.Type.IsNMap {
+		return nil, fmt.Errorf("only Map and DoubleMap have a Hasher")
+	}
 	return xxhash.New128(nil), nil
 }
 
-func (s StorageFunctionMetadataV5) Hasher2() (hash.Hash, error) {
+func (s StorageFunctionMetadataV13) Hasher2() (hash.Hash, error) {
 	if !s.Type.IsDoubleMap {
 		return nil, fmt.Errorf("only DoubleMaps have a Hasher2")
 	}
 	return s.Type.AsDoubleMap.Key2Hasher.HashFunc()
 }
 
-type StorageFunctionTypeV5 struct {
+func (s StorageFunctionMetadataV13) Hashers() ([]hash.Hash, error) {
+	if !s.Type.IsNMap {
+		return nil, fmt.Errorf("only NMaps have Hashers")
+	}
+
+	var hashers []hash.Hash
+	if s.Type.IsMap {
+		hashers = make([]hash.Hash, 1)
+		mapHasher, err := s.Type.AsMap.Hasher.HashFunc()
+		if err != nil {
+			return nil, err
+		}
+		hashers[0] = mapHasher
+		return hashers, nil
+	}
+	if s.Type.IsDoubleMap {
+		hashers = make([]hash.Hash, 2)
+		firstDoubleMapHasher, err := s.Type.AsDoubleMap.Hasher.HashFunc()
+		if err != nil {
+			return nil, err
+		}
+		hashers[0] = firstDoubleMapHasher
+		secondDoubleMapHasher, err := s.Type.AsDoubleMap.Key2Hasher.HashFunc()
+		if err != nil {
+			return nil, err
+		}
+		hashers[1] = secondDoubleMapHasher
+		return hashers, nil
+	}
+	if s.Type.IsNMap {
+		hashers = make([]hash.Hash, len(s.Type.AsNMap.Hashers))
+		for i, hasher := range s.Type.AsNMap.Hashers {
+			hasherFn, err := hasher.HashFunc()
+			if err != nil {
+				return nil, err
+			}
+			hashers[i] = hasherFn
+		}
+		return hashers, nil
+	}
+
+	hashers = make([]hash.Hash, 1)
+	hashers[0] = xxhash.New128(nil)
+
+	return hashers, nil
+}
+
+type StorageFunctionTypeV13 struct {
 	IsType      bool
 	AsType      Type // 0
 	IsMap       bool
-	AsMap       MapTypeV4 // 1
+	AsMap       MapTypeV10 // 1
 	IsDoubleMap bool
-	AsDoubleMap DoubleMapTypeV5 // 2
+	AsDoubleMap DoubleMapTypeV10 // 2
+	IsNMap      bool
+	AsNMap      NMapTypeV13 // 3
 }
 
-func (s *StorageFunctionTypeV5) Decode(decoder scale.Decoder) error {
+func (s *StorageFunctionTypeV13) Decode(decoder scale.Decoder) error {
 	var t uint8
 	err := decoder.Decode(&t)
 	if err != nil {
@@ -312,13 +370,19 @@ func (s *StorageFunctionTypeV5) Decode(decoder scale.Decoder) error {
 		if err != nil {
 			return err
 		}
+	case 3:
+		s.IsNMap = true
+		err = decoder.Decode(&s.AsNMap)
+		if err != nil {
+			return err
+		}
 	default:
 		return fmt.Errorf("received unexpected type %v", t)
 	}
 	return nil
 }
 
-func (s StorageFunctionTypeV5) Encode(encoder scale.Encoder) error {
+func (s StorageFunctionTypeV13) Encode(encoder scale.Encoder) error {
 	switch {
 	case s.IsType:
 		err := encoder.PushByte(0)
@@ -347,23 +411,23 @@ func (s StorageFunctionTypeV5) Encode(encoder scale.Encoder) error {
 		if err != nil {
 			return err
 		}
+	case s.IsNMap:
+		err := encoder.PushByte(3)
+		if err != nil {
+			return err
+		}
+		err = encoder.Encode(s.AsNMap)
+		if err != nil {
+			return err
+		}
 	default:
-		return fmt.Errorf("expected to be either type, map or double map, but none was set: %v", s)
+		return fmt.Errorf("expected to be either type, map, double map or nmap but none was set: %v", s)
 	}
 	return nil
 }
 
-type DoubleMapTypeV5 struct {
-	Hasher     StorageHasher
-	Key1       Type
-	Key2       Type
-	Value      Type
-	Key2Hasher StorageHasher
-}
-
-type ModuleConstantMetadataV6 struct {
-	Name          Text
-	Type          Type
-	Value         Bytes
-	Documentation []Text
+type NMapTypeV13 struct {
+	Keys    []Type
+	Hashers []StorageHasherV10
+	Value   Type
 }

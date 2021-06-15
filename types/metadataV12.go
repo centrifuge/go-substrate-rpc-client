@@ -83,6 +83,18 @@ func (m *MetadataV12) FindStorageEntryMetadata(module string, fn string) (Storag
 	return nil, fmt.Errorf("module %v not found in metadata", module)
 }
 
+func (m *MetadataV12) FindConstantValue(module Text, constant Text) ([]byte, error) {
+	for _, mod := range m.Modules {
+		if mod.Name == module {
+			value, err := mod.FindConstantValue(constant)
+			if err == nil {
+				return value, nil
+			}
+		}
+	}
+	return nil, fmt.Errorf("could not find constant %s.%s", module, constant)
+}
+
 func (m *MetadataV12) ExistsModuleMetadata(module string) bool {
 	for _, mod := range m.Modules {
 		if string(mod.Name) == module {
@@ -93,124 +105,22 @@ func (m *MetadataV12) ExistsModuleMetadata(module string) bool {
 }
 
 type ModuleMetadataV12 struct {
-	Name       Text
-	HasStorage bool
-	Storage    StorageMetadataV10
-	HasCalls   bool
-	Calls      []FunctionMetadataV4
-	HasEvents  bool
-	Events     []EventMetadataV4
-	Constants  []ModuleConstantMetadataV6
-	Errors     []ErrorMetadataV8
-	Index      uint8
+	ModuleMetadataV10
+	Index uint8
 }
 
 func (m *ModuleMetadataV12) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&m.Name)
+	err := decoder.Decode(&m.ModuleMetadataV10)
 	if err != nil {
 		return err
 	}
-
-	err = decoder.Decode(&m.HasStorage)
-	if err != nil {
-		return err
-	}
-
-	if m.HasStorage {
-		err = decoder.Decode(&m.Storage)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = decoder.Decode(&m.HasCalls)
-	if err != nil {
-		return err
-	}
-
-	if m.HasCalls {
-		err = decoder.Decode(&m.Calls)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = decoder.Decode(&m.HasEvents)
-	if err != nil {
-		return err
-	}
-
-	if m.HasEvents {
-		err = decoder.Decode(&m.Events)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = decoder.Decode(&m.Constants)
-	if err != nil {
-		return err
-	}
-
-	err = decoder.Decode(&m.Errors)
-	if err != nil {
-		return err
-	}
-
 	return decoder.Decode(&m.Index)
 }
 
 func (m ModuleMetadataV12) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(m.Name)
+	err := encoder.Encode(&m.ModuleMetadataV10)
 	if err != nil {
 		return err
 	}
-
-	err = encoder.Encode(m.HasStorage)
-	if err != nil {
-		return err
-	}
-
-	if m.HasStorage {
-		err = encoder.Encode(m.Storage)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = encoder.Encode(m.HasCalls)
-	if err != nil {
-		return err
-	}
-
-	if m.HasCalls {
-		err = encoder.Encode(m.Calls)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = encoder.Encode(m.HasEvents)
-	if err != nil {
-		return err
-	}
-
-	if m.HasEvents {
-		err = encoder.Encode(m.Events)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = encoder.Encode(m.Constants)
-	if err != nil {
-		return err
-	}
-
-	err = encoder.Encode(m.Errors)
-	if err != nil {
-		return err
-	}
-
 	return encoder.Encode(m.Index)
 }

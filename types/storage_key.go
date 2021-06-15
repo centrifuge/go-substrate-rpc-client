@@ -37,7 +37,8 @@ func NewStorageKey(b []byte) StorageKey {
 
 // CreateStorageKey uses the given metadata and to derive the right hashing of method, prefix as well as arguments to
 // create a hashed StorageKey
-func CreateStorageKey(meta *Metadata, prefix, method string, arg []byte, arg2 []byte) (StorageKey, error) {
+// Using variadic argument, so caller do not need to construct array of arguments
+func CreateStorageKey(meta *Metadata, prefix, method string, args ...[]byte) (StorageKey, error) {
 	stringKey := []byte(prefix + " " + method)
 
 	entryMeta, err := meta.FindStorageEntryMetadata(prefix, method)
@@ -45,11 +46,23 @@ func CreateStorageKey(meta *Metadata, prefix, method string, arg []byte, arg2 []
 		return nil, err
 	}
 
-	if entryMeta.IsDoubleMap() {
-		return createKeyDoubleMap(meta, method, prefix, stringKey, arg, arg2, entryMeta)
+	if entryMeta.IsNMap() {
+		return createKeyNMap(meta, method, prefix, args, entryMeta)
 	}
 
-	return createKey(meta, method, prefix, stringKey, arg, entryMeta)
+	if entryMeta.IsDoubleMap() {
+		if len(args) != 2 {
+			return nil, fmt.Errorf("%v is a double map, therefore requires precisely two arguments. "+
+				"received: %d", method, len(args))
+		}
+		return createKeyDoubleMap(meta, method, prefix, stringKey, args[0], args[1], entryMeta)
+	}
+
+	if len(args) != 1 {
+		return nil, fmt.Errorf("%v is a map, therefore requires precisely one argument. "+
+			"received: %d", method, len(args))
+	}
+	return createKey(meta, method, prefix, stringKey, args[0], entryMeta)
 }
 
 // Encode implements encoding for StorageKey, which just unwraps the bytes of StorageKey
@@ -75,6 +88,35 @@ func (s *StorageKey) Decode(decoder scale.Decoder) error {
 // Hex returns a hex string representation of the value (not of the encoded value)
 func (s StorageKey) Hex() string {
 	return fmt.Sprintf("%#x", s)
+}
+
+func createKeyNMap(meta *Metadata, method, prefix string, args [][]byte,
+	entryMeta StorageEntryMetadata) (StorageKey, error) {
+	if !meta.IsMetadataV13 {
+		return nil, fmt.Errorf("storage n map is only supported in metadata version 13 or up")
+	}
+
+	hashers, err := entryMeta.Hashers()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(hashers) != len(args) {
+		return nil, fmt.Errorf("number of arguments should exactly match number of hashers in metadata. "+
+			"Expected: %d, received: %d", len(hashers), len(args))
+	}
+
+	key := createPrefixedKey(method, prefix)
+
+	for i, arg := range args {
+		_, err := hashers[i].Write(arg)
+		if err != nil {
+			return nil, fmt.Errorf("unable to hash args[%d]: %s Error: %v", i, arg, err)
+		}
+		key = append(key, hashers[i].Sum(nil)...)
+	}
+
+	return key, nil
 }
 
 // createKeyDoubleMap creates a key for a DoubleMap type

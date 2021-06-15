@@ -38,7 +38,7 @@ func TestState_SubscribeStorage_EventsRaw(t *testing.T) {
 	meta, err := api.RPC.State.GetMetadataLatest()
 	assert.NoError(t, err)
 
-	key, err := types.CreateStorageKey(meta, "System", "Events", nil, nil)
+	key, err := types.CreateStorageKey(meta, "System", "Events", nil)
 	assert.NoError(t, err)
 
 	sub, err := api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key})
@@ -75,7 +75,7 @@ func TestState_SubscribeStorage_Events(t *testing.T) {
 	meta, err := api.RPC.State.GetMetadataLatest()
 	assert.NoError(t, err)
 
-	key, err := types.CreateStorageKey(meta, "System", "Events", nil, nil)
+	key, err := types.CreateStorageKey(meta, "System", "Events", nil)
 	assert.NoError(t, err)
 
 	sub, err := api.RPC.State.SubscribeStorageRaw([]types.StorageKey{key})

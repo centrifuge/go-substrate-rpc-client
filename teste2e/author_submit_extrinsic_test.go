@@ -34,7 +34,7 @@ func TestChain_Events(t *testing.T) {
 	meta, err := api.RPC.State.GetMetadataLatest()
 	assert.NoError(t, err)
 
-	key, err := types.CreateStorageKey(meta, "System", "Events", nil, nil)
+	key, err := types.CreateStorageKey(meta, "System", "Events", nil)
 	assert.NoError(t, err)
 
 	blockNUmber := uint64(0) // Replace with desired block to parse events
@@ -80,7 +80,7 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 	rv, err := api.RPC.State.GetRuntimeVersionLatest()
 	assert.NoError(t, err)
 
-	key, err := types.CreateStorageKey(meta, "System", "Account", from.PublicKey, nil)
+	key, err := types.CreateStorageKey(meta, "System", "Account", from.PublicKey)
 	assert.NoError(t, err)
 
 	var accountInfo types.AccountInfo
