@@ -399,12 +399,16 @@ func (d *DispatchError) Decode(decoder scale.Decoder) error {
 	if b == 3 {
 		d.HasModule = true
 		err = decoder.Decode(&d.Module)
-	}
-	if err != nil {
-		return err
+		if err != nil {
+			return err
+		}
+		return decoder.Decode(&d.Error)
 	}
 
-	return decoder.Decode(&d.Error)
+	// Since the rest are enum errors, there is no further data to decode, just set enum byte as error
+	d.Error = b
+
+	return nil
 }
 
 func (d DispatchError) Encode(encoder scale.Encoder) error {
@@ -415,15 +419,13 @@ func (d DispatchError) Encode(encoder scale.Encoder) error {
 			return err
 		}
 		err = encoder.Encode(d.Module)
-	} else {
-		err = encoder.PushByte(0)
+		if err != nil {
+			return err
+		}
+		return encoder.Encode(&d.Error)
 	}
 
-	if err != nil {
-		return err
-	}
-
-	return encoder.Encode(&d.Error)
+	return encoder.PushByte(d.Error)
 }
 
 type EventID [2]byte
