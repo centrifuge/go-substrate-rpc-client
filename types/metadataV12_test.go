@@ -19,41 +19,47 @@ var exampleRuntimeMetadataV12 = MetadataV12{
 }
 
 var exampleModuleMetadataV12Empty = ModuleMetadataV12{
-	Name:       "EmptyModule",
-	HasStorage: false,
-	Storage:    StorageMetadataV10{},
-	HasCalls:   false,
-	Calls:      nil,
-	HasEvents:  false,
-	Events:     nil,
-	Constants:  nil,
-	Errors:     nil,
+	ModuleMetadataV10: ModuleMetadataV10 {
+		Name: "EmptyModule",
+		HasStorage: false,
+		Storage:    StorageMetadataV10{},
+		HasCalls:   false,
+		Calls:      nil,
+		HasEvents:  false,
+		Events:     nil,
+		Constants:  nil,
+		Errors:     nil,
+	},
 	Index:      0,
 }
 
 var exampleModuleMetadataV121 = ModuleMetadataV12{
-	Name:       "Module1",
-	HasStorage: true,
-	Storage:    exampleStorageMetadataV10,
-	HasCalls:   true,
-	Calls:      []FunctionMetadataV4{exampleFunctionMetadataV4},
-	HasEvents:  true,
-	Events:     []EventMetadataV4{exampleEventMetadataV4},
-	Constants:  []ModuleConstantMetadataV6{exampleModuleConstantMetadataV6},
-	Errors:     []ErrorMetadataV8{exampleErrorMetadataV8},
+	ModuleMetadataV10: ModuleMetadataV10 {
+		Name:       "Module1",
+		HasStorage: true,
+		Storage:    exampleStorageMetadataV10,
+		HasCalls:   true,
+		Calls:      []FunctionMetadataV4{exampleFunctionMetadataV4},
+		HasEvents:  true,
+		Events:     []EventMetadataV4{exampleEventMetadataV4},
+		Constants:  []ModuleConstantMetadataV6{exampleModuleConstantMetadataV6},
+		Errors:     []ErrorMetadataV8{exampleErrorMetadataV8},
+	},
 	Index:      1,
 }
 
 var exampleModuleMetadataV122 = ModuleMetadataV12{
-	Name:       "Module2",
-	HasStorage: true,
-	Storage:    exampleStorageMetadataV10,
-	HasCalls:   true,
-	Calls:      []FunctionMetadataV4{exampleFunctionMetadataV4},
-	HasEvents:  true,
-	Events:     []EventMetadataV4{exampleEventMetadataV4},
-	Constants:  []ModuleConstantMetadataV6{exampleModuleConstantMetadataV6},
-	Errors:     []ErrorMetadataV8{exampleErrorMetadataV8},
+	ModuleMetadataV10: ModuleMetadataV10 {
+		Name:       "Module2",
+		HasStorage: true,
+		Storage:    exampleStorageMetadataV10,
+		HasCalls:   true,
+		Calls:      []FunctionMetadataV4{exampleFunctionMetadataV4},
+		HasEvents:  true,
+		Events:     []EventMetadataV4{exampleEventMetadataV4},
+		Constants:  []ModuleConstantMetadataV6{exampleModuleConstantMetadataV6},
+		Errors:     []ErrorMetadataV8{exampleErrorMetadataV8},
+	},
 	Index:      2,
 }
 

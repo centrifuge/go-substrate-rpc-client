@@ -70,7 +70,7 @@ func TestCreateStorageKeyPlainV4(t *testing.T) {
 func TestCreateStorageKeyMapV10(t *testing.T) {
 	b := MustHexDecodeString(AlicePubKey)
 	m := ExamplaryMetadataV10
-	key, err := CreateStorageKey(m, "System", "AccountNonce", b, nil)
+	key, err := CreateStorageKey(m, "System", "AccountNonce", b)
 	assert.NoError(t, err)
 	hex, err := Hex(key)
 	assert.NoError(t, err)

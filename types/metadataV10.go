@@ -90,10 +90,9 @@ func (m *MetadataV10) FindEventNamesForEventID(eventID EventID) (Text, Text, err
 func (m *MetadataV10) FindConstantValue(module Text, constant Text) ([]byte, error) {
 	for _, mod := range m.Modules {
 		if mod.Name == module {
-			for _, cons := range mod.Constants {
-				if cons.Name == constant {
-					return cons.Value, nil
-				}
+			value, err := mod.FindConstantValue(constant)
+			if err == nil {
+				return value, nil
 			}
 		}
 	}
@@ -238,6 +237,15 @@ func (m ModuleMetadataV10) Encode(encoder scale.Encoder) error {
 	}
 
 	return encoder.Encode(m.Errors)
+}
+
+func (m *ModuleMetadataV10) FindConstantValue(constant Text) ([]byte, error) {
+	for _, cons := range m.Constants {
+		if cons.Name == constant {
+			return cons.Value, nil
+		}
+	}
+	return nil, fmt.Errorf("could not find constant %s", constant)
 }
 
 type StorageMetadataV10 struct {

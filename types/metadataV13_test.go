@@ -1,7 +1,6 @@
 package types_test
 
 import (
-	"fmt"
 	. "github.com/centrifuge/go-substrate-rpc-client/v3/types"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -147,7 +146,6 @@ func TestNewMetadataV13_Decode(t *testing.T) {
 	err := DecodeFromBytes(MustHexDecodeString(ExamplaryMetadataV13SubstrateString), metadata)
 	assert.True(t, metadata.IsMetadataV13)
 	assert.NoError(t, err)
-	fmt.Printf("%#v", metadata)
 	data, err := EncodeToBytes(metadata)
 	assert.NoError(t, err)
 	assert.Equal(t, ExamplaryMetadataV13SubstrateString, HexEncodeToString(data))

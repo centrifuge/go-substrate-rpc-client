@@ -87,10 +87,9 @@ func (m *MetadataV13) FindStorageEntryMetadata(module string, fn string) (Storag
 func (m *MetadataV13) FindConstantValue(module Text, constant Text) ([]byte, error) {
 	for _, mod := range m.Modules {
 		if mod.Name == module {
-			for _, cons := range mod.Constants {
-				if cons.Name == constant {
-					return cons.Value, nil
-				}
+			value, err := mod.FindConstantValue(constant)
+			if err == nil {
+				return value, nil
 			}
 		}
 	}
@@ -227,6 +226,15 @@ func (m ModuleMetadataV13) Encode(encoder scale.Encoder) error {
 	}
 
 	return encoder.Encode(m.Index)
+}
+
+func (m *ModuleMetadataV13) FindConstantValue(constant Text) ([]byte, error) {
+	for _, cons := range m.Constants {
+		if cons.Name == constant {
+			return cons.Value, nil
+		}
+	}
+	return nil, fmt.Errorf("could not find constant %s", constant)
 }
 
 type StorageMetadataV13 struct {
