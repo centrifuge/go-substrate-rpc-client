@@ -1,4 +1,4 @@
-module github.com/substrate/go-substrate-rpc-client/v3
+module github.com/snowfork/go-substrate-rpc-client/v3
 
 go 1.16
 
