@@ -17,6 +17,8 @@
 package types
 
 import (
+	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"math/big"
 
@@ -37,11 +39,22 @@ type BlockNumber U32
 
 // UnmarshalJSON fills BlockNumber with the JSON encoded byte array given by bz
 func (b *BlockNumber) UnmarshalJSON(bz []byte) error {
-	var tmp U32
-	if err := json.Unmarshal(bz, &tmp); err != nil {
+	var numberString string
+	if err := json.Unmarshal(bz, &numberString); err != nil {
 		return err
 	}
-	*b = BlockNumber(tmp)
+
+	numberBytes, err := hex.DecodeString(numberString)
+	if err != nil {
+		return err
+	}
+
+	number, err := scale.NewDecoder(bytes.NewReader(numberBytes)).DecodeUintCompact()
+	if err != nil {
+		return err
+	}
+
+	*b = BlockNumber(number.Uint64())
 	return nil
 }
 
