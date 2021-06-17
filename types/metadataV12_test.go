@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	. "github.com/centrifuge/go-substrate-rpc-client/v3/types"
+	. "github.com/snowfork/go-substrate-rpc-client/v3/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,8 +19,8 @@ var exampleRuntimeMetadataV12 = MetadataV12{
 }
 
 var exampleModuleMetadataV12Empty = ModuleMetadataV12{
-	ModuleMetadataV10: ModuleMetadataV10 {
-		Name: "EmptyModule",
+	ModuleMetadataV10: ModuleMetadataV10{
+		Name:       "EmptyModule",
 		HasStorage: false,
 		Storage:    StorageMetadataV10{},
 		HasCalls:   false,
@@ -30,11 +30,11 @@ var exampleModuleMetadataV12Empty = ModuleMetadataV12{
 		Constants:  nil,
 		Errors:     nil,
 	},
-	Index:      0,
+	Index: 0,
 }
 
 var exampleModuleMetadataV121 = ModuleMetadataV12{
-	ModuleMetadataV10: ModuleMetadataV10 {
+	ModuleMetadataV10: ModuleMetadataV10{
 		Name:       "Module1",
 		HasStorage: true,
 		Storage:    exampleStorageMetadataV10,
@@ -45,11 +45,11 @@ var exampleModuleMetadataV121 = ModuleMetadataV12{
 		Constants:  []ModuleConstantMetadataV6{exampleModuleConstantMetadataV6},
 		Errors:     []ErrorMetadataV8{exampleErrorMetadataV8},
 	},
-	Index:      1,
+	Index: 1,
 }
 
 var exampleModuleMetadataV122 = ModuleMetadataV12{
-	ModuleMetadataV10: ModuleMetadataV10 {
+	ModuleMetadataV10: ModuleMetadataV10{
 		Name:       "Module2",
 		HasStorage: true,
 		Storage:    exampleStorageMetadataV10,
@@ -60,7 +60,7 @@ var exampleModuleMetadataV122 = ModuleMetadataV12{
 		Constants:  []ModuleConstantMetadataV6{exampleModuleConstantMetadataV6},
 		Errors:     []ErrorMetadataV8{exampleErrorMetadataV8},
 	},
-	Index:      2,
+	Index: 2,
 }
 
 func TestNewMetadataV12_Decode(t *testing.T) {

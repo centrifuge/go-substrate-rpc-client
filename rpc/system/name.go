@@ -17,7 +17,7 @@
 package system
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
+	"github.com/snowfork/go-substrate-rpc-client/v3/types"
 )
 
 // Name retrieves the node name

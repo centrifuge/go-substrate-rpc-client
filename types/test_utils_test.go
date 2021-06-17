@@ -22,8 +22,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v3/scale"
-	. "github.com/centrifuge/go-substrate-rpc-client/v3/types"
+	"github.com/snowfork/go-substrate-rpc-client/v3/scale"
+	. "github.com/snowfork/go-substrate-rpc-client/v3/types"
 	"github.com/stretchr/testify/assert"
 )
 

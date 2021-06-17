@@ -21,7 +21,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	. "github.com/centrifuge/go-substrate-rpc-client/v3/types"
+	. "github.com/snowfork/go-substrate-rpc-client/v3/types"
 )
 
 func TestOptionBytes8_EncodeDecode(t *testing.T) {

@@ -17,8 +17,8 @@
 package state
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/v3/client"
-	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
+	"github.com/snowfork/go-substrate-rpc-client/v3/client"
+	"github.com/snowfork/go-substrate-rpc-client/v3/types"
 )
 
 // QueryStorage queries historical storage entries (by key) starting from a start block until an end block
