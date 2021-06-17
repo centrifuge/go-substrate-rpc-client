@@ -41,28 +41,69 @@ func NewStorageKey(b []byte) StorageKey {
 func CreateStorageKey(meta *Metadata, prefix, method string, args ...[]byte) (StorageKey, error) {
 	stringKey := []byte(prefix + " " + method)
 
+	validateAndTrimArgs := func(args [][]byte) ([][]byte, error) {
+		nonNilCount := -1
+		for i, arg := range args {
+			if len(arg) == 0 {
+				nonNilCount = i
+				break
+			}
+		}
+
+		if nonNilCount == -1 {
+			return args, nil
+		}
+
+		for i := nonNilCount; i < len(args); i++ {
+			if len(args[i]) != 0 {
+				return nil, fmt.Errorf("non-nil arguments cannot be preceded by nil arguments")
+			}
+		}
+
+		trimmedArgs := make([][]byte, nonNilCount)
+		for i := 0; i < nonNilCount; i++ {
+			trimmedArgs[i] = args[i]
+		}
+
+		return trimmedArgs, nil
+	}
+
+	validatedArgs, err := validateAndTrimArgs(args)
+	if err != nil {
+		return nil, err
+	}
+
 	entryMeta, err := meta.FindStorageEntryMetadata(prefix, method)
 	if err != nil {
 		return nil, err
 	}
 
 	if entryMeta.IsNMap() {
-		return createKeyNMap(meta, method, prefix, args, entryMeta)
+		return createKeyNMap(meta, method, prefix, validatedArgs, entryMeta)
 	}
 
 	if entryMeta.IsDoubleMap() {
-		if len(args) != 2 {
+		if len(validatedArgs) != 2 {
 			return nil, fmt.Errorf("%v is a double map, therefore requires precisely two arguments. "+
-				"received: %d", method, len(args))
+				"received: %d", method, len(validatedArgs))
 		}
-		return createKeyDoubleMap(meta, method, prefix, stringKey, args[0], args[1], entryMeta)
+		return createKeyDoubleMap(meta, method, prefix, stringKey, validatedArgs[0], validatedArgs[1], entryMeta)
 	}
 
-	if len(args) != 1 {
-		return nil, fmt.Errorf("%v is a map, therefore requires precisely one argument. "+
-			"received: %d", method, len(args))
+	if entryMeta.IsMap() {
+		if len(validatedArgs) != 1 {
+			return nil, fmt.Errorf("%v is a map, therefore requires precisely one argument. "+
+				"received: %d", method, len(validatedArgs))
+		}
+		return createKey(meta, method, prefix, stringKey, validatedArgs[0], entryMeta)
 	}
-	return createKey(meta, method, prefix, stringKey, args[0], entryMeta)
+
+	if entryMeta.IsPlain() && len(validatedArgs) != 0 {
+		return nil, fmt.Errorf("%v is a plain key, therefore requires no argument. "+
+			"received: %d", method, len(validatedArgs))
+	}
+
+	return createKey(meta, method, prefix, stringKey, nil, entryMeta)
 }
 
 // Encode implements encoding for StorageKey, which just unwraps the bytes of StorageKey
