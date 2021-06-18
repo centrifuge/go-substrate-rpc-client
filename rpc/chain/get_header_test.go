@@ -33,6 +33,7 @@ func TestChain_GetHeader(t *testing.T) {
 	assert.NoError(t, err)
 
 	header, err := chain.GetHeader(res)
+
 	assert.NoError(t, err)
 	assert.NotEmpty(t, header)
 }

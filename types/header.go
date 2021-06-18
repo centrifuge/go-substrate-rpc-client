@@ -17,10 +17,10 @@
 package types
 
 import (
-	"bytes"
-	"encoding/hex"
 	"encoding/json"
 	"math/big"
+	"strconv"
+	"strings"
 
 	"github.com/snowfork/go-substrate-rpc-client/v3/scale"
 )
@@ -44,17 +44,13 @@ func (b *BlockNumber) UnmarshalJSON(bz []byte) error {
 		return err
 	}
 
-	numberBytes, err := hex.DecodeString(numberString)
+	numberStringTrimmed := strings.TrimPrefix(numberString, "0x")
+	number, err := strconv.ParseUint(numberStringTrimmed, 16, 64)
 	if err != nil {
 		return err
 	}
 
-	number, err := scale.NewDecoder(bytes.NewReader(numberBytes)).DecodeUintCompact()
-	if err != nil {
-		return err
-	}
-
-	*b = BlockNumber(number.Uint64())
+	*b = BlockNumber(number)
 	return nil
 }
 
