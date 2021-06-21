@@ -46,6 +46,9 @@ func TestCreateStorageKeyArgValidationForPlainKey(t *testing.T) {
 	_, err = CreateStorageKey(m, "Timestamp", "Now", nil, []byte{0x01})
 	assert.EqualError(t, err, "non-nil arguments cannot be preceded by nil arguments")
 
+	_, err = CreateStorageKey(m, "Timestamp", "Now", []byte{0x01})
+	assert.EqualError(t, err, "Timestamp:Now is a plain key, therefore requires no argument. received: 1")
+
 	expectedKeyBuilder := strings.Builder{}
 	hexStr, err := Hex(xxhash.New128([]byte("Timestamp")).Sum(nil))
 	assert.NoError(t, err)
