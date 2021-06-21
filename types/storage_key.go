@@ -79,28 +79,37 @@ func CreateStorageKey(meta *Metadata, prefix, method string, args ...[]byte) (St
 	}
 
 	if entryMeta.IsNMap() {
-		return createKeyNMap(meta, method, prefix, validatedArgs, entryMeta)
+		hashers, err := entryMeta.Hashers()
+		if err != nil {
+			return nil, fmt.Errorf("unable to get hashers for %s nmap", method)
+		}
+		if len(hashers) != len(validatedArgs) {
+			return nil, fmt.Errorf("%s:%s is a nmap, therefore requires that number of arguments should "+
+				"exactly match number of hashers in metadata. "+
+				"Expected: %d, received: %d", prefix, method, len(hashers), len(validatedArgs))
+		}
+		return createKeyNMap(method, prefix, validatedArgs, entryMeta)
 	}
 
 	if entryMeta.IsDoubleMap() {
 		if len(validatedArgs) != 2 {
-			return nil, fmt.Errorf("%v is a double map, therefore requires precisely two arguments. "+
-				"received: %d", method, len(validatedArgs))
+			return nil, fmt.Errorf("%s:%s is a double map, therefore requires precisely two arguments. "+
+				"received: %d", prefix, method, len(validatedArgs))
 		}
 		return createKeyDoubleMap(meta, method, prefix, stringKey, validatedArgs[0], validatedArgs[1], entryMeta)
 	}
 
 	if entryMeta.IsMap() {
 		if len(validatedArgs) != 1 {
-			return nil, fmt.Errorf("%v is a map, therefore requires precisely one argument. "+
-				"received: %d", method, len(validatedArgs))
+			return nil, fmt.Errorf("%s:%s is a map, therefore requires precisely one argument. "+
+				"received: %d", prefix, method, len(validatedArgs))
 		}
 		return createKey(meta, method, prefix, stringKey, validatedArgs[0], entryMeta)
 	}
 
 	if entryMeta.IsPlain() && len(validatedArgs) != 0 {
-		return nil, fmt.Errorf("%v is a plain key, therefore requires no argument. "+
-			"received: %d", method, len(validatedArgs))
+		return nil, fmt.Errorf("%s:%s is a plain key, therefore requires no argument. "+
+			"received: %d", prefix, method, len(validatedArgs))
 	}
 
 	return createKey(meta, method, prefix, stringKey, nil, entryMeta)
@@ -131,20 +140,10 @@ func (s StorageKey) Hex() string {
 	return fmt.Sprintf("%#x", s)
 }
 
-func createKeyNMap(meta *Metadata, method, prefix string, args [][]byte,
-	entryMeta StorageEntryMetadata) (StorageKey, error) {
-	if !meta.IsMetadataV13 {
-		return nil, fmt.Errorf("storage n map is only supported in metadata version 13 or up")
-	}
-
+func createKeyNMap(method, prefix string, args [][]byte, entryMeta StorageEntryMetadata) (StorageKey, error) {
 	hashers, err := entryMeta.Hashers()
 	if err != nil {
 		return nil, err
-	}
-
-	if len(hashers) != len(args) {
-		return nil, fmt.Errorf("number of arguments should exactly match number of hashers in metadata. "+
-			"Expected: %d, received: %d", len(hashers), len(args))
 	}
 
 	key := createPrefixedKey(method, prefix)
@@ -163,9 +162,6 @@ func createKeyNMap(meta *Metadata, method, prefix string, args [][]byte,
 // createKeyDoubleMap creates a key for a DoubleMap type
 func createKeyDoubleMap(meta *Metadata, method, prefix string, stringKey, arg, arg2 []byte,
 	entryMeta StorageEntryMetadata) (StorageKey, error) {
-	if arg == nil || arg2 == nil {
-		return nil, fmt.Errorf("%v is a DoubleMap and requires two arguments", method)
-	}
 
 	hasher, err := entryMeta.Hasher()
 	if err != nil {
@@ -208,9 +204,6 @@ func createKeyDoubleMap(meta *Metadata, method, prefix string, stringKey, arg, a
 // createKey creates a key for either a map or a plain value
 func createKey(meta *Metadata, method, prefix string, stringKey, arg []byte, entryMeta StorageEntryMetadata) (
 	StorageKey, error) {
-	if entryMeta.IsMap() && arg == nil {
-		return nil, fmt.Errorf("%v is a Map and requires one argument", method)
-	}
 
 	hasher, err := entryMeta.Hasher()
 	if err != nil {
