@@ -17,6 +17,10 @@
 package types_test
 
 import (
+	"encoding/binary"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/hash"
+	"github.com/centrifuge/go-substrate-rpc-client/v3/xxhash"
+	"strings"
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v3/types"
@@ -27,10 +31,199 @@ const (
 	AlicePubKey = "0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
 )
 
+func TestCreateStorageKeyArgValidationForPlainKey(t *testing.T) {
+	m := ExamplaryMetadataV13
+
+	_, err := CreateStorageKey(m, "Timestamp", "Now")
+	assert.NoError(t, err)
+
+	_, err = CreateStorageKey(m, "Timestamp", "Now", nil)
+	assert.NoError(t, err)
+
+	_, err = CreateStorageKey(m, "Timestamp", "Now", nil, []byte{})
+	assert.NoError(t, err)
+
+	_, err = CreateStorageKey(m, "Timestamp", "Now", nil, []byte{0x01})
+	assert.EqualError(t, err, "non-nil arguments cannot be preceded by nil arguments")
+
+	expectedKeyBuilder := strings.Builder{}
+	hexStr, err := Hex(xxhash.New128([]byte("Timestamp")).Sum(nil))
+	assert.NoError(t, err)
+	expectedKeyBuilder.WriteString(hexStr)
+	hexStr, err = Hex(xxhash.New128([]byte("Now")).Sum(nil))
+	assert.NoError(t, err)
+	expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
+
+	key, err := CreateStorageKey(m, "Timestamp", "Now")
+	assert.NoError(t, err)
+	hex, err := Hex(key)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedKeyBuilder.String(), hex)
+}
+
+func TestCreateStorageKeyArgValidationForMapKey(t *testing.T) {
+	m := ExamplaryMetadataV13
+
+	_, err := CreateStorageKey(m, "System", "Account")
+	assert.EqualError(t, err, "System:Account is a map, therefore requires precisely one argument. " +
+		"received: 0")
+
+	_, err = CreateStorageKey(m, "System", "Account", nil)
+	assert.EqualError(t, err, "System:Account is a map, therefore requires precisely one argument. " +
+		"received: 0")
+
+	_, err = CreateStorageKey(m, "System", "Account", nil, []byte{})
+	assert.EqualError(t, err, "System:Account is a map, therefore requires precisely one argument. " +
+		"received: 0")
+
+	_, err = CreateStorageKey(m, "System", "Account", nil, []byte{0x01})
+	assert.EqualError(t, err, "non-nil arguments cannot be preceded by nil arguments")
+
+	accountIdSerialized := MustHexDecodeString(AlicePubKey)
+
+	// Build expected answer
+	expectedKeyBuilder := strings.Builder{}
+	hexStr, err := Hex(xxhash.New128([]byte("System")).Sum(nil))
+	assert.NoError(t, err)
+	expectedKeyBuilder.WriteString(hexStr)
+	hexStr, err = Hex(xxhash.New128([]byte("Account")).Sum(nil))
+	assert.NoError(t, err)
+	expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
+	accountIdHasher, err := hash.NewBlake2b128Concat(nil)
+	assert.NoError(t, err)
+	_, err = accountIdHasher.Write(accountIdSerialized)
+	assert.NoError(t, err)
+	hexStr, err = Hex(accountIdHasher.Sum(nil))
+	assert.NoError(t, err)
+	expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
+
+	key, err := CreateStorageKey(m, "System", "Account", accountIdSerialized)
+	assert.NoError(t, err)
+	hex, err := Hex(key)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedKeyBuilder.String(), hex)
+}
+
+func TestCreateStorageKeyArgValidationForDoubleMapKey(t *testing.T) {
+	m := ExamplaryMetadataV13
+
+	_, err := CreateStorageKey(m, "Staking", "ErasStakers")
+	assert.EqualError(t, err, "Staking:ErasStakers is a double map, therefore requires precisely two " +
+		"arguments. received: 0")
+
+	_, err = CreateStorageKey(m, "Staking", "ErasStakers", nil)
+	assert.EqualError(t, err, "Staking:ErasStakers is a double map, therefore requires precisely two " +
+		"arguments. received: 0")
+
+	_, err = CreateStorageKey(m, "Staking", "ErasStakers", nil, []byte{})
+	assert.EqualError(t, err, "Staking:ErasStakers is a double map, therefore requires precisely two " +
+		"arguments. received: 0")
+
+	_, err = CreateStorageKey(m, "Staking", "ErasStakers", nil, []byte{0x01})
+	assert.EqualError(t, err, "non-nil arguments cannot be preceded by nil arguments")
+
+	_, err = CreateStorageKey(m, "Staking", "ErasStakers", []byte{0x01})
+	assert.EqualError(t, err, "Staking:ErasStakers is a double map, therefore requires precisely two " +
+		"arguments. received: 1")
+
+	// Serialize EraIndex and AccountId
+	accountIdSerialized := MustHexDecodeString(AlicePubKey)
+	var eraIndex uint32 = 3
+	eraIndexSerialized := make([]byte, 4)
+	binary.LittleEndian.PutUint32(eraIndexSerialized, eraIndex)
+
+	// Build expected answer
+	expectedKeyBuilder := strings.Builder{}
+	hexStr, err := Hex(xxhash.New128([]byte("Staking")).Sum(nil))
+	assert.NoError(t, err)
+	expectedKeyBuilder.WriteString(hexStr)
+	hexStr, err = Hex(xxhash.New128([]byte("ErasStakers")).Sum(nil))
+	assert.NoError(t, err)
+	expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
+	hexStr, err = Hex(xxhash.New64Concat(eraIndexSerialized).Sum(nil))
+	assert.NoError(t, err)
+	expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
+	hexStr, err = Hex(xxhash.New64Concat(accountIdSerialized).Sum(nil))
+	assert.NoError(t, err)
+	expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
+
+	key, err := CreateStorageKey(m, "Staking", "ErasStakers", eraIndexSerialized, accountIdSerialized)
+	assert.NoError(t, err)
+	hex, err := Hex(key)
+	assert.NoError(t, err)
+
+	assert.Equal(t, expectedKeyBuilder.String(), hex)
+}
+
+func TestCreateStorageKeyArgValidationForNMapKey(t *testing.T) {
+	m := ExamplaryMetadataV13
+    //"Assets", "Approvals", "AssetId(u32)", "AccountId", "AccountId"
+
+	_, err := CreateStorageKey(m, "Assets", "Approvals")
+	assert.EqualError(t, err, "Assets:Approvals is a nmap, therefore requires that number of arguments " +
+		"should exactly match number of hashers in metadata. Expected: 3, received: 0")
+
+	_, err = CreateStorageKey(m, "Assets", "Approvals", nil)
+	assert.EqualError(t, err, "Assets:Approvals is a nmap, therefore requires that number of arguments " +
+		"should exactly match number of hashers in metadata. Expected: 3, received: 0")
+
+	_, err = CreateStorageKey(m, "Assets", "Approvals", nil, []byte{})
+	assert.EqualError(t, err, "Assets:Approvals is a nmap, therefore requires that number of arguments " +
+		"should exactly match number of hashers in metadata. Expected: 3, received: 0")
+
+	_, err = CreateStorageKey(m, "Assets", "Approvals", nil, []byte{0x01})
+	assert.EqualError(t, err, "non-nil arguments cannot be preceded by nil arguments")
+
+	_, err = CreateStorageKey(m, "Assets", "Approvals", []byte{0x01})
+	assert.EqualError(t, err, "Assets:Approvals is a nmap, therefore requires that number of arguments " +
+		"should exactly match number of hashers in metadata. Expected: 3, received: 1")
+
+	// Serialize EraIndex and AccountId
+	var assetId uint32 = 3
+	assetIdSerialized := make([]byte, 4)
+	binary.LittleEndian.PutUint32(assetIdSerialized, assetId)
+	// Will be used both as owner as well as delegate
+	accountIdSerialized := MustHexDecodeString(AlicePubKey)
+
+	// Build expected answer
+	expectedKeyBuilder := strings.Builder{}
+	hexStr, err := Hex(xxhash.New128([]byte("Assets")).Sum(nil))
+	assert.NoError(t, err)
+	expectedKeyBuilder.WriteString(hexStr)
+	hexStr, err = Hex(xxhash.New128([]byte("Approvals")).Sum(nil))
+	assert.NoError(t, err)
+	expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
+	// Hashing serialized asset id
+	assetIdHasher, err := hash.NewBlake2b128Concat(nil)
+	assert.NoError(t, err)
+	_, err = assetIdHasher.Write(assetIdSerialized)
+	assert.NoError(t, err)
+	hexStr, err = Hex(assetIdHasher.Sum(nil))
+	expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
+	// Hashing serialized account id
+	accountIdHasher, err := hash.NewBlake2b128Concat(nil)
+	assert.NoError(t, err)
+	_, err = accountIdHasher.Write(accountIdSerialized)
+	assert.NoError(t, err)
+	hexStr, err = Hex(accountIdHasher.Sum(nil))
+	// Writing it multiple times as both owner and delegate
+	expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
+	expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
+
+
+	key, err := CreateStorageKey(m, "Assets", "Approvals", assetIdSerialized, accountIdSerialized,
+		accountIdSerialized)
+	assert.NoError(t, err)
+	hex, err := Hex(key)
+	assert.NoError(t, err)
+
+	assert.Equal(t, expectedKeyBuilder.String(), hex)
+}
+
 func TestCreateStorageKeyPlainV13(t *testing.T) {
 	m := ExamplaryMetadataV13
 
-	key, err := CreateStorageKey(m, "Timestamp", "Now", nil)
+	key, err := CreateStorageKey(m, "Timestamp", "Now")
 	assert.NoError(t, err)
 	hex, err := Hex(key)
 	assert.NoError(t, err)
@@ -40,7 +233,7 @@ func TestCreateStorageKeyPlainV13(t *testing.T) {
 func TestCreateStorageKeyPlainV10(t *testing.T) {
 	m := ExamplaryMetadataV10
 
-	key, err := CreateStorageKey(m, "Timestamp", "Now", nil)
+	key, err := CreateStorageKey(m, "Timestamp", "Now")
 	assert.NoError(t, err)
 	hex, err := Hex(key)
 	assert.NoError(t, err)
@@ -50,7 +243,7 @@ func TestCreateStorageKeyPlainV10(t *testing.T) {
 func TestCreateStorageKeyPlainV9(t *testing.T) {
 	m := ExamplaryMetadataV9
 
-	key, err := CreateStorageKey(m, "Timestamp", "Now", nil)
+	key, err := CreateStorageKey(m, "Timestamp", "Now")
 	assert.NoError(t, err)
 	hex, err := Hex(key)
 	assert.NoError(t, err)
@@ -60,7 +253,7 @@ func TestCreateStorageKeyPlainV9(t *testing.T) {
 func TestCreateStorageKeyPlainV4(t *testing.T) {
 	m := ExamplaryMetadataV4
 
-	key, err := CreateStorageKey(m, "Timestamp", "Now", nil)
+	key, err := CreateStorageKey(m, "Timestamp", "Now")
 	assert.NoError(t, err)
 	hex, err := Hex(key)
 	assert.NoError(t, err)
