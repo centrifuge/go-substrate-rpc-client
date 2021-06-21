@@ -88,7 +88,7 @@ func CreateStorageKey(meta *Metadata, prefix, method string, args ...[]byte) (St
 				"exactly match number of hashers in metadata. "+
 				"Expected: %d, received: %d", prefix, method, len(hashers), len(validatedArgs))
 		}
-		return createKeyNMap(meta, method, prefix, validatedArgs, entryMeta)
+		return createKeyNMap(method, prefix, validatedArgs, entryMeta)
 	}
 
 	if entryMeta.IsDoubleMap() {
@@ -140,12 +140,7 @@ func (s StorageKey) Hex() string {
 	return fmt.Sprintf("%#x", s)
 }
 
-func createKeyNMap(meta *Metadata, method, prefix string, args [][]byte,
-	entryMeta StorageEntryMetadata) (StorageKey, error) {
-	if !meta.IsMetadataV13 {
-		return nil, fmt.Errorf("storage n map is only supported in metadata version 13 or up")
-	}
-
+func createKeyNMap(method, prefix string, args [][]byte, entryMeta StorageEntryMetadata) (StorageKey, error) {
 	hashers, err := entryMeta.Hashers()
 	if err != nil {
 		return nil, err
