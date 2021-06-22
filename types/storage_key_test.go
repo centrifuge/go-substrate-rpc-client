@@ -18,8 +18,8 @@ package types_test
 
 import (
 	"encoding/binary"
-	"github.com/centrifuge/go-substrate-rpc-client/v3/hash"
-	"github.com/centrifuge/go-substrate-rpc-client/v3/xxhash"
+	"github.com/snowfork/go-substrate-rpc-client/v3/hash"
+	"github.com/snowfork/go-substrate-rpc-client/v3/xxhash"
 	"strings"
 	"testing"
 
