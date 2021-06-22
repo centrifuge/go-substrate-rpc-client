@@ -291,45 +291,14 @@ func (s StorageFunctionMetadataV13) Hashers() ([]hash.Hash, error) {
 		return nil, fmt.Errorf("only NMaps have Hashers")
 	}
 
-	var hashers []hash.Hash
-	if s.Type.IsMap {
-		hashers = make([]hash.Hash, 1)
-		mapHasher, err := s.Type.AsMap.Hasher.HashFunc()
+	hashers := make([]hash.Hash, len(s.Type.AsNMap.Hashers))
+	for i, hasher := range s.Type.AsNMap.Hashers {
+		hasherFn, err := hasher.HashFunc()
 		if err != nil {
 			return nil, err
 		}
-		hashers[0] = mapHasher
-		return hashers, nil
+		hashers[i] = hasherFn
 	}
-	if s.Type.IsDoubleMap {
-		hashers = make([]hash.Hash, 2)
-		firstDoubleMapHasher, err := s.Type.AsDoubleMap.Hasher.HashFunc()
-		if err != nil {
-			return nil, err
-		}
-		hashers[0] = firstDoubleMapHasher
-		secondDoubleMapHasher, err := s.Type.AsDoubleMap.Key2Hasher.HashFunc()
-		if err != nil {
-			return nil, err
-		}
-		hashers[1] = secondDoubleMapHasher
-		return hashers, nil
-	}
-	if s.Type.IsNMap {
-		hashers = make([]hash.Hash, len(s.Type.AsNMap.Hashers))
-		for i, hasher := range s.Type.AsNMap.Hashers {
-			hasherFn, err := hasher.HashFunc()
-			if err != nil {
-				return nil, err
-			}
-			hashers[i] = hasherFn
-		}
-		return hashers, nil
-	}
-
-	hashers = make([]hash.Hash, 1)
-	hashers[0] = xxhash.New128(nil)
-
 	return hashers, nil
 }
 
