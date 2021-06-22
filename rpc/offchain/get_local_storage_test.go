@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,18 +13,17 @@ func TestOffchain_LocalStorageGetSet(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 20, n)
 
+	value := []byte{0, 1, 2}
+
 	data, err := offchain.LocalStorageGet(Persistent, key)
 	assert.NoError(t, err)
 	assert.Empty(t, data)
 
-	err = offchain.LocalStorageSet(Persistent, key, key)
+	err = offchain.LocalStorageSet(Persistent, key, value)
 	assert.NoError(t, err)
 
 	data, err = offchain.LocalStorageGet(Persistent, key)
 	assert.NoError(t, err)
 
-	got := make([]byte, 0, 20)
-	err = types.DecodeFromHexString(data.Hex(), &got)
-	assert.NoError(t, err)
-	assert.Equal(t, key, got)
+	assert.Equal(t, value, []byte(*data))
 }
