@@ -111,6 +111,30 @@ func (e ExtrinsicPayloadV4) Sign(signer signature.KeyringPair) (Signature, error
 	return NewSignature(sig), err
 }
 
+// Sign the extrinsic payload with the given derivation path
+func (e ExtrinsicPayloadV4) SignEd25519(signer signature.KeyringPair) (Signature, error) {
+	b, err := EncodeToBytes(e)
+	if err != nil {
+		return Signature{}, err
+	}
+
+	sig, err := signature.SignEd25519(b, signer.URI)
+
+	return NewSignature(sig), err
+}
+
+// TODO: Does not work
+// Sign the extrinsic payload with the given derivation path
+func (e ExtrinsicPayloadV4) SignEcdsa(signer signature.KeyringPair) (Signature, error) {
+	b, err := EncodeToBytes(e)
+	if err != nil {
+		return Signature{}, err
+	}
+	// fmt.Println("BXL ExtrinsicPayloadV4 SignEcdsa : 	")
+	sig, err := signature.SignEcdsa(b, signer.URI)
+	return NewSignature(sig), err
+}
+
 func (e ExtrinsicPayloadV4) Encode(encoder scale.Encoder) error {
 	err := encoder.Encode(e.Method)
 	if err != nil {

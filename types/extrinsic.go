@@ -50,6 +50,14 @@ type Extrinsic struct {
 	Signature ExtrinsicSignatureV4
 	// Method is the call this extrinsic wraps
 	Method Call
+	// Sign Scheme
+	CurrentScheme
+}
+
+type CurrentScheme struct {
+	IsEd25519 bool // 0:: Ed25519(Ed25519Signature)
+	IsSr25519 bool // 1:: Sr25519(Sr25519Signature)
+	IsEcdsa   bool // 2:: Ecdsa(EcdsaSignature)
 }
 
 // NewExtrinsic creates a new Extrinsic from the provided Call
@@ -119,6 +127,21 @@ func (e Extrinsic) Type() uint8 {
 	return e.Version & ExtrinsicUnmaskVersion
 }
 
+func (e *Extrinsic) SetSignScheme(scheme string) {
+	switch scheme {
+	case "Ed25519":
+		// fmt.Println("BXL ---- Ed25519  -----")
+		e.CurrentScheme = CurrentScheme{IsEd25519: true}
+
+	case "Ecdsa":
+		// fmt.Println("BXL ---- Ecdsa	  -----")
+		e.CurrentScheme = CurrentScheme{IsEcdsa: true}
+	default:
+		// fmt.Println("BXL ---- Sr25519	  -----")
+		e.CurrentScheme = CurrentScheme{IsSr25519: true}
+	}
+}
+
 // Sign adds a signature to the extrinsic
 func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error {
 	if e.Type() != ExtrinsicVersion4 {
@@ -150,17 +173,37 @@ func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error
 
 	signerPubKey := NewMultiAddressFromAccountID(signer.PublicKey)
 
-	sig, err := payload.Sign(signer)
-	if err != nil {
-		return err
+	extSig := ExtrinsicSignatureV4{
+		Signer: signerPubKey,
+		Era:    era,
+		Nonce:  o.Nonce,
+		Tip:    o.Tip,
 	}
 
-	extSig := ExtrinsicSignatureV4{
-		Signer:    signerPubKey,
-		Signature: MultiSignature{IsSr25519: true, AsSr25519: sig},
-		Era:       era,
-		Nonce:     o.Nonce,
-		Tip:       o.Tip,
+	switch {
+	case e.CurrentScheme.IsEd25519:
+		// fmt.Println("BXL e.CurrentScheme.IsEd25519 : ", e.CurrentScheme.IsEd25519)
+		sig, err := payload.SignEd25519(signer)
+		if err != nil {
+			return err
+		}
+		// fmt.Println("BXL e.CurrentScheme.IsEd25519 :  IsEd25519	")
+		extSig.Signature = MultiSignature{IsEd25519: true, AsEd25519: sig}
+	case e.CurrentScheme.IsEcdsa:
+		fmt.Println("BXL DOES NOT WORK e.CurrentScheme.IsEcdsa : ", e.CurrentScheme.IsEcdsa)
+		sig, err := payload.SignEcdsa(signer)
+		if err != nil {
+			return err
+		}
+		fmt.Println("BXL DOES NOT WORK e.CurrentScheme.IsEcdsa :  IsEcdsa	")
+		extSig.Signature = MultiSignature{IsEcdsa: true, AsEcdsa: sig}
+	default:
+		sig, err := payload.Sign(signer)
+		if err != nil {
+			return err
+		}
+		// fmt.Println("BXL e.CurrentScheme.IsSr25519 :  IsSr25519	")
+		extSig.Signature = MultiSignature{IsSr25519: true, AsSr25519: sig}
 	}
 
 	e.Signature = extSig

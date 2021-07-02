@@ -33,6 +33,13 @@ test-dockerized:		## run all tests in a docker container against the Substrate D
 test-dockerized: run-substrate-docker
 	@docker-compose build; docker-compose up --abort-on-container-exit gsrpc-test
 
+test-dockerized-polkadot-latest:		## run all tests in a docker container against the Substrate Default Docker image
+test-dockerized-polkadot-latest: run-substrate-docker-polkadot-latest
+	@docker-compose build; docker-compose up --abort-on-container-exit gsrpc-test
+
+run-substrate-docker-polkadot-latest: 		## starts the Substrate Docker image
+	@docker-compose -f docker-compose-polkadot-latest.yml up -d substrate
+
 run-substrate-docker: 		## starts the Substrate Docker image
 	@docker-compose up -d substrate
 
