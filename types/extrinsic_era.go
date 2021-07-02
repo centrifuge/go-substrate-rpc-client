@@ -17,6 +17,9 @@
 package types
 
 import (
+	"math"
+	"math/bits"
+
 	"github.com/centrifuge/go-substrate-rpc-client/v3/scale"
 )
 
@@ -73,4 +76,27 @@ func (e ExtrinsicEra) Encode(encoder scale.Encoder) error {
 type MortalEra struct {
 	First  byte
 	Second byte
+}
+
+// Mortal describes a mortal era based on a period of validity and a block number on which it should start
+func Mortal(validityPeriod, currentBlock uint64) (period, phase uint64) {
+	calPeriod := math.Pow(2, math.Ceil(math.Log2(float64(validityPeriod))))
+	period = uint64(math.Min(math.Max(calPeriod, 4), 1<<16))
+
+	quantizeFactor := math.Max(float64(period>>12), 1)
+	quantizedPhase := float64(currentBlock%period) / quantizeFactor * quantizeFactor
+
+	phase = uint64(quantizedPhase)
+
+	return
+}
+
+// NewMortalEra encodes a mortal era based on period and phase
+func NewMortalEra(period, phase uint64) MortalEra {
+	quantizeFactor := math.Max(float64(period>>12), 1)
+
+	trailingZeros := bits.TrailingZeros16(uint16(period))
+	encoded := uint16(float64(phase)/quantizeFactor)<<4 | uint16(math.Min(15, math.Max(1, float64(trailingZeros-1))))
+
+	return MortalEra{First: byte(encoded & 0xff), Second: byte(encoded >> 8)}
 }
