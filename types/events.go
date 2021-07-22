@@ -136,6 +136,16 @@ type EventImOnlineAllGood struct {
 	Topics []Hash
 }
 
+// EventImOnlineSomeOffline is emitted when the end of the session, at least once validator was found to be offline
+type EventImOnlineSomeOffline struct {
+	Phase                Phase
+	IdentificationTuples []struct {
+		ValidatorID        AccountID
+		FullIdentification Exposure
+	}
+	Topics []Hash
+}
+
 // Exposure lists the own and nominated stake of a validator
 type Exposure struct {
 	Total  UCompact
@@ -147,16 +157,6 @@ type Exposure struct {
 type IndividualExposure struct {
 	Who   AccountID
 	Value UCompact
-}
-
-// EventImOnlineSomeOffline is emitted when the end of the session, at least once validator was found to be offline
-type EventImOnlineSomeOffline struct {
-	Phase                Phase
-	IdentificationTuples []struct {
-		ValidatorID        AccountID
-		FullIdentification Exposure
-	}
-	Topics []Hash
 }
 
 // EventIndicesIndexAssigned is emitted when an index is assigned to an AccountID.
@@ -269,6 +269,12 @@ type EventStakingKicked struct {
 	Nominator AccountID
 	Stash     AccountID
 	Topics    []Hash
+}
+
+type EventStakingChilled struct {
+	Phase  Phase
+	Stash  AccountID
+	Topics []Hash
 }
 
 // EventSystemExtrinsicSuccessV8 is emitted when an extrinsic completed successfully
@@ -399,6 +405,13 @@ type EventSystemNewAccount struct {
 type EventSystemKilledAccount struct {
 	Phase  Phase
 	Who    AccountID
+	Topics []Hash
+}
+
+type EventSystemRemarked struct {
+	Phase  Phase
+	Who    AccountID
+	Hash   Hash
 	Topics []Hash
 }
 
@@ -642,7 +655,7 @@ type EventDemocracyCancelled struct {
 type EventDemocracyExecuted struct {
 	Phase           Phase
 	ReferendumIndex U32
-	Result          bool
+	Result          DispatchResult
 	Topics          []Hash
 }
 
@@ -898,6 +911,7 @@ type EventTechnicalMembershipDummy struct {
 type EventElectionMultiPhaseSolutionStored struct {
 	Phase   Phase
 	Compute ElectionCompute
+	Ejected Bool
 	Topics  []Hash
 }
 
@@ -912,6 +926,7 @@ type EventElectionMultiPhaseElectionFinalized struct {
 type EventElectionMultiPhaseRewarded struct {
 	Phase  Phase
 	Who    AccountID
+	Amount U128
 	Topics []Hash
 }
 
@@ -919,6 +934,7 @@ type EventElectionMultiPhaseRewarded struct {
 type EventElectionMultiPhaseSlashed struct {
 	Phase  Phase
 	Who    AccountID
+	Amount U128
 	Topics []Hash
 }
 
@@ -1583,16 +1599,17 @@ type EventUtilityBatchCompleted struct {
 // EventUtilityNewMultisig is emitted when a new multisig operation has begun.
 // First param is the account that is approving, second is the multisig account, third is hash of the call.
 type EventMultisigNewMultisig struct {
-	Phase    Phase
-	Who, ID  AccountID
-	CallHash Hash
-	Topics   []Hash
+	Phase     Phase
+	Approving AccountID
+	Multisig  AccountID
+	CallHash  Hash
+	Topics    []Hash
 }
 
 // TimePoint is a global extrinsic index, formed as the extrinsic index within a block,
 // together with that block's height.
 type TimePoint struct {
-	Height U32
+	Height BlockNumber
 	Index  U32
 }
 
@@ -1667,5 +1684,67 @@ type EventMultisigCancelled struct {
 	TimePoint TimePoint
 	ID        AccountID
 	CallHash  Hash
+	Topics    []Hash
+}
+
+type EventParachainSystemValidationFunctionStored struct {
+	Phase  Phase
+	Height BlockNumber
+	Topics []Hash
+}
+
+type EventParachainSystemValidationFunctionApplied struct {
+	Phase  Phase
+	Height BlockNumber
+	Topics []Hash
+}
+
+type EventParachainSystemUpgradeAuthorized struct {
+	Phase  Phase
+	Hash   Hash
+	Topics []Hash
+}
+
+type EventParachainSystemDownwardMessagesReceived struct {
+	Phase  Phase
+	Count  U32
+	Topics []Hash
+}
+
+type EventParachainSystemDownwardMessagesProcessed struct {
+	Phase  Phase
+	Weight Weight
+	Hash   Hash
+	Topics []Hash
+}
+
+type EventCollatorSelectionNewInvulnerables struct {
+	Phase    Phase
+	Accounts []AccountID
+	Topics   []Hash
+}
+
+type EventCollatorSelectionNewDesiredCandidates struct {
+	Phase   Phase
+	Desired U32
+	Topics  []Hash
+}
+
+type EventCollatorSelectionNewCandidacyBond struct {
+	Phase  Phase
+	Amount U128
+	Topics []Hash
+}
+
+type EventCollatorSelectionCandidateAdded struct {
+	Phase     Phase
+	Candidate AccountID
+	Amount    U128
+	Topics    []Hash
+}
+
+type EventCollatorSelectionCandidateRemoved struct {
+	Phase     Phase
+	Candidate AccountID
 	Topics    []Hash
 }
