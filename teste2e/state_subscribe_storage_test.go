@@ -90,16 +90,18 @@ func TestState_SubscribeStorage_Events(t *testing.T) {
 		case set := <-sub.Chan():
 			fmt.Printf("%#v\n", set)
 			for _, chng := range set.Changes {
-				if !types.Eq(chng.StorageKey, key) || !chng.HasStorageData {
+				if !types.Eq(chng.StorageKey, key) || !chng.StorageData.IsSome() {
 					// skip, we are only interested in events with content
 					continue
 				}
+				_, storageData := chng.StorageData.Unwrap()
 
 				fmt.Printf("%s\n", chng.StorageKey.Hex())
-				fmt.Printf("%#x\n", chng.StorageData)
+				fmt.Printf("%#x\n", storageData)
 
 				events := types.EventRecords{}
-				err = types.EventRecordsRaw(chng.StorageData).DecodeEventRecords(meta, &events)
+
+				err = types.EventRecordsRaw(storageData).DecodeEventRecords(meta, &events)
 				assert.NoError(t, err)
 
 				fmt.Printf("%#v\n", events)

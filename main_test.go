@@ -128,12 +128,14 @@ func Example_listenToBalanceChange() {
 	for {
 		// inner loop for the changes within one of those notifications
 		for _, chng := range (<-sub.Chan()).Changes {
-			if !chng.HasStorageData {
+			if chng.StorageData.IsNone() {
 				continue
 			}
 
+			_, storageData := chng.StorageData.Unwrap()
+
 			var acc types.AccountInfo
-			if err = types.DecodeFromBytes(chng.StorageData, &acc); err != nil {
+			if err = types.DecodeFromBytes(storageData, &acc); err != nil {
 				panic(err)
 			}
 
@@ -296,14 +298,16 @@ func Example_displaySystemEvents() {
 		set := <-sub.Chan()
 		// inner loop for the changes within one of those notifications
 		for _, chng := range set.Changes {
-			if !types.Eq(chng.StorageKey, key) || !chng.HasStorageData {
+			if !types.Eq(chng.StorageKey, key) || !chng.StorageData.IsSome() {
 				// skip, we are only interested in events with content
 				continue
 			}
 
+			_, storageData := chng.StorageData.Unwrap()
+
 			// Decode the event records
 			events := types.EventRecords{}
-			err = types.EventRecordsRaw(chng.StorageData).DecodeEventRecords(meta, &events)
+			err = types.EventRecordsRaw(storageData).DecodeEventRecords(meta, &events)
 			if err != nil {
 				panic(err)
 			}

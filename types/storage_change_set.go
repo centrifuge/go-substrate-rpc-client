@@ -1,6 +1,7 @@
 // Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
 //
 // Copyright 2019 Centrifuge GmbH
+// Copyright 2021 Snowfork
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,9 +29,25 @@ type StorageChangeSet struct {
 }
 
 type KeyValueOption struct {
-	StorageKey     StorageKey
-	HasStorageData bool
-	StorageData    StorageDataRaw
+	StorageKey  StorageKey
+	StorageData OptionStorageData
+}
+
+type OptionStorageData struct {
+	option
+	value StorageDataRaw
+}
+
+func NewOptionStorageData(value StorageDataRaw) OptionStorageData {
+	return OptionStorageData{option{true}, value}
+}
+
+func NewOptionStorageDataEmpty() OptionStorageData {
+	return OptionStorageData{option{false}, nil}
+}
+
+func (o OptionStorageData) Unwrap() (ok bool, value StorageDataRaw) {
+	return o.hasValue, o.value
 }
 
 func (r *KeyValueOption) UnmarshalJSON(b []byte) error {
@@ -38,35 +55,38 @@ func (r *KeyValueOption) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &tmp); err != nil {
 		return err
 	}
+
 	switch len(tmp) {
-	case 0:
-		return fmt.Errorf("expected at least one entry for KeyValueOption")
 	case 2:
-		r.HasStorageData = true
-		data, err := HexDecodeString(tmp[1])
-		if err != nil {
-			return err
-		}
-		r.StorageData = data
-		fallthrough
-	case 1:
 		key, err := HexDecodeString(tmp[0])
 		if err != nil {
 			return err
 		}
 		r.StorageKey = key
+
+		if tmp[1] != "" {
+			r.StorageData.hasValue = true
+			data, err := HexDecodeString(tmp[1])
+			if err != nil {
+				return err
+			}
+			r.StorageData.value = data
+		} else {
+			r.StorageData.hasValue = false
+		}
 	default:
-		return fmt.Errorf("expected 1 or 2 entries for KeyValueOption, got %v", len(tmp))
+		return fmt.Errorf("expected 2 entries for StorageChange, got %v", len(tmp))
 	}
 	return nil
 }
 
 func (r KeyValueOption) MarshalJSON() ([]byte, error) {
-	var tmp []string
-	if r.HasStorageData {
-		tmp = []string{r.StorageKey.Hex(), r.StorageData.Hex()}
+	var tmp []interface{}
+	tmp = append(tmp, r.StorageKey.Hex())
+	if r.StorageData.hasValue {
+		tmp = append(tmp, r.StorageData.value.Hex())
 	} else {
-		tmp = []string{r.StorageKey.Hex()}
+		tmp = append(tmp, nil)
 	}
 	return json.Marshal(tmp)
 }

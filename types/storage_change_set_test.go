@@ -25,7 +25,7 @@ import (
 )
 
 func TestStorageChangeSet_UnmarshalMarshalJSON(t *testing.T) {
-	s := []byte("{\"block\":\"0xa230d0b6dc75868237b08d71618f3d19526b8aa346d94c792a4fce0a945b1e3f\",\"changes\":[[\"0xcc956bdb7605e3547539f321ac2bc95c\",\"0x0800000000000000000001000000000000\"],[\"0xcc956bdb7605e3547539f321ac2bc95d\"]]}") //nolint:lll
+	s := []byte("{\"block\":\"0xa230d0b6dc75868237b08d71618f3d19526b8aa346d94c792a4fce0a945b1e3f\",\"changes\":[[\"0xcc956bdb7605e3547539f321ac2bc95c\",\"0x0800000000000000000001000000000000\"],[\"0xcc956bdb7605e3547539f321ac2bc95d\",null]]}") //nolint:lll
 
 	var cs StorageChangeSet
 
@@ -36,13 +36,12 @@ func TestStorageChangeSet_UnmarshalMarshalJSON(t *testing.T) {
 		Block: NewHash([]byte{0xa2, 0x30, 0xd0, 0xb6, 0xdc, 0x75, 0x86, 0x82, 0x37, 0xb0, 0x8d, 0x71, 0x61, 0x8f, 0x3d, 0x19, 0x52, 0x6b, 0x8a, 0xa3, 0x46, 0xd9, 0x4c, 0x79, 0x2a, 0x4f, 0xce, 0xa, 0x94, 0x5b, 0x1e, 0x3f}), //nolint:lll
 		Changes: []KeyValueOption{
 			{
-				StorageKey:     MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95c"),
-				HasStorageData: true,
-				StorageData:    MustHexDecodeString("0x0800000000000000000001000000000000"),
+				StorageKey:  MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95c"),
+				StorageData: NewOptionStorageData(NewStorageDataRaw(MustHexDecodeString("0x0800000000000000000001000000000000"))),
 			},
 			{
-				StorageKey:     MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95d"),
-				HasStorageData: false,
+				StorageKey:  MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95d"),
+				StorageData: NewOptionStorageDataEmpty(),
 			},
 		},
 	}, cs)
@@ -61,14 +60,13 @@ func TestKeyValueOption_UnmarshalJSON(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, KeyValueOption{
-		StorageKey:     MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95c"),
-		HasStorageData: true,
-		StorageData:    MustHexDecodeString("0x0800000000000000000001000000000000"),
+		StorageKey:  MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95c"),
+		StorageData: NewOptionStorageData(MustHexDecodeString("0x0800000000000000000001000000000000")),
 	}, kv)
 }
 
 func TestKeyValueOption_UnmarshalJSON2(t *testing.T) {
-	s := []byte("[\"0xcc956bdb7605e3547539f321ac2bc95c\"]")
+	s := []byte("[\"0xcc956bdb7605e3547539f321ac2bc95c\",null]")
 
 	var kv KeyValueOption
 
@@ -76,8 +74,8 @@ func TestKeyValueOption_UnmarshalJSON2(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, KeyValueOption{
-		StorageKey:     MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95c"),
-		HasStorageData: false,
+		StorageKey:  MustHexDecodeString("0xcc956bdb7605e3547539f321ac2bc95c"),
+		StorageData: NewOptionStorageDataEmpty(),
 	}, kv)
 }
 
@@ -95,7 +93,7 @@ func TestKeyValueOption_UnmarshalMarshalJSON(t *testing.T) {
 }
 
 func TestKeyValueOption_UnmarshalMarshalJSON2(t *testing.T) {
-	s := []byte("[\"0xcc956bdb7605e3547539f321ac2bc95c\"]")
+	s := []byte("[\"0xcc956bdb7605e3547539f321ac2bc95c\",null]")
 
 	var kv KeyValueOption
 
