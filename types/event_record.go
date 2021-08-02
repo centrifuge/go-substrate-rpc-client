@@ -442,7 +442,8 @@ func (d *DispatchError) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	return decoder.Decode(&d.Error)
+	// ignore other error
+	return nil
 }
 
 func (d DispatchError) Encode(encoder scale.Encoder) error {
