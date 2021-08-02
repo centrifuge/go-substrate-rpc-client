@@ -255,7 +255,7 @@ type EventRecords struct {
 // If this method returns an error like `unable to decode Phase for event #x: EOF`, it is likely that you have defined
 // a custom event record with a wrong type. For example your custom event record has a field with a length prefixed
 // type, such as types.Bytes, where your event in reallity contains a fixed width type, such as a types.U32.
-func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
+func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}, modules []string) error {
 	log.Debug(fmt.Sprintf("will decode event records from raw hex: %#x", e))
 
 	// ensure t is a pointer
@@ -311,6 +311,23 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
 
 		// ask metadata for method & event name for event
 		moduleName, eventName, err := m.FindEventNamesForEventID(id)
+
+		findModule := func(name string) bool {
+			for _, v := range modules {
+				if v == name {
+					return true
+				}
+			}
+
+			return false
+		}
+		// if we just care about specfic modules' events, we can just ignore the others
+		if len(modules) > 0 {
+			if !findModule(string(moduleName)) {
+				continue
+			}
+		}
+
 		// moduleName, eventName, err := "System", "ExtrinsicSuccess", nil
 		if err != nil {
 			return fmt.Errorf("unable to find event with EventID %v in metadata for event #%v: %s", id, i, err)
