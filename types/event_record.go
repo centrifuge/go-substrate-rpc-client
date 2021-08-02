@@ -439,8 +439,6 @@ func (d *DispatchError) Decode(decoder scale.Decoder) error {
 	if b == 3 {
 		d.HasModule = true
 		err = decoder.Decode(&d.Module)
-	}
-	if err != nil {
 		return err
 	}
 
@@ -448,8 +446,6 @@ func (d *DispatchError) Decode(decoder scale.Decoder) error {
 	if b == 6 {
 		d.HasToken = true
 		err = decoder.Decode(&d.Token)
-	}
-	if err != nil {
 		return err
 	}
 
@@ -457,8 +453,6 @@ func (d *DispatchError) Decode(decoder scale.Decoder) error {
 	if b == 7 {
 		d.HasArithmetic = true
 		err = decoder.Decode(&d.Arithmetic)
-	}
-	if err != nil {
 		return err
 	}
 
