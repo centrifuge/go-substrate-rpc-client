@@ -426,28 +426,39 @@ func (p Phase) Encode(encoder scale.Encoder) error {
 
 // DispatchError is an error occurring during extrinsic dispatch
 type DispatchError struct {
-	HasModule bool
-	Module    uint8
-	Error     uint8
+	Error              uint8
+	HasModule          bool
+	Module             uint8
+	ModuleError        uint8
+	HasTokenError      bool
+	TokenError         uint8
+	HasArithmeticError bool
+	ArithmeticError    uint8
 }
 
 func (d *DispatchError) Decode(decoder scale.Decoder) error {
-	b, err := decoder.ReadOneByte()
+	err := decoder.Decode(&d.Error)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("================ DispatchError decode, b = %v\n", b)
+	fmt.Printf("================ DispatchError decode, error = %v\n", d.Error)
 
 	// Enum index 3 for Module Error
-	if b == 3 {
+	if d.Error == 3 {
 		d.HasModule = true
 		err = decoder.Decode(&d.Module)
+		if err != nil {
+			return err
+		}
+		err = decoder.Decode(&d.ModuleError)
+	} else if d.Error == 6 {
+		d.HasTokenError = true
+		err = decoder.Decode(&d.TokenError)
+	} else if d.Error == 7 {
+		d.HasArithmeticError = true
+		err = decoder.Decode(&d.ArithmeticError)
 	}
-	if err != nil {
-		return err
-	}
-
-	return decoder.Decode(&d.Error)
+	return err
 }
 
 func (d DispatchError) Encode(encoder scale.Encoder) error {
@@ -458,15 +469,26 @@ func (d DispatchError) Encode(encoder scale.Encoder) error {
 			return err
 		}
 		err = encoder.Encode(d.Module)
+		if err != nil {
+			return err
+		}
+		err = encoder.Encode(d.ModuleError)
+	} else if d.HasTokenError {
+		err = encoder.PushByte(6)
+		if err != nil {
+			return err
+		}
+		err = encoder.PushByte(d.TokenError)
+	} else if d.HasArithmeticError {
+		err = encoder.PushByte(7)
+		if err != nil {
+			return err
+		}
+		err = encoder.PushByte(d.ArithmeticError)
 	} else {
-		err = encoder.PushByte(0)
+		err = encoder.PushByte(d.Error)
 	}
-
-	if err != nil {
-		return err
-	}
-
-	return encoder.Encode(&d.Error)
+	return err
 }
 
 type EventID [2]byte
