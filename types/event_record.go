@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"io"
 	"reflect"
-	"strings"
 
 	"github.com/Phala-Network/go-substrate-rpc-client/v3/scale"
 	"github.com/ethereum/go-ethereum/log"
@@ -256,7 +255,7 @@ type EventRecords struct {
 // If this method returns an error like `unable to decode Phase for event #x: EOF`, it is likely that you have defined
 // a custom event record with a wrong type. For example your custom event record has a field with a length prefixed
 // type, such as types.Bytes, where your event in reallity contains a fixed width type, such as a types.U32.
-func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}, modules []string) error {
+func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
 	log.Debug(fmt.Sprintf("will decode event records from raw hex: %#x", e))
 
 	// ensure t is a pointer
@@ -293,7 +292,7 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}, modules 
 	// iterate over events
 	for i := uint64(0); i < n.Uint64(); i++ {
 		// log.Debug(fmt.Sprintf("decoding event #%v", i))
-		fmt.Printf("================ decoding event #%v", i)
+		fmt.Printf("================ decoding event #%v\n", i)
 
 		// decode Phase
 		phase := Phase{}
@@ -310,37 +309,19 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}, modules 
 		}
 
 		// log.Debug(fmt.Sprintf("event #%v has EventID %v", i, id))
-		fmt.Printf("================ event #%v has EventID %v", i, id)
+		fmt.Printf("================ event #%v has EventID %v\n", i, id)
 
 		// ask metadata for method & event name for event
 		moduleName, eventName, err := m.FindEventNamesForEventID(id)
 		fmt.Printf("================ module - event: %v-%v\n", moduleName, eventName)
 		// moduleName, eventName, err := "System", "ExtrinsicSuccess", nil
 		if err != nil {
-			fmt.Printf("================ FindEventNamesForEventID return failed, ingore\n")
-			// ingore events that decoded failed
-			continue
-		}
-
-		findModule := func(name string) bool {
-			for _, v := range modules {
-				fmt.Printf("================ found module: %v, expected %v\n", v, name)
-				if strings.ToLower(v) == strings.ToLower(name) {
-					return true
-				}
-			}
-
-			return false
-		}
-		// if we just care about specfic modules' events, we can just ignore the others
-		if len(modules) > 0 {
-			if !findModule(string(moduleName)) {
-				continue
-			}
+			fmt.Printf("================ FindEventNamesForEventID return failed\n")
+			return nil
 		}
 
 		// log.Debug(fmt.Sprintf("event #%v is in module %v with event name %v", i, moduleName, eventName))
-		fmt.Printf("================ event #%v is in module %v with event name %v", i, moduleName, eventName)
+		fmt.Printf("================ event #%v is in module %v with event name %v\n", i, moduleName, eventName)
 
 		// check whether name for eventID exists in t
 		field := val.FieldByName(fmt.Sprintf("%v_%v", moduleName, eventName))
