@@ -287,7 +287,8 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
 		return err
 	}
 
-	log.Debug(fmt.Sprintf("found %v events", n))
+	// log.Debug(fmt.Sprintf("found %v events", n))
+	fmt.Printf("================ found %v events", n)
 
 	// iterate over events
 	for i := uint64(0); i < n.Uint64(); i++ {
@@ -317,7 +318,7 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
 		// moduleName, eventName, err := "System", "ExtrinsicSuccess", nil
 		if err != nil {
 			fmt.Printf("================ FindEventNamesForEventID return failed\n")
-			return nil
+			return err
 		}
 
 		// log.Debug(fmt.Sprintf("event #%v is in module %v with event name %v", i, moduleName, eventName))
@@ -444,6 +445,8 @@ func (d *DispatchError) Decode(decoder scale.Decoder) error {
 	if b == 3 {
 		d.HasModule = true
 		err = decoder.Decode(&d.Module)
+	}
+	if err != nil {
 		return err
 	}
 
@@ -451,6 +454,8 @@ func (d *DispatchError) Decode(decoder scale.Decoder) error {
 	if b == 6 {
 		d.HasToken = true
 		err = decoder.Decode(&d.Token)
+	}
+	if err != nil {
 		return err
 	}
 
@@ -458,6 +463,8 @@ func (d *DispatchError) Decode(decoder scale.Decoder) error {
 	if b == 7 {
 		d.HasArithmetic = true
 		err = decoder.Decode(&d.Arithmetic)
+	}
+	if err != nil {
 		return err
 	}
 
