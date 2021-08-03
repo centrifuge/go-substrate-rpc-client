@@ -61,10 +61,12 @@ func (m *MetadataV13) FindEventNamesForEventID(eventID EventID) (Text, Text, err
 			continue
 		}
 		if int(eventID[1]) >= len(mod.Events) {
+			fmt.Printf("================ event index %v for module %v out of range\n", eventID[1], mod.Name)
 			return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], mod.Name)
 		}
 		return mod.Name, mod.Events[eventID[1]].Name, nil
 	}
+	fmt.Printf("================ module index %v out of range\n", eventID[0])
 	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
 }
 

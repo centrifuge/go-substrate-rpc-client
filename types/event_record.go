@@ -292,7 +292,8 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}, modules 
 
 	// iterate over events
 	for i := uint64(0); i < n.Uint64(); i++ {
-		log.Debug(fmt.Sprintf("decoding event #%v", i))
+		// log.Debug(fmt.Sprintf("decoding event #%v", i))
+		fmt.Printf("================ decoding event #%v", i)
 
 		// decode Phase
 		phase := Phase{}
@@ -308,14 +309,22 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}, modules 
 			return fmt.Errorf("unable to decode EventID for event #%v: %v", i, err)
 		}
 
-		log.Debug(fmt.Sprintf("event #%v has EventID %v", i, id))
+		// log.Debug(fmt.Sprintf("event #%v has EventID %v", i, id))
+		fmt.Printf("================ event #%v has EventID %v", i, id)
 
 		// ask metadata for method & event name for event
 		moduleName, eventName, err := m.FindEventNamesForEventID(id)
 		fmt.Printf("================ module - event: %v-%v\n", moduleName, eventName)
+		// moduleName, eventName, err := "System", "ExtrinsicSuccess", nil
+		if err != nil {
+			fmt.Printf("================ FindEventNamesForEventID return failed, ingore\n")
+			// ingore events that decoded failed
+			continue
+		}
 
 		findModule := func(name string) bool {
 			for _, v := range modules {
+				fmt.Printf("================ found module: %v, expected %v\n", v, name)
 				if strings.ToLower(v) == strings.ToLower(name) {
 					return true
 				}
@@ -330,12 +339,8 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}, modules 
 			}
 		}
 
-		// moduleName, eventName, err := "System", "ExtrinsicSuccess", nil
-		if err != nil {
-			return fmt.Errorf("unable to find event with EventID %v in metadata for event #%v: %s", id, i, err)
-		}
-
-		log.Debug(fmt.Sprintf("event #%v is in module %v with event name %v", i, moduleName, eventName))
+		// log.Debug(fmt.Sprintf("event #%v is in module %v with event name %v", i, moduleName, eventName))
+		fmt.Printf("================ event #%v is in module %v with event name %v", i, moduleName, eventName)
 
 		// check whether name for eventID exists in t
 		field := val.FieldByName(fmt.Sprintf("%v_%v", moduleName, eventName))
