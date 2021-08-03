@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"reflect"
+	"strings"
 
 	"github.com/Phala-Network/go-substrate-rpc-client/v3/scale"
 	"github.com/ethereum/go-ethereum/log"
@@ -311,10 +312,11 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}, modules 
 
 		// ask metadata for method & event name for event
 		moduleName, eventName, err := m.FindEventNamesForEventID(id)
+		fmt.Printf("================ module - event: %v-%v\n", moduleName, eventName)
 
 		findModule := func(name string) bool {
 			for _, v := range modules {
-				if v == name {
+				if strings.ToLower(v) == strings.ToLower(name) {
 					return true
 				}
 			}
