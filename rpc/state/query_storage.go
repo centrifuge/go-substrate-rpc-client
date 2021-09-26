@@ -17,6 +17,7 @@
 package state
 
 import (
+	"fmt"
 	"github.com/centrifuge/go-substrate-rpc-client/v3/client"
 	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
 )
@@ -46,4 +47,30 @@ func (s *State) queryStorage(keys []types.StorageKey, startBlock types.Hash, blo
 	}
 
 	return res, nil
+}
+
+func (s *State) QueryStorageAt(keys []types.StorageKey, blockHash *types.Hash) (data types.StorageChangeSet, err error) {
+	return s.queryStorageAt(keys, blockHash)
+}
+
+func (s *State) queryStorageAt(keys []types.StorageKey, blockHash *types.Hash) (data types.StorageChangeSet, err error) {
+	var res []types.StorageChangeSet
+	var args []interface{}
+	for _, key := range keys {
+		args = append(args, key.Hex())
+	}
+	if blockHash != nil {
+		err = s.client.Call(&res, "state_queryStorageAt", args, blockHash)
+	} else {
+		err = s.client.Call(&res, "state_queryStorageAt", args)
+	}
+	if err != nil {
+		return
+	}
+	if len(res) != 1 {
+		err = fmt.Errorf("unexpected answer length %v", len(res))
+		return
+	}
+	data = res[0]
+	return
 }
