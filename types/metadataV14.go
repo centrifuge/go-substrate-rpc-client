@@ -3,19 +3,33 @@ package types
 import (
 	"fmt"
 	"hash"
+	"math/big"
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v3/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v3/xxhash"
 )
 
+type Si1LookupTypeId big.Int
+
 // Based on:
-// https://github.com/polkadot-js/api/blob/48ef04b8ca21dc4bd06442775d9b7585c75d1253/packages/types/src/interfaces/metadata/v14.ts
+// https://github.com/polkadot-js/api/blob/48ef04b8ca21dc4bd06442775d9b7585c75d1253/packages/types/src/interfaces/metadata/v14.ts#L30-L34
 
 type MetadataV14 struct {
-	Types PortableRegistry
+	Types     PortableRegistry
 	Pallets   []PalletMetadataV14
-	Extrinsic ExtrinsicV11
+	Extrinsic ExtrinsicV14
+}
+
+type ExtrinsicV14 struct {
+	Type             Si1LookupTypeId
+	Version          U8
+	SignedExtensions []SignedExtensionV14
+}
+
+type SignedExtensionV14 struct {
+	Identifier Text
+	Type       Si1LookupTypeId
 }
 
 func (m *MetadataV14) Decode(decoder scale.Decoder) error {
@@ -121,9 +135,9 @@ type PalletMetadataV14 struct {
 	HasCalls   bool
 	Calls      []FunctionMetadataV4
 	HasEvents  bool
-	Events     []EventMetadataV4
-	Constants  []ModuleConstantMetadataV6
-	Errors     []ErrorMetadataV8
+	Events     []EventMetadataV4          //todo(nuno): use v14
+	Constants  []ModuleConstantMetadataV6 //todo(nuno): use v14
+	Errors     []ErrorMetadataV8          //todo(nuno): use v14
 	Index      uint8
 }
 
