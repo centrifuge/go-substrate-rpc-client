@@ -16,25 +16,44 @@ type MetadataV14 struct {
 	Types     PortableRegistry
 	Pallets   []PalletMetadataV14
 	Extrinsic ExtrinsicV14
+
+	LookUpData map[int64]*Si1Type
 }
 
 type ExtrinsicV14 struct {
-	Type             Si1LookupTypeId
+	Type             Si1LookupTypeID
 	Version          U8
 	SignedExtensions []SignedExtensionV14
 }
 
 type SignedExtensionV14 struct {
 	Identifier Text
-	Type       Si1LookupTypeId
+	Type       Si1LookupTypeID
 }
 
 func (m *MetadataV14) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&m.Pallets)
+	var err error
+	err = decoder.Decode(&m.Types)
 	if err != nil {
 		return err
 	}
-	return decoder.Decode(&m.Extrinsic)
+
+	// todo(nuno): make sure we need a lock
+	m.LookUpData = make(map[int64]*Si1Type)
+	for _, lookUp := range m.Types {
+		m.LookUpData[lookUp.ID.Int64()] = &lookUp.Type
+	}
+
+	err = decoder.Decode(&m.Pallets)
+	if err != nil {
+		return err
+	}
+
+	err = decoder.Decode(&m.Extrinsic)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (m MetadataV14) Encode(encoder scale.Encoder) error {
@@ -69,13 +88,13 @@ func (m *MetadataV14) FindEventNamesForEventID(eventID EventID) (Text, Text, err
 		if !mod.HasEvents {
 			continue
 		}
-		if uint8(mod.Index) != eventID[0] {
+		if mod.Index != eventID[0] {
 			continue
 		}
 		eventType := mod.Events.Type.Int64()
 
 		for _, lookUp := range m.Types {
-			if lookUp.Id.Int64() == eventType {
+			if lookUp.ID.Int64() == eventType {
 				if len(lookUp.Type.Def.Variant.Variants) > 0 {
 					for _, vars := range lookUp.Type.Def.Variant.Variants {
 						if uint8(vars.Index) == eventID[1] {
@@ -145,18 +164,18 @@ type PalletMetadataV14 struct {
 }
 
 type EventMetadataV14 struct {
-	Type Si1LookupTypeId
+	Type Si1LookupTypeID
 }
 
 type ConstantMetadataV14 struct {
 	Name  Text
-	Type  Si1LookupTypeId
+	Type  Si1LookupTypeID
 	Value Bytes
 	Docs  []Text
 }
 
 type ErrorMetadataV14 struct {
-	Type Si1LookupTypeId
+	Type Si1LookupTypeID
 }
 
 func (m *PalletMetadataV14) Decode(decoder scale.Decoder) error {

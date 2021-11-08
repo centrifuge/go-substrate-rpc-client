@@ -9,16 +9,16 @@ import (
 )
 
 type PortableTypeV14 struct {
-	Id   Si1LookupTypeId
+	ID   Si1LookupTypeID
 	Type Si1Type
 
-	//todo(nuno): complete following https://github.com/polkadot-js/api/blob/2801088b0a05e6bc505c2c449f1eddb31b15587d/packages/types/src/interfaces/scaleInfo/v1.ts#L25
+	// TODO(nuno): complete following https://tinyurl.com/zzznj3wd
 }
 
 func (d *PortableTypeV14) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&d.Id)
+	err := decoder.Decode(&d.ID)
 	if err != nil {
-		return fmt.Errorf("decode Si1LookupTypeId error: %v", err)
+		return fmt.Errorf("decode Si1LookupTypeID error: %v", err)
 	}
 
 	return decoder.Decode(&d.Type)
@@ -26,7 +26,7 @@ func (d *PortableTypeV14) Decode(decoder scale.Decoder) error {
 
 //----------------v0------------
 
-type Si0LookupTypeId UCompact
+type Si0LookupTypeID UCompact
 
 type Si0Path []Text
 
@@ -78,46 +78,46 @@ func (d *Si0TypeDefPrimitive) Decode(decoder scale.Decoder) error {
 
 //------------------v1-----------
 
-type Si1LookupTypeId big.Int
+type Si1LookupTypeID big.Int
 
-func NewSi1LookupTypeId(value *big.Int) Si1LookupTypeId {
-	return Si1LookupTypeId(*value)
+func NewSi1LookupTypeID(value *big.Int) Si1LookupTypeID {
+	return Si1LookupTypeID(*value)
 }
 
-func NewSi1LookupTypeIdFromUInt(value uint64) Si1LookupTypeId {
-	return NewSi1LookupTypeId(new(big.Int).SetUint64(value))
+func NewSi1LookupTypeIDFromUInt(value uint64) Si1LookupTypeID {
+	return NewSi1LookupTypeID(new(big.Int).SetUint64(value))
 }
-func (d *Si1LookupTypeId) Int64() int64 {
+func (d *Si1LookupTypeID) Int64() int64 {
 	i := big.Int(*d)
 	return i.Int64()
 }
 
-func (d *Si1LookupTypeId) UnmarshalJSON(b []byte) error {
-	var s int64
-	if err := json.Unmarshal(b, &s); err != nil {
-		return err
-	}
-	dd := NewSi1LookupTypeIdFromUInt(uint64(s))
-	d = &dd
-	return nil
-}
+// func (d *Si1LookupTypeID) UnmarshalJSON(bytes []byte) error {
+// 	var s int64
+// 	if err := json.Unmarshal(bytes, &s); err != nil {
+// 		return err
+// 	}
+// 	dd := NewSi1LookupTypeIDFromUInt(uint64(s))
+// 	d = &dd
+// 	return nil
+// }
 
-func (d Si1LookupTypeId) MarshalJSON() ([]byte, error) {
+func (d Si1LookupTypeID) MarshalJSON() ([]byte, error) {
 	s := d.Int64()
 	return json.Marshal(s)
 }
 
-func (d *Si1LookupTypeId) Decode(decoder scale.Decoder) error {
+func (d *Si1LookupTypeID) Decode(decoder scale.Decoder) error {
 	ui, err := decoder.DecodeUintCompact()
 	if err != nil {
 		return err
 	}
 
-	*d = Si1LookupTypeId(*ui)
+	*d = Si1LookupTypeID(*ui)
 	return nil
 }
 
-func (d Si1LookupTypeId) Encode(encoder scale.Encoder) error {
+func (d Si1LookupTypeID) Encode(encoder scale.Encoder) error {
 	err := encoder.EncodeUintCompact(big.Int(d))
 	if err != nil {
 		return err
@@ -152,7 +152,7 @@ func (d *Si1Type) Decode(decoder scale.Decoder) error {
 
 type Si1TypeParameter struct {
 	Name Text
-	Type Si1LookupTypeId
+	Type Si1LookupTypeID
 }
 
 func (d *Si1TypeParameter) Decode(decoder scale.Decoder) error {
@@ -166,7 +166,7 @@ func (d *Si1TypeParameter) Decode(decoder scale.Decoder) error {
 		return err
 	}
 	if !hasValue {
-		d.Type = NewSi1LookupTypeId(big.NewInt(0))
+		d.Type = NewSi1LookupTypeID(big.NewInt(0))
 	}
 	return nil
 }
@@ -245,7 +245,7 @@ func (d *Si1TypeDefComposite) Decode(decoder scale.Decoder) error {
 
 type Si1Field struct {
 	Name     Text
-	Type     Si1LookupTypeId
+	Type     Si1LookupTypeID
 	TypeName Text
 	Docs     []Text
 }
@@ -304,7 +304,7 @@ func (d *Si1Variant) Decode(decoder scale.Decoder) error {
 }
 
 type Si1TypeDefSequence struct {
-	Type Si1LookupTypeId
+	Type Si1LookupTypeID
 }
 
 func (d *Si1TypeDefSequence) Decode(decoder scale.Decoder) error {
@@ -313,7 +313,7 @@ func (d *Si1TypeDefSequence) Decode(decoder scale.Decoder) error {
 
 type Si1TypeDefArray struct {
 	Len  U32
-	Type Si1LookupTypeId
+	Type Si1LookupTypeID
 }
 
 func (d *Si1TypeDefArray) Decode(decoder scale.Decoder) error {
@@ -324,14 +324,14 @@ func (d *Si1TypeDefArray) Decode(decoder scale.Decoder) error {
 	return decoder.Decode(&d.Type)
 }
 
-type Si1TypeDefTuple []Si1LookupTypeId
+type Si1TypeDefTuple []Si1LookupTypeID
 
 type Si1TypeDefPrimitive struct {
 	Si0TypeDefPrimitive
 }
 
 type Si1TypeDefCompact struct {
-	Type Si1LookupTypeId
+	Type Si1LookupTypeID
 }
 
 func (d *Si1TypeDefCompact) Decode(decoder scale.Decoder) error {
@@ -339,8 +339,8 @@ func (d *Si1TypeDefCompact) Decode(decoder scale.Decoder) error {
 }
 
 type Si1TypeDefBitSequence struct {
-	BitStoreType Si1LookupTypeId
-	BitOrderType Si1LookupTypeId
+	BitStoreType Si1LookupTypeID
+	BitOrderType Si1LookupTypeID
 }
 
 func (d *Si1TypeDefBitSequence) Decode(decoder scale.Decoder) error {
