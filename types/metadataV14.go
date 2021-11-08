@@ -3,14 +3,11 @@ package types
 import (
 	"fmt"
 	"hash"
-	"math/big"
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v3/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v3/xxhash"
 )
-
-type Si1LookupTypeId big.Int
 
 // Based on:
 // https://github.com/polkadot-js/api/blob/48ef04b8ca21dc4bd06442775d9b7585c75d1253/packages/types/src/interfaces/metadata/v14.ts#L30-L34
@@ -72,13 +69,22 @@ func (m *MetadataV14) FindEventNamesForEventID(eventID EventID) (Text, Text, err
 		if !mod.HasEvents {
 			continue
 		}
-		if mod.Index != eventID[0] {
+		if uint8(mod.Index) != eventID[0] {
 			continue
 		}
-		if int(eventID[1]) >= len(mod.Events) {
-			return "", "", fmt.Errorf("event index %v for module %v out of range", eventID[1], mod.Name)
+		eventType := mod.Events.Type.Int64()
+
+		for _, lookUp := range m.Types {
+			if lookUp.Id.Int64() == eventType {
+				if len(lookUp.Type.Def.Variant.Variants) > 0 {
+					for _, vars := range lookUp.Type.Def.Variant.Variants {
+						if uint8(vars.Index) == eventID[1] {
+							return mod.Name, vars.Name, nil
+						}
+					}
+				}
+			}
 		}
-		return mod.Name, mod.Events[eventID[1]].Name, nil
 	}
 	return "", "", fmt.Errorf("module index %v out of range", eventID[0])
 }
@@ -123,10 +129,7 @@ func (m *MetadataV14) ExistsModuleMetadata(module string) bool {
 	return false
 }
 
-type PortableRegistry struct {
-	//todo implement SiType/Si1Type https://github.com/polkadot-js/api/blob/2801088b0a05e6bc505c2c449f1eddb31b15587d/packages/types/src/interfaces/scaleInfo/v1.ts#L25
-	Types []byte
-}
+type PortableRegistry []PortableTypeV14
 
 type PalletMetadataV14 struct {
 	Name       Text
@@ -135,10 +138,25 @@ type PalletMetadataV14 struct {
 	HasCalls   bool
 	Calls      []FunctionMetadataV4
 	HasEvents  bool
-	Events     []EventMetadataV4          //todo(nuno): use v14
-	Constants  []ModuleConstantMetadataV6 //todo(nuno): use v14
-	Errors     []ErrorMetadataV8          //todo(nuno): use v14
+	Events     EventMetadataV14
+	Constants  []ConstantMetadataV14
+	Errors     ErrorMetadataV14
 	Index      uint8
+}
+
+type EventMetadataV14 struct {
+	Type Si1LookupTypeId
+}
+
+type ConstantMetadataV14 struct {
+	Name  Text
+	Type  Si1LookupTypeId
+	Value Bytes
+	Docs  []Text
+}
+
+type ErrorMetadataV14 struct {
+	Type Si1LookupTypeId
 }
 
 func (m *PalletMetadataV14) Decode(decoder scale.Decoder) error {
