@@ -303,10 +303,29 @@ type StorageMetadataV14 struct {
 
 type StorageFunctionMetadataV14 struct {
 	Name          Text
-	Modifier      StorageFunctionModifierV0
-	Type          StorageFunctionTypeV13
+	Modifier      StorageEntryModifierV14
+	Type          StorageFunctionTypeV14
 	Fallback      Bytes
 	Documentation []Text
+}
+
+type StorageEntryTypeV14 struct {
+	IsPlainType bool
+	AsPlainType Si1LookupTypeID
+	IsMap       bool
+	AsMap       MapTypeV14
+}
+
+type MapTypeV14 struct {
+	Hasher  []StorageHasherV10
+	KeysId  Si1LookupTypeID
+	ValueId Si1LookupTypeID
+}
+
+type StorageEntryModifierV14 struct {
+	IsOptional bool // 0
+	IsDefault  bool // 1
+	IsRequired bool // 2
 }
 
 func (s StorageFunctionMetadataV14) IsPlain() bool {
