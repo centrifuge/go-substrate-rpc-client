@@ -38,7 +38,6 @@ func (m *MetadataV14) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	// todo(nuno): make sure we need a lock
 	m.LookUpData = make(map[int64]*Si1Type)
 	for _, lookUp := range m.Types {
 		m.LookUpData[lookUp.ID.Int64()] = &lookUp.Type
