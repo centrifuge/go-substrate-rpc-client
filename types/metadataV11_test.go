@@ -10,7 +10,6 @@ import (
 var exampleMetadataV11 = Metadata{
 	MagicNumber:   0x6174656d,
 	Version:       11,
-	IsMetadataV11: true,
 	AsMetadataV11: MetadataV11{MetadataV10: exampleRuntimeMetadataV10},
 }
 

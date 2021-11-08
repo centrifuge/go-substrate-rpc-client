@@ -10,7 +10,6 @@ import (
 var exampleMetadataV12 = Metadata{
 	MagicNumber:   0x6174656d,
 	Version:       12,
-	IsMetadataV12: true,
 	AsMetadataV12: exampleRuntimeMetadataV12,
 }
 
@@ -19,8 +18,8 @@ var exampleRuntimeMetadataV12 = MetadataV12{
 }
 
 var exampleModuleMetadataV12Empty = ModuleMetadataV12{
-	ModuleMetadataV10: ModuleMetadataV10 {
-		Name: "EmptyModule",
+	ModuleMetadataV10: ModuleMetadataV10{
+		Name:       "EmptyModule",
 		HasStorage: false,
 		Storage:    StorageMetadataV10{},
 		HasCalls:   false,
@@ -30,11 +29,11 @@ var exampleModuleMetadataV12Empty = ModuleMetadataV12{
 		Constants:  nil,
 		Errors:     nil,
 	},
-	Index:      0,
+	Index: 0,
 }
 
 var exampleModuleMetadataV121 = ModuleMetadataV12{
-	ModuleMetadataV10: ModuleMetadataV10 {
+	ModuleMetadataV10: ModuleMetadataV10{
 		Name:       "Module1",
 		HasStorage: true,
 		Storage:    exampleStorageMetadataV10,
@@ -45,11 +44,11 @@ var exampleModuleMetadataV121 = ModuleMetadataV12{
 		Constants:  []ModuleConstantMetadataV6{exampleModuleConstantMetadataV6},
 		Errors:     []ErrorMetadataV8{exampleErrorMetadataV8},
 	},
-	Index:      1,
+	Index: 1,
 }
 
 var exampleModuleMetadataV122 = ModuleMetadataV12{
-	ModuleMetadataV10: ModuleMetadataV10 {
+	ModuleMetadataV10: ModuleMetadataV10{
 		Name:       "Module2",
 		HasStorage: true,
 		Storage:    exampleStorageMetadataV10,
@@ -60,7 +59,7 @@ var exampleModuleMetadataV122 = ModuleMetadataV12{
 		Constants:  []ModuleConstantMetadataV6{exampleModuleConstantMetadataV6},
 		Errors:     []ErrorMetadataV8{exampleErrorMetadataV8},
 	},
-	Index:      2,
+	Index: 2,
 }
 
 func TestNewMetadataV12_Decode(t *testing.T) {
@@ -76,7 +75,7 @@ func TestNewMetadataV12_Decode(t *testing.T) {
 		t.Run(s.name, func(t *testing.T) {
 			metadata := NewMetadataV12()
 			err := DecodeFromBytes(MustHexDecodeString(s.hexData), metadata)
-			assert.True(t, metadata.IsMetadataV12)
+			assert.EqualValues(t, metadata.Version, 12)
 			assert.NoError(t, err)
 			data, err := EncodeToBytes(metadata)
 			assert.NoError(t, err)
