@@ -1,212 +1,49 @@
 package types_test
 
 import (
-	"bytes"
-	"encoding/hex"
-	"encoding/json"
-	"fmt"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v3/scale"
 	. "github.com/centrifuge/go-substrate-rpc-client/v3/types"
 	"github.com/stretchr/testify/assert"
 )
 
-// var exampleMetadataV14 = Metadata{
-// 	MagicNumber:   0x6174656d,
-// 	Version:       13,
-// 	AsMetadataV14: exampleRuntimeMetadataV14,
-// }
-
-// // var exampleRuntimeMetadataV14 = MetadataV14{
-// // 	Pallets: []PalletMetadataV14{examplePalletMetadataV14Empty, examplePalletMetadataV141, examplePalletMetadataV142},
-// // }
-
-// // // var examplePalletMetadataV14Empty = PalletMetadataV14{
-// // // 	Name:       "EmptyModule_14",
-// // // 	HasStorage: false,
-// // // 	Storage:    StorageMetadataV14{},
-// // // 	HasCalls:   false,
-// // // 	Calls:      nil,
-// // // 	HasEvents:  false,
-// // // 	Events:     nil,
-// // // 	Constants:  nil,
-// // // 	Errors:     nil,
-// // // 	Index:      0,
-// // // }
-
-// // // var examplePalletMetadataV141 = PalletMetadataV14{
-// // // 	Name:       "Module1_14",
-// // // 	HasStorage: true,
-// // // 	Storage:    exampleStorageMetadataV14,
-// // // 	HasCalls:   true,
-// // // 	Calls:      []FunctionMetadataV4{exampleFunctionMetadataV4},
-// // // 	HasEvents:  true,
-// // // 	Events:     []EventMetadataV4{exampleEventMetadataV4},
-// // // 	Constants:  []ModuleConstantMetadataV6{exampleModuleConstantMetadataV6},
-// // // 	Errors:     []ErrorMetadataV8{exampleErrorMetadataV8},
-// // // 	Index:      1,
-// // // }
-
-// // // var examplePalletMetadataV142 = PalletMetadataV14{
-// // // 	Name:       "Module2_14",
-// // // 	HasStorage: true,
-// // // 	Storage:    exampleStorageMetadataV14,
-// // // 	HasCalls:   true,
-// // // 	Calls:      []FunctionMetadataV4{exampleFunctionMetadataV4},
-// // // 	HasEvents:  true,
-// // // 	Events:     []EventMetadataV4{exampleEventMetadataV4},
-// // // 	Constants:  []ModuleConstantMetadataV6{exampleModuleConstantMetadataV6},
-// // // 	Errors:     []ErrorMetadataV8{exampleErrorMetadataV8},
-// // // 	Index:      2,
-// // // }
-
-// // // var exampleStorageMetadataV14 = StorageMetadataV14{
-// // // 	Prefix: "myStoragePrefix_14",
-// // // 	Items: []StorageFunctionMetadataV14{exampleStorageFunctionMetadataV14Type, exampleStorageFunctionMetadataV14Map,
-// // // 		exampleStorageFunctionMetadataV14DoubleMap, exampleStorageFunctionMetadataV14NMap},
-// // // }
-
-// // // var exampleStorageFunctionMetadataV14Type = StorageFunctionMetadataV14{
-// // // 	Name:          "myStorageFunc_14",
-// // // 	Modifier:      StorageFunctionModifierV0{IsOptional: true},
-// // // 	Type:          StorageFunctionTypeV14{IsType: true, AsType: "U8"},
-// // // 	Fallback:      []byte{23, 14},
-// // // 	Documentation: []Text{"My", "storage func", "doc"},
-// // // }
-
-// // // var exampleStorageFunctionMetadataV14Map = StorageFunctionMetadataV14{
-// // // 	Name:          "myStorageFunc2_14",
-// // // 	Modifier:      StorageFunctionModifierV0{IsOptional: true},
-// // // 	Type:          StorageFunctionTypeV14{IsMap: true, AsMap: exampleMapTypeV10},
-// // // 	Fallback:      []byte{23, 14},
-// // // 	Documentation: []Text{"My", "storage func", "doc"},
-// // // }
-
-// // // var exampleStorageFunctionMetadataV14DoubleMap = StorageFunctionMetadataV14{
-// // // 	Name:          "myStorageFunc3_14",
-// // // 	Modifier:      StorageFunctionModifierV0{IsOptional: true},
-// // // 	Type:          StorageFunctionTypeV14{IsDoubleMap: true, AsDoubleMap: exampleDoubleMapTypeV10},
-// // // 	Fallback:      []byte{23, 14},
-// // // 	Documentation: []Text{"My", "storage func", "doc"},
-// // // }
-
-// // // var exampleStorageFunctionMetadataV14NMap = StorageFunctionMetadataV14{
-// // // 	Name:          "myStorageFunc4_14",
-// // // 	Modifier:      StorageFunctionModifierV0{IsOptional: true},
-// // // 	Type:          StorageFunctionTypeV14{IsNMap: true, AsNMap: exampleNMapTypeV14},
-// // // 	Fallback:      []byte{23, 14},
-// // // 	Documentation: []Text{"My", "storage func", "doc"},
-// // // }
-
-// var exampleNMapTypeV14 = NMapTypeV14{
-// 	Hashers: []StorageHasherV10{{IsBlake2_256: true}, {IsBlake2_128Concat: true}, {IsIdentity: true}},
-// 	Keys:    []Type{"myKey1", "myKey2", "myKey3"},
-// 	Value:   "and a value",
-// }
-
-// func TestMetadataV14_ExistsModuleMetadata(t *testing.T) {
-// 	assert.True(t, exampleMetadataV14.ExistsModuleMetadata("EmptyModule_14"))
-// 	assert.False(t, exampleMetadataV14.ExistsModuleMetadata("NotExistModule"))
-// }
-
-// func TestMetadataV14_FindEventNamesForEventID(t *testing.T) {
-// 	module, event, err := exampleMetadataV14.FindEventNamesForEventID(EventID([2]byte{1, 0}))
-
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, examplePalletMetadataV141.Name, module)
-// 	assert.Equal(t, exampleEventMetadataV4.Name, event)
-// }
-
-// func TestMetadataV14_FindEventNamesForUnknownModule(t *testing.T) {
-// 	_, _, err := exampleMetadataV14.FindEventNamesForEventID(EventID([2]byte{1, 18}))
-
-// 	assert.Error(t, err)
-// }
-
-// func TestMetadataV14_TestFindStorageEntryMetadata(t *testing.T) {
-// 	_, err := exampleMetadataV14.FindStorageEntryMetadata("myStoragePrefix_14", "myStorageFunc2_14")
-// 	assert.NoError(t, err)
-// }
-
-// func TestMetadataV14_TestFindCallIndex(t *testing.T) {
-// 	callIndex, err := exampleMetadataV14.FindCallIndex("Module2_14.my function")
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, examplePalletMetadataV142.Index, callIndex.SectionIndex)
-// 	assert.Equal(t, uint8(0), callIndex.MethodIndex)
-// }
-
-// func TestMetadataV14_TestFindCallIndexWithUnknownModule(t *testing.T) {
-// 	_, err := exampleMetadataV14.FindCallIndex("UnknownModule.my function")
-// 	assert.Error(t, err)
-// }
-
-// func TestMetadataV14_TestFindCallIndexWithUnknownFunction(t *testing.T) {
-// 	_, err := exampleMetadataV14.FindCallIndex("Module2_14.unknownFunction")
-// 	assert.Error(t, err)
-// }
-
-func TestNewMetadataV14_Decode(t *testing.T) {
-	metadata := NewMetadataV14()
-	err := DecodeFromBytes(MustHexDecodeString(MetadataV14Data), metadata)
+func TestMetadataV14_TestFindCallIndexWithUnknownFunction(t *testing.T) {
+	var metadata Metadata
+	err := DecodeFromHexString(MetadataV14Data, &metadata)
 	assert.EqualValues(t, metadata.Version, 14)
 	assert.NoError(t, err)
-	// data, err := EncodeToBytes(metadata)
-	// assert.NoError(t, err)
-	// assert.Equal(t, MetadataV14Data, HexEncodeToString(data))
+
+	_, err = metadata.FindCallIndex("Module2_14.unknownFunction")
+	assert.Error(t, err)
 }
 
-func TestDecodePortableRegistry(t *testing.T) {
-	s := "10000c1c73705f636f72651863727970746f2c4163636f756e7449643332000004000401205b75383b2033325d0000040000032000000008000800000503000c08306672616d655f73797374656d2c4163636f756e74496e666f0814496e64657801102c4163636f756e74446174610114001401146e6f6e6365100114496e646578000124636f6e73756d657273100120526566436f756e7400012470726f766964657273100120526566436f756e7400012c73756666696369656e7473100120526566436f756e740001106461746114012c4163636f756e74446174610000"
-	d, _ := hex.DecodeString(s)
-	decoder := scale.NewDecoder(bytes.NewReader(d))
-	var pro PortableRegistry
-	err := decoder.Decode(&pro)
-	if err != nil {
-		panic(err)
-	}
-	dd, _ := json.Marshal(pro)
-	fmt.Println(string(dd))
+// Test that decoding the example metadata v14 works and that
+// encoding it produces the original value.
+func TestNewMetadataV14_Decode(t *testing.T) {
+	// Verify that we can succcessfully decode metadata v14
+	var metadata Metadata
+	err := DecodeFromHexString(MetadataV14Data, &metadata)
+	assert.EqualValues(t, metadata.Version, 14)
+	assert.NoError(t, err)
+
+	// Verify that (encoding . decoding) equals the original input
+	data, err := EncodeToBytes(metadata)
+	assert.NoError(t, err)
+	assert.Equal(t, MetadataV14Data, HexEncodeToString(data))
 }
 
-func TestVecDecodePalletMetadataV14(t *testing.T) {
-	s := "041853797374656d011853797374656d401c4163636f756e7401010402000c4101000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004e8205468652066756c6c206163636f756e7420696e666f726d6174696f6e20666f72206120706172746963756c6172206163636f756e742049442e3845787472696e736963436f756e74000010040004b820546f74616c2065787472696e7369637320636f756e7420666f72207468652063757272656e7420626c6f636b2e2c426c6f636b57656967687401001c600000000000000000000000000000000000000000000000000488205468652063757272656e742077656967687420666f722074686520626c6f636b2e40416c6c45787472696e736963734c656e000010040004410120546f74616c206c656e6774682028696e2062797465732920666f7220616c6c2065787472696e736963732070757420746f6765746865722c20666f72207468652063757272656e7420626c6f636b2e24426c6f636b486173680101040510248000000000000000000000000000000000000000000000000000000000000000000498204d6170206f6620626c6f636b206e756d6265727320746f20626c6f636b206861736865732e3445787472696e736963446174610101040510280400043d012045787472696e73696373206461746120666f72207468652063757272656e7420626c6f636b20286d61707320616e2065787472696e736963277320696e64657820746f206974732064617461292e184e756d6265720100101000000000040901205468652063757272656e7420626c6f636b206e756d626572206265696e672070726f6365737365642e205365742062792060657865637574655f626c6f636b602e28506172656e744861736801002480000000000000000000000000000000000000000000000000000000000000000004702048617368206f66207468652070726576696f757320626c6f636b2e1844696765737401002c040004f020446967657374206f66207468652063757272656e7420626c6f636b2c20616c736f2070617274206f662074686520626c6f636b206865616465722e184576656e7473010048040010a0204576656e7473206465706f736974656420666f72207468652063757272656e7420626c6f636b2e005901204e4f54453a20546869732073746f72616765206974656d206973206578706c696369746c7920756e626f756e6465642073696e6365206974206973206e6576657220696e74656e64656420746f2062652072656164642066726f6d2077697468696e207468652072756e74696d652e284576656e74436f756e74010010100000000004b820546865206e756d626572206f66206576656e747320696e2074686520604576656e74733c543e60206c6973742e2c4576656e74546f706963730101040224e5010400282501204d617070696e67206265747765656e206120746f7069632028726570726573656e74656420627920543a3a486173682920616e64206120766563746f72206f6620696e646578657394206f66206576656e747320696e2074686520603c4576656e74733c543e3e60206c6973742e00510120416c6c20746f70696320766563746f727320686176652064657465726d696e69737469632073746f72616765206c6f636174696f6e7320646570656e64696e67206f6e2074686520746f7069632e2054686973450120616c6c6f7773206c696768742d636c69656e747320746f206c6576657261676520746865206368616e67657320747269652073746f7261676520747261636b696e67206d656368616e69736d20616e64e420696e2063617365206f66206368616e67657320666574636820746865206c697374206f66206576656e7473206f6620696e7465726573742e004d01205468652076616c756520686173207468652074797065206028543a3a426c6f636b4e756d6265722c204576656e74496e646578296020626563617573652069662077652075736564206f6e6c79206a7573744d012074686520604576656e74496e64657860207468656e20696e20636173652069662074686520746f70696320686173207468652073616d6520636f6e74656e7473206f6e20746865206e65787420626c6f636b0101206e6f206e6f74696669636174696f6e2077696c6c20626520747269676765726564207468757320746865206576656e74206d69676874206265206c6f73742e484c61737452756e74696d65557067726164650000ed0104000455012053746f726573207468652060737065635f76657273696f6e6020616e642060737065635f6e616d6560206f66207768656e20746865206c6173742072756e74696d6520757067726164652068617070656e65642e545570677261646564546f553332526566436f756e74010031010400044d012054727565206966207765206861766520757067726164656420736f207468617420607479706520526566436f756e74602069732060753332602e2046616c7365202864656661756c7429206966206e6f742e605570677261646564546f547269706c65526566436f756e74010031010400085d012054727565206966207765206861766520757067726164656420736f2074686174204163636f756e74496e666f20636f6e7461696e73207468726565207479706573206f662060526566436f756e74602e2046616c736548202864656661756c7429206966206e6f742e38457865637574696f6e50686173650000dd01040004882054686520657865637574696f6e207068617365206f662074686520626c6f636b2e01f50101541830426c6f636b576569676874730902850100f2052a0100000000204aa9d1010000405973070000000001c0766c8f58010000010098f73e5d010000010000000000000000405973070000000001c0febef9cc0100000100204aa9d1010000010088526a74000000405973070000000000000004d020426c6f636b20262065787472696e7369637320776569676874733a20626173652076616c75657320616e64206c696d6974732e2c426c6f636b4c656e67746819023000003c00000050000000500004a820546865206d6178696d756d206c656e677468206f66206120626c6f636b2028696e206279746573292e38426c6f636b48617368436f756e74101060090000045501204d6178696d756d206e756d626572206f6620626c6f636b206e756d62657220746f20626c6f636b2068617368206d617070696e677320746f206b65657020286f6c64657374207072756e6564206669727374292e20446257656967687421024040787d010000000000e1f505000000000409012054686520776569676874206f662072756e74696d65206461746162617365206f7065726174696f6e73207468652072756e74696d652063616e20696e766f6b652e1c56657273696f6e25024d0318726f636f636f487061726974792d726f636f636f2d76312e38000000008f2300000000000038df6acb689907609b0300000037e397fc7c91f5e40100000040fe3ad401f8959a05000000d2bc9897eed08f1503000000f78b278be53f454c02000000af2c0297a23e6d3d01000000ed99c5acb25eedf503000000cbca25e39f14238702000000687ad44ad37f03c201000000ab3c0572291feb8b0100000049eaaf1b548a0cb00100000091d5df18b0d2cf5801000000bc9d89904f5b923f0100000037c8bb1350a9a2a801000000000000000484204765742074686520636861696e27732063757272656e742076657273696f6e2e28535335385072656669784501082a0014a8205468652064657369676e61746564205353383520707265666978206f66207468697320636861696e2e0039012054686973207265706c6163657320746865202273733538466f726d6174222070726f7065727479206465636c6172656420696e2074686520636861696e20737065632e20526561736f6e20697331012074686174207468652072756e74696d652073686f756c64206b6e6f772061626f7574207468652070726566697820696e206f7264657220746f206d616b6520757365206f662069742061737020616e206964656e746966696572206f662074686520636861696e2e01350200"
-	d, _ := hex.DecodeString(s)
-	decoder := scale.NewDecoder(bytes.NewReader(d))
-	var pro []PalletMetadataV14
-	err := decoder.Decode(&pro)
-	if err != nil {
-		panic(err)
-	}
-	dd, _ := json.Marshal(pro)
-	fmt.Println(string(dd))
-}
-
-func TestDecodePalletMetadataV14(t *testing.T) {
-	s := "2454696d657374616d70012454696d657374616d70080c4e6f7701002020000000000000000004902043757272656e742074696d6520666f72207468652063757272656e7420626c6f636b2e2444696455706461746501003101040004b420446964207468652074696d657374616d7020676574207570646174656420696e207468697320626c6f636b3f0179020004344d696e696d756d506572696f642020b80b000000000000104d0120546865206d696e696d756d20706572696f64206265747765656e20626c6f636b732e204265776172652074686174207468697320697320646966666572656e7420746f20746865202a65787065637465642a5d0120706572696f6420746861742074686520626c6f636b2070726f64756374696f6e206170706172617475732070726f76696465732e20596f75722063686f73656e20636f6e73656e7375732073797374656d2077696c6c5d012067656e6572616c6c7920776f726b2077697468207468697320746f2064657465726d696e6520612073656e7369626c6520626c6f636b2074696d652e20652e672e20466f7220417572612c2069742077696c6c206265a020646f75626c65207468697320706572696f64206f6e2064656661756c742073657474696e67732e0002"
-	d, _ := hex.DecodeString(s)
-	decoder := scale.NewDecoder(bytes.NewReader(d))
-	var pro PalletMetadataV14
-	err := decoder.Decode(&pro)
-	if err != nil {
-		panic(err)
-	}
-	dd, _ := json.Marshal(pro)
-	fmt.Println(string(dd))
-}
-
+// TODO(nuno): make verifications more meaningful
 func TestMetadataV14FindCallIndex(t *testing.T) {
 	var meta Metadata
 	err := DecodeFromHexString(MetadataV14Data, &meta)
 	if err != nil {
 		t.Fatal(err)
 	}
-	callIdx, err := meta.FindCallIndex("Balances.transfer")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(callIdx)
+	_, err = meta.FindCallIndex("Balances.transfer")
+	assert.NoError(t, err)
 }
+
+// TODO(nuno): make verifications more meaningful
 func TestMetadataV14FindEventNamesForEventID(t *testing.T) {
 	var meta Metadata
 	err := DecodeFromHexString(MetadataV14Data, &meta)
@@ -216,24 +53,18 @@ func TestMetadataV14FindEventNamesForEventID(t *testing.T) {
 	id := EventID{}
 	id[0] = 5
 	id[1] = 2
-	mod, event, err := meta.FindEventNamesForEventID(id)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(mod, event)
+	_, _, err = meta.FindEventNamesForEventID(id)
+	assert.NoError(t, err)
 }
 
+// TODO(nuno): make verifications more meaningful
 func TestMetadataV14FindStorageEntryMetadata(t *testing.T) {
 	var meta Metadata
 	err := DecodeFromHexString(MetadataV14Data, &meta)
-	if err != nil {
-		t.Fatal(err)
-	}
-	st, err := meta.FindStorageEntryMetadata("System", "Account")
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println(st)
+	assert.NoError(t, err)
+
+	_, err = meta.FindStorageEntryMetadata("System", "Account")
+	assert.NoError(t, err)
 }
 
 func TestMetadataV14ExistsModuleMetadata(t *testing.T) {
@@ -242,7 +73,6 @@ func TestMetadataV14ExistsModuleMetadata(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	s := meta.ExistsModuleMetadata("System")
-
-	fmt.Println(s)
+	res := meta.ExistsModuleMetadata("System")
+	assert.True(t, res)
 }
