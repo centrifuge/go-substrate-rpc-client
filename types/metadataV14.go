@@ -31,6 +31,20 @@ type SignedExtensionMetadataV14 struct {
 	AdditionalSigned Si1LookupTypeID
 }
 
+func (m MetadataV14) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(m.Lookup)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(m.Pallets)
+	if err != nil {
+		return err
+	}
+
+	return encoder.Encode(m.Extrinsic)
+}
+
 func (m *MetadataV14) Decode(decoder scale.Decoder) error {
 	var err error
 	err = decoder.Decode(&m.Lookup)
@@ -54,14 +68,6 @@ func (m *MetadataV14) Decode(decoder scale.Decoder) error {
 	}
 
 	return nil
-}
-
-func (m MetadataV14) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(m.Pallets)
-	if err != nil {
-		return err
-	}
-	return encoder.Encode(m.Extrinsic)
 }
 
 func (m *MetadataV14) FindCallIndex(call string) (CallIndex, error) {
@@ -339,8 +345,8 @@ type StorageEntryMetadataV14 struct {
 
 type MapTypeV14 struct {
 	Hasher  []StorageHasherV10
-	KeysId  Si1LookupTypeID
-	ValueId Si1LookupTypeID
+	KeysID  Si1LookupTypeID
+	ValueID Si1LookupTypeID
 }
 
 func (s StorageEntryMetadataV14) IsPlain() bool {
