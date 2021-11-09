@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 	"math/big"
 
@@ -92,20 +91,20 @@ func (d *Si1LookupTypeID) Int64() int64 {
 	return i.Int64()
 }
 
-func (d *Si1LookupTypeID) UnmarshalJSON(bytes []byte) error {
-	var s int64
-	if err := json.Unmarshal(bytes, &s); err != nil {
-		return err
-	}
-	dd := NewSi1LookupTypeIDFromUInt(uint64(s))
-	d = &dd
-	return nil
-}
+// func (d *Si1LookupTypeID) UnmarshalJSON(bytes []byte) error {
+// 	var s int64
+// 	if err := json.Unmarshal(bytes, &s); err != nil {
+// 		return err
+// 	}
+// 	dd := NewSi1LookupTypeIDFromUInt(uint64(s))
+// 	d = &dd
+// 	return nil
+// }
 
-func (d Si1LookupTypeID) MarshalJSON() ([]byte, error) {
-	s := d.Int64()
-	return json.Marshal(s)
-}
+// func (d Si1LookupTypeID) MarshalJSON() ([]byte, error) {
+// 	s := d.Int64()
+// 	return json.Marshal(s)
+// }
 
 func (d *Si1LookupTypeID) Decode(decoder scale.Decoder) error {
 	ui, err := decoder.DecodeUintCompact()
