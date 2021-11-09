@@ -301,30 +301,6 @@ type StorageMetadataV14 struct {
 	Items  []StorageEntryMetadataV14
 }
 
-/// NUNO
-
-func (s *StorageEntryModifierV14) Decode(decoder scale.Decoder) error {
-	var t uint8
-	err := decoder.Decode(&t)
-	if err != nil {
-		return err
-	}
-
-	switch t {
-	case 0:
-		s.IsOptional = true
-	case 1:
-		s.IsDefault = true
-	case 2:
-		s.IsRequired = true
-	default:
-		return fmt.Errorf("received unexpected storage function modifier type %v", t)
-	}
-	return nil
-}
-
-/// END
-
 func (storage *StorageMetadataV14) Decode(decoder scale.Decoder) error {
 	err := decoder.Decode(&storage.Prefix)
 	if err != nil {
@@ -335,7 +311,7 @@ func (storage *StorageMetadataV14) Decode(decoder scale.Decoder) error {
 
 type StorageEntryMetadataV14 struct {
 	Name          Text
-	Modifier      StorageEntryModifierV14
+	Modifier      StorageFunctionModifierV0
 	Type          StorageEntryTypeV14
 	Fallback      Bytes
 	Documentation []Text
@@ -344,14 +320,8 @@ type StorageEntryMetadataV14 struct {
 type MapTypeV14 struct {
 	Hasher StorageHasherV10
 	//TODO(nuno): may need to rename fields according to https://github.com/polkadot-js/api/blob/48ef04b8ca21dc4bd06442775d9b7585c75d1253/packages/types/src/interfaces/metadata/v14.ts#L77
-	KeysID  Si1LookupTypeID
-	ValueID Si1LookupTypeID
-}
-
-type StorageEntryModifierV14 struct {
-	IsOptional bool // 0
-	IsDefault  bool // 1
-	IsRequired bool // 2
+	Keys  Si1LookupTypeID
+	Value Si1LookupTypeID
 }
 
 func (s StorageEntryMetadataV14) IsPlain() bool {
