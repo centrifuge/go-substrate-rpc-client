@@ -359,15 +359,11 @@ func (s StorageEntryMetadataV14) IsNMap() bool {
 }
 
 func (s StorageEntryMetadataV14) Hasher() (hash.Hash, error) {
-	if s.IsPlain() {
-		return xxhash.New128(nil), nil
-	}
-
 	return xxhash.New128(nil), nil
 }
 
 func (s StorageEntryMetadataV14) Hasher2() (hash.Hash, error) {
-	panic("Not implemented")
+	return nil, fmt.Errorf("StorageEntryMetadataV14 does not implement Hasher2()")
 }
 
 func (s StorageEntryMetadataV14) Hashers() ([]hash.Hash, error) {
