@@ -37,28 +37,21 @@ func (m *MetadataV14) Decode(decoder scale.Decoder) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Decoded types")
 
 	m.LookUpData = make(map[int64]*Si1Type)
 	for _, lookUp := range m.Lookup {
 		m.LookUpData[lookUp.ID.Int64()] = &lookUp.Type
 	}
-	fmt.Println("Built LookUpData")
-
-	fmt.Println("Will Decode Pallets")
 
 	err = decoder.Decode(&m.Pallets)
 	if err != nil {
 		return err
 	}
-	fmt.Println("Decoded Pallets")
 
 	err = decoder.Decode(&m.Extrinsic)
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("Decoded Extrinsic")
 
 	return nil
 }
@@ -202,14 +195,11 @@ func (m *PalletMetadataV14) Decode(decoder scale.Decoder) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Decoded Pallet.Name")
 
 	err = decoder.Decode(&m.HasStorage)
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("Decoded Pallet.HasStorage")
 
 	if m.HasStorage {
 		err = decoder.Decode(&m.Storage)
@@ -218,14 +208,10 @@ func (m *PalletMetadataV14) Decode(decoder scale.Decoder) error {
 		}
 	}
 
-	fmt.Println("Decoded Pallet.Storage")
-
 	err = decoder.Decode(&m.HasCalls)
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("Decoded Pallet.HasCalls")
 
 	if m.HasCalls {
 		err = decoder.Decode(&m.Calls)
@@ -234,14 +220,10 @@ func (m *PalletMetadataV14) Decode(decoder scale.Decoder) error {
 		}
 	}
 
-	fmt.Println("Decoded Pallet.Calls")
-
 	err = decoder.Decode(&m.HasEvents)
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("Decoded Pallet.HasEvents")
 
 	if m.HasEvents {
 		err = decoder.Decode(&m.Events)
@@ -250,21 +232,15 @@ func (m *PalletMetadataV14) Decode(decoder scale.Decoder) error {
 		}
 	}
 
-	fmt.Println("Decoded Pallet.Events")
-
 	err = decoder.Decode(&m.Constants)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("Decoded Pallet.Constants")
-
 	err = decoder.Decode(&m.HasErrors)
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("Decoded Pallet.HasErrors")
 
 	if m.HasErrors {
 		err = decoder.Decode(&m.Errors)
@@ -272,8 +248,6 @@ func (m *PalletMetadataV14) Decode(decoder scale.Decoder) error {
 			return err
 		}
 	}
-
-	fmt.Println("Decoded Pallet.Errors")
 
 	return decoder.Decode(&m.Index)
 }
