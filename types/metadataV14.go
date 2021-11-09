@@ -10,7 +10,7 @@ import (
 )
 
 // Based on:
-// https://github.com/polkadot-js/api/blob/48ef04b8ca21dc4bd06442775d9b7585c75d1253/packages/types/src/interfaces/metadata/v14.ts#L30-L34
+// https://github.com/polkadot-js/api/blob/master/packages/types/src/interfaces/metadata/v14.ts
 type MetadataV14 struct {
 	Lookup    PortableRegistry
 	Pallets   []PalletMetadataV14
