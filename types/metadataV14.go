@@ -11,9 +11,8 @@ import (
 
 // Based on:
 // https://github.com/polkadot-js/api/blob/48ef04b8ca21dc4bd06442775d9b7585c75d1253/packages/types/src/interfaces/metadata/v14.ts#L30-L34
-
 type MetadataV14 struct {
-	Types     PortableRegistry
+	Lookup    PortableRegistry
 	Pallets   []PalletMetadataV14
 	Extrinsic ExtrinsicV14
 
@@ -23,24 +22,25 @@ type MetadataV14 struct {
 type ExtrinsicV14 struct {
 	Type             Si1LookupTypeID
 	Version          U8
-	SignedExtensions []SignedExtensionV14
+	SignedExtensions []SignedExtensionMetadataV14
 }
 
-type SignedExtensionV14 struct {
-	Identifier Text
-	Type       Si1LookupTypeID
+type SignedExtensionMetadataV14 struct {
+	Identifier       Text
+	Type             Si1LookupTypeID
+	AdditionalSigned Si1LookupTypeID
 }
 
 func (m *MetadataV14) Decode(decoder scale.Decoder) error {
 	var err error
-	err = decoder.Decode(&m.Types)
+	err = decoder.Decode(&m.Lookup)
 	if err != nil {
 		return err
 	}
 	fmt.Println("Decoded types")
 
 	m.LookUpData = make(map[int64]*Si1Type)
-	for _, lookUp := range m.Types {
+	for _, lookUp := range m.Lookup {
 		m.LookUpData[lookUp.ID.Int64()] = &lookUp.Type
 	}
 	fmt.Println("Built LookUpData")
@@ -82,7 +82,7 @@ func (m *MetadataV14) FindCallIndex(call string) (CallIndex, error) {
 		}
 		callType := mod.Calls.Type
 
-		for _, lookUp := range m.Types {
+		for _, lookUp := range m.Lookup {
 			if lookUp.ID.Int64() == callType.Int64() {
 				if len(lookUp.Type.Def.Variant.Variants) > 0 {
 					for _, vars := range lookUp.Type.Def.Variant.Variants {
@@ -107,7 +107,7 @@ func (m *MetadataV14) FindEventNamesForEventID(eventID EventID) (Text, Text, err
 		}
 		eventType := mod.Events.Type.Int64()
 
-		for _, lookUp := range m.Types {
+		for _, lookUp := range m.Lookup {
 			if lookUp.ID.Int64() == eventType {
 				if len(lookUp.Type.Def.Variant.Variants) > 0 {
 					for _, vars := range lookUp.Type.Def.Variant.Variants {
@@ -364,73 +364,57 @@ type StorageEntryMetadataV14 struct {
 }
 
 type MapTypeV14 struct {
-	Hasher StorageHasherV10
-	//TODO(nuno): may need to rename fields according to https://github.com/polkadot-js/api/blob/48ef04b8ca21dc4bd06442775d9b7585c75d1253/packages/types/src/interfaces/metadata/v14.ts#L77
-	Keys  Si1LookupTypeID
-	Value Si1LookupTypeID
+	Hasher  []StorageHasherV10
+	KeysId  Si1LookupTypeID
+	ValueId Si1LookupTypeID
 }
 
 func (s StorageEntryMetadataV14) IsPlain() bool {
-	return s.Type.IsType
+	return s.Type.IsPlainType
 }
 
 func (s StorageEntryMetadataV14) IsMap() bool {
-	return s.Type.IsMap
+	return false
 }
 
 func (s StorageEntryMetadataV14) IsDoubleMap() bool {
-	return s.Type.IsDoubleMap
+	return false
 }
-
 func (s StorageEntryMetadataV14) IsNMap() bool {
-	return s.Type.IsNMap
+	return s.Type.IsMap
 }
 
 func (s StorageEntryMetadataV14) Hasher() (hash.Hash, error) {
-	if s.Type.IsMap {
-		return s.Type.AsMap.Hasher.HashFunc()
+	if s.IsPlain() {
+		return xxhash.New128(nil), nil
 	}
-	if s.Type.IsDoubleMap {
-		return s.Type.AsDoubleMap.Hasher.HashFunc()
-	}
-	if s.Type.IsNMap {
-		return nil, fmt.Errorf("only Map and DoubleMap have a Hasher")
-	}
+
 	return xxhash.New128(nil), nil
 }
 
 func (s StorageEntryMetadataV14) Hasher2() (hash.Hash, error) {
-	if !s.Type.IsDoubleMap {
-		return nil, fmt.Errorf("only DoubleMaps have a Hasher2")
-	}
-	return s.Type.AsDoubleMap.Key2Hasher.HashFunc()
+	panic("Not implemented")
 }
 
 func (s StorageEntryMetadataV14) Hashers() ([]hash.Hash, error) {
-	if !s.Type.IsNMap {
-		return nil, fmt.Errorf("only NMaps have Hashers")
-	}
-
-	hashers := make([]hash.Hash, len(s.Type.AsNMap.Hashers))
-	for i, hasher := range s.Type.AsNMap.Hashers {
-		hasherFn, err := hasher.HashFunc()
-		if err != nil {
-			return nil, err
+	var hashes []hash.Hash
+	if s.Type.IsMap {
+		for _, hasher := range s.Type.AsMap.Hasher {
+			h, err := hasher.HashFunc()
+			if err != nil {
+				return nil, err
+			}
+			hashes = append(hashes, h)
 		}
-		hashers[i] = hasherFn
 	}
-	return hashers, nil
+	return hashes, nil
 }
 
 type StorageEntryTypeV14 struct {
-	IsType      bool
-	AsType      Type // 0
+	IsPlainType bool
+	AsPlainType Si1LookupTypeID
 	IsMap       bool
-	AsMap       MapTypeV14 // 1
-	IsDoubleMap bool
-	AsDoubleMap DoubleMapTypeV14
-	IsNMap      bool
-	AsNMap      NMapTypeV14 // 3
+	AsMap       MapTypeV14
 }
 
 type DoubleMapTypeV14 struct {
@@ -447,52 +431,38 @@ type NMapTypeV14 struct {
 	Value   Si1LookupTypeID
 }
 
-func (s *StorageEntryTypeV14) Decode(decoder scale.Decoder) error {
-	var t uint8
-	err := decoder.Decode(&t)
+func (d *StorageEntryTypeV14) Decode(decoder scale.Decoder) error {
+	b, err := decoder.ReadOneByte()
 	if err != nil {
 		return err
 	}
-
-	switch t {
+	switch b {
 	case 0:
-		s.IsType = true
-		err = decoder.Decode(&s.AsType)
+		d.IsPlainType = true
+		err = decoder.Decode(&d.AsPlainType)
 		if err != nil {
 			return err
 		}
 	case 1:
-		s.IsMap = true
-		err = decoder.Decode(&s.AsMap)
-		if err != nil {
-			return err
-		}
-	case 2:
-		s.IsDoubleMap = true
-		err = decoder.Decode(&s.AsDoubleMap)
-		if err != nil {
-			return err
-		}
-	case 3:
-		s.IsNMap = true
-		err = decoder.Decode(&s.AsNMap)
+		d.IsMap = true
+		err = decoder.Decode(&d.AsMap)
 		if err != nil {
 			return err
 		}
 	default:
-		return fmt.Errorf("received unexpected type %v", t)
+		return fmt.Errorf("StorageFunctionTypeV14 is not support this type: %d", b)
 	}
 	return nil
 }
 
 func (s StorageEntryTypeV14) Encode(encoder scale.Encoder) error {
 	switch {
-	case s.IsType:
+	case s.IsPlainType:
 		err := encoder.PushByte(0)
 		if err != nil {
 			return err
 		}
-		err = encoder.Encode(s.AsType)
+		err = encoder.Encode(s.AsPlainType)
 		if err != nil {
 			return err
 		}
@@ -502,24 +472,6 @@ func (s StorageEntryTypeV14) Encode(encoder scale.Encoder) error {
 			return err
 		}
 		err = encoder.Encode(s.AsMap)
-		if err != nil {
-			return err
-		}
-	case s.IsDoubleMap:
-		err := encoder.PushByte(2)
-		if err != nil {
-			return err
-		}
-		err = encoder.Encode(s.AsDoubleMap)
-		if err != nil {
-			return err
-		}
-	case s.IsNMap:
-		err := encoder.PushByte(3)
-		if err != nil {
-			return err
-		}
-		err = encoder.Encode(s.AsNMap)
 		if err != nil {
 			return err
 		}
