@@ -298,28 +298,54 @@ func (m *PalletMetadataV14) FindConstantValue(constant Text) ([]byte, error) {
 
 type StorageMetadataV14 struct {
 	Prefix Text
-	Items  []StorageFunctionMetadataV14
+	Items  []StorageEntryMetadataV14
 }
 
-type StorageFunctionMetadataV14 struct {
+/// NUNO
+
+func (s *StorageEntryModifierV14) Decode(decoder scale.Decoder) error {
+	var t uint8
+	err := decoder.Decode(&t)
+	if err != nil {
+		return err
+	}
+
+	switch t {
+	case 0:
+		s.IsOptional = true
+	case 1:
+		s.IsDefault = true
+	case 2:
+		s.IsRequired = true
+	default:
+		return fmt.Errorf("received unexpected storage function modifier type %v", t)
+	}
+	return nil
+}
+
+/// END
+
+func (storage *StorageMetadataV14) Decode(decoder scale.Decoder) error {
+	err := decoder.Decode(&storage.Prefix)
+	if err != nil {
+		return err
+	}
+	return decoder.Decode(&storage.Items)
+}
+
+type StorageEntryMetadataV14 struct {
 	Name          Text
 	Modifier      StorageEntryModifierV14
-	Type          StorageFunctionTypeV14
+	Type          StorageEntryTypeV14
 	Fallback      Bytes
 	Documentation []Text
 }
 
-type StorageEntryTypeV14 struct {
-	IsPlainType bool
-	AsPlainType Si1LookupTypeID
-	IsMap       bool
-	AsMap       MapTypeV14
-}
-
 type MapTypeV14 struct {
-	Hasher  []StorageHasherV10
-	KeysId  Si1LookupTypeID
-	ValueId Si1LookupTypeID
+	Hasher StorageHasherV10
+	//TODO(nuno): may need to rename fields according to https://github.com/polkadot-js/api/blob/48ef04b8ca21dc4bd06442775d9b7585c75d1253/packages/types/src/interfaces/metadata/v14.ts#L77
+	KeysID  Si1LookupTypeID
+	ValueID Si1LookupTypeID
 }
 
 type StorageEntryModifierV14 struct {
@@ -328,23 +354,23 @@ type StorageEntryModifierV14 struct {
 	IsRequired bool // 2
 }
 
-func (s StorageFunctionMetadataV14) IsPlain() bool {
+func (s StorageEntryMetadataV14) IsPlain() bool {
 	return s.Type.IsType
 }
 
-func (s StorageFunctionMetadataV14) IsMap() bool {
+func (s StorageEntryMetadataV14) IsMap() bool {
 	return s.Type.IsMap
 }
 
-func (s StorageFunctionMetadataV14) IsDoubleMap() bool {
+func (s StorageEntryMetadataV14) IsDoubleMap() bool {
 	return s.Type.IsDoubleMap
 }
 
-func (s StorageFunctionMetadataV14) IsNMap() bool {
+func (s StorageEntryMetadataV14) IsNMap() bool {
 	return s.Type.IsNMap
 }
 
-func (s StorageFunctionMetadataV14) Hasher() (hash.Hash, error) {
+func (s StorageEntryMetadataV14) Hasher() (hash.Hash, error) {
 	if s.Type.IsMap {
 		return s.Type.AsMap.Hasher.HashFunc()
 	}
@@ -357,14 +383,14 @@ func (s StorageFunctionMetadataV14) Hasher() (hash.Hash, error) {
 	return xxhash.New128(nil), nil
 }
 
-func (s StorageFunctionMetadataV14) Hasher2() (hash.Hash, error) {
+func (s StorageEntryMetadataV14) Hasher2() (hash.Hash, error) {
 	if !s.Type.IsDoubleMap {
 		return nil, fmt.Errorf("only DoubleMaps have a Hasher2")
 	}
 	return s.Type.AsDoubleMap.Key2Hasher.HashFunc()
 }
 
-func (s StorageFunctionMetadataV14) Hashers() ([]hash.Hash, error) {
+func (s StorageEntryMetadataV14) Hashers() ([]hash.Hash, error) {
 	if !s.Type.IsNMap {
 		return nil, fmt.Errorf("only NMaps have Hashers")
 	}
@@ -380,18 +406,18 @@ func (s StorageFunctionMetadataV14) Hashers() ([]hash.Hash, error) {
 	return hashers, nil
 }
 
-type StorageFunctionTypeV14 struct {
+type StorageEntryTypeV14 struct {
 	IsType      bool
 	AsType      Type // 0
 	IsMap       bool
-	AsMap       MapTypeV10 // 1
+	AsMap       MapTypeV14 // 1
 	IsDoubleMap bool
-	AsDoubleMap DoubleMapTypeV10 // 2
+	AsDoubleMap DoubleMapTypeV10 // 2 //TODO(nuno): use v14
 	IsNMap      bool
 	AsNMap      NMapTypeV13 // 3
 }
 
-func (s *StorageFunctionTypeV14) Decode(decoder scale.Decoder) error {
+func (s *StorageEntryTypeV14) Decode(decoder scale.Decoder) error {
 	var t uint8
 	err := decoder.Decode(&t)
 	if err != nil {
@@ -429,7 +455,7 @@ func (s *StorageFunctionTypeV14) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (s StorageFunctionTypeV14) Encode(encoder scale.Encoder) error {
+func (s StorageEntryTypeV14) Encode(encoder scale.Encoder) error {
 	switch {
 	case s.IsType:
 		err := encoder.PushByte(0)
