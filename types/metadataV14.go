@@ -37,21 +37,29 @@ func (m *MetadataV14) Decode(decoder scale.Decoder) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("Decoded types")
 
 	m.LookUpData = make(map[int64]*Si1Type)
 	for _, lookUp := range m.Types {
 		m.LookUpData[lookUp.ID.Int64()] = &lookUp.Type
 	}
+	fmt.Println("Built LookUpData")
+
+	fmt.Println("Will Decode Pallets")
 
 	err = decoder.Decode(&m.Pallets)
 	if err != nil {
 		return err
 	}
+	fmt.Println("Decoded Pallets")
 
 	err = decoder.Decode(&m.Extrinsic)
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("Decoded Extrinsic")
+
 	return nil
 }
 
@@ -72,12 +80,19 @@ func (m *MetadataV14) FindCallIndex(call string) (CallIndex, error) {
 		if string(mod.Name) != s[0] {
 			continue
 		}
-		for ci, f := range mod.Calls {
-			if string(f.Name) == s[1] {
-				return CallIndex{mod.Index, uint8(ci)}, nil
+		callType := mod.Calls.Type
+
+		for _, lookUp := range m.Types {
+			if lookUp.ID.Int64() == callType.Int64() {
+				if len(lookUp.Type.Def.Variant.Variants) > 0 {
+					for _, vars := range lookUp.Type.Def.Variant.Variants {
+						if string(vars.Name) == s[1] {
+							return CallIndex{uint8(mod.Index), uint8(vars.Index)}, nil
+						}
+					}
+				}
 			}
 		}
-		return CallIndex{}, fmt.Errorf("method %v not found within module %v for call %v", s[1], mod.Name, call)
 	}
 	return CallIndex{}, fmt.Errorf("module %v not found in metadata for call %v", s[0], call)
 }
@@ -154,12 +169,17 @@ type PalletMetadataV14 struct {
 	HasStorage bool
 	Storage    StorageMetadataV14
 	HasCalls   bool
-	Calls      []FunctionMetadataV4
+	Calls      FunctionMetadataV14
 	HasEvents  bool
 	Events     EventMetadataV14
 	Constants  []ConstantMetadataV14
+	HasErrors  bool
 	Errors     ErrorMetadataV14
 	Index      uint8
+}
+
+type FunctionMetadataV14 struct {
+	Type Si1LookupTypeID
 }
 
 type EventMetadataV14 struct {
@@ -182,11 +202,14 @@ func (m *PalletMetadataV14) Decode(decoder scale.Decoder) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("Decoded Pallet.Name")
 
 	err = decoder.Decode(&m.HasStorage)
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("Decoded Pallet.HasStorage")
 
 	if m.HasStorage {
 		err = decoder.Decode(&m.Storage)
@@ -195,10 +218,14 @@ func (m *PalletMetadataV14) Decode(decoder scale.Decoder) error {
 		}
 	}
 
+	fmt.Println("Decoded Pallet.Storage")
+
 	err = decoder.Decode(&m.HasCalls)
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("Decoded Pallet.HasCalls")
 
 	if m.HasCalls {
 		err = decoder.Decode(&m.Calls)
@@ -207,10 +234,14 @@ func (m *PalletMetadataV14) Decode(decoder scale.Decoder) error {
 		}
 	}
 
+	fmt.Println("Decoded Pallet.Calls")
+
 	err = decoder.Decode(&m.HasEvents)
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("Decoded Pallet.HasEvents")
 
 	if m.HasEvents {
 		err = decoder.Decode(&m.Events)
@@ -219,15 +250,30 @@ func (m *PalletMetadataV14) Decode(decoder scale.Decoder) error {
 		}
 	}
 
+	fmt.Println("Decoded Pallet.Events")
+
 	err = decoder.Decode(&m.Constants)
 	if err != nil {
 		return err
 	}
 
-	err = decoder.Decode(&m.Errors)
+	fmt.Println("Decoded Pallet.Constants")
+
+	err = decoder.Decode(&m.HasErrors)
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("Decoded Pallet.HasErrors")
+
+	if m.HasErrors {
+		err = decoder.Decode(&m.Errors)
+		if err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Decoded Pallet.Errors")
 
 	return decoder.Decode(&m.Index)
 }
@@ -382,9 +428,23 @@ type StorageEntryTypeV14 struct {
 	IsMap       bool
 	AsMap       MapTypeV14 // 1
 	IsDoubleMap bool
-	AsDoubleMap DoubleMapTypeV10 // 2 //TODO(nuno): use v14
+	AsDoubleMap DoubleMapTypeV14
 	IsNMap      bool
-	AsNMap      NMapTypeV13 // 3
+	AsNMap      NMapTypeV14 // 3
+}
+
+type DoubleMapTypeV14 struct {
+	Hasher     StorageHasherV10
+	Key1       Si1LookupTypeID
+	Key2       Si1LookupTypeID
+	Value      Si1LookupTypeID
+	Key2Hasher StorageHasherV10
+}
+
+type NMapTypeV14 struct {
+	Key     Si1LookupTypeID
+	Hashers []StorageHasherV10
+	Value   Si1LookupTypeID
 }
 
 func (s *StorageEntryTypeV14) Decode(decoder scale.Decoder) error {
@@ -467,10 +527,4 @@ func (s StorageEntryTypeV14) Encode(encoder scale.Encoder) error {
 		return fmt.Errorf("expected to be either type, map, double map or nmap but none was set: %v", s)
 	}
 	return nil
-}
-
-type NMapTypeV14 struct {
-	Keys    []Type
-	Hashers []StorageHasherV10
-	Value   Type
 }

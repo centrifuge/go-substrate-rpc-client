@@ -1,11 +1,10 @@
 package types_test
 
 import (
-	"encoding/json"
-	"fmt"
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v3/types"
+	"github.com/stretchr/testify/assert"
 )
 
 // var exampleMetadataV14 = Metadata{
@@ -142,75 +141,75 @@ import (
 // 	assert.Error(t, err)
 // }
 
-// func TestNewMetadataV14_Decode(t *testing.T) {
-// 	metadata := NewMetadataV14()
-// 	err := DecodeFromBytes(MustHexDecodeString(ExamplaryMetadataV14SubstrateString), metadata)
-// 	assert.EqualValues(t, metadata.Version, 13)
-// 	assert.NoError(t, err)
-// 	data, err := EncodeToBytes(metadata)
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, ExamplaryMetadataV14SubstrateString, HexEncodeToString(data))
+func TestNewMetadataV14_Decode(t *testing.T) {
+	metadata := NewMetadataV14()
+	err := DecodeFromBytes(MustHexDecodeString(MetadataV14Data), metadata)
+	assert.EqualValues(t, metadata.Version, 14)
+	assert.NoError(t, err)
+	// data, err := EncodeToBytes(metadata)
+	// assert.NoError(t, err)
+	// assert.Equal(t, MetadataV14Data, HexEncodeToString(data))
+}
+
+// func Test_ParseMetadata(t *testing.T) {
+// 	var meta Metadata
+// 	err := DecodeFromHexString(MetadataV14Data, &meta)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	v14 := meta.AsMetadataV14
+// 	d, _ := json.Marshal(v14)
+// 	fmt.Println(string(d))
 // }
 
-func Test_ParseMetadata(t *testing.T) {
-	var meta Metadata
-	err := DecodeFromHexString(MetadataV14Data, &meta)
-	if err != nil {
-		t.Fatal(err)
-	}
-	v14 := meta.AsMetadataV14
-	d, _ := json.Marshal(v14)
-	fmt.Println(string(d))
-}
+// func TestMetadataV14FindCallIndex(t *testing.T) {
+// 	var meta Metadata
+// 	err := DecodeFromHexString(MetadataV14Data, &meta)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	callIdx, err := meta.FindCallIndex("Balances.transfer")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	fmt.Println(callIdx)
+// }
+// func TestMetadataV14FindEventNamesForEventID(t *testing.T) {
+// 	var meta Metadata
+// 	err := DecodeFromHexString(MetadataV14Data, &meta)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	id := EventID{}
+// 	id[0] = 5
+// 	id[1] = 2
+// 	mod, event, err := meta.FindEventNamesForEventID(id)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	fmt.Println(mod, event)
+// }
 
-func TestMetadataV14FindCallIndex(t *testing.T) {
-	var meta Metadata
-	err := DecodeFromHexString(MetadataV14Data, &meta)
-	if err != nil {
-		t.Fatal(err)
-	}
-	callIdx, err := meta.FindCallIndex("Balances.transfer")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(callIdx)
-}
-func TestMetadataV14FindEventNamesForEventID(t *testing.T) {
-	var meta Metadata
-	err := DecodeFromHexString(MetadataV14Data, &meta)
-	if err != nil {
-		t.Fatal(err)
-	}
-	id := EventID{}
-	id[0] = 5
-	id[1] = 2
-	mod, event, err := meta.FindEventNamesForEventID(id)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(mod, event)
-}
+// func TestMetadataV14FindStorageEntryMetadata(t *testing.T) {
+// 	var meta Metadata
+// 	err := DecodeFromHexString(MetadataV14Data, &meta)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	st, err := meta.FindStorageEntryMetadata("System", "Account")
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	fmt.Println(st)
+// }
 
-func TestMetadataV14FindStorageEntryMetadata(t *testing.T) {
-	var meta Metadata
-	err := DecodeFromHexString(MetadataV14Data, &meta)
-	if err != nil {
-		t.Fatal(err)
-	}
-	st, err := meta.FindStorageEntryMetadata("System", "Account")
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println(st)
-}
+// func TestMetadataV14ExistsModuleMetadata(t *testing.T) {
+// 	var meta Metadata
+// 	err := DecodeFromHexString(MetadataV14Data, &meta)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	s := meta.ExistsModuleMetadata("System")
 
-func TestMetadataV14ExistsModuleMetadata(t *testing.T) {
-	var meta Metadata
-	err := DecodeFromHexString(MetadataV14Data, &meta)
-	if err != nil {
-		t.Fatal(err)
-	}
-	s := meta.ExistsModuleMetadata("System")
-
-	fmt.Println(s)
-}
+// 	fmt.Println(s)
+// }
