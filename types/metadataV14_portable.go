@@ -77,19 +77,21 @@ func (d *Si0TypeDefPrimitive) Decode(decoder scale.Decoder) error {
 
 //------------------v1-----------
 
-type Si1LookupTypeID big.Int
+type Si1LookupTypeID struct {
+	UCompact
+}
 
 func NewSi1LookupTypeID(value *big.Int) Si1LookupTypeID {
-	return Si1LookupTypeID(*value)
+	return Si1LookupTypeID{NewUCompact(value)}
 }
 
 func NewSi1LookupTypeIDFromUInt(value uint64) Si1LookupTypeID {
 	return NewSi1LookupTypeID(new(big.Int).SetUint64(value))
 }
-func (d *Si1LookupTypeID) Int64() int64 {
-	i := big.Int(*d)
-	return i.Int64()
-}
+//func (d *Si1LookupTypeID) Int64() int64 {
+//	i := big.Int(*d)
+//	return i.Int64()
+//}
 
 // func (d *Si1LookupTypeID) UnmarshalJSON(bytes []byte) error {
 // 	var s int64
@@ -106,23 +108,23 @@ func (d *Si1LookupTypeID) Int64() int64 {
 // 	return json.Marshal(s)
 // }
 
-func (d *Si1LookupTypeID) Decode(decoder scale.Decoder) error {
-	ui, err := decoder.DecodeUintCompact()
-	if err != nil {
-		return err
-	}
-
-	*d = Si1LookupTypeID(*ui)
-	return nil
-}
-
-func (d Si1LookupTypeID) Encode(encoder scale.Encoder) error {
-	err := encoder.EncodeUintCompact(big.Int(d))
-	if err != nil {
-		return err
-	}
-	return nil
-}
+//func (d *Si1LookupTypeID) Decode(decoder scale.Decoder) error {
+//	ui, err := decoder.DecodeUintCompact()
+//	if err != nil {
+//		return err
+//	}
+//
+//	*d = Si1LookupTypeID(*ui)
+//	return nil
+//}
+//
+//func (d Si1LookupTypeID) Encode(encoder scale.Encoder) error {
+//	err := encoder.EncodeUintCompact(big.Int(d))
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
 
 type Si1Path Si0Path
 
