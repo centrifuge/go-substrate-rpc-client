@@ -1,6 +1,7 @@
 package types
 
 import (
+	"errors"
 	"fmt"
 	"math/big"
 
@@ -10,8 +11,6 @@ import (
 type PortableTypeV14 struct {
 	ID   Si1LookupTypeID
 	Type Si1Type
-
-	// TODO(nuno): complete following https://tinyurl.com/zzznj3wd
 }
 
 func (d *PortableTypeV14) Decode(decoder scale.Decoder) error {
@@ -84,6 +83,44 @@ func (d *Si0TypeDefPrimitive) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
+func (d Si0TypeDefPrimitive) Encode(encoder scale.Encoder) error {
+	switch d.Value {
+	case "Bool":
+		return encoder.PushByte(0)
+	case "Char":
+		return encoder.PushByte(1)
+	case "Str":
+		return encoder.PushByte(2)
+	case "U8":
+		return encoder.PushByte(3)
+	case "U16":
+		return encoder.PushByte(4)
+	case "U32":
+		return encoder.PushByte(5)
+	case "U64":
+		return encoder.PushByte(6)
+	case "U128":
+		return encoder.PushByte(7)
+	case "U256":
+		return encoder.PushByte(8)
+	case "I8":
+		return encoder.PushByte(9)
+	case "I16":
+		return encoder.PushByte(10)
+	case "I32":
+		return encoder.PushByte(11)
+	case "I64":
+		return encoder.PushByte(12)
+	case "I128":
+		return encoder.PushByte(13)
+	case "I256":
+		return encoder.PushByte(14)
+	default:
+		//TODO(nuno): Not sure what to do
+		return nil
+	}
+}
+
 //------------------v1-----------
 
 type Si1LookupTypeID struct {
@@ -140,8 +177,9 @@ func (x Si1Type) Encode(encoder scale.Encoder) error {
 }
 
 type Si1TypeParameter struct {
-	Name Text
-	Type Si1LookupTypeID
+	Name    Text
+	HasType bool
+	Type    Si1LookupTypeID
 }
 
 func (d *Si1TypeParameter) Decode(decoder scale.Decoder) error {
@@ -149,15 +187,27 @@ func (d *Si1TypeParameter) Decode(decoder scale.Decoder) error {
 	if err != nil {
 		return err
 	}
+
 	var hasValue bool
 	err = decoder.DecodeOption(&hasValue, &d.Type)
 	if err != nil {
 		return err
 	}
-	if !hasValue {
+	d.HasType = hasValue
+	if !d.HasType {
 		d.Type = NewSi1LookupTypeID(big.NewInt(0))
 	}
 	return nil
+}
+
+func (d Si1TypeParameter) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(d.Name)
+	if err != nil {
+		return err
+	}
+
+	return encoder.EncodeOption(d.HasType, &d.Type)
+
 }
 
 type Si1TypeDef struct {
@@ -216,12 +266,71 @@ func (d *Si1TypeDef) Decode(decoder scale.Decoder) error {
 		return decoder.Decode(&d.HistoricMetaCompat)
 
 	default:
-		return fmt.Errorf("Si1TypeDef un know type : %d", num)
+		return fmt.Errorf("Si1TypeDef unknow type : %d", num)
 	}
 }
 
-func (d *Si1TypeDef) GetSi1TypeDefData() {
+func (d *Si1TypeDef) Encode(encoder scale.Encoder) error {
+	switch {
+	case d.IsComposite:
+		err := encoder.PushByte(0)
+		if err != nil {
+			return err
+		}
+		return encoder.Encode(&d.Composite)
+	case d.IsVariant:
+		err := encoder.PushByte(1)
+		if err != nil {
+			return err
+		}
+		return encoder.Encode(&d.Variant)
+	case d.IsSequence:
+		err := encoder.PushByte(2)
+		if err != nil {
+			return err
+		}
+		return encoder.Encode(&d.Sequence)
+	case d.IsArray:
+		err := encoder.PushByte(3)
+		if err != nil {
+			return err
+		}
+		return encoder.Encode(&d.Array)
+	case d.IsTuple:
+		err := encoder.PushByte(4)
+		if err != nil {
+			return err
+		}
+		return encoder.Encode(&d.Tuple)
+	case d.IsPrimitive:
+		err := encoder.PushByte(5)
+		if err != nil {
+			return err
+		}
+		return encoder.Encode(&d.Primitive)
+	case d.IsCompact:
+		err := encoder.PushByte(6)
+		if err != nil {
+			return err
+		}
+		return encoder.Encode(&d.Compact)
+	case d.IsBitSequence:
+		err := encoder.PushByte(7)
+		if err != nil {
+			return err
+		}
+		return encoder.Encode(&d.BitSequence)
+	case d.IsHistoricMetaCompat:
+		err := encoder.PushByte(8)
+		if err != nil {
+			return err
+		}
+		d.IsHistoricMetaCompat = true
+		return encoder.Encode(&d.HistoricMetaCompat)
 
+	default:
+		return errors.New("expected Si1TypeDef instance to be one of the valid variants")
+	}
 }
 
 type Si1TypeDefComposite struct {
@@ -254,6 +363,23 @@ func (d *Si1Field) Decode(decoder scale.Decoder) error {
 		return err
 	}
 	return decoder.Decode(&d.Docs)
+}
+
+func (d Si1Field) Encode(encoder scale.Encoder) error {
+	// TODO(nuno): may need to handle optional Name and TypeName
+	err := encoder.Encode(d.Name)
+	if err != nil {
+		return err
+	}
+	err = encoder.Encode(d.Type)
+	if err != nil {
+		return err
+	}
+	err = encoder.Encode(d.TypeName)
+	if err != nil {
+		return err
+	}
+	return encoder.Encode(&d.Docs)
 }
 
 type Si1TypeDefVariant struct {
