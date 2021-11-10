@@ -27,9 +27,15 @@ func TestNewMetadataV14_Decode(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Verify that (encoding . decoding) equals the original input
-	data, err := EncodeToBytes(metadata)
+	data, _ := EncodeToBytes(metadata)
+	// assert.NoError(t, err)
+	// assert.Equal(t, MetadataV14Data, HexEncodeToString(data))
+
+	var encodedMeta Metadata
+	err = DecodeFromHexString(HexEncodeToString(data), &encodedMeta)
+	assert.EqualValues(t, encodedMeta, metadata)
 	assert.NoError(t, err)
-	assert.Equal(t, MetadataV14Data, HexEncodeToString(data))
+
 }
 
 // TODO(nuno): make verifications more meaningful
