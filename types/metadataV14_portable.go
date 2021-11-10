@@ -342,32 +342,41 @@ func (d *Si1TypeDefComposite) Decode(decoder scale.Decoder) error {
 }
 
 type Si1Field struct {
-	Name     Text
-	Type     Si1LookupTypeID
-	TypeName Text
-	Docs     []Text
+	HasName     bool
+	Name        Text
+	Type        Si1LookupTypeID
+	HasTypeName bool
+	TypeName    Text
+	Docs        []Text
 }
 
 func (d *Si1Field) Decode(decoder scale.Decoder) error {
 	var hasValue bool
+	fmt.Println("Si1Field decode option name")
 	err := decoder.DecodeOption(&hasValue, &d.Name)
 	if err != nil {
 		return err
 	}
+	d.HasName = hasValue
+
 	err = decoder.Decode(&d.Type)
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("Si1Field decode option typeName")
 	err = decoder.DecodeOption(&hasValue, &d.TypeName)
 	if err != nil {
 		return err
 	}
+	d.HasTypeName = hasValue
+
 	return decoder.Decode(&d.Docs)
 }
 
 func (d Si1Field) Encode(encoder scale.Encoder) error {
 	// TODO(nuno): may need to handle optional Name and TypeName
-	err := encoder.Encode(d.Name)
+	err := encoder.EncodeOption(d.HasName, d.Name)
 	if err != nil {
 		return err
 	}
@@ -375,7 +384,7 @@ func (d Si1Field) Encode(encoder scale.Encoder) error {
 	if err != nil {
 		return err
 	}
-	err = encoder.Encode(d.TypeName)
+	err = encoder.EncodeOption(d.HasTypeName, d.TypeName)
 	if err != nil {
 		return err
 	}
