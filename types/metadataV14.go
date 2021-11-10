@@ -350,9 +350,9 @@ type StorageEntryMetadataV14 struct {
 }
 
 type MapTypeV14 struct {
-	Hasher  []StorageHasherV10
-	KeysID  Si1LookupTypeID
-	ValueID Si1LookupTypeID
+	Hashers []StorageHasherV10
+	Key     Si1LookupTypeID
+	Value   Si1LookupTypeID
 }
 
 func (s StorageEntryMetadataV14) IsPlain() bool {
@@ -360,7 +360,7 @@ func (s StorageEntryMetadataV14) IsPlain() bool {
 }
 
 func (s StorageEntryMetadataV14) IsMap() bool {
-	return false
+	return s.Type.IsMap
 }
 
 func (s StorageEntryMetadataV14) IsDoubleMap() bool {
@@ -381,7 +381,7 @@ func (s StorageEntryMetadataV14) Hasher2() (hash.Hash, error) {
 func (s StorageEntryMetadataV14) Hashers() ([]hash.Hash, error) {
 	var hashes []hash.Hash
 	if s.Type.IsMap {
-		for _, hasher := range s.Type.AsMap.Hasher {
+		for _, hasher := range s.Type.AsMap.Hashers {
 			h, err := hasher.HashFunc()
 			if err != nil {
 				return nil, err
@@ -458,7 +458,7 @@ func (s StorageEntryTypeV14) Encode(encoder scale.Encoder) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("expected to be either type, map, double map or nmap but none was set: %v", s)
+		return fmt.Errorf("expected to be either plain type or map, but none was set: %v", s)
 	}
 	return nil
 }

@@ -27,15 +27,34 @@ func TestNewMetadataV14_Decode(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Verify that (encoding . decoding) equals the original input
-	data, _ := EncodeToBytes(metadata)
-	// assert.NoError(t, err)
-	// assert.Equal(t, MetadataV14Data, HexEncodeToString(data))
+	data, err := EncodeToBytes(metadata)
+	assert.NoError(t, err)
 
 	var encodedMeta Metadata
 	err = DecodeFromHexString(HexEncodeToString(data), &encodedMeta)
-	assert.EqualValues(t, encodedMeta, metadata)
 	assert.NoError(t, err)
 
+	// assert.EqualValues(t, encodedMeta, metadata)
+
+}
+
+// Verify that decoding the metadata v14 hex string twice
+// produces the same output.
+func TestNewMetadataV14_DecodeTwice(t *testing.T) {
+	// Verify that we can succcessfully decode metadata v14
+	var metadata1 Metadata
+	err := DecodeFromHexString(MetadataV14Data, &metadata1)
+	assert.EqualValues(t, metadata1.Version, 14)
+	assert.NoError(t, err)
+
+	// Decode it again
+	var metadata2 Metadata
+	err = DecodeFromHexString(MetadataV14Data, &metadata2)
+	assert.EqualValues(t, metadata2.Version, 14)
+	assert.NoError(t, err)
+
+	// Verify they are the same value
+	assert.EqualValues(t, metadata1, metadata2)
 }
 
 // TODO(nuno): make verifications more meaningful
