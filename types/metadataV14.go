@@ -311,9 +311,16 @@ func (m PalletMetadataV14) Encode(encoder scale.Encoder) error {
 		return err
 	}
 
-	err = encoder.Encode(m.Errors)
+	err = encoder.Encode(m.HasErrors)
 	if err != nil {
 		return err
+	}
+
+	if m.HasErrors {
+		err = encoder.Encode(m.Errors)
+		if err != nil {
+			return err
+		}
 	}
 
 	return encoder.Encode(m.Index)
