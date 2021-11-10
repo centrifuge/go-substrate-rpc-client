@@ -15,6 +15,7 @@ type MetadataV14 struct {
 	Lookup    PortableRegistry
 	Pallets   []PalletMetadataV14
 	Extrinsic ExtrinsicV14
+	Type      Si1LookupTypeID
 
 	LookUpData map[int64]*Si1Type
 }
@@ -42,7 +43,12 @@ func (m MetadataV14) Encode(encoder scale.Encoder) error {
 		return err
 	}
 
-	return encoder.Encode(m.Extrinsic)
+	err = encoder.Encode(m.Extrinsic)
+	if err != nil {
+		return err
+	}
+
+	return encoder.Encode(m.Type)
 }
 
 func (m *MetadataV14) Decode(decoder scale.Decoder) error {
@@ -67,7 +73,7 @@ func (m *MetadataV14) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	return nil
+	return decoder.Decode(&m.Type)
 }
 
 func (m *MetadataV14) FindCallIndex(call string) (CallIndex, error) {
