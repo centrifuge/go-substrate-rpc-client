@@ -23,6 +23,15 @@ func (d *PortableTypeV14) Decode(decoder scale.Decoder) error {
 	return decoder.Decode(&d.Type)
 }
 
+func (x PortableTypeV14) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(x.ID)
+	if err != nil {
+		return err
+	}
+
+	return encoder.Encode(x.Type)
+}
+
 //----------------v0------------
 
 type Si0LookupTypeID UCompact
@@ -147,6 +156,22 @@ func (d *Si1Type) Decode(decoder scale.Decoder) error {
 		return err
 	}
 	return decoder.Decode(&d.Docs)
+}
+
+func (x Si1Type) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(x.Path)
+	if err != nil {
+		return err
+	}
+	err = encoder.Encode(x.Params)
+	if err != nil {
+		return err
+	}
+	err = encoder.Encode(x.Def)
+	if err != nil {
+		return err
+	}
+	return encoder.Encode(x.Docs)
 }
 
 type Si1TypeParameter struct {
