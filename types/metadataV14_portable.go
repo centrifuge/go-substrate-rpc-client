@@ -13,33 +13,32 @@ type PortableTypeV14 struct {
 	Type Si1Type
 }
 
-func (d *PortableTypeV14) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&d.ID)
-	if err != nil {
-		return fmt.Errorf("decode Si1LookupTypeID error: %v", err)
-	}
-
-	return decoder.Decode(&d.Type)
-}
-
-func (x PortableTypeV14) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(x.ID)
-	if err != nil {
-		return err
-	}
-
-	return encoder.Encode(x.Type)
-}
-
 //----------------v0------------
 
 type Si0LookupTypeID UCompact
 
 type Si0Path []Text
 
-type Si0TypeDefPrimitive struct {
-	Value string
-}
+
+const (
+	IsBool = 0
+	IsChar = 1
+	IsStr  = 2
+	IsU8   = 3
+	IsU16  = 4
+	IsU32  = 5
+	IsU64  = 6
+	IsU128 = 7
+	IsU256 = 8
+	IsI8   = 9
+	IsI16  = 10
+	IsI32  = 11
+	IsI64  = 12
+	IsI128 = 13
+	IsI256 = 14
+)
+
+type Si0TypeDefPrimitive byte
 
 func (d *Si0TypeDefPrimitive) Decode(decoder scale.Decoder) error {
 	b, err := decoder.ReadOneByte()
@@ -47,76 +46,75 @@ func (d *Si0TypeDefPrimitive) Decode(decoder scale.Decoder) error {
 		return err
 	}
 	switch b {
-	case 0:
-		d.Value = "Bool"
-	case 1:
-		d.Value = "Char"
-	case 2:
-		d.Value = "Str"
-	case 3:
-		d.Value = "U8"
-	case 4:
-		d.Value = "U16"
-	case 5:
-		d.Value = "U32"
-	case 6:
-		d.Value = "U64"
-	case 7:
-		d.Value = "U128"
-	case 8:
-		d.Value = "U256"
-	case 9:
-		d.Value = "I8"
-	case 10:
-		d.Value = "I16"
-	case 11:
-		d.Value = "I32"
-	case 12:
-		d.Value = "I64"
-	case 13:
-		d.Value = "I128"
-	case 14:
-		d.Value = "I256"
+	case IsBool:
+		*d = IsBool
+	case IsChar:
+		*d = IsChar
+	case IsStr:
+		*d = IsStr
+	case IsU8:
+		*d = IsU8
+	case IsU16:
+		*d = IsU16
+	case IsU32:
+		*d = IsU32
+	case IsU64:
+		*d = IsU64
+	case IsU128:
+		*d = IsU128
+	case IsU256:
+		*d = IsU256
+	case IsI8:
+		*d = IsI8
+	case IsI16:
+		*d = IsI16
+	case IsI32:
+		*d = IsI32
+	case IsI64:
+		*d = IsI64
+	case IsI128:
+		*d = IsI128
+	case IsI256:
+		*d = IsI256
 	default:
 		return fmt.Errorf("Si0TypeDefPrimitive do not support this type: %d", b)
 	}
 	return nil
 }
 
-func (d Si0TypeDefPrimitive) Encode(encoder scale.Encoder) error {
-	switch d.Value {
-	case "Bool":
-		return encoder.PushByte(0)
-	case "Char":
-		return encoder.PushByte(1)
-	case "Str":
-		return encoder.PushByte(2)
-	case "U8":
-		return encoder.PushByte(3)
-	case "U16":
-		return encoder.PushByte(4)
-	case "U32":
-		return encoder.PushByte(5)
-	case "U64":
-		return encoder.PushByte(6)
-	case "U128":
-		return encoder.PushByte(7)
-	case "U256":
-		return encoder.PushByte(8)
-	case "I8":
-		return encoder.PushByte(9)
-	case "I16":
-		return encoder.PushByte(10)
-	case "I32":
-		return encoder.PushByte(11)
-	case "I64":
-		return encoder.PushByte(12)
-	case "I128":
-		return encoder.PushByte(13)
-	case "I256":
-		return encoder.PushByte(14)
+func (d *Si0TypeDefPrimitive) Encode(encoder scale.Encoder) error {
+	switch *d {
+	case IsBool:
+		return encoder.PushByte(IsBool)
+	case IsChar:
+		return encoder.PushByte(IsChar)
+	case IsStr:
+		return encoder.PushByte(IsStr)
+	case IsU8:
+		return encoder.PushByte(IsU8)
+	case IsU16:
+		return encoder.PushByte(IsU16)
+	case IsU32:
+		return encoder.PushByte(IsU32)
+	case IsU64:
+		return encoder.PushByte(IsU64)
+	case IsU128:
+		return encoder.PushByte(IsU128)
+	case IsU256:
+		return encoder.PushByte(IsU256)
+	case IsI8:
+		return encoder.PushByte(IsI8)
+	case IsI16:
+		return encoder.PushByte(IsI16)
+	case IsI32:
+		return encoder.PushByte(IsI32)
+	case IsI64:
+		return encoder.PushByte(IsI64)
+	case IsI128:
+		return encoder.PushByte(IsI128)
+	case IsI256:
+		return encoder.PushByte(IsI256)
 	default:
-		//TODO(nuno): Not sure what to do
 		return nil
 	}
 }
@@ -144,22 +142,6 @@ type Si1Type struct {
 	Docs   []Text
 }
 
-func (d *Si1Type) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&d.Path)
-	if err != nil {
-		return err
-	}
-	err = decoder.Decode(&d.Params)
-	if err != nil {
-		return err
-	}
-	err = decoder.Decode(&d.Def)
-	if err != nil {
-		return err
-	}
-	return decoder.Decode(&d.Docs)
-}
-
 type Si1TypeParameter struct {
 	Name    Text
 	HasType bool
@@ -172,16 +154,7 @@ func (d *Si1TypeParameter) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	var hasValue bool
-	err = decoder.DecodeOption(&hasValue, &d.Type)
-	if err != nil {
-		return err
-	}
-	d.HasType = hasValue
-	if !d.HasType {
-		d.Type = NewSi1LookupTypeID(big.NewInt(0))
-	}
-	return nil
+	return decoder.DecodeOption(&d.HasType, &d.Type)
 }
 
 func (d Si1TypeParameter) Encode(encoder scale.Encoder) error {
@@ -321,10 +294,6 @@ type Si1TypeDefComposite struct {
 	Fields []Si1Field
 }
 
-func (d *Si1TypeDefComposite) Decode(decoder scale.Decoder) error {
-	return decoder.Decode(&d.Fields)
-}
-
 type Si1Field struct {
 	HasName     bool
 	Name        Text
@@ -335,30 +304,25 @@ type Si1Field struct {
 }
 
 func (d *Si1Field) Decode(decoder scale.Decoder) error {
-	var hasValue bool
-	err := decoder.DecodeOption(&hasValue, &d.Name)
+	err := decoder.DecodeOption(&d.HasName, &d.Name)
 	if err != nil {
 		return err
 	}
-	d.HasName = hasValue
 
 	err = decoder.Decode(&d.Type)
 	if err != nil {
 		return err
 	}
 
-	err = decoder.DecodeOption(&hasValue, &d.TypeName)
+	err = decoder.DecodeOption(&d.HasTypeName, &d.TypeName)
 	if err != nil {
 		return err
 	}
-
-	d.HasTypeName = hasValue
 
 	return decoder.Decode(&d.Docs)
 }
 
 func (d Si1Field) Encode(encoder scale.Encoder) error {
-	// TODO(nuno): may need to handle optional Name and TypeName
 	err := encoder.EncodeOption(d.HasName, d.Name)
 	if err != nil {
 		return err
@@ -378,10 +342,6 @@ type Si1TypeDefVariant struct {
 	Variants []Si1Variant `json:"variants"`
 }
 
-func (d *Si1TypeDefVariant) Decode(decoder scale.Decoder) error {
-	return decoder.Decode(&d.Variants)
-}
-
 type Si1Variant struct {
 	Name   Text       `json:"name"`
 	Fields []Si1Field `json:"fields"`
@@ -389,46 +349,13 @@ type Si1Variant struct {
 	Docs   []Text     `json:"docs"`
 }
 
-func (d *Si1Variant) Decode(decoder scale.Decoder) error {
-	var err error
-	err = decoder.Decode(&d.Name)
-	if err != nil {
-		return err
-	}
-	err = decoder.Decode(&d.Fields)
-	if err != nil {
-		return err
-	}
-	err = decoder.Decode(&d.Index)
-	if err != nil {
-		return err
-	}
-	err = decoder.Decode(&d.Docs)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 type Si1TypeDefSequence struct {
 	Type Si1LookupTypeID
-}
-
-func (d *Si1TypeDefSequence) Decode(decoder scale.Decoder) error {
-	return decoder.Decode(&d.Type)
 }
 
 type Si1TypeDefArray struct {
 	Len  U32
 	Type Si1LookupTypeID
-}
-
-func (d *Si1TypeDefArray) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&d.Len)
-	if err != nil {
-		return err
-	}
-	return decoder.Decode(&d.Type)
 }
 
 type Si1TypeDefTuple []Si1LookupTypeID
@@ -441,19 +368,7 @@ type Si1TypeDefCompact struct {
 	Type Si1LookupTypeID
 }
 
-func (d *Si1TypeDefCompact) Decode(decoder scale.Decoder) error {
-	return decoder.Decode(&d.Type)
-}
-
 type Si1TypeDefBitSequence struct {
 	BitStoreType Si1LookupTypeID
 	BitOrderType Si1LookupTypeID
-}
-
-func (d *Si1TypeDefBitSequence) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&d.BitStoreType)
-	if err != nil {
-		return err
-	}
-	return decoder.Decode(&d.BitOrderType)
 }
