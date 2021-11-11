@@ -59,7 +59,7 @@ func (m *MetadataV14) Decode(decoder scale.Decoder) error {
 	}
 
 	m.LookUpData = make(map[int64]*Si1Type)
-	for _, lookUp := range m.Lookup {
+	for _, lookUp := range m.Lookup.Types {
 		m.LookUpData[lookUp.ID.Int64()] = &lookUp.Type
 	}
 
@@ -87,7 +87,7 @@ func (m *MetadataV14) FindCallIndex(call string) (CallIndex, error) {
 		}
 		callType := mod.Calls.Type
 
-		for _, lookUp := range m.Lookup {
+		for _, lookUp := range m.Lookup.Types {
 			if lookUp.ID.Int64() == callType.Int64() {
 				if len(lookUp.Type.Def.Variant.Variants) > 0 {
 					for _, vars := range lookUp.Type.Def.Variant.Variants {
@@ -112,7 +112,7 @@ func (m *MetadataV14) FindEventNamesForEventID(eventID EventID) (Text, Text, err
 		}
 		eventType := mod.Events.Type.Int64()
 
-		for _, lookUp := range m.Lookup {
+		for _, lookUp := range m.Lookup.Types {
 			if lookUp.ID.Int64() == eventType {
 				if len(lookUp.Type.Def.Variant.Variants) > 0 {
 					for _, vars := range lookUp.Type.Def.Variant.Variants {
@@ -167,7 +167,9 @@ func (m *MetadataV14) ExistsModuleMetadata(module string) bool {
 	return false
 }
 
-type PortableRegistry []PortableTypeV14
+type PortableRegistry struct {
+	Types []PortableTypeV14
+}
 
 type PalletMetadataV14 struct {
 	Name       Text
@@ -404,14 +406,6 @@ type StorageEntryTypeV14 struct {
 	AsPlainType Si1LookupTypeID
 	IsMap       bool
 	AsMap       MapTypeV14
-}
-
-type DoubleMapTypeV14 struct {
-	Hasher     StorageHasherV10
-	Key1       Si1LookupTypeID
-	Key2       Si1LookupTypeID
-	Value      Si1LookupTypeID
-	Key2Hasher StorageHasherV10
 }
 
 type NMapTypeV14 struct {
