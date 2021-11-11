@@ -160,22 +160,6 @@ func (d *Si1Type) Decode(decoder scale.Decoder) error {
 	return decoder.Decode(&d.Docs)
 }
 
-func (x Si1Type) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(x.Path)
-	if err != nil {
-		return err
-	}
-	err = encoder.Encode(x.Params)
-	if err != nil {
-		return err
-	}
-	err = encoder.Encode(x.Def)
-	if err != nil {
-		return err
-	}
-	return encoder.Encode(x.Docs)
-}
-
 type Si1TypeParameter struct {
 	Name    Text
 	HasType bool
@@ -270,7 +254,7 @@ func (d *Si1TypeDef) Decode(decoder scale.Decoder) error {
 	}
 }
 
-func (d *Si1TypeDef) Encode(encoder scale.Encoder) error {
+func (d Si1TypeDef) Encode(encoder scale.Encoder) error {
 	switch {
 	case d.IsComposite:
 		err := encoder.PushByte(0)
@@ -352,7 +336,6 @@ type Si1Field struct {
 
 func (d *Si1Field) Decode(decoder scale.Decoder) error {
 	var hasValue bool
-	fmt.Println("Si1Field decode option name")
 	err := decoder.DecodeOption(&hasValue, &d.Name)
 	if err != nil {
 		return err
@@ -364,11 +347,11 @@ func (d *Si1Field) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	fmt.Println("Si1Field decode option typeName")
 	err = decoder.DecodeOption(&hasValue, &d.TypeName)
 	if err != nil {
 		return err
 	}
+
 	d.HasTypeName = hasValue
 
 	return decoder.Decode(&d.Docs)
