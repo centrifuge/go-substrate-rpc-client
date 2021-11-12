@@ -17,7 +17,10 @@ type MetadataV14 struct {
 	Extrinsic ExtrinsicV14
 	Type      Si1LookupTypeID
 
-	LookUpData map[int64]*Si1Type
+	// Custom field to help us lookup a type from the registry
+	// more efficiently. This field is built while decoding and
+	// it is not to be encoded.
+	EfficientLookup map[int64]*Si1Type
 }
 
 type ExtrinsicV14 struct {
@@ -58,10 +61,7 @@ func (m *MetadataV14) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	m.LookUpData = make(map[int64]*Si1Type)
-	for _, lookUp := range m.Lookup.Types {
-		m.LookUpData[lookUp.ID.Int64()] = &lookUp.Type
-	}
+	m.EfficientLookup = m.Lookup.toMap()
 
 	err = decoder.Decode(&m.Pallets)
 	if err != nil {
@@ -74,6 +74,19 @@ func (m *MetadataV14) Decode(decoder scale.Decoder) error {
 	}
 
 	return decoder.Decode(&m.Type)
+}
+
+// Build a map of type id to pointer to the PortableTypeV14 itself.
+func (lookup *PortableRegistry) toMap() map[int64]*Si1Type {
+	var map_ = make(map[int64]*Si1Type)
+	var t PortableTypeV14
+	for _, t = range lookup.Types {
+		// We need to copy t so that the pointer doesn't get
+		// overwritten by the next assignent.
+		typ := t
+		map_[typ.ID.Int64()] = &typ.Type
+	}
+	return map_
 }
 
 func (m *MetadataV14) FindCallIndex(call string) (CallIndex, error) {

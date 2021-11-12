@@ -19,7 +19,6 @@ type Si0LookupTypeID UCompact
 
 type Si0Path []Text
 
-
 const (
 	IsBool = 0
 	IsChar = 1
