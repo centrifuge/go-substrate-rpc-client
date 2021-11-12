@@ -98,15 +98,13 @@ func (m *MetadataV14) FindCallIndex(call string) (CallIndex, error) {
 		if string(mod.Name) != s[0] {
 			continue
 		}
-		callType := mod.Calls.Type
+		callType := mod.Calls.Type.Int64()
 
-		for _, lookUp := range m.Lookup.Types {
-			if lookUp.ID.Int64() == callType.Int64() {
-				if len(lookUp.Type.Def.Variant.Variants) > 0 {
-					for _, vars := range lookUp.Type.Def.Variant.Variants {
-						if string(vars.Name) == s[1] {
-							return CallIndex{uint8(mod.Index), uint8(vars.Index)}, nil
-						}
+		if typ, ok := m.EfficientLookup[callType]; ok {
+			if len(typ.Def.Variant.Variants) > 0 {
+				for _, vars := range typ.Def.Variant.Variants {
+					if string(vars.Name) == s[1] {
+						return CallIndex{uint8(mod.Index), uint8(vars.Index)}, nil
 					}
 				}
 			}
@@ -125,13 +123,11 @@ func (m *MetadataV14) FindEventNamesForEventID(eventID EventID) (Text, Text, err
 		}
 		eventType := mod.Events.Type.Int64()
 
-		for _, lookUp := range m.Lookup.Types {
-			if lookUp.ID.Int64() == eventType {
-				if len(lookUp.Type.Def.Variant.Variants) > 0 {
-					for _, vars := range lookUp.Type.Def.Variant.Variants {
-						if uint8(vars.Index) == eventID[1] {
-							return mod.Name, vars.Name, nil
-						}
+		if typ, ok := m.EfficientLookup[eventType]; ok {
+			if len(typ.Def.Variant.Variants) > 0 {
+				for _, vars := range typ.Def.Variant.Variants {
+					if uint8(vars.Index) == eventID[1] {
+						return mod.Name, vars.Name, nil
 					}
 				}
 			}
@@ -149,10 +145,9 @@ func (m *MetadataV14) FindStorageEntryMetadata(module string, fn string) (Storag
 			continue
 		}
 		for _, s := range mod.Storage.Items {
-			if string(s.Name) != fn {
-				continue
+			if string(s.Name) == fn {
+				return s, nil
 			}
-			return s, nil
 		}
 		return nil, fmt.Errorf("storage %v not found within module %v", fn, module)
 	}

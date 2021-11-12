@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
@@ -147,11 +148,10 @@ func TestMetadataV14_DecodeTwice(t *testing.T) {
 func TestMetadataV14FindCallIndex(t *testing.T) {
 	var meta Metadata
 	err := DecodeFromHexString(MetadataV14Data, &meta)
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = meta.FindCallIndex("Balances.transfer")
 	assert.NoError(t, err)
+	index, err := meta.FindCallIndex("Balances.transfer")
+	assert.NoError(t, err)
+	assert.Equal(t, index, CallIndex{SectionIndex: 5, MethodIndex: 0})
 }
 
 // Verify that we get an error when querying for an invalid
@@ -159,9 +159,7 @@ func TestMetadataV14FindCallIndex(t *testing.T) {
 func TestMetadataV14FindCallIndexNonExistent(t *testing.T) {
 	var meta Metadata
 	err := DecodeFromHexString(MetadataV14Data, &meta)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 	_, err = meta.FindCallIndex("Doesnt.Exist")
 	assert.Error(t, err)
 }
@@ -173,9 +171,7 @@ func TestMetadataV14FindEventNamesForEventID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	id := EventID{}
-	id[0] = 5
-	id[1] = 2
+	id := EventID{5, 2}
 	_, _, err = meta.FindEventNamesForEventID(id)
 	assert.NoError(t, err)
 }
@@ -190,9 +186,21 @@ func TestMetadataV14FindStorageEntryMetadata(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-// Verify FindStorageEntryMetadata returns an err when given
-// a invalid function name.
-func TestMetadataV14FindStorageEntryMetadataInvalid(t *testing.T) {
+// Verify FindStorageEntryMetadata returns an err when
+// the given module can't be found.
+func TestMetadataV14FindStorageEntryMetadata_InvalidModule(t *testing.T) {
+	var meta Metadata
+	err := DecodeFromHexString(MetadataV14Data, &meta)
+	assert.NoError(t, err)
+
+	_, err = meta.FindStorageEntryMetadata("SystemZ", "Account")
+	fmt.Println(err)
+	assert.NoError(t, err)
+}
+
+// Verify FindStorageEntryMetadata returns an err when
+// it doesn't find a storage within an existing module.
+func TestMetadataV14FindStorageEntryMetadata_InvalidStorage(t *testing.T) {
 	var meta Metadata
 	err := DecodeFromHexString(MetadataV14Data, &meta)
 	assert.NoError(t, err)
