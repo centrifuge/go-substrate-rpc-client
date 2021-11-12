@@ -164,16 +164,36 @@ func TestMetadataV14FindCallIndexNonExistent(t *testing.T) {
 	assert.Error(t, err)
 }
 
-// TODO(nuno): make verifications more meaningful
+// Verify that we obtain the right modName, varName pair for a given Event id
 func TestMetadataV14FindEventNamesForEventID(t *testing.T) {
 	var meta Metadata
 	err := DecodeFromHexString(MetadataV14Data, &meta)
-	if err != nil {
-		t.Fatal(err)
-	}
-	id := EventID{5, 2}
-	_, _, err = meta.FindEventNamesForEventID(id)
 	assert.NoError(t, err)
+
+	modName, varName, err := meta.FindEventNamesForEventID(EventID{5, 2})
+	assert.NoError(t, err)
+	assert.Equal(t, modName, NewText("Balances"))
+	assert.Equal(t, varName, NewText("Transfer"))
+}
+
+// Verify that we get an error when passing an invalid module ID
+func TestMetadataV14FindEventNames_InvalidModuleID(t *testing.T) {
+	var meta Metadata
+	err := DecodeFromHexString(MetadataV14Data, &meta)
+	assert.NoError(t, err)
+
+	_, _, err = meta.FindEventNamesForEventID(EventID{100, 2})
+	assert.Error(t, err)
+}
+
+// Verify that we get an error when passing an invalid event ID
+func TestMetadataV14FindEventNames_InvalidEventID(t *testing.T) {
+	var meta Metadata
+	err := DecodeFromHexString(MetadataV14Data, &meta)
+	assert.NoError(t, err)
+
+	_, _, err = meta.FindEventNamesForEventID(EventID{5, 42})
+	assert.Error(t, err)
 }
 
 // TODO(nuno): make verifications more meaningful
