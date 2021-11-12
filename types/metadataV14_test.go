@@ -93,7 +93,7 @@ func TestMetadataV14_Debug_Pallets(t *testing.T) {
 	encoded, err := EncodeToBytes(metadata.AsMetadataV14.Pallets)
 	assert.NoError(t, err)
 
-	var decodedPallets PalletMetadataV14
+	var decodedPallets []PalletMetadataV14
 	err = DecodeFromBytes(encoded, &decodedPallets)
 	assert.NoError(t, err)
 
