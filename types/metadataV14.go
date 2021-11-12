@@ -78,15 +78,15 @@ func (m *MetadataV14) Decode(decoder scale.Decoder) error {
 
 // Build a map of type id to pointer to the PortableTypeV14 itself.
 func (lookup *PortableRegistry) toMap() map[int64]*Si1Type {
-	var map_ = make(map[int64]*Si1Type)
+	var efficientLookup = make(map[int64]*Si1Type)
 	var t PortableTypeV14
 	for _, t = range lookup.Types {
 		// We need to copy t so that the pointer doesn't get
 		// overwritten by the next assignent.
 		typ := t
-		map_[typ.ID.Int64()] = &typ.Type
+		efficientLookup[typ.ID.Int64()] = &typ.Type
 	}
-	return map_
+	return efficientLookup
 }
 
 func (m *MetadataV14) FindCallIndex(call string) (CallIndex, error) {
@@ -358,21 +358,21 @@ type NMapTypeV14 struct {
 	Value   Si1LookupTypeID
 }
 
-func (d *StorageEntryTypeV14) Decode(decoder scale.Decoder) error {
+func (s *StorageEntryTypeV14) Decode(decoder scale.Decoder) error {
 	b, err := decoder.ReadOneByte()
 	if err != nil {
 		return err
 	}
 	switch b {
 	case 0:
-		d.IsPlainType = true
-		err = decoder.Decode(&d.AsPlainType)
+		s.IsPlainType = true
+		err = decoder.Decode(&s.AsPlainType)
 		if err != nil {
 			return err
 		}
 	case 1:
-		d.IsMap = true
-		err = decoder.Decode(&d.AsMap)
+		s.IsMap = true
+		err = decoder.Decode(&s.AsMap)
 		if err != nil {
 			return err
 		}

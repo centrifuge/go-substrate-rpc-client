@@ -1,7 +1,6 @@
 package types_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
@@ -81,24 +80,6 @@ func TestMetadataV14_Debug_Type(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, metadata.AsMetadataV14.Type, decodedTypz)
-}
-
-// Test that decoding the example metadata v14 doesn't fail
-func TestMetadataV14_Debug_Pallets(t *testing.T) {
-	// Verify that we can succcessfully decode metadata v14
-	var metadata Metadata
-	err := DecodeFromHexString(MetadataV14Data, &metadata)
-	assert.EqualValues(t, metadata.Version, 14)
-	assert.NoError(t, err)
-
-	encoded, err := EncodeToBytes(metadata.AsMetadataV14.Pallets)
-	assert.NoError(t, err)
-
-	var decodedPallets PalletMetadataV14
-	err = DecodeFromBytes(encoded, &decodedPallets)
-	assert.NoError(t, err)
-
-	assert.Equal(t, metadata.AsMetadataV14.Pallets, decodedPallets)
 }
 
 // Verify that (Decode . Encode) outputs the input.
@@ -214,8 +195,7 @@ func TestMetadataV14FindStorageEntryMetadata_InvalidModule(t *testing.T) {
 	assert.NoError(t, err)
 
 	_, err = meta.FindStorageEntryMetadata("SystemZ", "Account")
-	fmt.Println(err)
-	assert.NoError(t, err)
+	assert.Error(t, err)
 }
 
 // Verify FindStorageEntryMetadata returns an err when
