@@ -24,7 +24,7 @@ lint-fix: 			## run linters on go code and automatically fixes issues
 	@docker run -v `pwd`:/app -w /app golangci/golangci-lint:v1.36.0 golangci-lint run --fix
 
 test: 				## run all tests in project against the RPC URL specified in the RPC_URL env variable or localhost while excluding gethrpc
-	@go test -count=1 `go list ./... | grep -v '/gethrpc'`
+	@go test -race -count=1 `go list ./... | grep -v '/gethrpc'`
 
 test-cover: 			## run all tests in project against the RPC URL specified in the RPC_URL env variable or localhost and report coverage
 	@go test -race -coverprofile=coverage.txt -covermode=atomic `go list ./... | grep -v '/gethrpc'`
