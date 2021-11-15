@@ -49,8 +49,7 @@ func Example_simpleConnect() {
 	}
 
 	fmt.Printf("You are connected to chain %v using %v v%v\n", chain, nodeName, nodeVersion)
-
-	// Output: You are connected to chain Development using Substrate Node v3.0.0-dev-b01bd31-x86_64-linux-gnu
+	// Output: You are connected to chain Development using Substrate Node v3.0.0-dev-1b646b2-x86_64-linux-gnu
 }
 
 func Example_listenToNewBlocks() {
