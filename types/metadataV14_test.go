@@ -8,82 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMetadataV14_TestFindCallIndexWithUnknownFunction(t *testing.T) {
-	var metadata Metadata
-	err := DecodeFromHexString(MetadataV14Data, &metadata)
-	assert.EqualValues(t, metadata.Version, 14)
-	assert.NoError(t, err)
-
-	_, err = metadata.FindCallIndex("Module2_14.unknownFunction")
-	assert.Error(t, err)
-}
-
-// Test that decoding the example metadata v14 doesn't fail
-func TestMetadataV14_Decode(t *testing.T) {
-	// Verify that we can succcessfully decode metadata v14
-	var metadata Metadata
-	err := DecodeFromHexString(MetadataV14Data, &metadata)
-	assert.EqualValues(t, metadata.Version, 14)
-	assert.NoError(t, err)
-}
-
-// Test that decoding the example metadata v14 doesn't fail
-func TestMetadataV14_Debug_Extrinsic(t *testing.T) {
-	// Verify that we can succcessfully decode metadata v14
-	var metadata Metadata
-	err := DecodeFromHexString(MetadataV14Data, &metadata)
-	assert.EqualValues(t, metadata.Version, 14)
-	assert.NoError(t, err)
-
-	encoded, err := EncodeToBytes(metadata.AsMetadataV14.Extrinsic)
-	assert.NoError(t, err)
-
-	var decodedExtrinsic ExtrinsicV14
-	err = DecodeFromBytes(encoded, &decodedExtrinsic)
-	assert.NoError(t, err)
-
-	assert.Equal(t, metadata.AsMetadataV14.Extrinsic, decodedExtrinsic)
-}
-
-// Test that decoding the example metadata v14 doesn't fail
-func TestMetadataV14_Debug_Lookup(t *testing.T) {
-	// Verify that we can succcessfully decode metadata v14
-	var metadata Metadata
-	err := DecodeFromHexString(MetadataV14Data, &metadata)
-	assert.EqualValues(t, metadata.Version, 14)
-	assert.NoError(t, err)
-
-	encoded, err := EncodeToBytes(metadata.AsMetadataV14.Lookup)
-	assert.NoError(t, err)
-
-	var decodedLookup PortableRegistry
-	err = DecodeFromBytes(encoded, &decodedLookup)
-	assert.NoError(t, err, "oopsi")
-
-	assert.Equal(t, metadata.AsMetadataV14.Lookup, decodedLookup)
-
-}
-
-// Test that decoding the example metadata v14 doesn't fail
-func TestMetadataV14_Debug_Type(t *testing.T) {
-	// Verify that we can succcessfully decode metadata v14
-	var metadata Metadata
-	err := DecodeFromHexString(MetadataV14Data, &metadata)
-	assert.EqualValues(t, metadata.Version, 14)
-	assert.NoError(t, err)
-
-	encoded, err := EncodeToBytes(metadata.AsMetadataV14.Type)
-	assert.NoError(t, err)
-
-	var decodedTypz Si1LookupTypeID
-	err = DecodeFromBytes(encoded, &decodedTypz)
-	assert.NoError(t, err)
-
-	assert.Equal(t, metadata.AsMetadataV14.Type, decodedTypz)
-}
-
 // Verify that (Decode . Encode) outputs the input.
-func TestMetadataV14_Decode_Rountrip(t *testing.T) {
+func TestMetadataV14EncodeDecodeRoundtrip(t *testing.T) {
 	// Decode the metadata
 	var metadata Metadata
 	err := DecodeFromHexString(MetadataV14Data, &metadata)
@@ -94,7 +20,7 @@ func TestMetadataV14_Decode_Rountrip(t *testing.T) {
 	encoded, err := EncodeToHexString(metadata)
 	assert.NoError(t, err)
 
-	// Verify it equals the original metadata
+	// Verify the encoded metadata equals the original one
 	assert.Equal(t, MetadataV14Data, encoded)
 
 	// Verify that decoding the encoded metadata
@@ -102,27 +28,19 @@ func TestMetadataV14_Decode_Rountrip(t *testing.T) {
 	var decodedMetadata Metadata
 	err = DecodeFromHexString(encoded, &decodedMetadata)
 	assert.NoError(t, err)
-
 	assert.EqualValues(t, metadata, decodedMetadata)
 }
 
-// Verify that decoding the metadata v14 hex string twice
-// produces the same output.
-func TestMetadataV14_DecodeTwice(t *testing.T) {
-	// Verify that we can succcessfully decode metadata v14
-	var metadata1 Metadata
-	err := DecodeFromHexString(MetadataV14Data, &metadata1)
-	assert.EqualValues(t, metadata1.Version, 14)
+/* Test Metadata interface functions for v14 */
+
+func TestMetadataV14_TestFindCallIndexWithUnknownFunction(t *testing.T) {
+	var metadata Metadata
+	err := DecodeFromHexString(MetadataV14Data, &metadata)
+	assert.EqualValues(t, metadata.Version, 14)
 	assert.NoError(t, err)
 
-	// Decode it again
-	var metadata2 Metadata
-	err = DecodeFromHexString(MetadataV14Data, &metadata2)
-	assert.EqualValues(t, metadata2.Version, 14)
-	assert.NoError(t, err)
-
-	// Verify they are the same value
-	assert.EqualValues(t, metadata1, metadata2)
+	_, err = metadata.FindCallIndex("Module2_14.unknownFunction")
+	assert.Error(t, err)
 }
 
 // Verify that we can find the index of a valid call
@@ -158,7 +76,7 @@ func TestMetadataV14FindEventNamesForEventID(t *testing.T) {
 }
 
 // Verify that we get an error when passing an invalid module ID
-func TestMetadataV14FindEventNames_InvalidModuleID(t *testing.T) {
+func TestMetadataV14FindEventNamesInvalidModuleID(t *testing.T) {
 	var meta Metadata
 	err := DecodeFromHexString(MetadataV14Data, &meta)
 	assert.NoError(t, err)
@@ -168,7 +86,7 @@ func TestMetadataV14FindEventNames_InvalidModuleID(t *testing.T) {
 }
 
 // Verify that we get an error when passing an invalid event ID
-func TestMetadataV14FindEventNames_InvalidEventID(t *testing.T) {
+func TestMetadataV14FindEventNamesInvalidEventID(t *testing.T) {
 	var meta Metadata
 	err := DecodeFromHexString(MetadataV14Data, &meta)
 	assert.NoError(t, err)
@@ -177,7 +95,6 @@ func TestMetadataV14FindEventNames_InvalidEventID(t *testing.T) {
 	assert.Error(t, err)
 }
 
-// TODO(nuno): make verifications more meaningful
 func TestMetadataV14FindStorageEntryMetadata(t *testing.T) {
 	var meta Metadata
 	err := DecodeFromHexString(MetadataV14Data, &meta)
@@ -189,7 +106,7 @@ func TestMetadataV14FindStorageEntryMetadata(t *testing.T) {
 
 // Verify FindStorageEntryMetadata returns an err when
 // the given module can't be found.
-func TestMetadataV14FindStorageEntryMetadata_InvalidModule(t *testing.T) {
+func TestMetadataV14FindStorageEntryMetadataInvalidModule(t *testing.T) {
 	var meta Metadata
 	err := DecodeFromHexString(MetadataV14Data, &meta)
 	assert.NoError(t, err)
@@ -200,7 +117,7 @@ func TestMetadataV14FindStorageEntryMetadata_InvalidModule(t *testing.T) {
 
 // Verify FindStorageEntryMetadata returns an err when
 // it doesn't find a storage within an existing module.
-func TestMetadataV14FindStorageEntryMetadata_InvalidStorage(t *testing.T) {
+func TestMetadataV14FindStorageEntryMetadataInvalidStorage(t *testing.T) {
 	var meta Metadata
 	err := DecodeFromHexString(MetadataV14Data, &meta)
 	assert.NoError(t, err)
@@ -219,7 +136,9 @@ func TestMetadataV14ExistsModuleMetadata(t *testing.T) {
 	assert.True(t, res)
 }
 
-func TestMetadataV14_Pallet_Empty(t *testing.T) {
+/* Unit tests covering decoding/encoding of nested Metadata v14 types */
+
+func TestMetadataV14PalletEmpty(t *testing.T) {
 	var pallet = PalletMetadataV14{
 		Name:       NewText("System"),
 		HasStorage: false,
@@ -241,7 +160,7 @@ func TestMetadataV14_Pallet_Empty(t *testing.T) {
 	assert.EqualValues(t, encodedPallets, pallet)
 }
 
-func TestMetadataV14_Pallet_Filled(t *testing.T) {
+func TestMetadataV14PalletFilled(t *testing.T) {
 	var pallet = PalletMetadataV14{
 		Name:       NewText("System"),
 		HasStorage: true,
@@ -322,7 +241,7 @@ func TestMetadataV14_Pallet_Filled(t *testing.T) {
 	assert.Equal(t, encodedPallets, pallet)
 }
 
-func TestSi1Type(t *testing.T) {
+func TestSi1TypeDecodeEncode(t *testing.T) {
 	type Si1Type struct {
 		Path   Si1Path
 		Params []Si1TypeParameter

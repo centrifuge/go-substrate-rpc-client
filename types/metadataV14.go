@@ -10,9 +10,9 @@ import (
 )
 
 // Based on:
-// https://github.com/polkadot-js/api/blob/master/packages/types/src/interfaces/metadata/v14.ts
+// https://tinyurl.com/metadataV14
 type MetadataV14 struct {
-	Lookup    PortableRegistry
+	Lookup    PortableRegistryV14
 	Pallets   []PalletMetadataV14
 	Extrinsic ExtrinsicV14
 	Type      Si1LookupTypeID
@@ -23,18 +23,9 @@ type MetadataV14 struct {
 	EfficientLookup map[int64]*Si1Type
 }
 
-type ExtrinsicV14 struct {
-	Type             Si1LookupTypeID
-	Version          U8
-	SignedExtensions []SignedExtensionMetadataV14
-}
-
-type SignedExtensionMetadataV14 struct {
-	Identifier       Text
-	Type             Si1LookupTypeID
-	AdditionalSigned Si1LookupTypeID
-}
-
+// Encode implementation for MetadataV14
+// Note: We need a custom impl to avoid `EfficientLookup`
+// from being encoded.
 func (m MetadataV14) Encode(encoder scale.Encoder) error {
 	err := encoder.Encode(m.Lookup)
 	if err != nil {
@@ -54,6 +45,9 @@ func (m MetadataV14) Encode(encoder scale.Encoder) error {
 	return encoder.Encode(m.Type)
 }
 
+// Decode implementation for MetadataV14
+// Note: We opt for a custom impl build `EfficientLookup`
+// on the fly.
 func (m *MetadataV14) Decode(decoder scale.Decoder) error {
 	var err error
 	err = decoder.Decode(&m.Lookup)
@@ -77,17 +71,19 @@ func (m *MetadataV14) Decode(decoder scale.Decoder) error {
 }
 
 // Build a map of type id to pointer to the PortableTypeV14 itself.
-func (lookup *PortableRegistry) toMap() map[int64]*Si1Type {
+func (lookup *PortableRegistryV14) toMap() map[int64]*Si1Type {
 	var efficientLookup = make(map[int64]*Si1Type)
 	var t PortableTypeV14
 	for _, t = range lookup.Types {
 		// We need to copy t so that the pointer doesn't get
-		// overwritten by the next assignent.
+		// overwritten by the next assignment.
 		typ := t
 		efficientLookup[typ.ID.Int64()] = &typ.Type
 	}
 	return efficientLookup
 }
+
+/* Metadata interface functions implementation */
 
 func (m *MetadataV14) FindCallIndex(call string) (CallIndex, error) {
 	s := strings.Split(call, ".")
@@ -175,7 +171,21 @@ func (m *MetadataV14) ExistsModuleMetadata(module string) bool {
 	return false
 }
 
-type PortableRegistry struct {
+/* Supporting types */
+
+type ExtrinsicV14 struct {
+	Type             Si1LookupTypeID
+	Version          U8
+	SignedExtensions []SignedExtensionMetadataV14
+}
+
+type SignedExtensionMetadataV14 struct {
+	Identifier       Text
+	Type             Si1LookupTypeID
+	AdditionalSigned Si1LookupTypeID
+}
+
+type PortableRegistryV14 struct {
 	Types []PortableTypeV14
 }
 
@@ -377,7 +387,7 @@ func (s *StorageEntryTypeV14) Decode(decoder scale.Decoder) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("StorageFunctionTypeV14 is not support this type: %d", b)
+		return fmt.Errorf("StorageFunctionTypeV14 does not support this type: %d", b)
 	}
 	return nil
 }

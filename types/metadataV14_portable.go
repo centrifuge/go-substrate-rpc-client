@@ -13,12 +13,14 @@ type PortableTypeV14 struct {
 	Type Si1Type
 }
 
-//----------------v0------------
-
 type Si0LookupTypeID UCompact
 
 type Si0Path []Text
 
+// `byte` can only be one of the variants listed below
+type Si0TypeDefPrimitive byte
+
+// Si0TypeDefPrimitive variants
 const (
 	IsBool = 0
 	IsChar = 1
@@ -36,8 +38,6 @@ const (
 	IsI128 = 13
 	IsI256 = 14
 )
-
-type Si0TypeDefPrimitive byte
 
 func (d *Si0TypeDefPrimitive) Decode(decoder scale.Decoder) error {
 	b, err := decoder.ReadOneByte()
@@ -80,45 +80,6 @@ func (d *Si0TypeDefPrimitive) Decode(decoder scale.Decoder) error {
 	}
 	return nil
 }
-
-func (d *Si0TypeDefPrimitive) Encode(encoder scale.Encoder) error {
-	switch *d {
-	case IsBool:
-		return encoder.PushByte(IsBool)
-	case IsChar:
-		return encoder.PushByte(IsChar)
-	case IsStr:
-		return encoder.PushByte(IsStr)
-	case IsU8:
-		return encoder.PushByte(IsU8)
-	case IsU16:
-		return encoder.PushByte(IsU16)
-	case IsU32:
-		return encoder.PushByte(IsU32)
-	case IsU64:
-		return encoder.PushByte(IsU64)
-	case IsU128:
-		return encoder.PushByte(IsU128)
-	case IsU256:
-		return encoder.PushByte(IsU256)
-	case IsI8:
-		return encoder.PushByte(IsI8)
-	case IsI16:
-		return encoder.PushByte(IsI16)
-	case IsI32:
-		return encoder.PushByte(IsI32)
-	case IsI64:
-		return encoder.PushByte(IsI64)
-	case IsI128:
-		return encoder.PushByte(IsI128)
-	case IsI256:
-		return encoder.PushByte(IsI256)
-	default:
-		return nil
-	}
-}
-
-//------------------v1-----------
 
 type Si1LookupTypeID struct {
 	UCompact
@@ -167,22 +128,30 @@ func (d Si1TypeParameter) Encode(encoder scale.Encoder) error {
 }
 
 type Si1TypeDef struct {
-	IsComposite          bool
-	Composite            Si1TypeDefComposite
-	IsVariant            bool
-	Variant              Si1TypeDefVariant
-	IsSequence           bool
-	Sequence             Si1TypeDefSequence
-	IsArray              bool
-	Array                Si1TypeDefArray
-	IsTuple              bool
-	Tuple                Si1TypeDefTuple
-	IsPrimitive          bool
-	Primitive            Si1TypeDefPrimitive
-	IsCompact            bool
-	Compact              Si1TypeDefCompact
-	IsBitSequence        bool
-	BitSequence          Si1TypeDefBitSequence
+	IsComposite bool
+	Composite   Si1TypeDefComposite
+
+	IsVariant bool
+	Variant   Si1TypeDefVariant
+
+	IsSequence bool
+	Sequence   Si1TypeDefSequence
+
+	IsArray bool
+	Array   Si1TypeDefArray
+
+	IsTuple bool
+	Tuple   Si1TypeDefTuple
+
+	IsPrimitive bool
+	Primitive   Si1TypeDefPrimitive
+
+	IsCompact bool
+	Compact   Si1TypeDefCompact
+
+	IsBitSequence bool
+	BitSequence   Si1TypeDefBitSequence
+
 	IsHistoricMetaCompat bool
 	HistoricMetaCompat   Type
 }
@@ -338,14 +307,14 @@ func (d Si1Field) Encode(encoder scale.Encoder) error {
 }
 
 type Si1TypeDefVariant struct {
-	Variants []Si1Variant `json:"variants"`
+	Variants []Si1Variant
 }
 
 type Si1Variant struct {
-	Name   Text       `json:"name"`
-	Fields []Si1Field `json:"fields"`
-	Index  U8         `json:"index"`
-	Docs   []Text     `json:"docs"`
+	Name   Text
+	Fields []Si1Field
+	Index  U8
+	Docs   []Text
 }
 
 type Si1TypeDefSequence struct {
