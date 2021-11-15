@@ -38,7 +38,7 @@ func TestState_SubscribeRuntimeVersion(t *testing.T) {
 	assert.NoError(t, err)
 	defer sub.Unsubscribe()
 
-	timeout := time.After(10 * time.Second)
+	timeout := time.After(15 * time.Second)
 
 	for {
 		select {
