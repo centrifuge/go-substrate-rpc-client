@@ -20,29 +20,7 @@ type MetadataV14 struct {
 	// Custom field to help us lookup a type from the registry
 	// more efficiently. This field is built while decoding and
 	// it is not to be encoded.
-	EfficientLookup map[int64]*Si1Type
-}
-
-// Encode implementation for MetadataV14
-// Note: We need a custom impl to avoid `EfficientLookup`
-// from being encoded.
-func (m MetadataV14) Encode(encoder scale.Encoder) error {
-	err := encoder.Encode(m.Lookup)
-	if err != nil {
-		return err
-	}
-
-	err = encoder.Encode(m.Pallets)
-	if err != nil {
-		return err
-	}
-
-	err = encoder.Encode(m.Extrinsic)
-	if err != nil {
-		return err
-	}
-
-	return encoder.Encode(m.Type)
+	EfficientLookup map[int64]*Si1Type `scale:"-"`
 }
 
 // Decode implementation for MetadataV14
