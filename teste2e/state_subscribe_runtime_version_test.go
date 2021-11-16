@@ -28,7 +28,7 @@ func TestState_SubscribeRuntimeVersion(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping end-to-end test in short mode.")
 	}
-	api := globalAPI
+	api := subscriptionsAPI
 
 	sub, err := api.RPC.State.SubscribeRuntimeVersion()
 	assert.NoError(t, err)

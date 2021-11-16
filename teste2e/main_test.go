@@ -26,12 +26,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// To be used on subscription tests only
-var globalAPI *gsrpc.SubstrateAPI
+// A global SubstrateAPI instance
+// NOTE: Only to be used for subscriptions-covering tests,
+// where we have experienced an issue where setting up
+// an instance per test caused issues leading to timeouts.
+var subscriptionsAPI *gsrpc.SubstrateAPI
 
 func TestMain(m *testing.M) {
 	localApi, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
-	globalAPI = localApi
+	subscriptionsAPI = localApi
 	assert.NoError(&testing.T{}, err)
 }
 

@@ -37,7 +37,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		from = signature.TestKeyringPairAlice
 	}
 
-	api := globalAPI
+	api := subscriptionsAPI
 
 	meta, err := api.RPC.State.GetMetadataLatest()
 	assert.NoError(t, err)
