@@ -35,7 +35,7 @@ func Default() Config {
 	return Config{
 		RPCURL:           extractDefaultRPCURL(),
 		DialTimeout:      10 * time.Second,
-		SubscribeTimeout: 10 * time.Second,
+		SubscribeTimeout: 5 * time.Second,
 	}
 }
 
