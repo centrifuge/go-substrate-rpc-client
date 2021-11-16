@@ -9,8 +9,8 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v3/xxhash"
 )
 
-// Based on:
-// https://tinyurl.com/metadataV14
+// nolint:lll
+// Based on https://github.com/polkadot-js/api/blob/80b581f0df87108c59f71e67d7c5fc5f8c89ec33/packages/types/src/interfaces/metadata/v14.ts
 type MetadataV14 struct {
 	Lookup    PortableRegistryV14
 	Pallets   []PalletMetadataV14
