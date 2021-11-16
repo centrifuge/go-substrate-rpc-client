@@ -21,8 +21,6 @@ import (
 	"testing"
 	"time"
 
-	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v3"
-	"github.com/centrifuge/go-substrate-rpc-client/v3/config"
 	"github.com/centrifuge/go-substrate-rpc-client/v3/rpc/author"
 	"github.com/centrifuge/go-substrate-rpc-client/v3/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
@@ -39,8 +37,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		from = signature.TestKeyringPairAlice
 	}
 
-	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
-	assert.NoError(t, err)
+	api := subscriptionsAPI
 
 	meta, err := api.RPC.State.GetMetadataLatest()
 	assert.NoError(t, err)
