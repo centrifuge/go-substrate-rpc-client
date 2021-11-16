@@ -26,6 +26,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// To be used on subscription tests only
+var globalAPI *gsrpc.SubstrateAPI
+
+func TestMain(m *testing.M) {
+	localApi, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
+	globalAPI = localApi
+	assert.NoError(&testing.T{}, err)
+}
+
 func TestEnd2end(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping end-to-end test in short mode.")
