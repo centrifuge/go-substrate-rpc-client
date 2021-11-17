@@ -121,23 +121,19 @@ func TestCreateStorageKeyArgValidationForDoubleMapKey(t *testing.T) {
 	m := ExamplaryMetadataV13
 
 	_, err := CreateStorageKey(m, "Staking", "ErasStakers")
-	assert.EqualError(t, err, "Staking:ErasStakers is a double map, therefore requires precisely two "+
-		"arguments. received: 0")
+	assert.EqualError(t, err, "Staking:ErasStakers is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 2, received: 0")
 
 	_, err = CreateStorageKey(m, "Staking", "ErasStakers", nil)
-	assert.EqualError(t, err, "Staking:ErasStakers is a double map, therefore requires precisely two "+
-		"arguments. received: 0")
+	assert.EqualError(t, err, "Staking:ErasStakers is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 2, received: 0")
 
 	_, err = CreateStorageKey(m, "Staking", "ErasStakers", nil, []byte{})
-	assert.EqualError(t, err, "Staking:ErasStakers is a double map, therefore requires precisely two "+
-		"arguments. received: 0")
+	assert.EqualError(t, err, "Staking:ErasStakers is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 2, received: 0")
 
 	_, err = CreateStorageKey(m, "Staking", "ErasStakers", nil, []byte{0x01})
 	assert.EqualError(t, err, "non-nil arguments cannot be preceded by nil arguments")
 
 	_, err = CreateStorageKey(m, "Staking", "ErasStakers", []byte{0x01})
-	assert.EqualError(t, err, "Staking:ErasStakers is a double map, therefore requires precisely two "+
-		"arguments. received: 1")
+	assert.EqualError(t, err, "Staking:ErasStakers is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 2, received: 1")
 
 	// Serialize EraIndex and AccountId
 	accountIdSerialized := MustHexDecodeString(AlicePubKey)
@@ -173,22 +169,22 @@ func TestCreateStorageKeyArgValidationForNMapKey(t *testing.T) {
 	//"Assets", "Approvals", "AssetId(u32)", "AccountId", "AccountId"
 
 	_, err := CreateStorageKey(m, "Assets", "Approvals")
-	assert.EqualError(t, err, "Assets:Approvals is a nmap, therefore requires that number of arguments "+
+	assert.EqualError(t, err, "Assets:Approvals is a map, therefore requires that number of arguments "+
 		"should exactly match number of hashers in metadata. Expected: 3, received: 0")
 
 	_, err = CreateStorageKey(m, "Assets", "Approvals", nil)
-	assert.EqualError(t, err, "Assets:Approvals is a nmap, therefore requires that number of arguments "+
+	assert.EqualError(t, err, "Assets:Approvals is a map, therefore requires that number of arguments "+
 		"should exactly match number of hashers in metadata. Expected: 3, received: 0")
 
 	_, err = CreateStorageKey(m, "Assets", "Approvals", nil, []byte{})
-	assert.EqualError(t, err, "Assets:Approvals is a nmap, therefore requires that number of arguments "+
+	assert.EqualError(t, err, "Assets:Approvals is a map, therefore requires that number of arguments "+
 		"should exactly match number of hashers in metadata. Expected: 3, received: 0")
 
 	_, err = CreateStorageKey(m, "Assets", "Approvals", nil, []byte{0x01})
 	assert.EqualError(t, err, "non-nil arguments cannot be preceded by nil arguments")
 
 	_, err = CreateStorageKey(m, "Assets", "Approvals", []byte{0x01})
-	assert.EqualError(t, err, "Assets:Approvals is a nmap, therefore requires that number of arguments "+
+	assert.EqualError(t, err, "Assets:Approvals is a map, therefore requires that number of arguments "+
 		"should exactly match number of hashers in metadata. Expected: 3, received: 1")
 
 	// Serialize EraIndex and AccountId

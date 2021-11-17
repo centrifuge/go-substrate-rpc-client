@@ -268,7 +268,7 @@ func (s StorageFunctionMetadataV13) Hashers() ([]hash.Hash, error) {
 
 	var hashers = collectHashersV13(s.Type)
 	hasherFns := make([]hash.Hash, len(hashers))
-	for i, hasher := range s.Type.AsNMap.Hashers {
+	for i, hasher := range hashers {
 		hasherFn, err := hasher.HashFunc()
 		if err != nil {
 			return nil, err
