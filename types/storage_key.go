@@ -78,7 +78,11 @@ func CreateStorageKey(meta *Metadata, prefix, method string, args ...[]byte) (St
 		return nil, err
 	}
 
-	if entryMeta.IsNMap() {
+	// From metadata >= v14, there is only one representation of Map,
+	// which is more alike the old 'NMap': a Map with n keys (n >= 1).
+	// Therefore, checking for this 'variant' satisfies all cases for
+	// v14 while keeping support for older versions.
+	if (meta.Version == 14 && entryMeta.IsMap()) || entryMeta.IsNMap() {
 		hashers, err := entryMeta.Hashers()
 		if err != nil {
 			return nil, fmt.Errorf("unable to get hashers for %s nmap", method)
@@ -91,6 +95,7 @@ func CreateStorageKey(meta *Metadata, prefix, method string, args ...[]byte) (St
 		return createKeyNMap(method, prefix, validatedArgs, entryMeta)
 	}
 
+	// Deprecated since metadata v14
 	if entryMeta.IsDoubleMap() {
 		if len(validatedArgs) != 2 {
 			return nil, fmt.Errorf("%s:%s is a double map, therefore requires precisely two arguments. "+
@@ -99,6 +104,7 @@ func CreateStorageKey(meta *Metadata, prefix, method string, args ...[]byte) (St
 		return createKeyDoubleMap(meta, method, prefix, stringKey, validatedArgs[0], validatedArgs[1], entryMeta)
 	}
 
+	// Deprecated since metadata v14
 	if entryMeta.IsMap() {
 		if len(validatedArgs) != 1 {
 			return nil, fmt.Errorf("%s:%s is a map, therefore requires precisely one argument. "+

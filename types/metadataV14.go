@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v3/scale"
-	"github.com/centrifuge/go-substrate-rpc-client/v3/xxhash"
 )
 
 // nolint:lll
@@ -305,14 +304,14 @@ func (s StorageEntryMetadataV14) IsMap() bool {
 }
 
 func (s StorageEntryMetadataV14) IsDoubleMap() bool {
-	return false
+	panic(unsupportedMapVariantCheck("IsDoubleMap"))
 }
 func (s StorageEntryMetadataV14) IsNMap() bool {
-	return s.Type.IsMap
+	panic(unsupportedMapVariantCheck("IsNMap"))
 }
 
 func (s StorageEntryMetadataV14) Hasher() (hash.Hash, error) {
-	return xxhash.New128(nil), nil
+	return nil, fmt.Errorf("StorageEntryMetadataV14 does not implement Hasher()")
 }
 
 func (s StorageEntryMetadataV14) Hasher2() (hash.Hash, error) {
@@ -320,16 +319,19 @@ func (s StorageEntryMetadataV14) Hasher2() (hash.Hash, error) {
 }
 
 func (s StorageEntryMetadataV14) Hashers() ([]hash.Hash, error) {
-	var hashes []hash.Hash
-	if s.Type.IsMap {
-		for _, hasher := range s.Type.AsMap.Hashers {
-			h, err := hasher.HashFunc()
-			if err != nil {
-				return nil, err
-			}
-			hashes = append(hashes, h)
-		}
+	if !s.IsMap() {
+		return nil, fmt.Errorf("StorageEntryMetadataV14.Hashers() should be called on a Map entry")
 	}
+
+	var hashes []hash.Hash
+	for _, hasher := range s.Type.AsMap.Hashers {
+		h, err := hasher.HashFunc()
+		if err != nil {
+			return nil, err
+		}
+		hashes = append(hashes, h)
+	}
+
 	return hashes, nil
 }
 
@@ -338,12 +340,6 @@ type StorageEntryTypeV14 struct {
 	AsPlainType Si1LookupTypeID
 	IsMap       bool
 	AsMap       MapTypeV14
-}
-
-type NMapTypeV14 struct {
-	Key     Si1LookupTypeID
-	Hashers []StorageHasherV10
-	Value   Si1LookupTypeID
 }
 
 func (s *StorageEntryTypeV14) Decode(decoder scale.Decoder) error {
@@ -394,4 +390,11 @@ func (s StorageEntryTypeV14) Encode(encoder scale.Encoder) error {
 		return fmt.Errorf("expected to be either plain type or map, but none was set: %v", s)
 	}
 	return nil
+}
+
+func unsupportedMapVariantCheck(variant string) error {
+	return fmt.Errorf("StorageEntryMetadataV14 does not implement %s "+
+		"as now there is only one Map variant with n keys",
+		variant,
+	)
 }
