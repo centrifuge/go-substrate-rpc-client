@@ -299,23 +299,12 @@ func (s StorageEntryMetadataV14) IsPlain() bool {
 	return s.Type.IsPlainType
 }
 
+func (s StorageEntryMetadataV14) Hasher() (hash.Hash, error) {
+	return DefaultPlainHasher(s)
+}
+
 func (s StorageEntryMetadataV14) IsMap() bool {
 	return s.Type.IsMap
-}
-
-func (s StorageEntryMetadataV14) IsDoubleMap() bool {
-	panic(unsupportedMapVariantCheck("IsDoubleMap"))
-}
-func (s StorageEntryMetadataV14) IsNMap() bool {
-	panic(unsupportedMapVariantCheck("IsNMap"))
-}
-
-func (s StorageEntryMetadataV14) Hasher() (hash.Hash, error) {
-	return nil, fmt.Errorf("StorageEntryMetadataV14 does not implement Hasher()")
-}
-
-func (s StorageEntryMetadataV14) Hasher2() (hash.Hash, error) {
-	return nil, fmt.Errorf("StorageEntryMetadataV14 does not implement Hasher2()")
 }
 
 func (s StorageEntryMetadataV14) Hashers() ([]hash.Hash, error) {

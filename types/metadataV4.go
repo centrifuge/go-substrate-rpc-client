@@ -119,16 +119,6 @@ func (m *MetadataV4) ExistsModuleMetadata(module string) bool {
 	return false
 }
 
-type StorageEntryMetadata interface {
-	IsPlain() bool
-	IsMap() bool
-	IsDoubleMap() bool
-	IsNMap() bool
-	Hasher() (hash.Hash, error)
-	Hasher2() (hash.Hash, error)
-	Hashers() ([]hash.Hash, error)
-}
-
 type ModuleMetadataV4 struct {
 	Name       Text
 	Prefix     Text
@@ -246,40 +236,6 @@ type StorageFunctionMetadataV4 struct {
 	Documentation []Text
 }
 
-func (s StorageFunctionMetadataV4) IsPlain() bool {
-	return s.Type.IsType
-}
-
-func (s StorageFunctionMetadataV4) IsMap() bool {
-	return s.Type.IsMap
-}
-
-func (s StorageFunctionMetadataV4) IsDoubleMap() bool {
-	return s.Type.IsDoubleMap
-}
-
-func (s StorageFunctionMetadataV4) IsNMap() bool {
-	return false
-}
-
-func (s StorageFunctionMetadataV4) Hashers() ([]hash.Hash, error) {
-	return nil, fmt.Errorf("Hashers is not supported for metadata v4, please upgrade to use metadata v13 or newer")
-}
-
-func (s StorageFunctionMetadataV4) Hasher() (hash.Hash, error) {
-	if s.Type.IsMap {
-		return s.Type.AsMap.Hasher.HashFunc()
-	}
-	if s.Type.IsDoubleMap {
-		return s.Type.AsDoubleMap.Hasher.HashFunc()
-	}
-	return xxhash.New128(nil), nil
-}
-
-func (s StorageFunctionMetadataV4) Hasher2() (hash.Hash, error) {
-	return nil, fmt.Errorf("Hasher2 is not supported for metadata v4, please upgrade to use metadata v8 or newer")
-}
-
 type StorageFunctionTypeV4 struct {
 	IsType      bool
 	AsType      Type // 0
@@ -287,6 +243,36 @@ type StorageFunctionTypeV4 struct {
 	AsMap       MapTypeV4 // 1
 	IsDoubleMap bool
 	AsDoubleMap DoubleMapTypeV4 // 2
+}
+
+func (s StorageFunctionMetadataV4) IsPlain() bool {
+	return s.Type.IsType
+}
+
+func (s StorageFunctionMetadataV4) Hasher() (hash.Hash, error) {
+	return DefaultPlainHasher(s)
+}
+
+func (s StorageFunctionMetadataV4) IsMap() bool {
+	return s.Type.IsMap || s.Type.IsDoubleMap
+}
+
+func (s StorageFunctionMetadataV4) Hashers() ([]hash.Hash, error) {
+	if !s.IsMap() {
+		return nil, fmt.Errorf("Hashers() is only to be called on Maps")
+	}
+
+	if s.Type.IsDoubleMap {
+		return nil, fmt.Errorf("Getting the two hashers of a DoubleMap is not supported for metadata v4. " +
+			"Please upgrade to use metadata v8 or newer")
+	}
+
+	hashFn, err := s.Type.AsMap.Hasher.HashFunc()
+	if err != nil {
+		return nil, err
+	}
+
+	return []hash.Hash{hashFn}, nil
 }
 
 func (s *StorageFunctionTypeV4) Decode(decoder scale.Decoder) error {

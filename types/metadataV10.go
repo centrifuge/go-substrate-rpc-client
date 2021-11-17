@@ -265,37 +265,40 @@ func (s StorageFunctionMetadataV10) IsPlain() bool {
 	return s.Type.IsType
 }
 
+func (s StorageFunctionMetadataV10) Hasher() (hash.Hash, error) {
+	return DefaultPlainHasher(s)
+}
+
 func (s StorageFunctionMetadataV10) IsMap() bool {
-	return s.Type.IsMap
-}
-
-func (s StorageFunctionMetadataV10) IsDoubleMap() bool {
-	return s.Type.IsDoubleMap
-}
-
-func (s StorageFunctionMetadataV10) IsNMap() bool {
-	return false
+	return s.Type.IsMap || s.Type.IsDoubleMap
 }
 
 func (s StorageFunctionMetadataV10) Hashers() ([]hash.Hash, error) {
-	return nil, fmt.Errorf("Hashers is not supported for metadata v10, please upgrade to use metadata v13 or newer")
+	if !s.IsMap() {
+		return nil, fmt.Errorf("Hashers() is only to be called on Maps")
+	}
+
+	var hashers = collectHashersV10(s.Type)
+	hasherFns := make([]hash.Hash, len(hashers))
+	for i, hasher := range hashers {
+		hasherFn, err := hasher.HashFunc()
+		if err != nil {
+			return nil, err
+		}
+		hasherFns[i] = hasherFn
+	}
+	return hasherFns, nil
 }
 
-func (s StorageFunctionMetadataV10) Hasher() (hash.Hash, error) {
-	if s.Type.IsMap {
-		return s.Type.AsMap.Hasher.HashFunc()
+func collectHashersV10(x StorageFunctionTypeV10) []StorageHasherV10 {
+	switch {
+	case x.IsMap:
+		return []StorageHasherV10{x.AsMap.Hasher}
+	case x.IsDoubleMap:
+		return []StorageHasherV10{x.AsDoubleMap.Hasher, x.AsDoubleMap.Key2Hasher}
+	default:
+		panic("Unexpexted type")
 	}
-	if s.Type.IsDoubleMap {
-		return s.Type.AsDoubleMap.Hasher.HashFunc()
-	}
-	return xxhash.New128(nil), nil
-}
-
-func (s StorageFunctionMetadataV10) Hasher2() (hash.Hash, error) {
-	if !s.Type.IsDoubleMap {
-		return nil, fmt.Errorf("only DoubleMaps have a Hasher2")
-	}
-	return s.Type.AsDoubleMap.Key2Hasher.HashFunc()
 }
 
 type StorageFunctionTypeV10 struct {

@@ -69,16 +69,25 @@ func TestCreateStorageKeyArgValidationForMapKey(t *testing.T) {
 	m := ExamplaryMetadataV13
 
 	_, err := CreateStorageKey(m, "System", "Account")
-	assert.EqualError(t, err, "System:Account is a map, therefore requires precisely one argument. "+
-		"received: 0")
+	assert.EqualError(
+		t,
+		err,
+		"System:Account is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 1, received: 0",
+	)
 
 	_, err = CreateStorageKey(m, "System", "Account", nil)
-	assert.EqualError(t, err, "System:Account is a map, therefore requires precisely one argument. "+
-		"received: 0")
+	assert.EqualError(
+		t,
+		err,
+		"System:Account is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 1, received: 0",
+	)
 
 	_, err = CreateStorageKey(m, "System", "Account", nil, []byte{})
-	assert.EqualError(t, err, "System:Account is a map, therefore requires precisely one argument. "+
-		"received: 0")
+	assert.EqualError(
+		t,
+		err,
+		"System:Account is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 1, received: 0",
+	)
 
 	_, err = CreateStorageKey(m, "System", "Account", nil, []byte{0x01})
 	assert.EqualError(t, err, "non-nil arguments cannot be preceded by nil arguments")

@@ -22,7 +22,6 @@ import (
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/xxhash"
 )
 
 // Modelled after packages/types/src/Metadata/v7/Metadata.ts
@@ -240,43 +239,6 @@ type StorageFunctionMetadataV5 struct {
 	Documentation []Text
 }
 
-func (s StorageFunctionMetadataV5) IsPlain() bool {
-	return s.Type.IsType
-}
-
-func (s StorageFunctionMetadataV5) IsMap() bool {
-	return s.Type.IsMap
-}
-
-func (s StorageFunctionMetadataV5) IsDoubleMap() bool {
-	return s.Type.IsDoubleMap
-}
-
-func (s StorageFunctionMetadataV5) IsNMap() bool {
-	return false
-}
-
-func (s StorageFunctionMetadataV5) Hashers() ([]hash.Hash, error) {
-	return nil, fmt.Errorf("Hashers is not supported for metadata v5, please upgrade to use metadata v13 or newer")
-}
-
-func (s StorageFunctionMetadataV5) Hasher() (hash.Hash, error) {
-	if s.Type.IsMap {
-		return s.Type.AsMap.Hasher.HashFunc()
-	}
-	if s.Type.IsDoubleMap {
-		return s.Type.AsDoubleMap.Hasher.HashFunc()
-	}
-	return xxhash.New128(nil), nil
-}
-
-func (s StorageFunctionMetadataV5) Hasher2() (hash.Hash, error) {
-	if !s.Type.IsDoubleMap {
-		return nil, fmt.Errorf("only DoubleMaps have a Hasher2")
-	}
-	return s.Type.AsDoubleMap.Key2Hasher.HashFunc()
-}
-
 type StorageFunctionTypeV5 struct {
 	IsType      bool
 	AsType      Type // 0
@@ -284,6 +246,46 @@ type StorageFunctionTypeV5 struct {
 	AsMap       MapTypeV4 // 1
 	IsDoubleMap bool
 	AsDoubleMap DoubleMapTypeV5 // 2
+}
+
+func (s StorageFunctionMetadataV5) IsPlain() bool {
+	return s.Type.IsType
+}
+
+func (s StorageFunctionMetadataV5) Hasher() (hash.Hash, error) {
+	return DefaultPlainHasher(s)
+}
+
+func (s StorageFunctionMetadataV5) IsMap() bool {
+	return s.Type.IsMap || s.Type.IsDoubleMap
+}
+
+func (s StorageFunctionMetadataV5) Hashers() ([]hash.Hash, error) {
+	if !s.IsMap() {
+		return nil, fmt.Errorf("Hashers() is only to be called on Maps")
+	}
+
+	var hashers = collectHashersV5(s.Type)
+	hasherFns := make([]hash.Hash, len(hashers))
+	for i, hasher := range hashers {
+		hasherFn, err := hasher.HashFunc()
+		if err != nil {
+			return nil, err
+		}
+		hasherFns[i] = hasherFn
+	}
+	return hasherFns, nil
+}
+
+func collectHashersV5(x StorageFunctionTypeV5) []StorageHasher {
+	switch {
+	case x.IsMap:
+		return []StorageHasher{x.AsMap.Hasher}
+	case x.IsDoubleMap:
+		return []StorageHasher{x.AsDoubleMap.Hasher, x.AsDoubleMap.Key2Hasher}
+	default:
+		panic("Unexpexted type")
+	}
 }
 
 func (s *StorageFunctionTypeV5) Decode(decoder scale.Decoder) error {

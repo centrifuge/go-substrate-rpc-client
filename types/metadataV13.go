@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/xxhash"
 )
 
 type MetadataV13 struct {
@@ -254,52 +253,42 @@ func (s StorageFunctionMetadataV13) IsPlain() bool {
 	return s.Type.IsType
 }
 
-func (s StorageFunctionMetadataV13) IsMap() bool {
-	return s.Type.IsMap
-}
-
-func (s StorageFunctionMetadataV13) IsDoubleMap() bool {
-	return s.Type.IsDoubleMap
-}
-
-func (s StorageFunctionMetadataV13) IsNMap() bool {
-	return s.Type.IsNMap
-}
-
 func (s StorageFunctionMetadataV13) Hasher() (hash.Hash, error) {
-	if s.Type.IsMap {
-		return s.Type.AsMap.Hasher.HashFunc()
-	}
-	if s.Type.IsDoubleMap {
-		return s.Type.AsDoubleMap.Hasher.HashFunc()
-	}
-	if s.Type.IsNMap {
-		return nil, fmt.Errorf("only Map and DoubleMap have a Hasher")
-	}
-	return xxhash.New128(nil), nil
+	return DefaultPlainHasher(s)
 }
 
-func (s StorageFunctionMetadataV13) Hasher2() (hash.Hash, error) {
-	if !s.Type.IsDoubleMap {
-		return nil, fmt.Errorf("only DoubleMaps have a Hasher2")
-	}
-	return s.Type.AsDoubleMap.Key2Hasher.HashFunc()
+func (s StorageFunctionMetadataV13) IsMap() bool {
+	return s.Type.IsMap || s.Type.IsDoubleMap || s.Type.IsNMap
 }
 
 func (s StorageFunctionMetadataV13) Hashers() ([]hash.Hash, error) {
-	if !s.Type.IsNMap {
-		return nil, fmt.Errorf("only NMaps have Hashers")
+	if !s.IsMap() {
+		return nil, fmt.Errorf("Hashers() is only to be called on Maps")
 	}
 
-	hashers := make([]hash.Hash, len(s.Type.AsNMap.Hashers))
+	var hashers = collectHashersV13(s.Type)
+	hasherFns := make([]hash.Hash, len(hashers))
 	for i, hasher := range s.Type.AsNMap.Hashers {
 		hasherFn, err := hasher.HashFunc()
 		if err != nil {
 			return nil, err
 		}
-		hashers[i] = hasherFn
+		hasherFns[i] = hasherFn
 	}
-	return hashers, nil
+	return hasherFns, nil
+}
+
+func collectHashersV13(x StorageFunctionTypeV13) []StorageHasherV10 {
+	switch {
+	case x.IsMap:
+		return []StorageHasherV10{x.AsMap.Hasher}
+	case x.IsDoubleMap:
+		return []StorageHasherV10{x.AsDoubleMap.Hasher, x.AsDoubleMap.Key2Hasher}
+	case x.IsNMap:
+		return x.AsNMap.Hashers
+	default:
+		panic("Unexpexted type")
+	}
 }
 
 type StorageFunctionTypeV13 struct {

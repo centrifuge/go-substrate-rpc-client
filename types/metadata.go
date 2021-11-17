@@ -18,8 +18,10 @@ package types
 
 import (
 	"fmt"
+	"hash"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/xxhash"
 )
 
 const MagicNumber uint32 = 0x6174656d
@@ -43,6 +45,19 @@ type Metadata struct {
 	AsMetadataV12 MetadataV12
 	AsMetadataV13 MetadataV13
 	AsMetadataV14 MetadataV14
+}
+
+type StorageEntryMetadata interface {
+	// Check whether the entry is a plain type
+	IsPlain() bool
+	// Get the hasher to store the plain type
+	Hasher() (hash.Hash, error)
+
+	// Check whether the entry is a map type.
+	// Since v14, a Map is the union of the old Map, DoubleMap, and NMap.
+	IsMap() bool
+	// Get the hashers of the map keys. It should contain one hash per key.
+	Hashers() ([]hash.Hash, error)
 }
 
 func NewMetadataV4() *Metadata {
@@ -296,4 +311,14 @@ func (m *Metadata) ExistsModuleMetadata(module string) bool {
 	default:
 		return false
 	}
+}
+
+// Default implementation of Hasher() for a Storage entry
+// It fails when called if entry is not a plain type.
+func DefaultPlainHasher(entry StorageEntryMetadata) (hash.Hash, error) {
+	if entry.IsPlain() {
+		return xxhash.New128(nil), nil
+	}
+
+	return nil, fmt.Errorf("Hasher() is only to be called on a Plain entry")
 }
