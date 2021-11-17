@@ -250,6 +250,10 @@ func (s StorageFunctionMetadataV4) IsPlain() bool {
 }
 
 func (s StorageFunctionMetadataV4) Hasher() (hash.Hash, error) {
+	if s.IsMap() {
+		return s.Type.AsMap.Hasher.HashFunc()
+	}
+
 	return DefaultPlainHasher(s)
 }
 
@@ -263,7 +267,7 @@ func (s StorageFunctionMetadataV4) Hashers() ([]hash.Hash, error) {
 	}
 
 	if s.Type.IsDoubleMap {
-		return nil, fmt.Errorf("Getting the two hashers of a DoubleMap is not supported for metadata v4. " +
+		return nil, fmt.Errorf("getting the two hashers of a DoubleMap is not supported for metadata v4. " +
 			"Please upgrade to use metadata v8 or newer")
 	}
 

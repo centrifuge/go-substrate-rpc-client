@@ -80,7 +80,7 @@ func CreateStorageKey(meta *Metadata, prefix, method string, args ...[]byte) (St
 
 	// From metadata >= v14, there is only one representation of Map,
 	// which is more alike the old 'NMap': a Map with n keys (n >= 1).
-	if entryMeta.IsMap() {
+	if entryMeta.IsMap() && meta.Version > 4 {
 		hashers, err := entryMeta.Hashers()
 		if err != nil {
 			return nil, fmt.Errorf("unable to get hashers for %s map", method)
@@ -162,6 +162,7 @@ func createKey(meta *Metadata, method, prefix string, stringKey, arg []byte, ent
 		return hasher.Sum(nil), err
 	}
 
+	//TODO(NUNO): PROBABLY DELETE THIS
 	if entryMeta.IsMap() {
 		_, err := hasher.Write(arg)
 		if err != nil {
