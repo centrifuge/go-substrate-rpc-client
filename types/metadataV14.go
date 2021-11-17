@@ -380,10 +380,3 @@ func (s StorageEntryTypeV14) Encode(encoder scale.Encoder) error {
 	}
 	return nil
 }
-
-func unsupportedMapVariantCheck(variant string) error {
-	return fmt.Errorf("StorageEntryMetadataV14 does not implement %s "+
-		"as now there is only one Map variant with n keys",
-		variant,
-	)
-}

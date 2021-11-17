@@ -162,15 +162,6 @@ func createKey(meta *Metadata, method, prefix string, stringKey, arg []byte, ent
 		return hasher.Sum(nil), err
 	}
 
-	//TODO(NUNO): PROBABLY DELETE THIS
-	if entryMeta.IsMap() {
-		_, err := hasher.Write(arg)
-		if err != nil {
-			return nil, err
-		}
-		arg = hasher.Sum(nil)
-	}
-
 	return append(createPrefixedKey(method, prefix), arg...), nil
 }
 
