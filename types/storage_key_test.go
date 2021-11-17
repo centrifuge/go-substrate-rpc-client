@@ -288,16 +288,6 @@ func TestCreateStorageKeyMapV9(t *testing.T) {
 	assert.Equal(t, "0x26aa394eea5630e07c48ae0c9558cef79c2f82b23e5fd031fb54c292794b4cc42e3fb4c297a84c5cebc0e78257d213d0927ccc7596044c6ba013dd05522aacba", hex) //nolint:lll
 }
 
-// func TestCreateStorageKeyMapV4(t *testing.T) {
-// 	b := MustHexDecodeString(AlicePubKey)
-// 	m := ExamplaryMetadataV4
-// 	key, err := CreateStorageKey(m, "System", "AccountNonce", b)
-// 	assert.NoError(t, err)
-// 	hex, err := Hex(key)
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, "0x5c54163a1c72509b5250f0a30b9001fdee9d9b48388b06921f1b210e81e3a1f0", hex)
-// }
-
 func TestCreateStorageKeyMapV13(t *testing.T) {
 	m := ExamplaryMetadataV13
 	b := MustHexDecodeString(AlicePubKey)

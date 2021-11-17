@@ -80,7 +80,8 @@ func CreateStorageKey(meta *Metadata, prefix, method string, args ...[]byte) (St
 
 	// From metadata >= v14, there is only one representation of Map,
 	// which is more alike the old 'NMap': a Map with n keys (n >= 1).
-	if entryMeta.IsMap() && meta.Version > 4 {
+	// The old variants are now unified as thus IsMap() is true for all.
+	if entryMeta.IsMap() {
 		hashers, err := entryMeta.Hashers()
 		if err != nil {
 			return nil, fmt.Errorf("unable to get hashers for %s map", method)
@@ -127,8 +128,7 @@ func (s StorageKey) Hex() string {
 }
 
 // Create a key for a Map.
-// A map can be either a regular one-keyed Map, a Double Map, or an NMap.
-// There should be as many keys as hashers.
+// The number of keys of the map should match with the number of key hashers.
 func createKeyMap(method, prefix string, args [][]byte, entryMeta StorageEntryMetadata) (StorageKey, error) {
 	hashers, err := entryMeta.Hashers()
 	if err != nil {
