@@ -142,40 +142,19 @@ func (m *ModuleMetadataV8) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	err = decoder.Decode(&m.HasStorage)
+	err = decoder.DecodeOption(&m.HasStorage, &m.Storage)
 	if err != nil {
 		return err
 	}
 
-	if m.HasStorage {
-		err = decoder.Decode(&m.Storage)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = decoder.Decode(&m.HasCalls)
+	err = decoder.DecodeOption(&m.HasCalls, &m.Calls)
 	if err != nil {
 		return err
 	}
 
-	if m.HasCalls {
-		err = decoder.Decode(&m.Calls)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = decoder.Decode(&m.HasEvents)
+	err = decoder.DecodeOption(&m.HasEvents, &m.Events)
 	if err != nil {
 		return err
-	}
-
-	if m.HasEvents {
-		err = decoder.Decode(&m.Events)
-		if err != nil {
-			return err
-		}
 	}
 
 	err = decoder.Decode(&m.Constants)
@@ -192,40 +171,19 @@ func (m ModuleMetadataV8) Encode(encoder scale.Encoder) error {
 		return err
 	}
 
-	err = encoder.Encode(m.HasStorage)
+	err = encoder.EncodeOption(m.HasStorage, m.Storage)
 	if err != nil {
 		return err
 	}
 
-	if m.HasStorage {
-		err = encoder.Encode(m.Storage)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = encoder.Encode(m.HasCalls)
+	err = encoder.EncodeOption(m.HasCalls, m.Calls)
 	if err != nil {
 		return err
 	}
 
-	if m.HasCalls {
-		err = encoder.Encode(m.Calls)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = encoder.Encode(m.HasEvents)
+	err = encoder.EncodeOption(m.HasEvents, m.Events)
 	if err != nil {
 		return err
-	}
-
-	if m.HasEvents {
-		err = encoder.Encode(m.Events)
-		if err != nil {
-			return err
-		}
 	}
 
 	err = encoder.Encode(m.Constants)
