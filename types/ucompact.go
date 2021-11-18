@@ -19,13 +19,18 @@ package types
 import (
 	"math/big"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v3/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 )
 
 type UCompact big.Int
 
 func NewUCompact(value *big.Int) UCompact {
 	return UCompact(*value)
+}
+
+func (u *UCompact) Int64() int64 {
+	i := big.Int(*u)
+	return i.Int64()
 }
 
 func NewUCompactFromUInt(value uint64) UCompact {

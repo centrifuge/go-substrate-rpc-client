@@ -20,11 +20,23 @@ import (
 	"fmt"
 	"testing"
 
-	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v3"
-	"github.com/centrifuge/go-substrate-rpc-client/v3/config"
-	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
+	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/config"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/stretchr/testify/assert"
 )
+
+// A global SubstrateAPI instance
+// NOTE: Only to be used for subscriptions-covering tests,
+// where we have experienced an issue where setting up
+// an instance per test caused issues leading to timeouts.
+var subscriptionsAPI *gsrpc.SubstrateAPI
+
+func TestMain(m *testing.M) {
+	localApi, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
+	subscriptionsAPI = localApi
+	assert.NoError(&testing.T{}, err)
+}
 
 func TestEnd2end(t *testing.T) {
 	if testing.Short() {

@@ -20,9 +20,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v3/client"
-	"github.com/centrifuge/go-substrate-rpc-client/v3/rpcmocksrv"
-	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/rpcmocksrv"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
 var system *System

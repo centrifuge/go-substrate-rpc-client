@@ -21,10 +21,10 @@ import (
 	"math/big"
 	"time"
 
-	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v3"
-	"github.com/centrifuge/go-substrate-rpc-client/v3/config"
-	"github.com/centrifuge/go-substrate-rpc-client/v3/signature"
-	"github.com/centrifuge/go-substrate-rpc-client/v3/types"
+	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/config"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
 func Example_simpleConnect() {
@@ -49,8 +49,7 @@ func Example_simpleConnect() {
 	}
 
 	fmt.Printf("You are connected to chain %v using %v v%v\n", chain, nodeName, nodeVersion)
-
-	// Output: You are connected to chain Development using Substrate Node v2.0.0-49a4103f4b-x86_64-linux-gnu
+	// Output: You are connected to chain Development using Substrate Node v3.0.0-dev-1b646b2-x86_64-linux-gnu
 }
 
 func Example_listenToNewBlocks() {
@@ -245,7 +244,7 @@ func Example_makeASimpleTransfer() {
 		GenesisHash:        genesisHash,
 		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
 		SpecVersion:        rv.SpecVersion,
-		Tip:                types.NewUCompactFromUInt(0),
+		Tip:                types.NewUCompactFromUInt(100),
 		TransactionVersion: rv.TransactionVersion,
 	}
 
