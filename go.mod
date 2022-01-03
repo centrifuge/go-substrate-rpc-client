@@ -9,7 +9,7 @@ require (
 	github.com/ethereum/go-ethereum v1.10.13
 	github.com/gorilla/websocket v1.4.2
 	github.com/pierrec/xxHash v0.1.5
-	github.com/rs/cors v1.8.0
+	github.com/rs/cors v1.8.2
 	github.com/stretchr/testify v1.7.0
 	github.com/vedhavyas/go-subkey v1.0.3
 	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871
