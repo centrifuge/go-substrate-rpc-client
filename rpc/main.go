@@ -20,6 +20,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/author"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/chain"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/mmr"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/offchain"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/state"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/system"
@@ -29,6 +30,7 @@ import (
 type RPC struct {
 	Author   *author.Author
 	Chain    *chain.Chain
+	MMR      *mmr.MMR
 	Offchain *offchain.Offchain
 	State    *state.State
 	System   *system.System
