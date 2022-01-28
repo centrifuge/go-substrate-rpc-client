@@ -35,28 +35,28 @@ func NewOptionH160Empty() OptionH160 {
 }
 
 func (o OptionH160) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+	return encoder.EncodeOption(o.HasValue, o.value)
 }
 
 func (o *OptionH160) Decode(decoder scale.Decoder) error {
-	return decoder.DecodeOption(&o.hasValue, &o.value)
+	return decoder.DecodeOption(&o.HasValue, &o.value)
 }
 
 // SetSome sets a value
 func (o *OptionH160) SetSome(value H160) {
-	o.hasValue = true
+	o.HasValue = true
 	o.value = value
 }
 
 // SetNone removes a value and marks it as missing
 func (o *OptionH160) SetNone() {
-	o.hasValue = false
+	o.HasValue = false
 	o.value = H160{}
 }
 
 // Unwrap returns a flag that indicates whether a value is present and the stored value
 func (o OptionH160) Unwrap() (ok bool, value H160) {
-	return o.hasValue, o.value
+	return o.HasValue, o.value
 }
 
 // OptionH256 is a structure that can store a H256 or a missing value
@@ -76,28 +76,28 @@ func NewOptionH256Empty() OptionH256 {
 }
 
 func (o OptionH256) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+	return encoder.EncodeOption(o.HasValue, o.value)
 }
 
 func (o *OptionH256) Decode(decoder scale.Decoder) error {
-	return decoder.DecodeOption(&o.hasValue, &o.value)
+	return decoder.DecodeOption(&o.HasValue, &o.value)
 }
 
 // SetSome sets a value
 func (o *OptionH256) SetSome(value H256) {
-	o.hasValue = true
+	o.HasValue = true
 	o.value = value
 }
 
 // SetNone removes a value and marks it as missing
 func (o *OptionH256) SetNone() {
-	o.hasValue = false
+	o.HasValue = false
 	o.value = H256{}
 }
 
 // Unwrap returns a flag that indicates whether a value is present and the stored value
 func (o OptionH256) Unwrap() (ok bool, value H256) {
-	return o.hasValue, o.value
+	return o.HasValue, o.value
 }
 
 // OptionH512 is a structure that can store a H512 or a missing value
@@ -117,28 +117,28 @@ func NewOptionH512Empty() OptionH512 {
 }
 
 func (o OptionH512) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+	return encoder.EncodeOption(o.HasValue, o.value)
 }
 
 func (o *OptionH512) Decode(decoder scale.Decoder) error {
-	return decoder.DecodeOption(&o.hasValue, &o.value)
+	return decoder.DecodeOption(&o.HasValue, &o.value)
 }
 
 // SetSome sets a value
 func (o *OptionH512) SetSome(value H512) {
-	o.hasValue = true
+	o.HasValue = true
 	o.value = value
 }
 
 // SetNone removes a value and marks it as missing
 func (o *OptionH512) SetNone() {
-	o.hasValue = false
+	o.HasValue = false
 	o.value = H512{}
 }
 
 // Unwrap returns a flag that indicates whether a value is present and the stored value
 func (o OptionH512) Unwrap() (ok bool, value H512) {
-	return o.hasValue, o.value
+	return o.HasValue, o.value
 }
 
 // OptionHash is a structure that can store a Hash or a missing value
@@ -158,26 +158,26 @@ func NewOptionHashEmpty() OptionHash {
 }
 
 func (o OptionHash) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+	return encoder.EncodeOption(o.HasValue, o.value)
 }
 
 func (o *OptionHash) Decode(decoder scale.Decoder) error {
-	return decoder.DecodeOption(&o.hasValue, &o.value)
+	return decoder.DecodeOption(&o.HasValue, &o.value)
 }
 
 // SetSome sets a value
 func (o *OptionHash) SetSome(value Hash) {
-	o.hasValue = true
+	o.HasValue = true
 	o.value = value
 }
 
 // SetNone removes a value and marks it as missing
 func (o *OptionHash) SetNone() {
-	o.hasValue = false
+	o.HasValue = false
 	o.value = Hash{}
 }
 
 // Unwrap returns a flag that indicates whether a value is present and the stored value
 func (o OptionHash) Unwrap() (ok bool, value Hash) {
-	return o.hasValue, o.value
+	return o.HasValue, o.value
 }

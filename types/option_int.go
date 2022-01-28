@@ -35,28 +35,28 @@ func NewOptionI8Empty() OptionI8 {
 }
 
 func (o OptionI8) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+	return encoder.EncodeOption(o.HasValue, o.value)
 }
 
 func (o *OptionI8) Decode(decoder scale.Decoder) error {
-	return decoder.DecodeOption(&o.hasValue, &o.value)
+	return decoder.DecodeOption(&o.HasValue, &o.value)
 }
 
 // SetSome sets a value
 func (o *OptionI8) SetSome(value I8) {
-	o.hasValue = true
+	o.HasValue = true
 	o.value = value
 }
 
 // SetNone removes a value and marks it as missing
 func (o *OptionI8) SetNone() {
-	o.hasValue = false
+	o.HasValue = false
 	o.value = I8(0)
 }
 
 // Unwrap returns a flag that indicates whether a value is present and the stored value
 func (o OptionI8) Unwrap() (ok bool, value I8) {
-	return o.hasValue, o.value
+	return o.HasValue, o.value
 }
 
 // OptionI16 is a structure that can store a I16 or a missing value
@@ -76,28 +76,28 @@ func NewOptionI16Empty() OptionI16 {
 }
 
 func (o OptionI16) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+	return encoder.EncodeOption(o.HasValue, o.value)
 }
 
 func (o *OptionI16) Decode(decoder scale.Decoder) error {
-	return decoder.DecodeOption(&o.hasValue, &o.value)
+	return decoder.DecodeOption(&o.HasValue, &o.value)
 }
 
 // SetSome sets a value
 func (o *OptionI16) SetSome(value I16) {
-	o.hasValue = true
+	o.HasValue = true
 	o.value = value
 }
 
 // SetNone removes a value and marks it as missing
 func (o *OptionI16) SetNone() {
-	o.hasValue = false
+	o.HasValue = false
 	o.value = I16(0)
 }
 
 // Unwrap returns a flag that indicates whether a value is present and the stored value
 func (o OptionI16) Unwrap() (ok bool, value I16) {
-	return o.hasValue, o.value
+	return o.HasValue, o.value
 }
 
 // OptionI32 is a structure that can store a I32 or a missing value
@@ -117,28 +117,28 @@ func NewOptionI32Empty() OptionI32 {
 }
 
 func (o OptionI32) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+	return encoder.EncodeOption(o.HasValue, o.value)
 }
 
 func (o *OptionI32) Decode(decoder scale.Decoder) error {
-	return decoder.DecodeOption(&o.hasValue, &o.value)
+	return decoder.DecodeOption(&o.HasValue, &o.value)
 }
 
 // SetSome sets a value
 func (o *OptionI32) SetSome(value I32) {
-	o.hasValue = true
+	o.HasValue = true
 	o.value = value
 }
 
 // SetNone removes a value and marks it as missing
 func (o *OptionI32) SetNone() {
-	o.hasValue = false
+	o.HasValue = false
 	o.value = I32(0)
 }
 
 // Unwrap returns a flag that indicates whether a value is present and the stored value
 func (o OptionI32) Unwrap() (ok bool, value I32) {
-	return o.hasValue, o.value
+	return o.HasValue, o.value
 }
 
 // OptionI64 is a structure that can store a I64 or a missing value
@@ -158,26 +158,26 @@ func NewOptionI64Empty() OptionI64 {
 }
 
 func (o OptionI64) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
+	return encoder.EncodeOption(o.HasValue, o.value)
 }
 
 func (o *OptionI64) Decode(decoder scale.Decoder) error {
-	return decoder.DecodeOption(&o.hasValue, &o.value)
+	return decoder.DecodeOption(&o.HasValue, &o.value)
 }
 
 // SetSome sets a value
 func (o *OptionI64) SetSome(value I64) {
-	o.hasValue = true
+	o.HasValue = true
 	o.value = value
 }
 
 // SetNone removes a value and marks it as missing
 func (o *OptionI64) SetNone() {
-	o.hasValue = false
+	o.HasValue = false
 	o.value = I64(0)
 }
 
 // Unwrap returns a flag that indicates whether a value is present and the stored value
 func (o OptionI64) Unwrap() (ok bool, value I64) {
-	return o.hasValue, o.value
+	return o.HasValue, o.value
 }

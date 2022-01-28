@@ -17,15 +17,15 @@
 package types
 
 type option struct {
-	hasValue bool
+	HasValue bool
 }
 
 // IsNone returns true if the value is missing
 func (o option) IsNone() bool {
-	return !o.hasValue
+	return !o.HasValue
 }
 
 // IsNone returns true if a value is present
 func (o option) IsSome() bool {
-	return o.hasValue
+	return o.HasValue
 }

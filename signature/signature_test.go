@@ -17,127 +17,26 @@
 package signature_test
 
 import (
-	"crypto/rand"
+	"bytes"
 	"testing"
 
-	. "github.com/centrifuge/go-substrate-rpc-client/v4/signature"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
-	"github.com/stretchr/testify/assert"
 )
 
-var testSecretPhrase = "little orbit comfort eyebrow talk pink flame ridge bring milk equip blood"
-var testSecretSeed = "0x167d9a020688544ea246b056799d6a771e97c9da057e4d0b87024537f99177bc"
-var testPubKey = "0xdc64bef918ddda3126a39a11113767741ddfdf91399f055e1d963f2ae1ec2535"
-var testAddressSS58 = "5H3gKVQU7DfNFfNGkgTrD7p715jjg7QXtat8X3UxiSyw7APW"
-var testKusamaAddressSS58 = "HZHyokLjagJ1KBiXPGu75B79g1yUnDiLxisuhkvCFCRrWBk"
-var testPolkadotAddressSS58 = "15yyTpfXxzvqhCNniKWrMGeFrhjPNQxfy5ccgLUKGY1THbTW"
+func TestDecodeSubstrateMessage(t *testing.T) {
+	hex := "0xeee4318d5f09f8e6bb227855f3d1f265ce2bd6303316c560b9c1bc31be8149e761010000000000000000000014013845a96faf999274e973735201a2a0e70c7ebec67d016a1e1d5a68cd3205a41a708588694d948865da4f640cb58ca097a2dcb51baa33606453271136ca1ae7d1000001e05c7d9481cb6d7ae52c1a1b7608e1f55cf3e63a177306bca813a38c375da18f48f875874ef4a4931cbc9d7509ef9c3fa8144ea4407a65c2d31376341e981f560001b85e8d525f60a5f26a2350bd0b632d4c9f505bdd0d826f314cb9524a88a8b36f59e678dfc266ee8676db39a993b350ce5bbc33ab514bcac710c0ba4eedc10c7e0001626fe670748b10bbdecdacfc8253b7819afca627ee9a2787149d664aff76daa94a3bc509172cf444eca4a93025c8f90e5a56e4eff0b16f11511bebbbdbaecce300"
+	signedCommitment := &types.SignedCommitment{}
 
-func TestKeyRingPairFromSecretPhrase_SubstrateAddress(t *testing.T) {
-	p, err := KeyringPairFromSecret(testSecretPhrase, 42)
-	assert.NoError(t, err)
+	bz, err := types.HexDecodeString(hex)
+	if err != nil {
+		t.Error(err)
+	}
+	errr := scale.NewDecoder(bytes.NewReader(bz)).Decode(signedCommitment)
 
-	assert.Equal(t, KeyringPair{
-		URI:       testSecretPhrase,
-		Address:   testAddressSS58,
-		PublicKey: types.MustHexDecodeString(testPubKey),
-	}, p)
-}
-
-func TestKeyRingPairFromSecretPhrase_PolkadotAddress(t *testing.T) {
-	p, err := KeyringPairFromSecret(testSecretPhrase, 0)
-	assert.NoError(t, err)
-
-	assert.Equal(t, KeyringPair{
-		URI:       testSecretPhrase,
-		Address:   testPolkadotAddressSS58,
-		PublicKey: types.MustHexDecodeString(testPubKey),
-	}, p)
-}
-
-func TestKeyRingPairFromSecretPhrase_KusamaAddress(t *testing.T) {
-	p, err := KeyringPairFromSecret(testSecretPhrase, 2)
-	assert.NoError(t, err)
-
-	assert.Equal(t, KeyringPair{
-		URI:       testSecretPhrase,
-		Address:   testKusamaAddressSS58,
-		PublicKey: types.MustHexDecodeString(testPubKey),
-	}, p)
-}
-
-func TestKeyRingPairFromSecretPhrase_InvalidSecretPhrase(t *testing.T) {
-	_, err := KeyringPairFromSecret("foo", 42)
-	assert.Error(t, err)
-}
-
-func TestKeyringPairFromSecretSeed(t *testing.T) {
-	p, err := KeyringPairFromSecret(testSecretSeed, 42)
-	assert.NoError(t, err)
-
-	assert.Equal(t, KeyringPair{
-		URI:       testSecretSeed,
-		Address:   testAddressSS58,
-		PublicKey: types.MustHexDecodeString(testPubKey),
-	}, p)
-}
-
-func TestKeyringPairFromSecretSeedAndNetwork(t *testing.T) {
-	p, err := KeyringPairFromSecret(testSecretSeed, 42)
-	assert.NoError(t, err)
-
-	assert.Equal(t, KeyringPair{
-		URI:       testSecretSeed,
-		Address:   testAddressSS58,
-		PublicKey: types.MustHexDecodeString(testPubKey),
-	}, p)
-}
-
-func TestSignAndVerify(t *testing.T) {
-	data := []byte("hello!")
-
-	sig, err := Sign(data, TestKeyringPairAlice.URI)
-	assert.NoError(t, err)
-
-	ok, err := Verify(data, sig, TestKeyringPairAlice.URI)
-	assert.NoError(t, err)
-
-	assert.True(t, ok)
-}
-
-func TestSign_InvalidSecretPhrase(t *testing.T) {
-	data := []byte("hello!")
-
-	_, err := Sign(data, "foo")
-	assert.Error(t, err)
-}
-
-func TestSignAndVerify_InvalidSecretPhraseOnVerify(t *testing.T) {
-	data := []byte("hello!")
-
-	sig, err := Sign(data, TestKeyringPairAlice.URI)
-	assert.NoError(t, err)
-
-	_, err = Verify(data, sig, "foo")
-	assert.Error(t, err)
-}
-
-func TestVerify_InvalidSignatureLength(t *testing.T) {
-	data := []byte("hello!")
-
-	_, err := Verify(data, []byte{'f', 'o', 'o'}, TestKeyringPairAlice.URI)
-	assert.Error(t, err)
-}
-
-func TestSignAndVerifyLong(t *testing.T) {
-	data := make([]byte, 258)
-	_, err := rand.Read(data)
-	assert.NoError(t, err)
-
-	sig, err := Sign(data, TestKeyringPairAlice.URI)
-	assert.NoError(t, err)
-
-	ok, err := Verify(data, sig, TestKeyringPairAlice.URI)
-	assert.NoError(t, err)
-
-	assert.True(t, ok)
+	if errr != nil {
+		t.Errorf("error decoding %v ", errr.Error())
+	}
+	
+	t.Logf("SIGNED COMMITMENT %#v \n", signedCommitment)
 }

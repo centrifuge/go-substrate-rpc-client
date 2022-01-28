@@ -43,7 +43,7 @@ func NewOptionBoolEmpty() OptionBool {
 // Encode implements encoding for OptionBool as per Rust implementation
 func (o OptionBool) Encode(encoder scale.Encoder) error {
 	var err error
-	if !o.hasValue {
+	if !o.HasValue {
 		err = encoder.PushByte(0)
 	} else {
 		if o.value {
@@ -63,13 +63,13 @@ func (o *OptionBool) Decode(decoder scale.Decoder) error {
 	b, _ := decoder.ReadOneByte()
 	switch b {
 	case 0:
-		o.hasValue = false
+		o.HasValue = false
 		o.value = false
 	case 1:
-		o.hasValue = true
+		o.HasValue = true
 		o.value = true
 	case 2:
-		o.hasValue = true
+		o.HasValue = true
 		o.value = false
 	default:
 		return fmt.Errorf("unknown byte prefix for encoded OptionBool: %d", b)
@@ -79,17 +79,17 @@ func (o *OptionBool) Decode(decoder scale.Decoder) error {
 
 // SetSome sets a value
 func (o *OptionBool) SetSome(value Bool) {
-	o.hasValue = true
+	o.HasValue = true
 	o.value = value
 }
 
 // SetNone removes a value and marks it as missing
 func (o *OptionBool) SetNone() {
-	o.hasValue = false
+	o.HasValue = false
 	o.value = Bool(false)
 }
 
 // Unwrap returns a flag that indicates whether a value is present and the stored value
 func (o OptionBool) Unwrap() (ok bool, value Bool) {
-	return o.hasValue, o.value
+	return o.HasValue, o.value
 }
