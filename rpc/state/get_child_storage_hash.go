@@ -17,8 +17,8 @@
 package state
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/ComposableFi/go-substrate-rpc-client/v4/client"
+	"github.com/ComposableFi/go-substrate-rpc-client/v4/types"
 )
 
 // GetChildStorageHash retreives the child storage hash for the given key

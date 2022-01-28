@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+	"github.com/ComposableFi/go-substrate-rpc-client/v4/scale"
 )
 
 // Modelled after packages/types/src/Metadata/v11/toV12.ts

@@ -20,8 +20,8 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/ComposableFi/go-substrate-rpc-client/v4/scale"
+	"github.com/ComposableFi/go-substrate-rpc-client/v4/types"
 )
 
 func TestDecodeSubstrateMessage(t *testing.T) {

@@ -1,6 +1,6 @@
 package mmr
 
-import "github.com/centrifuge/go-substrate-rpc-client/v4/client"
+import "github.com/ComposableFi/go-substrate-rpc-client/v4/client"
 
 // MMR exposes methods for retrieval of MMR data
 type MMR struct {
