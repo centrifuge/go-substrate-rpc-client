@@ -21,7 +21,7 @@ import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 // Commitment is a beefy commitment
 type Commitment struct {
 	Payload        H256
-	BlockNumber    BlockNumber
+	BlockNumber    U32
 	ValidatorSetID U64
 }
 

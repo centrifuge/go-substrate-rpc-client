@@ -35,8 +35,19 @@ func TestDecodeSubstrateMessage(t *testing.T) {
 	errr := scale.NewDecoder(bytes.NewReader(bz)).Decode(signedCommitment)
 
 	if errr != nil {
-		t.Errorf("error decoding %v ", errr.Error())
+		t.Errorf("error decoding %+v ", errr.Error())
 	}
-	
-	t.Logf("SIGNED COMMITMENT %#v \n", signedCommitment)
+
+	t.Logf("COMMITMENT %#v \n", signedCommitment.Commitment)
+
+	for _, v := range signedCommitment.Signatures {
+		if v.HasValue {
+			_, sig := v.Unwrap()
+			t.Logf("SIGNATURE %#v \n", types.HexEncodeToString(sig[:]))
+
+		} else {
+			t.Logf("NONE\n")
+
+		}
+	}
 }
