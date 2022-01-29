@@ -17,6 +17,7 @@
 package gsrpc_test
 
 import (
+	"encoding/hex"
 	"fmt"
 	"math/big"
 	"time"
@@ -263,6 +264,454 @@ func Example_makeASimpleTransfer() {
 	fmt.Printf("Balance transferred from Alice to Bob: %v\n", bal.String())
 	// Output: Balance transferred from Alice to Bob: 100000000000000
 }
+
+func Example_makeASimpleTransferEd25519AccountTwo() {
+	// This sample shows how to create a transaction to make a transfer from one an account to another.
+
+	time.Sleep(10 * time.Second)
+
+	// Instantiate the API
+	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
+	if err != nil {
+		panic(err)
+	}
+
+	meta, err := api.RPC.State.GetMetadataLatest()
+	if err != nil {
+		panic(err)
+	}
+
+	// Create a call, transferring 12345 units to Ed25519 Account Two
+	accountTwo, err := types.NewMultiAddressFromHexAccountID("0x05aeedbab13e7c50ee8e46421104e213395921ea067aa5fbb6dcc3617dace6a7")
+	if err != nil {
+		panic(err)
+	}
+
+	// 1 unit of transfer
+	bal, ok := new(big.Int).SetString("100000000000000", 10)
+	if !ok {
+		panic(fmt.Errorf("failed to convert balance"))
+	}
+
+	c, err := types.NewCall(meta, "Balances.transfer", accountTwo, types.NewUCompact(bal))
+	if err != nil {
+		panic(err)
+	}
+
+	// Create the extrinsic
+	ext := types.NewExtrinsic(c)
+
+	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
+	if err != nil {
+		panic(err)
+	}
+
+	rv, err := api.RPC.State.GetRuntimeVersionLatest()
+	if err != nil {
+		panic(err)
+	}
+
+	key, err := types.CreateStorageKey(meta, "System", "Account", signature.TestKeyringPairAlice.PublicKey, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	var accountInfo types.AccountInfo
+	ok, err = api.RPC.State.GetStorageLatest(key, &accountInfo)
+	if err != nil || !ok {
+		panic(err)
+	}
+
+	nonce := uint32(accountInfo.Nonce)
+	o := types.SignatureOptions{
+		BlockHash:          genesisHash,
+		Era:                types.ExtrinsicEra{IsMortalEra: false},
+		GenesisHash:        genesisHash,
+		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+		SpecVersion:        rv.SpecVersion,
+		Tip:                types.NewUCompactFromUInt(0),
+		TransactionVersion: rv.TransactionVersion,
+	}
+
+	ext.SetSignScheme("Sr25519")
+
+	// Sign the transaction using Alice's default account
+	err = ext.Sign(signature.TestKeyringPairAlice, o)
+	if err != nil {
+		panic(err)
+	}
+
+	// Send the extrinsic
+	_, err = api.RPC.Author.SubmitExtrinsic(ext)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Balance transferred from Alice to AccountTwo: %v\n", bal.String())
+	// Output: Balance transferred from Alice to AccountTwo: 100000000000000
+}
+
+// TODO: ECDSA Account
+// func Example_makeASimpleTransferEcdsaAccountThree() {
+// 	// This sample shows how to create a transaction to make a transfer from one an account to another.
+
+// 	time.Sleep(8 * time.Second)
+
+// 	// Instantiate the API
+// 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	meta, err := api.RPC.State.GetMetadataLatest()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	// Create a call, transferring 12345 units to AccountThree Ecdsa
+// 	// 	subkey generate --scheme Ecdsa --network polkadot
+// 	// 	Secret phrase `clerk april useful wish balcony narrow member planet later explain cake harvest` is account:
+// 	//   Secret seed:       0x954e40cec3ffbfe7f12e5552b9807a21100d5dc0e0e8b70320d588402159090c
+// 	//   Public key (hex):  0x02ef86282d5a0c79ecfabaae31612d1d07c69dc5fce5e02761931e7febdcd1f732
+// 	//   Public key (SS58): 1HzNpEUKiBZCAVAB3FZv12jJRk4zNvzBh5UoSSq7mbAE8yVu
+// 	//   Account ID:        0x51ecb60d234ce572341bdfb6720b453e67e7b7de155a8843c7078c52dd1cb311
+// 	//   SS58 Address:      12rRCQDcDP7YzxjirKEV8hbJu77PtgX16rBoBTYMbDcyoFxw
+// 	accountTwo, err := types.NewMultiAddressFromHexAccountID("0x51ecb60d234ce572341bdfb6720b453e67e7b7de155a8843c7078c52dd1cb311")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	// 1 unit of transfer
+// 	bal, ok := new(big.Int).SetString("100000000000000", 10)
+// 	if !ok {
+// 		panic(fmt.Errorf("failed to convert balance"))
+// 	}
+
+// 	c, err := types.NewCall(meta, "Balances.transfer", accountTwo, types.NewUCompact(bal))
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	// Create the extrinsic
+// 	ext := types.NewExtrinsic(c)
+
+// 	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	rv, err := api.RPC.State.GetRuntimeVersionLatest()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	key, err := types.CreateStorageKey(meta, "System", "Account", signature.TestKeyringPairAlice.PublicKey, nil)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	var accountInfo types.AccountInfo
+// 	ok, err = api.RPC.State.GetStorageLatest(key, &accountInfo)
+// 	if err != nil || !ok {
+// 		panic(err)
+// 	}
+
+// 	nonce := uint32(accountInfo.Nonce)
+// 	o := types.SignatureOptions{
+// 		BlockHash:          genesisHash,
+// 		Era:                types.ExtrinsicEra{IsMortalEra: false},
+// 		GenesisHash:        genesisHash,
+// 		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+// 		SpecVersion:        rv.SpecVersion,
+// 		Tip:                types.NewUCompactFromUInt(0),
+// 		TransactionVersion: rv.TransactionVersion,
+// 	}
+
+// 	ext.SetSignScheme("Ecdsa")
+
+// 	// Sign the transaction using Alice's default account
+// 	err = ext.Sign(signature.TestKeyringPairAlice, o)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	// Send the extrinsic
+// 	_, err = api.RPC.Author.SubmitExtrinsic(ext)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	fmt.Printf("Balance transferred from Alice to AccountTwo: %v\n", bal.String())
+// 	// Output: Balance transferred from Alice to AccountTwo: 100000000000000
+// }
+
+func Example_makeASimpleTransferEd25519() {
+
+	// This sample shows how to create a transaction to make a transfer from one an account to another.
+	time.Sleep(10 * time.Second)
+	// Instantiate the API
+	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
+	if err != nil {
+		panic(err)
+	}
+
+	meta, err := api.RPC.State.GetMetadataLatest()
+	if err != nil {
+		panic(err)
+	}
+
+	// Create a call, transferring 12345 units to Bob Account
+	bob, err := types.NewMultiAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
+	if err != nil {
+		panic(err)
+	}
+	// fmt.Println("BXL Example_makeASimpleTransferEd25519 bob : ", bob)
+
+	// 1 unit of transfer
+	bal, ok := new(big.Int).SetString("50000000000000", 10)
+	if !ok {
+		panic(fmt.Errorf("failed to convert balance"))
+	}
+	// fmt.Println("BXL Example_makeASimpleTransferEd25519 bal : ", bal)
+
+	c, err := types.NewCall(meta, "Balances.transfer", bob, types.NewUCompact(bal))
+	if err != nil {
+		panic(err)
+	}
+
+	// Create the extrinsic
+	ext := types.NewExtrinsic(c)
+	// fmt.Println("BXL Example_makeASimpleTransferEd25519 ext : ", ext)
+
+	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
+	if err != nil {
+		panic(err)
+	}
+
+	rv, err := api.RPC.State.GetRuntimeVersionLatest()
+	if err != nil {
+		panic(err)
+	}
+
+	// Ed25519 Account Two
+	// 	subkey generate --scheme ed25519 --network polkadot
+	// Secret phrase `panda claim miracle furnace dynamic battle kick cigar grain book fox badge` is account:
+	//   Secret seed:       0x922b17a2230ca612424c9dc3990eaffa42e26cf74d795966819b6d04c980e81c
+	//   Public key (hex):  0x05aeedbab13e7c50ee8e46421104e213395921ea067aa5fbb6dcc3617dace6a7
+	//   Public key (SS58): 18TCqXdPyzrXWBDbd36foHbSQ7YitnqdNa8qdd1zUP6nUNF
+	//   Account ID:        0x05aeedbab13e7c50ee8e46421104e213395921ea067aa5fbb6dcc3617dace6a7
+	//   SS58 Address:      18TCqXdPyzrXWBDbd36foHbSQ7YitnqdNa8qdd1zUP6nUNF
+	//   SS58 Address: 		5CCA4WGZYCjP5yAhdyz6XeTSan7u2bEhYsqegLdfSPMac53h
+
+	pk, err := hex.DecodeString("05aeedbab13e7c50ee8e46421104e213395921ea067aa5fbb6dcc3617dace6a7")
+	if err != nil {
+		panic(err)
+	}
+	// fmt.Println("BXL Example_makeASimpleTransferEd25519 pk : ", pk)
+
+	var testKeypair = signature.KeyringPair{
+		URI:       "0x922b17a2230ca612424c9dc3990eaffa42e26cf74d795966819b6d04c980e81c",
+		Address:   "5CCA4WGZYCjP5yAhdyz6XeTSan7u2bEhYsqegLdfSPMac53h",
+		PublicKey: pk,
+	}
+
+	// fmt.Println("BXL:  testKeypair.PublicKey : ", testKeypair.PublicKey)
+	// fmt.Println("BXL:  testKeypair.URI : ", testKeypair.URI)
+	// fmt.Println("BXL:  testKeypair.Address : ", testKeypair.Address)
+
+	key, err := types.CreateStorageKey(meta, "System", "Account", testKeypair.PublicKey, nil)
+	if err != nil {
+		panic(err)
+	}
+	// fmt.Println("BXL Example_makeASimpleTransferEd25519 key : ", key)
+
+	var accountInfo types.AccountInfo
+	ok, err = api.RPC.State.GetStorageLatest(key, &accountInfo)
+	if err != nil || !ok {
+		fmt.Println("BXL Example_makeASimpleTransferEd25519 GetStorageLatest err : ", err)
+		panic(err)
+	}
+	// fmt.Println("BXL Example_makeASimpleTransferEd25519 accountInfo : ", accountInfo)
+
+	nonce := uint32(accountInfo.Nonce)
+	o := types.SignatureOptions{
+		BlockHash:          genesisHash,
+		Era:                types.ExtrinsicEra{IsMortalEra: false},
+		GenesisHash:        genesisHash,
+		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+		SpecVersion:        rv.SpecVersion,
+		Tip:                types.NewUCompactFromUInt(0),
+		TransactionVersion: rv.TransactionVersion,
+	}
+
+	ext.SetSignScheme("Ed25519")
+	// fmt.Println("BXL Example_makeASimpleTransferEd25519 SetSignScheme :  IsEd25519	")
+
+	// Sign the transaction using Alice's default account
+	err = ext.Sign(testKeypair, o)
+	if err != nil {
+		panic(err)
+	}
+	// fmt.Println("BXL Example_makeASimpleTransferEd25519 ext : ", ext)
+
+	// Debug encoding
+	// enc, err := types.EncodeToHexString(ext)
+	// fmt.Println("BXL Example_makeASimpleTransferEd25519 enc : ", enc)
+	// if err != nil {
+	// fmt.Println("BXL Example_makeASimpleTransferEd25519 err : ", err)
+
+	// return types.Hash{}, err
+	// }
+
+	// Debug encoding
+	// enc, err := types.EncodeToHexString(ext)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println("BXL Example_makeASimpleTransferEd25519 enc : ", enc)
+
+	// Send the extrinsic
+	_, err = api.RPC.Author.SubmitExtrinsic(ext)
+	if err != nil {
+		fmt.Println("BXL Example_makeASimpleTransferEd25519 err : ", err)
+		panic(err)
+	}
+
+	fmt.Printf("Balance transferred from Account2 to Bob: %v\n", bal.String())
+	// Output: Balance transferred from Account2 to Bob: 50000000000000
+}
+
+// func Example_makeASimpleTransferEcdsa() {
+// 	// This sample shows how to create a transaction to make a transfer from one an account to another.
+// 	time.Sleep(8 * time.Second)
+
+// 	// Instantiate the API
+// 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	meta, err := api.RPC.State.GetMetadataLatest()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	// Create a call, transferring 12345 units to Bob
+// 	bob, err := types.NewMultiAddressFromHexAccountID("0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	// fmt.Println("BXL Example_makeASimpleTransferEcdsa bob : ", bob)
+
+// 	// 1 unit of transfer
+// 	bal, ok := new(big.Int).SetString("50000000000000", 10)
+// 	if !ok {
+// 		panic(fmt.Errorf("failed to convert balance"))
+// 	}
+// 	// fmt.Println("BXL Example_makeASimpleTransferEcdsa bal : ", bal)
+
+// 	c, err := types.NewCall(meta, "Balances.transfer", bob, types.NewUCompact(bal))
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	// Create the extrinsic
+// 	ext := types.NewExtrinsic(c)
+// 	// fmt.Println("BXL Example_makeASimpleTransferEcdsa ext : ", ext)
+
+// 	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	rv, err := api.RPC.State.GetRuntimeVersionLatest()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	// Ecdsa Account
+// 	// 	subkey generate --scheme Ecdsa --network polkadot
+// 	// 	Secret phrase `clerk april useful wish balcony narrow member planet later explain cake harvest` is account:
+// 	//   Secret seed:       0x954e40cec3ffbfe7f12e5552b9807a21100d5dc0e0e8b70320d588402159090c
+// 	//   Public key (hex):  0x02ef86282d5a0c79ecfabaae31612d1d07c69dc5fce5e02761931e7febdcd1f732
+// 	//   Public key (SS58): 1HzNpEUKiBZCAVAB3FZv12jJRk4zNvzBh5UoSSq7mbAE8yVu
+// 	//   Account ID:        0x51ecb60d234ce572341bdfb6720b453e67e7b7de155a8843c7078c52dd1cb311
+// 	//   SS58 Address:      12rRCQDcDP7YzxjirKEV8hbJu77PtgX16rBoBTYMbDcyoFxw
+
+// 	pk, err := hex.DecodeString("51ecb60d234ce572341bdfb6720b453e67e7b7de155a8843c7078c52dd1cb311")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	// fmt.Println("BXL Example_makeASimpleTransferEcdsa pk : ", pk)
+
+// 	var testKeypair = signature.KeyringPair{
+// 		URI:       "0x954e40cec3ffbfe7f12e5552b9807a21100d5dc0e0e8b70320d588402159090c",
+// 		Address:   "12rRCQDcDP7YzxjirKEV8hbJu77PtgX16rBoBTYMbDcyoFxw",
+// 		PublicKey: pk,
+// 	}
+
+// 	fmt.Println("BXL:  testKeypair.PublicKey : ", testKeypair.PublicKey)
+// 	fmt.Println("BXL:  testKeypair.URI : ", testKeypair.URI)
+// 	fmt.Println("BXL:  testKeypair.Address : ", testKeypair.Address)
+
+// 	key, err := types.CreateStorageKey(meta, "System", "Account", testKeypair.PublicKey, nil)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	fmt.Println("BXL Example_makeASimpleTransferEcdsa key : ", key.Hex())
+
+// 	var accountInfo types.AccountInfo
+// 	ok, err = api.RPC.State.GetStorageLatest(key, &accountInfo)
+// 	if err != nil || !ok {
+// 		fmt.Println("BXL Example_makeASimpleTransferEcdsa GetStorageLatest err : ", err)
+// 		panic(err)
+// 	}
+
+// 	fmt.Println("BXL Example_makeASimpleTransferEcdsa accountInfo: ", accountInfo)
+
+// 	fmt.Println("BXL Example_makeASimpleTransferEcdsa accountInfo.Data : ", accountInfo.Data)
+// 	fmt.Printf("BXL %#x has a balance of %v\n", key, accountInfo.Data.Free)
+
+// 	nonce := uint32(accountInfo.Nonce)
+// 	o := types.SignatureOptions{
+// 		BlockHash:          genesisHash,
+// 		Era:                types.ExtrinsicEra{IsMortalEra: false},
+// 		GenesisHash:        genesisHash,
+// 		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
+// 		SpecVersion:        rv.SpecVersion,
+// 		Tip:                types.NewUCompactFromUInt(0),
+// 		TransactionVersion: rv.TransactionVersion,
+// 	}
+
+// 	ext.SetSignScheme("Ecdsa")
+// 	// fmt.Println("BXL Example_makeASimpleTransferEcdsa SetSignScheme :  IsEd25519	")
+
+// 	fmt.Println("BXL Example_makeASimpleTransferEcdsa ext : ", ext)
+
+// 	// Sign the transaction using Alice's default account
+// 	err = ext.Sign(testKeypair, o)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	// fmt.Println("BXL Example_makeASimpleTransferEcdsa ext : ", ext)
+
+// 	// Debug encoding
+// 	enc, err := types.EncodeToHexString(ext)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	fmt.Println("BXL Example_makeASimpleTransferEcdsa enc : ", enc)
+
+// 	// Send the extrinsic
+// 	// _, err = api.RPC.Author.SubmitExtrinsic(ext)
+// 	// if err != nil {
+// 	// 	panic(err)
+// 	// }
+// 	// fmt.Println("BXL Example_makeASimpleTransferEd25519 result : ", result)
+
+// 	fmt.Printf("Balance transferred from Account2 to Bob: %v\n", bal.String())
+// 	// Output: Balance transferred from Account2 to Bob: 50000000000000
+// }
 
 func Example_displaySystemEvents() {
 	// Query the system events and extract information from them. This example runs until exited via Ctrl-C
