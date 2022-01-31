@@ -50,6 +50,7 @@ func NewRPC(cl client.Client) (*RPC, error) {
 	return &RPC{
 		Author:   author.NewAuthor(cl),
 		Chain:    chain.NewChain(cl),
+		MMR:      mmr.NewMMR(cl),
 		Offchain: offchain.NewOffchain(cl),
 		State:    st,
 		System:   system.NewSystem(cl),
