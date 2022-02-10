@@ -2,15 +2,27 @@ package types
 
 import "encoding/json"
 
-// GenerateMMRProofResponse contains the generate proof rpc response
-type GenerateMMRProofResponse struct {
+// GenerateMmrProofResponse contains the generate proof rpc response
+type GenerateMmrProofResponse struct {
 	BlockHash H256
-	Leaf      MMRLeaf
-	Proof     MMRProof
+	Leaf      MmrLeaf
+	Proof     MmrProof
+}
+
+// GenerateMmrProofResponse contains the generate batch proof rpc response
+type GenerateMmrBatchProofResponse struct {
+	BlockHash H256
+	Leaves    []LeafWithIndex
+	Proof     MmrProof
+}
+
+type LeafWithIndex struct {
+	Index U64
+	Leaf  MmrLeaf
 }
 
 // UnmarshalJSON fills u with the JSON encoded byte array given by b
-func (d *GenerateMMRProofResponse) UnmarshalJSON(bz []byte) error {
+func (d *GenerateMmrProofResponse) UnmarshalJSON(bz []byte) error {
 	var tmp struct {
 		BlockHash string `json:"blockHash"`
 		Leaf      string `json:"leaf"`
@@ -41,8 +53,8 @@ func (d *GenerateMMRProofResponse) UnmarshalJSON(bz []byte) error {
 
 type MMREncodableOpaqueLeaf Bytes
 
-// MMRProof is a MMR proof
-type MMRProof struct {
+// MmrProof is a MMR proof
+type MmrProof struct {
 	// The index of the leaf the proof is for.
 	LeafIndex U64
 	// Number of leaves in MMR, when the proof was generated.
@@ -51,7 +63,7 @@ type MMRProof struct {
 	Items []H256
 }
 
-type MMRLeaf struct {
+type MmrLeaf struct {
 	Version               MMRLeafVersion
 	ParentNumberAndHash   ParentNumberAndHash
 	BeefyNextAuthoritySet BeefyNextAuthoritySet
@@ -62,7 +74,7 @@ type MMRLeafVersion U8
 
 type ParentNumberAndHash struct {
 	ParentNumber U32
-	Hash         Hash
+	Hash         H256
 }
 
 type BeefyNextAuthoritySet struct {
