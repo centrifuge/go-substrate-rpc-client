@@ -9,7 +9,7 @@ type GenerateMmrProofResponse struct {
 	Proof     MmrProof
 }
 
-// GenerateMmrProofResponse contains the generate batch proof rpc response
+// GenerateMmrBatchProofResponse contains the generate batch proof rpc response
 type GenerateMmrBatchProofResponse struct {
 	BlockHash H256
 	Leaves    []LeafWithIndex
@@ -41,6 +41,36 @@ func (d *GenerateMmrProofResponse) UnmarshalJSON(bz []byte) error {
 		return err
 	}
 	err = DecodeFromBytes(encodedLeaf, &d.Leaf)
+	if err != nil {
+		return err
+	}
+	err = DecodeFromHexString(tmp.Proof, &d.Proof)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// UnmarshalJSON fills u with the JSON encoded byte array given by b
+func (d *GenerateMmrBatchProofResponse) UnmarshalJSON(bz []byte) error {
+	var tmp struct {
+		BlockHash string `json:"blockHash"`
+		Leaves    string `json:"leaves"`
+		Proof     string `json:"proof"`
+	}
+	if err := json.Unmarshal(bz, &tmp); err != nil {
+		return err
+	}
+	err := DecodeFromHexString(tmp.BlockHash, &d.BlockHash)
+	if err != nil {
+		return err
+	}
+	var encodedLeaf MMREncodableOpaqueLeaf
+	err = DecodeFromHexString(tmp.Leaves, &encodedLeaf)
+	if err != nil {
+		return err
+	}
+	err = DecodeFromBytes(encodedLeaf, &d.Leaves)
 	if err != nil {
 		return err
 	}
