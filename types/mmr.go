@@ -1,6 +1,8 @@
 package types
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 // GenerateMmrProofResponse contains the generate proof rpc response
 type GenerateMmrProofResponse struct {
@@ -13,12 +15,17 @@ type GenerateMmrProofResponse struct {
 type GenerateMmrBatchProofResponse struct {
 	BlockHash H256
 	Leaves    []LeafWithIndex
-	Proof     MmrProof
+	Proof     MmrBatchProof
 }
 
 type LeafWithIndex struct {
-	Index U64
 	Leaf  MmrLeaf
+	Index uint64
+}
+
+type OpaqueLeafWithIndex struct {
+	Leaf  []byte
+	Index uint64
 }
 
 // UnmarshalJSON fills u with the JSON encoded byte array given by b
@@ -65,14 +72,22 @@ func (d *GenerateMmrBatchProofResponse) UnmarshalJSON(bz []byte) error {
 	if err != nil {
 		return err
 	}
-	var encodedLeaf MMREncodableOpaqueLeaf
-	err = DecodeFromHexString(tmp.Leaves, &encodedLeaf)
+
+	var opaqueLeaves []OpaqueLeafWithIndex
+	err = DecodeFromHexString(tmp.Leaves, &opaqueLeaves)
 	if err != nil {
 		return err
 	}
-	err = DecodeFromBytes(encodedLeaf, &d.Leaves)
-	if err != nil {
-		return err
+	for _, leaf := range opaqueLeaves {
+		var mmrLeaf MmrLeaf
+		err := DecodeFromBytes(leaf.Leaf, &mmrLeaf)
+		if err != nil {
+			return err
+		}
+		d.Leaves = append(d.Leaves, LeafWithIndex{
+			Leaf:  mmrLeaf,
+			Index: leaf.Index,
+		})
 	}
 	err = DecodeFromHexString(tmp.Proof, &d.Proof)
 	if err != nil {
@@ -81,7 +96,7 @@ func (d *GenerateMmrBatchProofResponse) UnmarshalJSON(bz []byte) error {
 	return nil
 }
 
-type MMREncodableOpaqueLeaf Bytes
+type MMREncodableOpaqueLeaf []byte
 
 // MmrProof is a MMR proof
 type MmrProof struct {
@@ -93,25 +108,35 @@ type MmrProof struct {
 	Items []H256
 }
 
+// MmrProof is a MMR proof
+type MmrBatchProof struct {
+	// The index of the leaf the proof is for.
+	LeafIndex []U64
+	// Number of leaves in MMR, when the proof was generated.
+	LeafCount U64
+	// Proof elements (hashes of siblings of inner nodes on the path to the leaf).
+	Items []H256
+}
+
 type MmrLeaf struct {
-	Version               MMRLeafVersion
+	Version               uint8
 	ParentNumberAndHash   ParentNumberAndHash
 	BeefyNextAuthoritySet BeefyNextAuthoritySet
-	ParachainHeads        H256
+	ParachainHeads        [32]byte
 }
 
 type MMRLeafVersion U8
 
 type ParentNumberAndHash struct {
-	ParentNumber U32
-	Hash         H256
+	ParentNumber uint32
+	Hash         [32]byte
 }
 
 type BeefyNextAuthoritySet struct {
 	// ID
-	ID U64
+	ID uint64
 	// Number of validators in the set.
-	Len U32
+	Len uint32
 	// Merkle Root Hash build from BEEFY uncompressed AuthorityIds.
-	Root H256
+	Root [32]byte
 }
