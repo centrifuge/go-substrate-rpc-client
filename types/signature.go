@@ -32,3 +32,18 @@ func NewSignature(b []byte) Signature {
 func (h Signature) Hex() string {
 	return fmt.Sprintf("%#x", h[:])
 }
+
+// EcdsaSignature is a 65 byte array
+type EcdsaSignature [65]byte
+
+// NewEcdsaSignature creates a new EcdsaSignature type
+func NewEcdsaSignature(b []byte) EcdsaSignature {
+	h := EcdsaSignature{}
+	copy(h[:], b)
+	return h
+}
+
+// Hex returns a hex string representation of the value (not of the encoded value)
+func (eh EcdsaSignature) Hex() string {
+	return fmt.Sprintf("%#x", eh[:])
+}
