@@ -35,6 +35,8 @@ type Client interface {
 		*gethrpc.ClientSubscription, error)
 
 	URL() string
+
+	Close()
 }
 
 type client struct {
@@ -46,6 +48,11 @@ type client struct {
 // URL returns the URL the client connects to
 func (c client) URL() string {
 	return c.url
+}
+
+// Close closes the connection
+func (c client) Close() {
+	c.Client.Close()
 }
 
 // Connect connects to the provided url
