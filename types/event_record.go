@@ -76,7 +76,7 @@ type EventRecords struct {
 	Balances_Slashed             []EventBalancesSlashed            //nolint:stylecheck,golint
 	Balances_Transfer            []EventBalancesTransfer           //nolint:stylecheck,golint
 	Balances_Unreserved          []EventBalancesUnreserved         //nolint:stylecheck,golint
-	Balances_Withdrawn           []EventBalancesWithdraw           //nolint:stylecheck,golint
+	Balances_Withdraw            []EventBalancesWithdraw           //nolint:stylecheck,golint
 	// Finish Bounties
 	Treasury_BountyProposed     []EventTreasuryBountyProposed     //nolint:stylecheck,golint
 	Treasury_BountyRejected     []EventTreasuryBountyRejected     //nolint:stylecheck,golint
