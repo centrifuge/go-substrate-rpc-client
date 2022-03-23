@@ -159,7 +159,10 @@ type EventRecords struct {
 	// Add ParaInclusion
 	// Add Paras
 	// Add ParasDisputes
-	// Add Preimage
+	// Add ParachainSystem
+	Preimage_Cleared           []EventPreimageCleared          //nolint:stylecheck,golint
+	Preimage_Noted             []EventPreimageNoted            //nolint:stylecheck,golint
+	Preimage_Requested         []EventPreimageRequested        //nolint:stylecheck,golint
 	Proxy_Announced            []EventProxyAnnounced           //nolint:stylecheck,golint
 	Proxy_AnonymousCreated     []EventProxyAnonymousCreated    //nolint:stylecheck,golint
 	Proxy_Added                []EventProxyAdded               //nolint:stylecheck,golint
@@ -235,14 +238,35 @@ type EventRecords struct {
 	Tips_TipRetracted                  []EventTipsTipRetracted                  //nolint:stylecheck,golint
 	Tips_TipSlashed                    []EventTipsTipSlashed                    //nolint:stylecheck,golint
 	// Add Transaction Storage
-	Treasury_Awarded  []EventTreasuryAwarded  //nolint:stylecheck,golint
-	Treasury_Burnt    []EventTreasuryBurnt    //nolint:stylecheck,golint
-	Treasury_Deposit  []EventTreasuryDeposit  //nolint:stylecheck,golint
-	Treasury_Proposed []EventTreasuryProposed //nolint:stylecheck,golint
-	Treasury_Rejected []EventTreasuryRejected //nolint:stylecheck,golint
-	Treasury_Rollover []EventTreasuryRollover //nolint:stylecheck,golint
-	Treasury_Spending []EventTreasurySpending //nolint:stylecheck,golint
-	// Add Uniques
+	Treasury_Awarded             []EventTreasuryAwarded             //nolint:stylecheck,golint
+	Treasury_Burnt               []EventTreasuryBurnt               //nolint:stylecheck,golint
+	Treasury_Deposit             []EventTreasuryDeposit             //nolint:stylecheck,golint
+	Treasury_Proposed            []EventTreasuryProposed            //nolint:stylecheck,golint
+	Treasury_Rejected            []EventTreasuryRejected            //nolint:stylecheck,golint
+	Treasury_Rollover            []EventTreasuryRollover            //nolint:stylecheck,golint
+	Treasury_Spending            []EventTreasurySpending            //nolint:stylecheck,golint
+	Uniques_ApprovalCancelled    []EventUniquesApprovalCancelled    //nolint:stylecheck,golint
+	Uniques_ApprovedTransfer     []EventUniquesApprovedTransfer     //nolint:stylecheck,golint
+	Uniques_AssetStatusChanged   []EventUniquesAssetStatusChanged   //nolint:stylecheck,golint
+	Uniques_AttributeCleared     []EventUniquesAttributeCleared     //nolint:stylecheck,golint
+	Uniques_AttributeSet         []EventUniquesAttributeSet         //nolint:stylecheck,golint
+	Uniques_Burned               []EventUniquesBurned               //nolint:stylecheck,golint
+	Uniques_ClassFrozen          []EventUniquesClassFrozen          //nolint:stylecheck,golint
+	Uniques_ClassMetadataCleared []EventUniquesClassMetadataCleared //nolint:stylecheck,golint
+	Uniques_ClassMetadataSet     []EventUniquesClassMetadataSet     //nolint:stylecheck,golint
+	Uniques_ClassThawed          []EventUniquesClassThawed          //nolint:stylecheck,golint
+	Uniques_Created              []EventUniquesCreated              //nolint:stylecheck,golint
+	Uniques_Destroyed            []EventUniquesDestroyed            //nolint:stylecheck,golint
+	Uniques_ForceCreated         []EventUniquesForceCreated         //nolint:stylecheck,golint
+	Uniques_Frozen               []EventUniquesFrozen               //nolint:stylecheck,golint
+	Uniques_Issued               []EventUniquesIssued               //nolint:stylecheck,golint
+	Uniques_MetadataCleared      []EventUniquesMetadataCleared      //nolint:stylecheck,golint
+	Uniques_MetadataSet          []EventUniquesMetadataSet          //nolint:stylecheck,golint
+	Uniques_OwnerChanged         []EventUniquesOwnerChanged         //nolint:stylecheck,golint
+	Uniques_Redeposited          []EventUniquesRedeposited          //nolint:stylecheck,golint
+	Uniques_TeamChanged          []EventUniquesTeamChanged          //nolint:stylecheck,golint
+	Uniques_Thawed               []EventUniquesThawed               //nolint:stylecheck,golint
+	Uniques_Transferred          []EventUniquesTransferred          //nolint:stylecheck,golint
 	// Add UMP
 	Utility_BatchCompleted   []EventUtilityBatchCompleted   //nolint:stylecheck,golint
 	Utility_BatchInterrupted []EventUtilityBatchInterrupted //nolint:stylecheck,golint

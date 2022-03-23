@@ -18,6 +18,7 @@ package types
 
 import (
 	"fmt"
+
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 )
 
@@ -949,7 +950,8 @@ type EventElectionsRenounced struct {
 	Topics []Hash
 }
 
-// EventElectionsSeatHolderSlashed is emitted when a seat holder was slashed by amount by being forcefully removed from the set
+// EventElectionsSeatHolderSlashed is emitted when a seat holder was slashed by amount
+// by being forcefully removed from the set
 type EventElectionsSeatHolderSlashed struct {
 	Phase   Phase
 	Who     AccountID
@@ -1276,12 +1278,34 @@ func (sle SchedulerLookupError) Encode(encoder scale.Encoder) error {
 	return encoder.PushByte(byte(sle))
 }
 
-// EventSchedulerCallLookupFailed is emitted when the call for the provided hash was not found so the task has been aborted.
+// EventSchedulerCallLookupFailed is emitted when the call for the provided hash was not found
+// so the task has been aborted.
 type EventSchedulerCallLookupFailed struct {
 	Phase  Phase
 	Task   TaskAddress
 	ID     OptionBytes
 	Error  SchedulerLookupError
+	Topics []Hash
+}
+
+// EventPreimageCleared is emitted when a preimage has been cleared
+type EventPreimageCleared struct {
+	Phase  Phase
+	Hash   Hash
+	Topics []Hash
+}
+
+// EventPreimageNoted is emitted when a preimage has been noted
+type EventPreimageNoted struct {
+	Phase  Phase
+	Hash   Hash
+	Topics []Hash
+}
+
+// EventPreimageRequested is emitted when a preimage has been requested
+type EventPreimageRequested struct {
+	Phase  Phase
+	Hash   Hash
 	Topics []Hash
 }
 
@@ -1514,6 +1538,196 @@ type EventTreasuryBountyExtended struct {
 	Topics []Hash
 }
 
+// EventUniquesApprovalCancelled is emitted when an approval for a delegate account to transfer the instance of
+// an asset class was cancelled by its owner
+type EventUniquesApprovalCancelled struct {
+	Phase    Phase
+	Class    U64
+	Instance U128
+	Owner    AccountID
+	Delegate AccountID
+	Topics   []Hash
+}
+
+// EventUniquesApprovedTransfer is emitted when an `instance` of an asset `class` has been approved by the `owner`
+// for transfer by a `delegate`.
+type EventUniquesApprovedTransfer struct {
+	Phase    Phase
+	Class    U64
+	Instance U128
+	Owner    AccountID
+	Delegate AccountID
+	Topics   []Hash
+}
+
+// EventUniquesAssetStatusChanged is emitted when an asset `class` has had its attributes changed by the `Force` origin
+type EventUniquesAssetStatusChanged struct {
+	Phase  Phase
+	Class  U64
+	Topics []Hash
+}
+
+// EventUniquesAttributeCleared is emitted when an attribute metadata has been cleared for an asset class or instance
+type EventUniquesAttributeCleared struct {
+	Phase         Phase
+	Class         U64
+	MaybeInstance OptionU128
+	Key           Bytes
+	Topics        []Hash
+}
+
+// EventUniquesAttributeSet is emitted when a new attribute metadata has been set for an asset class or instance
+type EventUniquesAttributeSet struct {
+	Phase         Phase
+	Class         U64
+	MaybeInstance OptionU128
+	Key           Bytes
+	Value         Bytes
+	Topics        []Hash
+}
+
+// EventUniquesBurned is emitted when an asset `instance` was destroyed
+type EventUniquesBurned struct {
+	Phase    Phase
+	Class    U64
+	Instance U128
+	Owner    AccountID
+	Topics   []Hash
+}
+
+// EventUniquesClassFrozen is emitted when some asset `class` was frozen
+type EventUniquesClassFrozen struct {
+	Phase  Phase
+	Class  U64
+	Topics []Hash
+}
+
+// EventUniquesClassMetadataCleared is emitted when metadata has been cleared for an asset class
+type EventUniquesClassMetadataCleared struct {
+	Phase  Phase
+	Class  U64
+	Topics []Hash
+}
+
+// EventUniquesClassMetadataSet is emitted when new metadata has been set for an asset class
+type EventUniquesClassMetadataSet struct {
+	Phase    Phase
+	Class    U64
+	Data     Bytes
+	IsFrozen Bool
+	Topics   []Hash
+}
+
+// EventUniquesClassThawed is emitted when some asset `class` was thawed
+type EventUniquesClassThawed struct {
+	Phase  Phase
+	Class  U64
+	Topics []Hash
+}
+
+// EventUniquesCreated is emitted when an asset class was created
+type EventUniquesCreated struct {
+	Phase   Phase
+	Class   U64
+	Creator AccountID
+	Owner   AccountID
+	Topics  []Hash
+}
+
+// EventUniquesDestroyed is emitted when an asset `class` was destroyed
+type EventUniquesDestroyed struct {
+	Phase  Phase
+	Class  U64
+	Topics []Hash
+}
+
+// EventUniquesForceCreated is emitted when an asset class was force-created
+type EventUniquesForceCreated struct {
+	Phase  Phase
+	Class  U64
+	Owner  AccountID
+	Topics []Hash
+}
+
+// EventUniquesFrozen is emitted when some asset `instance` was frozen
+type EventUniquesFrozen struct {
+	Phase    Phase
+	Class    U64
+	Instance U128
+	Topics   []Hash
+}
+
+// EventUniquesIssued is emitted when an asset instance was issued
+type EventUniquesIssued struct {
+	Phase    Phase
+	Class    U64
+	Instance U128
+	Owner    AccountID
+	Topics   []Hash
+}
+
+// EventUniquesMetadataCleared is emitted when metadata has been cleared for an asset instance
+type EventUniquesMetadataCleared struct {
+	Phase    Phase
+	Class    U64
+	Instance U128
+	Topics   []Hash
+}
+
+// EventUniquesMetadataSet is emitted when metadata has been set for an asset instance
+type EventUniquesMetadataSet struct {
+	Phase    Phase
+	Class    U64
+	Instance U128
+	Data     Bytes
+	IsFrozen Bool
+	Topics   []Hash
+}
+
+// EventUniquesOwnerChanged is emitted when the owner changed
+type EventUniquesOwnerChanged struct {
+	Phase    Phase
+	Class    U64
+	NewOwner AccountID
+	Topics   []Hash
+}
+
+// EventUniquesRedeposited is emitted when metadata has been cleared for an asset instance
+type EventUniquesRedeposited struct {
+	Phase               Phase
+	Class               U64
+	SuccessfulInstances []U128
+	Topics              []Hash
+}
+
+// EventUniquesTeamChanged is emitted when the management team changed
+type EventUniquesTeamChanged struct {
+	Phase   Phase
+	Class   U64
+	Issuer  AccountID
+	Admin   AccountID
+	Freezer AccountID
+	Topics  []Hash
+}
+
+// EventUniquesThawed is emitted when some asset instance was thawed
+type EventUniquesThawed struct {
+	Phase    Phase
+	Class    U64
+	Instance U128
+	Topics   []Hash
+}
+
+// EventUniquesTransferred is emitted when some asset instance was transferred
+type EventUniquesTransferred struct {
+	Phase    Phase
+	Class    U64
+	Instance U128
+	From     AccountID
+	To       AccountID
+	Topics   []Hash
+}
+
 // EventContractsInstantiated is emitted when a contract is deployed by address at the specified address
 type EventContractsInstantiated struct {
 	Phase    Phase
@@ -1523,7 +1737,7 @@ type EventContractsInstantiated struct {
 }
 
 // EventContractsTerminated The only way for a contract to be removed and emitting this event is by calling
-//`seal_terminate`
+// `seal_terminate`
 type EventContractsTerminated struct {
 	Phase       Phase
 	Contract    AccountID
