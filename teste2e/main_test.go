@@ -36,6 +36,7 @@ func TestMain(m *testing.M) {
 	localApi, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
 	subscriptionsAPI = localApi
 	assert.NoError(&testing.T{}, err)
+	//m.Run()
 }
 
 func TestEnd2end(t *testing.T) {

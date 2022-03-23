@@ -31,6 +31,7 @@ test-cover: 			## run all tests in project against the RPC URL specified in the 
 
 test-dockerized:		## run all tests in a docker container against the Substrate Default Docker image
 test-dockerized: run-substrate-docker
+	@sleep 15
 	@docker-compose build; docker-compose up --abort-on-container-exit gsrpc-test
 
 run-substrate-docker: 		## starts the Substrate Docker image

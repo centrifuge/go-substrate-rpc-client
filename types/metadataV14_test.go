@@ -50,7 +50,7 @@ func TestMetadataV14FindCallIndex(t *testing.T) {
 	assert.NoError(t, err)
 	index, err := meta.FindCallIndex("Balances.transfer")
 	assert.NoError(t, err)
-	assert.Equal(t, index, CallIndex{SectionIndex: 5, MethodIndex: 0})
+	assert.Equal(t, index, CallIndex{SectionIndex: 6, MethodIndex: 0})
 }
 
 // Verify that we get an error when querying for an invalid
@@ -69,7 +69,7 @@ func TestMetadataV14FindEventNamesForEventID(t *testing.T) {
 	err := DecodeFromHexString(MetadataV14Data, &meta)
 	assert.NoError(t, err)
 
-	modName, varName, err := meta.FindEventNamesForEventID(EventID{5, 2})
+	modName, varName, err := meta.FindEventNamesForEventID(EventID{6, 2})
 	assert.NoError(t, err)
 	assert.Equal(t, modName, NewText("Balances"))
 	assert.Equal(t, varName, NewText("Transfer"))
