@@ -1762,6 +1762,37 @@ type EventContractsContractCodeUpdated struct {
 	Topics      []Hash
 }
 
+type EventCollatorSelectionNewInvulnerables struct {
+	Phase            Phase
+	NewInvulnerables []AccountID
+	Topics           []Hash
+}
+
+type EventCollatorSelectionNewDesiredCandidates struct {
+	Phase                Phase
+	NewDesiredCandidates U32
+	Topics               []Hash
+}
+
+type EventCollatorSelectionNewCandidacyBond struct {
+	Phase            Phase
+	NewCandidacyBond U128
+	Topics           []Hash
+}
+
+type EventCollatorSelectionCandidateAdded struct {
+	Phase          Phase
+	CandidateAdded AccountID
+	Bond           U128
+	Topics         []Hash
+}
+
+type EventCollatorSelectionCandidateRemoved struct {
+	Phase            Phase
+	CandidateRemoved AccountID
+	Topics           []Hash
+}
+
 // EventContractsCodeRemoved is emitted when code with the specified hash was removed
 type EventContractsCodeRemoved struct {
 	Phase    Phase

@@ -86,13 +86,18 @@ type EventRecords struct {
 	Treasury_BountyCanceled     []EventTreasuryBountyCanceled     //nolint:stylecheck,golint
 	Treasury_BountyExtended     []EventTreasuryBountyExtended     //nolint:stylecheck,golint
 	// Add ChildBounties
-	Claims_Claimed                []EventClaimsClaimed                //nolint:stylecheck,golint
-	Contracts_CodeRemoved         []EventContractsCodeRemoved         //nolint:stylecheck,golint
-	Contracts_CodeStored          []EventContractsCodeStored          //nolint:stylecheck,golint
-	Contracts_ContractCodeUpdated []EventContractsContractCodeUpdated //nolint:stylecheck,golint
-	Contracts_ContractEmitted     []EventContractsContractEmitted     //nolint:stylecheck,golint
-	Contracts_Instantiated        []EventContractsInstantiated        //nolint:stylecheck,golint
-	Contracts_Terminated          []EventContractsTerminated          //nolint:stylecheck,golint
+	Claims_Claimed                         []EventClaimsClaimed                         //nolint:stylecheck,golint
+	CollatorSelection_NewInvulnerables     []EventCollatorSelectionNewInvulnerables     //nolint:stylecheck,golint
+	CollatorSelection_NewDesiredCandidates []EventCollatorSelectionNewDesiredCandidates //nolint:stylecheck,golint
+	CollatorSelection_NewCandidacyBond     []EventCollatorSelectionNewCandidacyBond     //nolint:stylecheck,golint
+	CollatorSelection_CandidateAdded       []EventCollatorSelectionCandidateAdded       //nolint:stylecheck,golint
+	CollatorSelection_CandidateRemoved     []EventCollatorSelectionCandidateRemoved     //nolint:stylecheck,golint
+	Contracts_CodeRemoved                  []EventContractsCodeRemoved                  //nolint:stylecheck,golint
+	Contracts_CodeStored                   []EventContractsCodeStored                   //nolint:stylecheck,golint
+	Contracts_ContractCodeUpdated          []EventContractsContractCodeUpdated          //nolint:stylecheck,golint
+	Contracts_ContractEmitted              []EventContractsContractEmitted              //nolint:stylecheck,golint
+	Contracts_Instantiated                 []EventContractsInstantiated                 //nolint:stylecheck,golint
+	Contracts_Terminated                   []EventContractsTerminated                   //nolint:stylecheck,golint
 	// Add Conviction voting
 	Council_Approved       []EventCollectiveApproved       //nolint:stylecheck,golint
 	Council_Closed         []EventCollectiveClosed         //nolint:stylecheck,golint
