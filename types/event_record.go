@@ -61,12 +61,12 @@ func (e *EventRecordsRaw) Decode(decoder scale.Decoder) error {
 // https://github.com/polkadot-js/api/blob/master/packages/api-augment/src/substrate/events.ts
 // https://github.com/polkadot-js/api/blob/master/packages/api-augment/src/polkadot/events.ts
 type EventRecords struct {
-	// Add Auctions
+	// TODO: Add Auctions
 	Assets_Issued      []EventAssetIssued      //nolint:stylecheck,golint
 	Assets_Transferred []EventAssetTransferred //nolint:stylecheck,golint
 	Assets_Destroyed   []EventAssetDestroyed   //nolint:stylecheck,golint
-	// Finish Assets
-	// Add BagsList
+	// TODO: Finish Assets
+	// TODO: Add BagsList
 	Balances_BalanceSet          []EventBalancesBalanceSet         //nolint:stylecheck,golint
 	Balances_Deposit             []EventBalancesDeposit            //nolint:stylecheck,golint
 	Balances_DustLost            []EventBalancesDustLost           //nolint:stylecheck,golint
@@ -77,7 +77,7 @@ type EventRecords struct {
 	Balances_Transfer            []EventBalancesTransfer           //nolint:stylecheck,golint
 	Balances_Unreserved          []EventBalancesUnreserved         //nolint:stylecheck,golint
 	Balances_Withdraw            []EventBalancesWithdraw           //nolint:stylecheck,golint
-	// Finish Bounties
+	// TODO: Finish Bounties
 	Treasury_BountyProposed     []EventTreasuryBountyProposed     //nolint:stylecheck,golint
 	Treasury_BountyRejected     []EventTreasuryBountyRejected     //nolint:stylecheck,golint
 	Treasury_BountyBecameActive []EventTreasuryBountyBecameActive //nolint:stylecheck,golint
@@ -85,7 +85,7 @@ type EventRecords struct {
 	Treasury_BountyClaimed      []EventTreasuryBountyClaimed      //nolint:stylecheck,golint
 	Treasury_BountyCanceled     []EventTreasuryBountyCanceled     //nolint:stylecheck,golint
 	Treasury_BountyExtended     []EventTreasuryBountyExtended     //nolint:stylecheck,golint
-	// Add ChildBounties
+	// TODO: Add ChildBounties
 	Claims_Claimed                         []EventClaimsClaimed                         //nolint:stylecheck,golint
 	CollatorSelection_NewInvulnerables     []EventCollatorSelectionNewInvulnerables     //nolint:stylecheck,golint
 	CollatorSelection_NewDesiredCandidates []EventCollatorSelectionNewDesiredCandidates //nolint:stylecheck,golint
@@ -98,7 +98,7 @@ type EventRecords struct {
 	Contracts_ContractEmitted              []EventContractsContractEmitted              //nolint:stylecheck,golint
 	Contracts_Instantiated                 []EventContractsInstantiated                 //nolint:stylecheck,golint
 	Contracts_Terminated                   []EventContractsTerminated                   //nolint:stylecheck,golint
-	// Add Conviction voting
+	// TODO: Add Conviction voting
 	Council_Approved       []EventCollectiveApproved       //nolint:stylecheck,golint
 	Council_Closed         []EventCollectiveClosed         //nolint:stylecheck,golint
 	Council_Disapproved    []EventCollectiveDisapproved    //nolint:stylecheck,golint
@@ -106,7 +106,7 @@ type EventRecords struct {
 	Council_MemberExecuted []EventCollectiveMemberExecuted //nolint:stylecheck,golint
 	Council_Proposed       []EventCollectiveProposed       //nolint:stylecheck,golint
 	Council_Voted          []EventCollectiveVoted          //nolint:stylecheck,golint
-	// Add Crowdloan
+	// TODO: Add Crowdloan
 	Democracy_Blacklisted     []EventDemocracyBlacklisted     //nolint:stylecheck,golint
 	Democracy_Cancelled       []EventDemocracyCancelled       //nolint:stylecheck,golint
 	Democracy_Delegated       []EventDemocracyDelegated       //nolint:stylecheck,golint
@@ -126,7 +126,7 @@ type EventRecords struct {
 	Democracy_Undelegated     []EventDemocracyUndelegated     //nolint:stylecheck,golint
 	Democracy_Vetoed          []EventDemocracyVetoed          //nolint:stylecheck,golint
 	Democracy_Voted           []EventDemocracyVoted           //nolint:stylecheck,golint
-	// Add ElectionProviderMultiPhase
+	// TODO: Add ElectionProviderMultiPhase
 	Elections_CandidateSlashed  []EventElectionsCandidateSlashed  //nolint:stylecheck,golint
 	Elections_ElectionError     []EventElectionsElectionError     //nolint:stylecheck,golint
 	Elections_EmptyTerm         []EventElectionsEmptyTerm         //nolint:stylecheck,golint
@@ -134,11 +134,11 @@ type EventRecords struct {
 	Elections_NewTerm           []EventElectionsNewTerm           //nolint:stylecheck,golint
 	Elections_Renounced         []EventElectionsRenounced         //nolint:stylecheck,golint
 	Elections_SeatHolderSlashed []EventElectionsSeatHolderSlashed //nolint:stylecheck,golint
-	// Add Guilt
+	// TODO: Add Guilt
 	Grandpa_NewAuthorities []EventGrandpaNewAuthorities //nolint:stylecheck,golint
 	Grandpa_Paused         []EventGrandpaPaused         //nolint:stylecheck,golint
 	Grandpa_Resumed        []EventGrandpaResumed        //nolint:stylecheck,golint
-	// Add HRMP
+	// TODO: Add HRMP
 	Identity_IdentityCleared      []EventIdentityCleared              //nolint:stylecheck,golint
 	Identity_IdentityKilled       []EventIdentityKilled               //nolint:stylecheck,golint
 	Identity_IdentitySet          []EventIdentitySet                  //nolint:stylecheck,golint
@@ -155,16 +155,16 @@ type EventRecords struct {
 	Indices_IndexAssigned         []EventIndicesIndexAssigned         //nolint:stylecheck,golint
 	Indices_IndexFreed            []EventIndicesIndexFreed            //nolint:stylecheck,golint
 	Indices_IndexFrozen           []EventIndicesIndexFrozen           //nolint:stylecheck,golint
-	// Add Lottery
+	// TODO: Add Lottery
 	Multisig_MultisigApproval  []EventMultisigApproval    //nolint:stylecheck,golint
 	Multisig_MultisigCancelled []EventMultisigCancelled   //nolint:stylecheck,golint
 	Multisig_MultisigExecuted  []EventMultisigExecuted    //nolint:stylecheck,golint
 	Multisig_NewMultisig       []EventMultisigNewMultisig //nolint:stylecheck,golint
 	Offences_Offence           []EventOffencesOffence     //nolint:stylecheck,golint
-	// Add ParaInclusion
-	// Add Paras
-	// Add ParasDisputes
-	// Add ParachainSystem
+	// TODO: Add ParaInclusion
+	// TODO: Add Paras
+	// TODO: Add ParasDisputes
+	// TODO: Add ParachainSystem
 	Preimage_Cleared           []EventPreimageCleared          //nolint:stylecheck,golint
 	Preimage_Noted             []EventPreimageNoted            //nolint:stylecheck,golint
 	Preimage_Requested         []EventPreimageRequested        //nolint:stylecheck,golint
@@ -178,14 +178,14 @@ type EventRecords struct {
 	Recovery_RecoveryInitiated []EventRecoveryInitiated        //nolint:stylecheck,golint
 	Recovery_RecoveryRemoved   []EventRecoveryRemoved          //nolint:stylecheck,golint
 	Recovery_RecoveryVouched   []EventRecoveryVouched          //nolint:stylecheck,golint
-	// Add Registrar
-	// Add Referenda
+	// TODO: Add Registrar
+	// TODO: Add Referenda
 	Scheduler_CallLookupFailed []EventSchedulerCallLookupFailed //nolint:stylecheck,golint
 	Scheduler_Canceled         []EventSchedulerCanceled         //nolint:stylecheck,golint
 	Scheduler_Dispatched       []EventSchedulerDispatched       //nolint:stylecheck,golint
 	Scheduler_Scheduled        []EventSchedulerScheduled        //nolint:stylecheck,golint
 	Session_NewSession         []EventSessionNewSession         //nolint:stylecheck,golint
-	// Add Slots
+	// TODO: Add Slots
 	Society_AutoUnbid                  []EventSocietyAutoUnbid                  //nolint:stylecheck,golint
 	Society_Bid                        []EventSocietyBid                        //nolint:stylecheck,golint
 	Society_CandidateSuspended         []EventSocietyCandidateSuspended         //nolint:stylecheck,golint
@@ -214,7 +214,7 @@ type EventRecords struct {
 	Staking_StakingElectionFailed      []EventStakingStakingElectionFailed      //nolint:stylecheck,golint
 	Staking_Unbonded                   []EventStakingUnbonded                   //nolint:stylecheck,golint
 	Staking_Withdrawn                  []EventStakingWithdrawn                  //nolint:stylecheck,golint
-	// Add StateTrieMigration
+	// TODO: Add StateTrieMigration
 	Sudo_KeyChanged                    []EventSudoKeyChanged                    //nolint:stylecheck,golint
 	Sudo_Sudid                         []EventSudoSudid                         //nolint:stylecheck,golint
 	Sudo_SudoAsDone                    []EventSudoAsDone                        //nolint:stylecheck,golint
@@ -242,7 +242,7 @@ type EventRecords struct {
 	Tips_TipClosing                    []EventTipsTipClosing                    //nolint:stylecheck,golint
 	Tips_TipRetracted                  []EventTipsTipRetracted                  //nolint:stylecheck,golint
 	Tips_TipSlashed                    []EventTipsTipSlashed                    //nolint:stylecheck,golint
-	// Add Transaction Storage
+	// TODO: Add Transaction Storage
 	Treasury_Awarded             []EventTreasuryAwarded             //nolint:stylecheck,golint
 	Treasury_Burnt               []EventTreasuryBurnt               //nolint:stylecheck,golint
 	Treasury_Deposit             []EventTreasuryDeposit             //nolint:stylecheck,golint
@@ -272,15 +272,15 @@ type EventRecords struct {
 	Uniques_TeamChanged          []EventUniquesTeamChanged          //nolint:stylecheck,golint
 	Uniques_Thawed               []EventUniquesThawed               //nolint:stylecheck,golint
 	Uniques_Transferred          []EventUniquesTransferred          //nolint:stylecheck,golint
-	// Add UMP
+	// TODO: Add UMP
 	Utility_BatchCompleted   []EventUtilityBatchCompleted   //nolint:stylecheck,golint
 	Utility_BatchInterrupted []EventUtilityBatchInterrupted //nolint:stylecheck,golint
 	Utility_DispatchedAs     []EventUtilityBatchInterrupted //nolint:stylecheck,golint
 	Utility_ItemCompleted    []EventUtilityItemCompleted    //nolint:stylecheck,golint
 	Vesting_VestingCompleted []EventVestingVestingCompleted //nolint:stylecheck,golint
 	Vesting_VestingUpdated   []EventVestingVestingUpdated   //nolint:stylecheck,golint
-	// Add Whitelist
-	// Add XCMPallet
+	// TODO: Add Whitelist
+	// TODO: Add XCMPallet
 }
 
 // DecodeEventRecords decodes the events records from an EventRecordRaw into a target t using the given Metadata m
