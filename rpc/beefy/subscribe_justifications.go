@@ -62,13 +62,14 @@ func (s *JustificationsSubscription) Unsubscribe() {
 
 // SubscribeJustifications subscribes beefy justifications, returning a subscription that will
 // receive server notifications containing the Header.
-func (c *Beefy) SubscribeJustifications() (*JustificationsSubscription, error) {
+func (b *Beefy) SubscribeJustifications() (*JustificationsSubscription, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
 	defer cancel()
 
 	ch := make(chan types.SignedCommitment)
 
-	sub, err := c.client.Subscribe(ctx, "beefy", "subscribeJustifications", "unsubscribeJustifications", "justifications", ch)
+	sub, err := b.client.Subscribe(ctx, "beefy", "subscribeJustifications", "unsubscribeJustifications",
+		"justifications", ch)
 	if err != nil {
 		return nil, err
 	}
