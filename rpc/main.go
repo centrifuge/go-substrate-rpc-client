@@ -19,7 +19,9 @@ package rpc
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/author"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/beefy"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/chain"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/mmr"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/offchain"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/state"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/system"
@@ -28,7 +30,9 @@ import (
 
 type RPC struct {
 	Author   *author.Author
+	Beefy    *beefy.Beefy
 	Chain    *chain.Chain
+	MMR      *mmr.MMR
 	Offchain *offchain.Offchain
 	State    *state.State
 	System   *system.System
@@ -47,7 +51,9 @@ func NewRPC(cl client.Client) (*RPC, error) {
 
 	return &RPC{
 		Author:   author.NewAuthor(cl),
+		Beefy:    beefy.NewBeefy(cl),
 		Chain:    chain.NewChain(cl),
+		MMR:      mmr.NewMMR(cl),
 		Offchain: offchain.NewOffchain(cl),
 		State:    st,
 		System:   system.NewSystem(cl),
