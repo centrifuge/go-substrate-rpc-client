@@ -23,6 +23,7 @@ import (
 )
 
 func TestBeefy_GetFinalizedHead(t *testing.T) {
+	t.Skip("API only available in Polkadot")
 	_, err := beefy.GetFinalizedHead()
 	assert.NoError(t, err)
 }
