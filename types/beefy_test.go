@@ -1,7 +1,6 @@
 package types_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -141,44 +140,4 @@ func TestSignedCommitment_EncodeDecode(t *testing.T) {
 	}
 
 	assertRoundtrip(t, s)
-}
-
-func TestOptionBeefySignature_Marshal(t *testing.T) {
-	actual, err := json.Marshal(types.NewOptionBeefySignature(sig1))
-	assert.NoError(t, err)
-	expected , err := json.Marshal(sig1)
-	assert.NoError(t, err)
-	assert.Equal(t, actual, expected)
-
-	actual, err = json.Marshal(types.NewOptionBeefySignatureEmpty())
-	assert.NoError(t, err)
-	expected , err = json.Marshal(nil)
-	assert.NoError(t, err)
-	assert.Equal(t, actual, expected)
-}
-
-func TestOptionBeefySignature_MarshalUnmarshal(t *testing.T) {
-	expected := types.NewOptionBeefySignature(sig1)
-
-	marshalled, err := json.Marshal(expected)
-	assert.NoError(t, err)
-
-	var unmarshalled types.OptionBeefySignature
-	err = json.Unmarshal(marshalled, &unmarshalled)
-	assert.NoError(t, err)
-
-	assert.Equal(t, expected, unmarshalled)
-}
-
-func TestOptionBeefySignature_MarshalUnmarshalEmpty(t *testing.T) {
-	expected := types.NewOptionBeefySignatureEmpty()
-
-	marshalled, err := json.Marshal(expected)
-	assert.NoError(t, err)
-
-	var unmarshalled types.OptionBeefySignature
-	err = json.Unmarshal(marshalled, &unmarshalled)
-	assert.NoError(t, err)
-
-	assert.Equal(t, expected, unmarshalled)
 }

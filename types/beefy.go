@@ -18,8 +18,6 @@
 package types
 
 import (
-	"encoding/json"
-
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 )
 
@@ -96,28 +94,6 @@ func (o *OptionBeefySignature) SetNone() {
 // Unwrap returns a flag that indicates whether a value is present and the stored value
 func (o OptionBeefySignature) Unwrap() (ok bool, value BeefySignature) {
 	return o.hasValue, o.value
-}
-
-func (o OptionBeefySignature) MarshalJSON() ([]byte, error) {
-	if !o.hasValue {
-		return json.Marshal(nil)
-	}
-	return json.Marshal(o.value)
-}
-
-func (o *OptionBeefySignature) UnmarshalJSON(b []byte) error {
-	var tmp *BeefySignature
-	if err := json.Unmarshal(b, &tmp); err != nil {
-		return err
-	}
-	if tmp != nil {
-		o.hasValue = true
-		o.value = *tmp
-	} else {
-		o.hasValue = false
-	}
-
-	return nil
 }
 
 // bits are packed into chunks of this size
