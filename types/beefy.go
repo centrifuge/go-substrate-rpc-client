@@ -42,7 +42,11 @@ type SignedCommitment struct {
 	Signatures []OptionBeefySignature
 }
 
-// CompactSignedCommitment ...
+type OptionalSignedCommitment struct {
+	option
+	value SignedCommitment
+}
+
 type CompactSignedCommitment struct {
 	Commitment        Commitment
 	SignaturesFrom    []byte
@@ -215,4 +219,26 @@ func makeChunks(slice []byte, chunkSize int) [][]byte {
 // Used for decoding JSON-RPC subscription messages (beefy_subscribeJustifications)
 func (s *SignedCommitment) UnmarshalText(text []byte) error {
 	return DecodeFromHexString(string(text), s)
+}
+
+func (o OptionalSignedCommitment) Encode(encoder scale.Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
+}
+
+func (o *OptionalSignedCommitment) Decode(decoder scale.Decoder) error {
+	return decoder.DecodeOption(&o.hasValue, &o.value)
+}
+
+func (o OptionalSignedCommitment) Unwrap() (ok bool, value SignedCommitment) {
+	return o.hasValue, o.value
+}
+
+func (o *OptionalSignedCommitment) SetSome(value SignedCommitment) {
+	o.hasValue = true
+	o.value = value
+}
+
+func (o *OptionalSignedCommitment) SetNone() {
+	o.hasValue = false
+	o.value = SignedCommitment{}
 }
