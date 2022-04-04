@@ -39,11 +39,11 @@ func (i IBC) QueryUpgradedConsState(height int64) (*clienttypes.QueryConsensusSt
 	return res, nil
 }
 
-func (i IBC) QueryClients() (*[]clienttypes.IdentifiedClientStates, error) {
-	var res *[]clienttypes.IdentifiedClientStates
+func (i IBC) QueryClients() (clienttypes.IdentifiedClientStates, error) {
+	var res clienttypes.IdentifiedClientStates
 	err := i.client.Call(&res, "ibc_queryClients")
 	if err != nil {
-		return &[]clienttypes.IdentifiedClientStates{}, err
+		return clienttypes.IdentifiedClientStates{}, err
 	}
 	return res, nil
 }
