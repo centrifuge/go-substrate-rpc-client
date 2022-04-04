@@ -20,6 +20,7 @@ import (
 	"github.com/ComposableFi/go-substrate-rpc-client/v4/client"
 	"github.com/ComposableFi/go-substrate-rpc-client/v4/rpc/author"
 	"github.com/ComposableFi/go-substrate-rpc-client/v4/rpc/chain"
+	"github.com/ComposableFi/go-substrate-rpc-client/v4/rpc/ibc"
 	"github.com/ComposableFi/go-substrate-rpc-client/v4/rpc/mmr"
 	"github.com/ComposableFi/go-substrate-rpc-client/v4/rpc/offchain"
 	"github.com/ComposableFi/go-substrate-rpc-client/v4/rpc/state"
@@ -30,6 +31,7 @@ import (
 type RPC struct {
 	Author   *author.Author
 	Chain    *chain.Chain
+	IBC      *ibc.IBC
 	MMR      *mmr.MMR
 	Offchain *offchain.Offchain
 	State    *state.State
@@ -50,6 +52,7 @@ func NewRPC(cl client.Client) (*RPC, error) {
 	return &RPC{
 		Author:   author.NewAuthor(cl),
 		Chain:    chain.NewChain(cl),
+		IBC:      ibc.NewIBC(cl),
 		MMR:      mmr.NewMMR(cl),
 		Offchain: offchain.NewOffchain(cl),
 		State:    st,
