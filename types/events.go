@@ -139,6 +139,40 @@ type EventGrandpaResumed struct {
 	Topics []Hash
 }
 
+// EventHRMPOpenChannelRequested is emitted when an open HRMP channel is requested.
+type EventHRMPOpenChannelRequested struct {
+	Phase                  Phase
+	Sender                 ParachainID
+	Recipient              ParachainID
+	ProposedMaxCapacity    U32
+	ProposedMaxMessageSize U32
+	Topics                 []Hash
+}
+
+// EventHRMPOpenChannelCanceled is emitted when an HRMP channel request sent by the receiver was canceled by either party.
+type EventHRMPOpenChannelCanceled struct {
+	Phase       Phase
+	ByParachain ParachainID
+	ChannelID   HRMPChannelID
+	Topics      []Hash
+}
+
+// EventHRMPOpenChannelAccepted is emitted when an open HRMP channel is accepted.
+type EventHRMPOpenChannelAccepted struct {
+	Phase     Phase
+	Sender    ParachainID
+	Recipient ParachainID
+	Topics    []Hash
+}
+
+// EventHRMPChannelClosed is emitted when an HRMP channel is closed.
+type EventHRMPChannelClosed struct {
+	Phase       Phase
+	ByParachain ParachainID
+	ChannelID   HRMPChannelID
+	Topics      []Hash
+}
+
 // EventImOnlineHeartbeatReceived is emitted when a new heartbeat was received from AuthorityId
 type EventImOnlineHeartbeatReceived struct {
 	Phase       Phase
@@ -198,6 +232,34 @@ type EventIndicesIndexFrozen struct {
 	Topics       []Hash
 }
 
+// EventLotteryLotteryStarted is emitted when a lottery has been started.
+type EventLotteryLotteryStarted struct {
+	Phase  Phase
+	Topics []Hash
+}
+
+// EventLotteryCallsUpdated is emitted when a new set of calls has been set.
+type EventLotteryCallsUpdated struct {
+	Phase  Phase
+	Topics []Hash
+}
+
+// EventLotteryWinner is emitted when a winner has been chosen.
+type EventLotteryWinner struct {
+	Phase          Phase
+	Winner         AccountID
+	LotteryBalance U128
+	Topics         []Hash
+}
+
+// EventLotteryTicketBought is emitted when a ticket has been bought.
+type EventLotteryTicketBought struct {
+	Phase     Phase
+	Who       AccountID
+	CallIndex LotteryCallIndex
+	Topics    []Hash
+}
+
 // EventOffencesOffence is emitted when there is an offence reported of the given kind happened at the session_index
 // and (kind-specific) time slot. This event is not deposited for duplicate slashes
 type EventOffencesOffence struct {
@@ -207,12 +269,206 @@ type EventOffencesOffence struct {
 	Topics         []Hash
 }
 
+// EventParasCurrentCodeUpdated is emitted when the current code has been updated for a Para.
+type EventParasCurrentCodeUpdated struct {
+	Phase       Phase
+	ParachainID ParachainID
+	Topics      []Hash
+}
+
+// EventParasCurrentHeadUpdated is emitted when the current head has been updated for a Para.
+type EventParasCurrentHeadUpdated struct {
+	Phase       Phase
+	ParachainID ParachainID
+	Topics      []Hash
+}
+
+// EventParasCodeUpgradeScheduled is emitted when a code upgrade has been scheduled for a Para.
+type EventParasCodeUpgradeScheduled struct {
+	Phase       Phase
+	ParachainID ParachainID
+	Topics      []Hash
+}
+
+// EventParasNewHeadNoted is emitted when a new head has been noted for a Para.
+type EventParasNewHeadNoted struct {
+	Phase       Phase
+	ParachainID ParachainID
+	Topics      []Hash
+}
+
+// EventParasActionQueued is emitted when a para has been queued to execute pending actions.
+type EventParasActionQueued struct {
+	Phase        Phase
+	ParachainID  ParachainID
+	SessionIndex U32
+	Topics       []Hash
+}
+
+// EventParasPvfCheckStarted is emitted when the given para either initiated or subscribed to a PVF
+// check for the given validation code.
+type EventParasPvfCheckStarted struct {
+	Phase       Phase
+	CodeHash    Hash
+	ParachainID ParachainID
+	Topics      []Hash
+}
+
+// EventParasPvfCheckAccepted is emitted when the given validation code was accepted by the PVF pre-checking vote.
+type EventParasPvfCheckAccepted struct {
+	Phase       Phase
+	CodeHash    Hash
+	ParachainID ParachainID
+	Topics      []Hash
+}
+
+// EventParasPvfCheckRejected is emitted when the given validation code was rejected by the PVF pre-checking vote.
+type EventParasPvfCheckRejected struct {
+	Phase       Phase
+	CodeHash    Hash
+	ParachainID ParachainID
+	Topics      []Hash
+}
+
+// EventParaDisputesDisputeInitiated is emitted when a dispute has been initiated.
+type EventParaDisputesDisputeInitiated struct {
+	Phase           Phase
+	CandidateHash   Hash
+	DisputeLocation DisputeLocation
+	Topics          []Hash
+}
+
+// EventParaDisputesDisputeConcluded is emitted when a dispute has concluded for or against a candidate.
+type EventParaDisputesDisputeConcluded struct {
+	Phase           Phase
+	CandidateHash   Hash
+	DisputeLocation DisputeResult
+	Topics          []Hash
+}
+
+// EventParaDisputesDisputeTimedOut is emitted when a dispute has timed out due to insufficient participation.
+type EventParaDisputesDisputeTimedOut struct {
+	Phase         Phase
+	CandidateHash Hash
+	Topics        []Hash
+}
+
+// EventParaDisputesRevert is emitted when a dispute has concluded with supermajority against a candidate.
+// Block authors should no longer build on top of this head and should
+// instead revert the block at the given height. This should be the
+// number of the child of the last known valid block in the chain.
+type EventParaDisputesRevert struct {
+	Phase       Phase
+	BlockNumber U32
+	Topics      []Hash
+}
+
+type HeadData []U8
+
+type CoreIndex U32
+
+type GroupIndex U32
+
+// EventParaInclusionCandidateBacked is emitted when a candidate was backed.
+type EventParaInclusionCandidateBacked struct {
+	Phase            Phase
+	CandidateReceipt CandidateReceipt
+	HeadData         HeadData
+	CoreIndex        CoreIndex
+	GroupIndex       GroupIndex
+	Topics           []Hash
+}
+
+// EventParaInclusionCandidateIncluded is emitted when a candidate was included.
+type EventParaInclusionCandidateIncluded struct {
+	Phase            Phase
+	CandidateReceipt CandidateReceipt
+	HeadData         HeadData
+	CoreIndex        CoreIndex
+	GroupIndex       GroupIndex
+	Topics           []Hash
+}
+
+// EventParaInclusionCandidateTimedOut is emitted when a candidate timed out.
+type EventParaInclusionCandidateTimedOut struct {
+	Phase            Phase
+	CandidateReceipt CandidateReceipt
+	HeadData         HeadData
+	CoreIndex        CoreIndex
+	Topics           []Hash
+}
+
+// EventParachainSystemValidationFunctionStored is emitted when the validation function has been scheduled to apply.
+type EventParachainSystemValidationFunctionStored struct {
+	Phase  Phase
+	Topics []Hash
+}
+
+// EventParachainSystemValidationFunctionApplied is emitted when the validation function was applied
+// as of the contained relay chain block number.
+type EventParachainSystemValidationFunctionApplied struct {
+	Phase                 Phase
+	RelayChainBlockNumber U32
+	Topics                []Hash
+}
+
+// EventParachainSystemValidationFunctionDiscarded is emitted when the relay-chain aborted the upgrade process.
+type EventParachainSystemValidationFunctionDiscarded struct {
+	Phase  Phase
+	Topics []Hash
+}
+
+// EventParachainSystemUpgradeAuthorized is emitted when an upgrade has been authorized.
+type EventParachainSystemUpgradeAuthorized struct {
+	Phase  Phase
+	Hash   Hash
+	Topics []Hash
+}
+
+// EventParachainSystemDownwardMessagesReceived is emitted when some downward messages have been received and will be processed.
+type EventParachainSystemDownwardMessagesReceived struct {
+	Phase  Phase
+	Count  U32
+	Topics []Hash
+}
+
+// EventParachainSystemDownwardMessagesProcessed is emitted when downward messages were processed using the given weight.
+type EventParachainSystemDownwardMessagesProcessed struct {
+	Phase         Phase
+	Weight        Weight
+	ResultMqcHead Hash
+	Topics        []Hash
+}
+
 // EventSessionNewSession is emitted when a new session has happened. Note that the argument is the session index,
 // not the block number as the type might suggest
 type EventSessionNewSession struct {
 	Phase        Phase
 	SessionIndex U32
 	Topics       []Hash
+}
+
+// EventSlotsNewLeasePeriod is emitted when a new `[lease_period]` is beginning.
+type EventSlotsNewLeasePeriod struct {
+	Phase       Phase
+	LeasePeriod U32
+	Topics      []Hash
+}
+
+type ParachainID U32
+
+// EventSlotsLeased is emitted when a para has won the right to a continuous set of lease periods as a parachain.
+// First balance is any extra amount reserved on top of the para's existing deposit.
+// Second balance is the total amount reserved.
+type EventSlotsLeased struct {
+	Phase         Phase
+	ParachainID   ParachainID
+	Leaser        AccountID
+	PeriodBegin   U32
+	PeriodCount   U32
+	ExtraReserved U128
+	TotalAmount   U128
+	Topics        []Hash
 }
 
 // EventStakingEraPaid is emitted when the era payout has been set;
@@ -315,6 +571,36 @@ type EventStakingWithdrawn struct {
 	Topics []Hash
 }
 
+// EventStateTrieMigrationMigrated is emitted when the given number of `(top, child)` keys were migrated respectively,
+// with the given `compute`.
+type EventStateTrieMigrationMigrated struct {
+	Phase   Phase
+	Top     U32
+	Child   U32
+	Compute MigrationCompute
+	Topics  []Hash
+}
+
+// EventStateTrieMigrationSlashed is emitted when some account got slashed by the given amount.
+type EventStateTrieMigrationSlashed struct {
+	Phase  Phase
+	Who    AccountID
+	Amount U128
+	Topics []Hash
+}
+
+// EventStateTrieMigrationAutoMigrationFinished is emitted when the auto migration task has finished.
+type EventStateTrieMigrationAutoMigrationFinished struct {
+	Phase  Phase
+	Topics []Hash
+}
+
+// EventStateTrieMigrationHalted is emitted when the migration got halted.
+type EventStateTrieMigrationHalted struct {
+	Phase  Phase
+	Topics []Hash
+}
+
 // EventSystemExtrinsicSuccessV8 is emitted when an extrinsic completed successfully
 //
 // Deprecated: EventSystemExtrinsicSuccessV8 exists to allow users to simply implement their own EventRecords struct if
@@ -338,6 +624,10 @@ type Pays struct {
 
 func (p *Pays) Decode(decoder scale.Decoder) error {
 	b, err := decoder.ReadOneByte()
+	if err != nil {
+		return err
+	}
+
 	switch b {
 	case 0:
 		p.IsYes = true
@@ -346,7 +636,8 @@ func (p *Pays) Decode(decoder scale.Decoder) error {
 	default:
 		return fmt.Errorf("unknown DispatchClass enum: %v", b)
 	}
-	return err
+
+	return nil
 }
 
 func (p Pays) Encode(encoder scale.Encoder) error {
@@ -369,6 +660,18 @@ type DispatchInfo struct {
 	PaysFee Pays
 }
 
+func (d *DispatchInfo) Decode(decoder scale.Decoder) error {
+	if err := decoder.Decode(&d.Weight); err != nil {
+		return err
+	}
+
+	if err := decoder.Decode(&d.Class); err != nil {
+		return err
+	}
+
+	return decoder.Decode(&d.PaysFee)
+}
+
 // DispatchClass is a generalized group of dispatch types. This is only distinguishing normal, user-triggered
 // transactions (`Normal`) and anything beyond which serves a higher purpose to the system (`Operational`).
 type DispatchClass struct {
@@ -382,6 +685,10 @@ type DispatchClass struct {
 
 func (d *DispatchClass) Decode(decoder scale.Decoder) error {
 	b, err := decoder.ReadOneByte()
+	if err != nil {
+		return err
+	}
+
 	switch b {
 	case 0:
 		d.IsNormal = true
@@ -389,23 +696,22 @@ func (d *DispatchClass) Decode(decoder scale.Decoder) error {
 		d.IsOperational = true
 	case 2:
 		d.IsMandatory = true
-	default:
-		return fmt.Errorf("unknown DispatchClass enum: %v", b)
 	}
-	return err
+
+	return nil
 }
 
-//nolint:gocritic,golint
 func (d DispatchClass) Encode(encoder scale.Encoder) error {
-	var err error
-	if d.IsNormal {
-		err = encoder.PushByte(0)
-	} else if d.IsOperational {
-		err = encoder.PushByte(1)
-	} else if d.IsMandatory {
-		err = encoder.PushByte(2)
+	switch {
+	case d.IsNormal:
+		return encoder.PushByte(0)
+	case d.IsOperational:
+		return encoder.PushByte(1)
+	case d.IsMandatory:
+		return encoder.PushByte(2)
 	}
-	return err
+
+	return nil
 }
 
 // EventSystemExtrinsicFailedV8 is emitted when an extrinsic failed
@@ -463,6 +769,15 @@ type EventAssetIssued struct {
 	Topics  []Hash
 }
 
+// EventAssetCreated is emitted when an asset is created.
+type EventAssetCreated struct {
+	Phase   Phase
+	AssetID U32
+	Creator AccountID
+	Owner   AccountID
+	Topics  []Hash
+}
+
 // EventAssetTransferred is emitted when an asset is transferred.
 type EventAssetTransferred struct {
 	Phase   Phase
@@ -473,13 +788,209 @@ type EventAssetTransferred struct {
 	Topics  []Hash
 }
 
-// EventAssetDestroyed is emitted when an asset is destroyed.
-type EventAssetDestroyed struct {
+// EventAssetBurned is emitted when an asset is destroyed.
+type EventAssetBurned struct {
+	Phase   Phase
+	AssetID U32
+	Owner   AccountID
+	Balance U128
+	Topics  []Hash
+}
+
+// EventAssetTeamChanged is emitted when the management team changed.
+type EventAssetTeamChanged struct {
+	Phase   Phase
+	AssetID U32
+	Issuer  AccountID
+	Admin   AccountID
+	Freezer AccountID
+	Topics  []Hash
+}
+
+// EventAssetOwnerChanged is emitted when the owner changed.
+type EventAssetOwnerChanged struct {
+	Phase   Phase
+	AssetID U32
+	Owner   AccountID
+	Topics  []Hash
+}
+
+// EventAssetFrozen is emitted when some account `who` was frozen.
+type EventAssetFrozen struct {
 	Phase   Phase
 	AssetID U32
 	Who     AccountID
-	Balance U128
 	Topics  []Hash
+}
+
+// EventAssetThawed is emitted when some account `who` was thawed.
+type EventAssetThawed struct {
+	Phase   Phase
+	AssetID U32
+	Who     AccountID
+	Topics  []Hash
+}
+
+// EventAssetAssetFrozen is emitted when some asset `asset_id` was frozen.
+type EventAssetAssetFrozen struct {
+	Phase   Phase
+	AssetID U32
+	Topics  []Hash
+}
+
+// EventAssetAssetThawed is emitted when some asset `asset_id` was thawed.
+type EventAssetAssetThawed struct {
+	Phase   Phase
+	AssetID U32
+	Topics  []Hash
+}
+
+// EventAssetDestroyed is emitted when an asset class is destroyed.
+type EventAssetDestroyed struct {
+	Phase   Phase
+	AssetID U32
+	Topics  []Hash
+}
+
+// EventAssetForceCreated is emitted when some asset class was force-created.
+type EventAssetForceCreated struct {
+	Phase   Phase
+	AssetID U32
+	Owner   AccountID
+	Topics  []Hash
+}
+
+type MetadataSetName []byte
+type MetadataSetSymbol []byte
+
+// EventAssetMetadataSet is emitted when new metadata has been set for an asset.
+type EventAssetMetadataSet struct {
+	Phase    Phase
+	AssetID  U32
+	Name     MetadataSetName
+	Symbol   MetadataSetSymbol
+	Decimals U8
+	IsFrozen bool
+	Topics   []Hash
+}
+
+// EventAssetMetadataCleared is emitted when metadata has been cleared for an asset.
+type EventAssetMetadataCleared struct {
+	Phase   Phase
+	AssetID U32
+	Topics  []Hash
+}
+
+// EventAssetApprovedTransfer is emitted when (additional) funds have been approved for transfer to a destination account.
+type EventAssetApprovedTransfer struct {
+	Phase    Phase
+	AssetID  U32
+	Source   AccountID
+	Delegate AccountID
+	Amount   U128
+	Topics   []Hash
+}
+
+// EventAssetApprovalCancelled is emitted when an approval for account `delegate` was cancelled by `owner`.
+type EventAssetApprovalCancelled struct {
+	Phase    Phase
+	AssetID  U32
+	Owner    AccountID
+	Delegate AccountID
+	Topics   []Hash
+}
+
+// EventAssetTransferredApproved is emitted when an `amount` was transferred in its entirety from `owner` to `destination` by
+// the approved `delegate`.
+type EventAssetTransferredApproved struct {
+	Phase       Phase
+	AssetID     U32
+	Owner       AccountID
+	Delegate    AccountID
+	Destination AccountID
+	Amount      U128
+	Topics      []Hash
+}
+
+// EventAssetAssetStatusChanged is emitted when an asset has had its attributes changed by the `Force` origin.
+type EventAssetAssetStatusChanged struct {
+	Phase   Phase
+	AssetID U32
+	Topics  []Hash
+}
+
+// EventAuctionsAuctionStarted is emitted when an auction started. Provides its index and the block number
+// where it will begin to close and the first lease period of the quadruplet that is auctioned.
+type EventAuctionsAuctionStarted struct {
+	Phase        Phase
+	AuctionIndex U32
+	LeasePeriod  U32
+	Ending       U32
+	Topics       []Hash
+}
+
+// EventAuctionsAuctionClosed is emitted when an auction ended. All funds become unreserved.
+type EventAuctionsAuctionClosed struct {
+	Phase        Phase
+	AuctionIndex U32
+	Topics       []Hash
+}
+
+// EventAuctionsReserved is emitted when funds were reserved for a winning bid. First balance is the extra amount reserved.
+// Second is the total.
+type EventAuctionsReserved struct {
+	Phase         Phase
+	Bidder        AccountID
+	ExtraReserved U128
+	TotalAmount   U128
+	Topics        []Hash
+}
+
+// EventAuctionsUnreserved is emitted when funds were unreserved since bidder is no longer active.
+type EventAuctionsUnreserved struct {
+	Phase  Phase
+	Bidder AccountID
+	Amount U128
+	Topics []Hash
+}
+
+// EventAuctionsReserveConfiscated is emitted when someone attempted to lease the same slot twice for a parachain.
+// The amount is held in reserve but no parachain slot has been leased.
+type EventAuctionsReserveConfiscated struct {
+	Phase       Phase
+	ParachainID ParachainID
+	Leaser      AccountID
+	Amount      U128
+	Topics      []Hash
+}
+
+// EventAuctionsBidAccepted is emitted when a new bid has been accepted as the current winner.
+type EventAuctionsBidAccepted struct {
+	Phase       Phase
+	Who         AccountID
+	ParachainID ParachainID
+	Amount      U128
+	FirstSlot   U32
+	LastSlot    U32
+	Topics      []Hash
+}
+
+// EventAuctionsWinningOffset is emitted when the winning offset was chosen for an auction.
+// This will map into the `Winning` storage map.
+type EventAuctionsWinningOffset struct {
+	Phase        Phase
+	AuctionIndex U32
+	BlockNumber  U32
+	Topics       []Hash
+}
+
+// EventBagsListRebagged is emitted when an account was moved from one bag to another.
+type EventBagsListRebagged struct {
+	Phase  Phase
+	Who    AccountID
+	From   U64
+	To     U64
+	Topics []Hash
 }
 
 // EventDemocracyProposed is emitted when a motion has been proposed by a public account.
@@ -664,7 +1175,7 @@ type EventDemocracyVetoed struct {
 	Phase       Phase
 	Who         AccountID
 	Hash        Hash
-	BlockNumber BlockNumber
+	BlockNumber U32
 	Topics      []Hash
 }
 
@@ -675,6 +1186,57 @@ type EventDemocracyVoted struct {
 	ReferendumIndex U32
 	Vote            VoteAccountVote
 	Topics          []Hash
+}
+
+// EventElectionProviderMultiPhaseSolutionStored is emitted when a solution was stored with the given compute.
+//
+// If the solution is signed, this means that it hasn't yet been processed. If the
+// solution is unsigned, this means that it has also been processed.
+//
+// The `bool` is `true` when a previous solution was ejected to make room for this one.
+type EventElectionProviderMultiPhaseSolutionStored struct {
+	Phase           Phase
+	ElectionCompute ElectionCompute
+	PrevEjected     bool
+	Topics          []Hash
+}
+
+// EventElectionProviderMultiPhaseElectionFinalized is emitted when the election has been finalized,
+// with `Some` of the given computation, or else if the election failed, `None`.
+type EventElectionProviderMultiPhaseElectionFinalized struct {
+	Phase           Phase
+	ElectionCompute OptionElectionCompute
+	Topics          []Hash
+}
+
+// EventElectionProviderMultiPhaseRewarded is emitted when an account has been rewarded for their signed submission being finalized.
+type EventElectionProviderMultiPhaseRewarded struct {
+	Phase   Phase
+	Account AccountID
+	Value   U128
+	Topics  []Hash
+}
+
+// EventElectionProviderMultiPhaseSlashed is emitted when an account has been slashed for submitting an invalid signed submission.
+type EventElectionProviderMultiPhaseSlashed struct {
+	Phase   Phase
+	Account AccountID
+	Value   U128
+	Topics  []Hash
+}
+
+// EventElectionProviderMultiPhaseSignedPhaseStarted is emitted when the signed phase of the given round has started.
+type EventElectionProviderMultiPhaseSignedPhaseStarted struct {
+	Phase  Phase
+	Round  U32
+	Topics []Hash
+}
+
+// EventElectionProviderMultiPhaseUnsignedPhaseStarted is emitted when the unsigned phase of the given round has started.
+type EventElectionProviderMultiPhaseUnsignedPhaseStarted struct {
+	Phase  Phase
+	Round  U32
+	Topics []Hash
 }
 
 // EventDemocracyPreimageNoted is emitted when a proposal's preimage was noted, and the deposit taken.
@@ -737,9 +1299,9 @@ type EventDemocracyBlacklisted struct {
 	Topics []Hash
 }
 
-// EventCollectiveProposed is emitted when a motion (given hash) has been proposed (by given account)
+// EventCouncilProposed is emitted when a motion (given hash) has been proposed (by given account)
 // with a threshold (given `MemberCount`).
-type EventCollectiveProposed struct {
+type EventCouncilProposed struct {
 	Phase         Phase
 	Who           AccountID
 	ProposalIndex U32
@@ -750,7 +1312,7 @@ type EventCollectiveProposed struct {
 
 // EventCollectiveVote is emitted when a motion (given hash) has been voted on by given account, leaving
 // a tally (yes votes and no votes given respectively as `MemberCount`).
-type EventCollectiveVoted struct {
+type EventCouncilVoted struct {
 	Phase    Phase
 	Who      AccountID
 	Proposal Hash
@@ -760,39 +1322,119 @@ type EventCollectiveVoted struct {
 	Topics   []Hash
 }
 
-// EventCollectiveApproved is emitted when a motion was approved by the required threshold.
-type EventCollectiveApproved struct {
+// EventCrowdloanCreated is emitted when a new crowdloaning campaign is created.
+type EventCrowdloanCreated struct {
+	Phase     Phase
+	FundIndex U32
+	Topics    []Hash
+}
+
+// EventCrowdloanContributed is emitted when `who` contributed to a crowd sale.
+type EventCrowdloanContributed struct {
+	Phase     Phase
+	Who       AccountID
+	FundIndex U32
+	Amount    U128
+	Topics    []Hash
+}
+
+// EventCrowdloanWithdrew is emitted when the full balance of a contributor was withdrawn.
+type EventCrowdloanWithdrew struct {
+	Phase     Phase
+	Who       AccountID
+	FundIndex U32
+	Amount    U128
+	Topics    []Hash
+}
+
+// EventCrowdloanPartiallyRefunded is emitted when the loans in a fund have been partially dissolved, i.e. there are some left
+// over child keys that still need to be killed.
+type EventCrowdloanPartiallyRefunded struct {
+	Phase     Phase
+	FundIndex U32
+	Topics    []Hash
+}
+
+// EventCrowdloanAllRefunded is emitted when all loans in a fund have been refunded.
+type EventCrowdloanAllRefunded struct {
+	Phase     Phase
+	FundIndex U32
+	Topics    []Hash
+}
+
+// EventCrowdloanDissolved is emitted when the fund is dissolved.
+type EventCrowdloanDissolved struct {
+	Phase     Phase
+	FundIndex U32
+	Topics    []Hash
+}
+
+// EventCrowdloanHandleBidResult is emitted when trying to submit a new bid to the Slots pallet.
+type EventCrowdloanHandleBidResult struct {
+	Phase          Phase
+	FundIndex      U32
+	DispatchResult DispatchResult
+	Topics         []Hash
+}
+
+// EventCrowdloanEdited is emitted when the configuration to a crowdloan has been edited.
+type EventCrowdloanEdited struct {
+	Phase     Phase
+	FundIndex U32
+	Topics    []Hash
+}
+
+type CrowloadMemo []byte
+
+// EventCrowdloanMemoUpdated is emitted when a memo has been updated.
+type EventCrowdloanMemoUpdated struct {
+	Phase     Phase
+	Who       AccountID
+	FundIndex U32
+	Memo      CrowloadMemo
+	Topics    []Hash
+}
+
+// EventCrowdloanAddedToNewRaise is emitted when a parachain has been moved to `NewRaise`.
+type EventCrowdloanAddedToNewRaise struct {
+	Phase     Phase
+	FundIndex U32
+	Topics    []Hash
+}
+
+// EventCouncilApproved is emitted when a motion was approved by the required threshold.
+type EventCouncilApproved struct {
 	Phase    Phase
 	Proposal Hash
 	Topics   []Hash
 }
 
-// EventCollectiveDisapproved is emitted when a motion was not approved by the required threshold.
-type EventCollectiveDisapproved struct {
+// EventCouncilDisapproved is emitted when a motion was not approved by the required threshold.
+type EventCouncilDisapproved struct {
 	Phase    Phase
 	Proposal Hash
 	Topics   []Hash
 }
 
-// EventCollectiveExecuted is emitted when a motion was executed; `result` is true if returned without error.
-type EventCollectiveExecuted struct {
+// EventCouncilExecuted is emitted when a motion was executed; `result` is true if returned without error.
+type EventCouncilExecuted struct {
 	Phase    Phase
 	Proposal Hash
 	Result   DispatchResult
 	Topics   []Hash
 }
 
-// EventCollectiveMemberExecuted is emitted when a single member did some action;
+// EventCouncilMemberExecuted is emitted when a single member did some action;
 // `result` is true if returned without error.
-type EventCollectiveMemberExecuted struct {
+type EventCouncilMemberExecuted struct {
 	Phase    Phase
 	Proposal Hash
 	Result   DispatchResult
 	Topics   []Hash
 }
 
-// EventCollectiveClosed is emitted when a proposal was closed after its duration was up.
-type EventCollectiveClosed struct {
+// EventCouncilClosed is emitted when a proposal was closed after its duration was up.
+type EventCouncilClosed struct {
 	Phase    Phase
 	Proposal Hash
 	YesCount U32
@@ -957,6 +1599,44 @@ type EventElectionsSeatHolderSlashed struct {
 	Who     AccountID
 	Balance U128
 	Topics  []Hash
+}
+
+// EventGiltBidPlaced is emitted when a bid was successfully placed.
+type EventGiltBidPlaced struct {
+	Phase    Phase
+	Who      AccountID
+	Amount   U128
+	Duration U32
+	Topics   []Hash
+}
+
+// EventGiltBidRetracted is emitted when a bid was successfully removed (before being accepted as a gilt).
+type EventGiltBidRetracted struct {
+	Phase    Phase
+	Who      AccountID
+	Amount   U128
+	Duration U32
+	Topics   []Hash
+}
+
+// EventGiltGiltIssued is emitted when a bid was accepted as a gilt. The balance may not be released until expiry.
+type EventGiltGiltIssued struct {
+	Phase  Phase
+	Index  U32
+	Expiry U32
+	Who    AccountID
+	Amount U128
+	Topics []Hash
+}
+
+// EventGiltGiltThawed is emitted when an expired gilt has been thawed.
+type EventGiltGiltThawed struct {
+	Phase            Phase
+	Index            U32
+	Who              AccountID
+	OriginalAmount   U128
+	AdditionalAmount U128
+	Topics           []Hash
 }
 
 // A name was set or reset (which will remove all judgements).
@@ -1188,6 +1868,135 @@ type EventRecoveryVouched struct {
 	Topics  []Hash
 }
 
+// EventRegistrarRegistered is emitted when a parachain is registered.
+type EventRegistrarRegistered struct {
+	Phase       Phase
+	ParachainID ParachainID
+	Account     AccountID
+	Topics      []Hash
+}
+
+// EventRegistrarDeregistered is emitted when a parachain is deregistered.
+type EventRegistrarDeregistered struct {
+	Phase       Phase
+	ParachainID ParachainID
+	Topics      []Hash
+}
+
+// EventRegistrarReserved is emitted when a parachain slot is reserved.
+type EventRegistrarReserved struct {
+	Phase       Phase
+	ParachainID ParachainID
+	Account     AccountID
+	Topics      []Hash
+}
+
+// EventReferendaSubmitted is emitted when a referendum has been submitted.
+type EventReferendaSubmitted struct {
+	Phase        Phase
+	Index        U32
+	Track        U8
+	ProposalHash Hash
+	Topics       []Hash
+}
+
+// EventReferendaDecisionDepositPlaced is emitted when the decision deposit has been placed.
+type EventReferendaDecisionDepositPlaced struct {
+	Phase  Phase
+	Index  U32
+	Who    AccountID
+	Amount U128
+	Topics []Hash
+}
+
+// EventReferendaDecisionDepositRefunded is emitted when the decision deposit has been refunded.
+type EventReferendaDecisionDepositRefunded struct {
+	Phase  Phase
+	Index  U32
+	Who    AccountID
+	Amount U128
+	Topics []Hash
+}
+
+// EventReferendaDecisionSlashed is emitted when a deposit has been slashed.
+type EventReferendaDecisionSlashed struct {
+	Phase  Phase
+	Who    AccountID
+	Amount U128
+	Topics []Hash
+}
+
+// EventReferendaDecisionStarted is emitted when a referendum has moved into the deciding phase.
+type EventReferendaDecisionStarted struct {
+	Phase        Phase
+	Index        U32
+	Track        U8
+	ProposalHash Hash
+	Tally        Tally
+	Topics       []Hash
+}
+
+// EventReferendaConfirmStarted is emitted when a referendum has been started.
+type EventReferendaConfirmStarted struct {
+	Phase  Phase
+	Index  U32
+	Topics []Hash
+}
+
+// EventReferendaConfirmAborted is emitted when a referendum has been aborted.
+type EventReferendaConfirmAborted struct {
+	Phase  Phase
+	Index  U32
+	Topics []Hash
+}
+
+// EventReferendaConfirmed is emitted when a referendum has ended its confirmation phase and is ready for approval.
+type EventReferendaConfirmed struct {
+	Phase  Phase
+	Index  U32
+	Tally  Tally
+	Topics []Hash
+}
+
+// EventReferendaApproved is emitted when a referendum has been approved and its proposal has been scheduled.
+type EventReferendaApproved struct {
+	Phase  Phase
+	Index  U32
+	Topics []Hash
+}
+
+// EventReferendaRejected is emitted when a proposal has been rejected by referendum.
+type EventReferendaRejected struct {
+	Phase  Phase
+	Index  U32
+	Tally  Tally
+	Topics []Hash
+}
+
+// EventReferendaTimedOut is emitted when a referendum has been timed out without being decided.
+type EventReferendaTimedOut struct {
+	Phase  Phase
+	Index  U32
+	Tally  Tally
+	Topics []Hash
+}
+
+// EventReferendaCancelled is emitted when a referendum has been cancelled.
+type EventReferendaCancelled struct {
+	Phase  Phase
+	Index  U32
+	Tally  Tally
+	Topics []Hash
+}
+
+// EventReferendaKilled is emitted when a referendum has been killed.
+type EventReferendaKilled struct {
+	Phase  Phase
+	Index  U32
+	Tally  Tally
+	Topics []Hash
+}
+
 // EventRecoveryClosed is emitted when a recovery process for account_1 by account_2 has been closed
 type EventRecoveryClosed struct {
 	Phase   Phase
@@ -1221,6 +2030,182 @@ type EventVestingVestingUpdated struct {
 	Topics   []Hash
 }
 
+// EventWhitelistCallWhitelisted is emitted when a call has been whitelisted.
+type EventWhitelistCallWhitelisted struct {
+	Phase    Phase
+	CallHash Hash
+	Topics   []Hash
+}
+
+// EventWhitelistWhitelistedCallRemoved is emitted when a whitelisted call has been removed.
+type EventWhitelistWhitelistedCallRemoved struct {
+	Phase    Phase
+	CallHash Hash
+	Topics   []Hash
+}
+
+// EventWhitelistWhitelistedCallDispatched is emitted when a whitelisted call has been dispatched.
+type EventWhitelistWhitelistedCallDispatched struct {
+	Phase    Phase
+	CallHash Hash
+	Result   DispatchResult
+	Topics   []Hash
+}
+
+// EventXcmPalletAttempted is emitted when the execution of an XCM message was attempted.
+type EventXcmPalletAttempted struct {
+	Phase   Phase
+	Outcome Outcome
+	Topics  []Hash
+}
+
+// EventXcmPalletSent is emitted when an XCM message was sent.
+type EventXcmPalletSent struct {
+	Phase       Phase
+	Origin      MultiLocationV1
+	Destination MultiLocationV1
+	Message     []Instruction
+	Topics      []Hash
+}
+
+// EventXcmPalletUnexpectedResponse is emitted when a query response which does not match a registered query is received.
+// This may be because a matching query was never registered, it may be because it is a duplicate response, or
+// because the query timed out.
+type EventXcmPalletUnexpectedResponse struct {
+	Phase          Phase
+	OriginLocation MultiLocationV1
+	QueryID        U64
+	Topics         []Hash
+}
+
+// EventXcmPalletResponseReady is emitted when a query response has been received and is ready for taking with `take_response`.
+// There is no registered notification call.
+type EventXcmPalletResponseReady struct {
+	Phase    Phase
+	QueryID  U64
+	Response Response
+	Topics   []Hash
+}
+
+// EventXcmPalletNotified is emitted when a query response has been received and query is removed. The registered notification has
+// been dispatched and executed successfully.
+type EventXcmPalletNotified struct {
+	Phase       Phase
+	QueryID     U64
+	PalletIndex U8
+	CallIndex   U8
+	Topics      []Hash
+}
+
+// EventXcmPalletNotifyOverweight is emitted when a query response has been received and query is removed. The registered notification could
+// not be dispatched because the dispatch weight is greater than the maximum weight originally budgeted by this runtime for the query result.
+type EventXcmPalletNotifyOverweight struct {
+	Phase             Phase
+	QueryID           U64
+	PalletIndex       U8
+	CallIndex         U8
+	ActualWeight      Weight
+	MaxBudgetedWeight Weight
+	Topics            []Hash
+}
+
+// EventXcmPalletNotifyDispatchError is emitted when a query response has been received and query is removed. There was a general error with
+// dispatching the notification call.
+type EventXcmPalletNotifyDispatchError struct {
+	Phase       Phase
+	QueryID     U64
+	PalletIndex U8
+	CallIndex   U8
+	Topics      []Hash
+}
+
+// EventXcmPalletNotifyDecodeFailed is emitted when a query response has been received and query is removed. The dispatch was unable to be
+// decoded into a `Call`; this might be due to dispatch function having a signature which is not `(origin, QueryId, Response)`.
+type EventXcmPalletNotifyDecodeFailed struct {
+	Phase       Phase
+	QueryID     U64
+	PalletIndex U8
+	CallIndex   U8
+	Topics      []Hash
+}
+
+// EventXcmPalletInvalidResponder is emitted when the expected query response has been received but the origin location of the response does
+// not match that expected. The query remains registered for a later, valid, response to be received and acted upon.
+type EventXcmPalletInvalidResponder struct {
+	Phase            Phase
+	OriginLocation   MultiLocationV1
+	QueryID          U64
+	ExpectedLocation OptionMultiLocationV1
+	Topics           []Hash
+}
+
+// EventXcmPalletInvalidResponderVersion is emitted when the expected query response has been received but the expected origin location placed in
+// storage by this runtime previously cannot be decoded. The query remains registered.
+// This is unexpected (since a location placed in storage in a previously executing
+// runtime should be readable prior to query timeout) and dangerous since the possibly
+// valid response will be dropped. Manual governance intervention is probably going to be
+// needed.
+type EventXcmPalletInvalidResponderVersion struct {
+	Phase          Phase
+	OriginLocation MultiLocationV1
+	QueryID        U64
+	Topics         []Hash
+}
+
+// EventXcmPalletResponseTaken is emitted when the received query response has been read and removed.
+type EventXcmPalletResponseTaken struct {
+	Phase   Phase
+	QueryID U64
+	Topics  []Hash
+}
+
+// EventXcmPalletAssetsTrapped is emitted when some assets have been placed in an asset trap.
+type EventXcmPalletAssetsTrapped struct {
+	Phase  Phase
+	Hash   H256
+	Origin MultiLocationV1
+	Assets VersionedMultiAssets
+	Topics []Hash
+}
+
+type XcmVersion U32
+
+// EventXcmPalletVersionChangeNotified is emitted when an XCM version change notification message has been attempted to be sent.
+type EventXcmPalletVersionChangeNotified struct {
+	Phase       Phase
+	Destination MultiLocationV1
+	Result      XcmVersion
+	Topics      []Hash
+}
+
+// EventXcmPalletSupportedVersionChanged is emitted when the supported version of a location has been changed.
+// This might be through an automatic notification or a manual intervention.
+type EventXcmPalletSupportedVersionChanged struct {
+	Phase      Phase
+	Location   MultiLocationV1
+	XcmVersion XcmVersion
+	Topics     []Hash
+}
+
+// EventXcmPalletNotifyTargetSendFail is emitted when a given location which had a version change subscription was dropped owing to an error
+// sending the notification to it.
+type EventXcmPalletNotifyTargetSendFail struct {
+	Phase    Phase
+	Location MultiLocationV1
+	QueryID  U64
+	XcmError XCMError
+	Topics   []Hash
+}
+
+// EventXcmPalletNotifyTargetMigrationFail is emitted when a given location which had a version change subscription was dropped owing to an error
+// migrating the location to our new XCM format.
+type EventXcmPalletNotifyTargetMigrationFail struct {
+	Phase    Phase
+	Location VersionedMultiLocation
+	QueryID  U64
+	Topics   []Hash
+}
+
 // EventVestingVestingCompleted is emitted when an [account] has become fully vested. No further vesting can happen
 type EventVestingVestingCompleted struct {
 	Phase   Phase
@@ -1231,7 +2216,7 @@ type EventVestingVestingCompleted struct {
 // EventSchedulerScheduled is emitted when scheduled some task
 type EventSchedulerScheduled struct {
 	Phase  Phase
-	When   BlockNumber
+	When   U32
 	Index  U32
 	Topics []Hash
 }
@@ -1239,7 +2224,7 @@ type EventSchedulerScheduled struct {
 // EventSchedulerCanceled is emitted when canceled some task
 type EventSchedulerCanceled struct {
 	Phase  Phase
-	When   BlockNumber
+	When   U32
 	Index  U32
 	Topics []Hash
 }
@@ -1476,6 +2461,26 @@ type EventTipsTipSlashed struct {
 	Topics    []Hash
 }
 
+// EventTransactionStorageStored is emitted when data is stored under a specific index.
+type EventTransactionStorageStored struct {
+	Phase  Phase
+	Index  U32
+	Topics []Hash
+}
+
+// EventTransactionStorageRenewed is emitted when data is renewed under a specific index.
+type EventTransactionStorageRenewed struct {
+	Phase  Phase
+	Index  U32
+	Topics []Hash
+}
+
+// EventTransactionStorageProofChecked is emitted when storage proof was successfully checked.
+type EventTransactionStorageProofChecked struct {
+	Phase  Phase
+	Topics []Hash
+}
+
 // EventTipsTipRetracted is emitted when a tip suggestion has been retracted.
 type EventTipsTipRetracted struct {
 	Phase  Phase
@@ -1485,38 +2490,38 @@ type EventTipsTipRetracted struct {
 
 type BountyIndex U32
 
-// EventTreasuryBountyProposed is emitted for a new bounty proposal.
-type EventTreasuryBountyProposed struct {
+// EventBountiesBountyProposed is emitted for a new bounty proposal.
+type EventBountiesBountyProposed struct {
+	Phase         Phase
+	ProposalIndex BountyIndex
+	Topics        []Hash
+}
+
+// EventBountiesBountyRejected is emitted when a bounty proposal was rejected; funds were slashed.
+type EventBountiesBountyRejected struct {
+	Phase         Phase
+	ProposalIndex BountyIndex
+	Bond          U128
+	Topics        []Hash
+}
+
+// EventBountiesBountyBecameActive is emitted when a bounty proposal is funded and became active
+type EventBountiesBountyBecameActive struct {
 	Phase  Phase
 	Index  BountyIndex
 	Topics []Hash
 }
 
-// EventTreasuryBountyRejected is emitted when a bounty proposal was rejected; funds were slashed.
-type EventTreasuryBountyRejected struct {
-	Phase  Phase
-	Index  BountyIndex
-	Bond   U128
-	Topics []Hash
-}
-
-// EventTreasuryBountyBecameActive is emitted when a bounty proposal is funded and became active
-type EventTreasuryBountyBecameActive struct {
-	Phase  Phase
-	Index  BountyIndex
-	Topics []Hash
-}
-
-// EventTreasuryBountyAwarded is emitted when a bounty is awarded to a beneficiary
-type EventTreasuryBountyAwarded struct {
+// EventBountiesBountyAwarded is emitted when a bounty is awarded to a beneficiary
+type EventBountiesBountyAwarded struct {
 	Phase       Phase
 	Index       BountyIndex
 	Beneficiary AccountID
 	Topics      []Hash
 }
 
-// EventTreasuryBountyClaimed is emitted when A bounty is claimed by beneficiary
-type EventTreasuryBountyClaimed struct {
+// EventBountiesBountyClaimed is emitted when a bounty is claimed by beneficiary
+type EventBountiesBountyClaimed struct {
 	Phase       Phase
 	Index       BountyIndex
 	Payout      U128
@@ -1524,18 +2529,53 @@ type EventTreasuryBountyClaimed struct {
 	Topics      []Hash
 }
 
-// EventTreasuryBountyCanceled is emitted when a bounty is cancelled.
-type EventTreasuryBountyCanceled struct {
+// EventBountiesBountyCanceled is emitted when a bounty is cancelled.
+type EventBountiesBountyCanceled struct {
 	Phase  Phase
 	Index  BountyIndex
 	Topics []Hash
 }
 
-// EventTreasuryBountyExtended is emitted when a bounty is extended.
-type EventTreasuryBountyExtended struct {
+// EventBountiesBountyExtended is emitted when a bounty is extended.
+type EventBountiesBountyExtended struct {
 	Phase  Phase
 	Index  BountyIndex
 	Topics []Hash
+}
+
+// EventChildBountiesAdded is emitted when a child-bounty is added.
+type EventChildBountiesAdded struct {
+	Phase      Phase
+	Index      BountyIndex
+	ChildIndex BountyIndex
+	Topics     []Hash
+}
+
+// EventChildBountiesAwarded is emitted when a child-bounty is awarded to a beneficiary.
+type EventChildBountiesAwarded struct {
+	Phase       Phase
+	Index       BountyIndex
+	ChildIndex  BountyIndex
+	Beneficiary AccountID
+	Topics      []Hash
+}
+
+// EventChildBountiesClaimed is emitted when a child-bounty is claimed by a beneficiary.
+type EventChildBountiesClaimed struct {
+	Phase       Phase
+	Index       BountyIndex
+	ChildIndex  BountyIndex
+	Payout      U128
+	Beneficiary AccountID
+	Topics      []Hash
+}
+
+// EventChildBountiesCanceled is emitted when a child-bounty is canceled.
+type EventChildBountiesCanceled struct {
+	Phase      Phase
+	Index      BountyIndex
+	ChildIndex BountyIndex
+	Topics     []Hash
 }
 
 // EventUniquesApprovalCancelled is emitted when an approval for a delegate account to transfer the instance of
@@ -1728,6 +2768,66 @@ type EventUniquesTransferred struct {
 	Topics   []Hash
 }
 
+// EventUMPInvalidFormat is emitted when the upward message is invalid XCM.
+type EventUMPInvalidFormat struct {
+	Phase     Phase
+	MessageID []U8
+	Topics    []Hash
+}
+
+// EventUMPUnsupportedVersion is emitted when the upward message is unsupported version of XCM.
+type EventUMPUnsupportedVersion struct {
+	Phase     Phase
+	MessageID []U8
+	Topics    []Hash
+}
+
+// EventUMPExecutedUpward is emitted when the upward message executed with the given outcome.
+type EventUMPExecutedUpward struct {
+	Phase     Phase
+	MessageID []U8
+	Outcome   Outcome
+	Topics    []Hash
+}
+
+// EventUMPWeightExhausted is emitted when the weight limit for handling upward messages was reached.
+type EventUMPWeightExhausted struct {
+	Phase     Phase
+	MessageID []U8
+	Remaining Weight
+	Required  Weight
+	Topics    []Hash
+}
+
+// EventUMPUpwardMessagesReceived is emitted when some upward messages have been received and will be processed.
+type EventUMPUpwardMessagesReceived struct {
+	Phase       Phase
+	ParachainID ParachainID
+	Count       U32
+	Size        U32
+	Topics      []Hash
+}
+
+// EventUMPOverweightEnqueued is emitted when the weight budget was exceeded for an individual upward message.
+// This message can be later dispatched manually using `service_overweight` dispatchable using the assigned `overweight_index`.
+type EventUMPOverweightEnqueued struct {
+	Phase           Phase
+	ParachainID     ParachainID
+	MessageID       []U8
+	OverweightIndex U64
+	RequiredWeight  Weight
+	Topics          []Hash
+}
+
+// EventUMPOverweightServiced is emitted when the upward message from the overweight queue was executed with the given actual weight
+// used.
+type EventUMPOverweightServiced struct {
+	Phase           Phase
+	OverweightIndex U64
+	Used            Weight
+	Topics          []Hash
+}
+
 // EventContractsInstantiated is emitted when a contract is deployed by address at the specified address
 type EventContractsInstantiated struct {
 	Phase    Phase
@@ -1743,6 +2843,22 @@ type EventContractsTerminated struct {
 	Contract    AccountID
 	Beneficiary AccountID
 	Topics      []Hash
+}
+
+// EventConvictionVotingDelegated is emitted when an account has delegated their vote to another account.
+type EventConvictionVotingDelegated struct {
+	Phase  Phase
+	Who    AccountID
+	Target AccountID
+	Topics []Hash
+}
+
+// EventConvictionVotingUndelegated is emitted when an account has delegated their vote to another account.
+type EventConvictionVotingUndelegated struct {
+	Phase  Phase
+	Who    AccountID
+	Target AccountID
+	Topics []Hash
 }
 
 // EventContractsContractEmitted is emitted when a custom event emitted by the contract
@@ -1860,6 +2976,33 @@ type EventMultisigNewMultisig struct {
 	Topics   []Hash
 }
 
+// EventNftSalesForSale is emitted when an NFT is out for sale.
+type EventNftSalesForSale struct {
+	Phase      Phase
+	ClassID    U64
+	InstanceID U128
+	Sale       Sale
+	Topics     []Hash
+}
+
+// EventNftSalesRemoved is emitted when an NFT is removed.
+type EventNftSalesRemoved struct {
+	Phase      Phase
+	ClassID    U64
+	InstanceID U128
+	Topics     []Hash
+}
+
+// EventNftSalesSold is emitted when an NFT is sold.
+type EventNftSalesSold struct {
+	Phase      Phase
+	ClassID    U64
+	InstanceID U128
+	Sale       Sale
+	Buyer      AccountID
+	Topics     []Hash
+}
+
 // TimePoint is a global extrinsic index, formed as the extrinsic index within a block,
 // together with that block's height.
 type TimePoint struct {
@@ -1869,7 +3012,7 @@ type TimePoint struct {
 
 // TaskAddress holds the location of a scheduled task that can be used to remove it
 type TaskAddress struct {
-	When  BlockNumber
+	When  U32
 	Index U32
 }
 
@@ -1901,13 +3044,7 @@ func (d *DispatchResult) Decode(decoder scale.Decoder) error {
 		d.Ok = true
 		return nil
 	default:
-		derr := DispatchError{}
-		err = decoder.Decode(&derr)
-		if err != nil {
-			return err
-		}
-		d.Error = derr
-		return nil
+		return decoder.Decode(&d.Error)
 	}
 }
 

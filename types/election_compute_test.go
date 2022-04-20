@@ -1,12 +1,36 @@
-package types
+package types_test
 
 import (
 	"bytes"
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestOptionElectionCompute_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, NewOptionElectionCompute(NewElectionCompute(byte(0))))
+	assertRoundtrip(t, NewOptionElectionComputeEmpty())
+}
+
+func TestOptionElectionCompute_Encode(t *testing.T) {
+	assertEncode(t, []encodingAssert{
+		{NewOptionElectionCompute(NewElectionCompute(byte(0))), MustHexDecodeString("0x0100")},
+		{NewOptionElectionCompute(NewElectionCompute(byte(1))), MustHexDecodeString("0x0101")},
+		{NewOptionElectionCompute(NewElectionCompute(byte(2))), MustHexDecodeString("0x0102")},
+		{NewOptionBytesEmpty(), MustHexDecodeString("0x00")},
+	})
+}
+
+func TestOptionElectionCompute_Decode(t *testing.T) {
+	assertDecode(t, []decodingAssert{
+		{MustHexDecodeString("0x0100"), NewOptionElectionCompute(NewElectionCompute(byte(0)))},
+		{MustHexDecodeString("0x0101"), NewOptionElectionCompute(NewElectionCompute(byte(1)))},
+		{MustHexDecodeString("0x0102"), NewOptionElectionCompute(NewElectionCompute(byte(2)))},
+		{MustHexDecodeString("0x00"), NewOptionBytesEmpty()},
+	})
+}
 
 func TestElectionComputeEncodeDecode(t *testing.T) {
 	// encode

@@ -37,7 +37,10 @@ test-dockerized: run-substrate-docker
 run-substrate-docker: 		## starts the Substrate Docker image
 	@docker-compose up -d substrate
 
+generate-test-data:		## generate test data for types
+	go generate ./types/test/...
+
 help: 				## shows this help
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
 
-.PHONY: install-deps lint lint-fix test test-cover test-dockerized run-substrate-docker clean
+.PHONY: install-deps lint lint-fix test test-cover test-dockerized run-substrate-docker clean generate-test-data

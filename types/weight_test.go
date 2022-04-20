@@ -22,6 +22,29 @@ import (
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+func TestOptionWeight_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, NewOptionWeight(NewWeight(0)))
+	assertRoundtrip(t, NewOptionWeightEmpty())
+}
+
+func TestOptionWeight_Encode(t *testing.T) {
+	assertEncode(t, []encodingAssert{
+		{NewOptionWeight(NewWeight(0)), MustHexDecodeString("0x010000000000000000")},
+		{NewOptionWeight(NewWeight(1)), MustHexDecodeString("0x010100000000000000")},
+		{NewOptionWeight(NewWeight(2)), MustHexDecodeString("0x010200000000000000")},
+		{NewOptionWeightEmpty(), MustHexDecodeString("0x00")},
+	})
+}
+
+func TestOptionWeight_Decode(t *testing.T) {
+	assertDecode(t, []decodingAssert{
+		{MustHexDecodeString("0x010000000000000000"), NewOptionWeight(NewWeight(0))},
+		{MustHexDecodeString("0x010100000000000000"), NewOptionWeight(NewWeight(1))},
+		{MustHexDecodeString("0x010200000000000000"), NewOptionWeight(NewWeight(2))},
+		{MustHexDecodeString("0x00"), NewOptionWeightEmpty()},
+	})
+}
+
 func TestWeight_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewWeight(0))
 	assertRoundtrip(t, NewWeight(12))
