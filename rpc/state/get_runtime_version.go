@@ -22,16 +22,16 @@ import (
 )
 
 // GetRuntimeVersion returns the runtime version at the given block
-func (s *State) GetRuntimeVersion(blockHash types.Hash) (*types.RuntimeVersion, error) {
+func (s *state) GetRuntimeVersion(blockHash types.Hash) (*types.RuntimeVersion, error) {
 	return s.getRuntimeVersion(&blockHash)
 }
 
 // GetRuntimeVersionLatest returns the latest runtime version
-func (s *State) GetRuntimeVersionLatest() (*types.RuntimeVersion, error) {
+func (s *state) GetRuntimeVersionLatest() (*types.RuntimeVersion, error) {
 	return s.getRuntimeVersion(nil)
 }
 
-func (s *State) getRuntimeVersion(blockHash *types.Hash) (*types.RuntimeVersion, error) {
+func (s *state) getRuntimeVersion(blockHash *types.Hash) (*types.RuntimeVersion, error) {
 	var runtimeVersion types.RuntimeVersion
 	err := client.CallWithBlockHash(s.client, &runtimeVersion, "state_getRuntimeVersion", blockHash)
 	if err != nil {

@@ -21,7 +21,7 @@ import (
 )
 
 // Version retrieves the version of the node
-func (c *System) Version() (types.Text, error) {
+func (c *system) Version() (types.Text, error) {
 	var t types.Text
 	err := c.client.Call(&t, "system_version")
 	return t, err

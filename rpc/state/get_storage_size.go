@@ -22,16 +22,16 @@ import (
 )
 
 // GetStorageSize retreives the storage size for the given key
-func (s *State) GetStorageSize(key types.StorageKey, blockHash types.Hash) (types.U64, error) {
+func (s *state) GetStorageSize(key types.StorageKey, blockHash types.Hash) (types.U64, error) {
 	return s.getStorageSize(key, &blockHash)
 }
 
 // GetStorageSizeLatest retreives the storage size for the given key for the latest block height
-func (s *State) GetStorageSizeLatest(key types.StorageKey) (types.U64, error) {
+func (s *state) GetStorageSizeLatest(key types.StorageKey) (types.U64, error) {
 	return s.getStorageSize(key, nil)
 }
 
-func (s *State) getStorageSize(key types.StorageKey, blockHash *types.Hash) (types.U64, error) {
+func (s *state) getStorageSize(key types.StorageKey, blockHash *types.Hash) (types.U64, error) {
 	var res types.U64
 	err := client.CallWithBlockHash(s.client, &res, "state_getStorageSize", blockHash, key.Hex())
 	if err != nil {

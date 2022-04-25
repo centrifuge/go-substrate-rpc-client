@@ -23,7 +23,7 @@ import (
 )
 
 func TestSystem_NetworkState(t *testing.T) {
-	n, err := system.NetworkState()
+	n, err := testSystem.NetworkState()
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.networkState, n)
 }

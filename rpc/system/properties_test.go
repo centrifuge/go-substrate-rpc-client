@@ -23,7 +23,7 @@ import (
 )
 
 func TestSystem_Properties(t *testing.T) {
-	p, err := system.Properties()
+	p, err := testSystem.Properties()
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.properties, p)
 }

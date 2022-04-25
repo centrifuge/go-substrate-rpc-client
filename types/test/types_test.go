@@ -1,3 +1,5 @@
+//go:build types_test
+
 package test
 
 import (

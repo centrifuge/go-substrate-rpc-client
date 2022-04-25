@@ -23,7 +23,7 @@ import (
 )
 
 func TestSystem_Health(t *testing.T) {
-	h, err := system.Health()
+	h, err := testSystem.Health()
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.health, h)
 }

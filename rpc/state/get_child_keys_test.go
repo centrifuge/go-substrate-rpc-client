@@ -26,13 +26,13 @@ import (
 var prefix = types.NewStorageKey(types.MustHexDecodeString(mockSrv.childStorageTrieKeyHex))[:8]
 
 func TestState_GetChildKeysLatest(t *testing.T) {
-	keys, err := state.GetChildKeysLatest(childStorageKey, prefix)
+	keys, err := testState.GetChildKeysLatest(childStorageKey, prefix)
 	assert.NoError(t, err)
 	assert.Equal(t, []types.StorageKey{types.MustHexDecodeString(mockSrv.childStorageTrieKeyHex)}, keys)
 }
 
 func TestState_GetChildKeys(t *testing.T) {
-	keys, err := state.GetChildKeys(childStorageKey, prefix, mockSrv.blockHashLatest)
+	keys, err := testState.GetChildKeys(childStorageKey, prefix, mockSrv.blockHashLatest)
 	assert.NoError(t, err)
 	assert.Equal(t, []types.StorageKey{types.MustHexDecodeString(mockSrv.childStorageTrieKeyHex)}, keys)
 }

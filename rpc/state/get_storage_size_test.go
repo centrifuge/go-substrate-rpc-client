@@ -25,14 +25,14 @@ import (
 
 func TestState_GetStorageSizeLatest(t *testing.T) {
 	key := types.NewStorageKey(types.MustHexDecodeString("0x3a636f6465"))
-	size, err := state.GetStorageSizeLatest(key)
+	size, err := testState.GetStorageSizeLatest(key)
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.storageSize, size)
 }
 
 func TestState_GetStorageSize(t *testing.T) {
 	key := types.NewStorageKey(types.MustHexDecodeString("0x3a636f6465"))
-	size, err := state.GetStorageSize(key, mockSrv.blockHashLatest)
+	size, err := testState.GetStorageSize(key, mockSrv.blockHashLatest)
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.storageSize, size)
 }

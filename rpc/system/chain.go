@@ -21,7 +21,7 @@ import (
 )
 
 // Chain retrieves the chain
-func (c *System) Chain() (types.Text, error) {
+func (c *system) Chain() (types.Text, error) {
 	var t types.Text
 	err := c.client.Call(&t, "system_chain")
 	return t, err

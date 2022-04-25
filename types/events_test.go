@@ -43,10 +43,11 @@ func TestDispatchResult_Decode(t *testing.T) {
 	decoder = scale.NewDecoder(bytes.NewReader([]byte{1, 3, 1, 1}))
 	res = DispatchResult{}
 	assert.NoError(t, decoder.Decode(&res))
+
 	assert.False(t, res.Ok)
-	assert.True(t, res.Error.HasModule)
-	assert.Equal(t, res.Error.Module, byte(1))
-	assert.Equal(t, res.Error.Error, byte(1))
+	assert.True(t, res.Error.IsModule)
+	assert.Equal(t, res.Error.ModuleError.Index, U8(1))
+	assert.Equal(t, res.Error.ModuleError.Error, U8(1))
 
 	// decoder error
 	decoder = scale.NewDecoder(bytes.NewReader([]byte{1, 3, 1}))
@@ -108,15 +109,10 @@ func TestDispatchClassEncodeDecode(t *testing.T) {
 	assert.Equal(t, buf.Len(), 1)
 	assert.Equal(t, buf.Bytes(), []byte{2})
 
-	// decode unsupported
-	var dcc DispatchClass
-	decoder := scale.NewDecoder(bytes.NewReader([]byte{3}))
-	err := decoder.Decode(&dcc)
-	assert.Error(t, err)
-
 	// decode supported
-	decoder = scale.NewDecoder(bytes.NewReader(buf.Bytes()))
-	err = decoder.Decode(&dcc)
+	var dcc DispatchClass
+	decoder := scale.NewDecoder(bytes.NewReader(buf.Bytes()))
+	err := decoder.Decode(&dcc)
 	assert.NoError(t, err)
 	assert.True(t, dcc.IsMandatory)
 }

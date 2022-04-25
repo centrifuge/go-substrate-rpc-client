@@ -21,7 +21,7 @@ import (
 )
 
 // Health retrieves the health status of the connected node
-func (c *System) Health() (types.Health, error) {
+func (c *system) Health() (types.Health, error) {
 	var h types.Health
 	err := c.client.Call(&h, "system_health")
 	return h, err

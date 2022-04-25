@@ -37,8 +37,11 @@ test-dockerized: run-substrate-docker
 run-substrate-docker: 		## starts the Substrate Docker image
 	@docker-compose up -d substrate
 
-generate-test-data:		## generate test data for types
-	go generate ./types/test/...
+generate-test-data:		## generate data for types decode test
+	@go generate -tags=types_test ./types/test/...
+
+test-types-decode:      ## run tests for types decode
+	@go test -tags=types_test ./types/test/...
 
 help: 				## shows this help
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)

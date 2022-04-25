@@ -22,16 +22,16 @@ import (
 )
 
 // GetHeader retrieves the header for the specific block
-func (c *Chain) GetHeader(blockHash types.Hash) (*types.Header, error) {
+func (c *chain) GetHeader(blockHash types.Hash) (*types.Header, error) {
 	return c.getHeader(&blockHash)
 }
 
 // GetHeaderLatest retrieves the header of the latest block
-func (c *Chain) GetHeaderLatest() (*types.Header, error) {
+func (c *chain) GetHeaderLatest() (*types.Header, error) {
 	return c.getHeader(nil)
 }
 
-func (c *Chain) getHeader(blockHash *types.Hash) (*types.Header, error) {
+func (c *chain) getHeader(blockHash *types.Hash) (*types.Header, error) {
 	var Header types.Header
 	err := client.CallWithBlockHash(c.client, &Header, "chain_getHeader", blockHash)
 	if err != nil {

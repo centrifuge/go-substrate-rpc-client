@@ -27,11 +27,11 @@ import (
 )
 
 type RPC struct {
-	Author   *author.Author
-	Chain    *chain.Chain
-	Offchain *offchain.Offchain
-	State    *state.State
-	System   *system.System
+	Author   author.Author
+	Chain    chain.Chain
+	Offchain offchain.Offchain
+	State    state.State
+	System   system.System
 	client   client.Client
 }
 

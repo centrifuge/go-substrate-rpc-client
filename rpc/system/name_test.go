@@ -23,7 +23,7 @@ import (
 )
 
 func TestSystem_Name(t *testing.T) {
-	n, err := system.Name()
+	n, err := testSystem.Name()
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.name, n)
 }

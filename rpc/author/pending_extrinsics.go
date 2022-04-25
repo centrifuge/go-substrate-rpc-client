@@ -21,7 +21,7 @@ import (
 )
 
 // PendingExtrinsics returns all pending extrinsics, potentially grouped by sender
-func (a *Author) PendingExtrinsics() ([]types.Extrinsic, error) {
+func (a *author) PendingExtrinsics() ([]types.Extrinsic, error) {
 	var res []string
 	err := a.client.Call(&res, "author_pendingExtrinsics")
 	if err != nil {

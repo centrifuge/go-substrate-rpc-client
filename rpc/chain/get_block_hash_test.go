@@ -24,19 +24,19 @@ import (
 )
 
 func TestChain_GetBlockHash(t *testing.T) {
-	res, err := chain.GetBlockHash(1)
+	res, err := testChain.GetBlockHash(1)
 	assert.NoError(t, err)
 
-	blk, err := chain.GetBlock(res)
+	blk, err := testChain.GetBlock(res)
 	assert.NoError(t, err)
 	assert.Equal(t, types.BlockNumber(1), blk.Block.Header.Number)
 }
 
 func TestChain_GetBlockHashLatest(t *testing.T) {
-	res, err := chain.GetBlockHashLatest()
+	res, err := testChain.GetBlockHashLatest()
 	assert.NoError(t, err)
 
-	blk, err := chain.GetBlock(res)
+	blk, err := testChain.GetBlock(res)
 	assert.NoError(t, err)
 	assert.True(t, blk.Block.Header.Number > 0)
 }
