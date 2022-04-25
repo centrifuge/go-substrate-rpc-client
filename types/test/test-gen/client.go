@@ -52,26 +52,30 @@ func NewClient(opts ClientOpts) (*Client, error) {
 	}, nil
 }
 
+type EventListResponseEvent struct {
+	EventIndex     string `json:"event_index"`
+	BlockNum       int    `json:"block_num"`
+	ExtrinsicIdx   int    `json:"extrinsic_idx"`
+	ModuleId       string `json:"module_id"`
+	EventId        string `json:"event_id"`
+	Params         string `json:"params"`
+	Phase          int    `json:"phase"`
+	EventIdx       int    `json:"event_idx"`
+	ExtrinsicHash  string `json:"extrinsic_hash"`
+	Finalized      bool   `json:"finalized"`
+	BlockTimestamp int    `json:"block_timestamp"`
+}
+
+type EventListResponseData struct {
+	Count  int                      `json:"count"`
+	Events []EventListResponseEvent `json:"events"`
+}
+
 type EventListResponseBody struct {
-	Code        int    `json:"code"`
-	Message     string `json:"message"`
-	GeneratedAt int    `json:"generated_at"`
-	Data        struct {
-		Count  int `json:"count"`
-		Events []struct {
-			EventIndex     string `json:"event_index"`
-			BlockNum       int    `json:"block_num"`
-			ExtrinsicIdx   int    `json:"extrinsic_idx"`
-			ModuleId       string `json:"module_id"`
-			EventId        string `json:"event_id"`
-			Params         string `json:"params"`
-			Phase          int    `json:"phase"`
-			EventIdx       int    `json:"event_idx"`
-			ExtrinsicHash  string `json:"extrinsic_hash"`
-			Finalized      bool   `json:"finalized"`
-			BlockTimestamp int    `json:"block_timestamp"`
-		} `json:"events"`
-	} `json:"data"`
+	Code        int                   `json:"code"`
+	Message     string                `json:"message"`
+	GeneratedAt int                   `json:"generated_at"`
+	Data        EventListResponseData `json:"data"`
 }
 
 func (c *Client) GetTestData(ctx context.Context, reqData *ReqData) (*TestData, error) {
@@ -140,6 +144,11 @@ const (
 	maxBlockAge = 180 * 24 * time.Hour // 180 days
 )
 
+var (
+	errNoEventsFound = errors.New("no events found")
+	errBlockIsTooOld = errors.New("block is too old")
+)
+
 func (c *Client) getBlockNumber(ctx context.Context, reqData *ReqData) (int, error) {
 	req, err := c.createRequest(ctx, reqData)
 
@@ -168,7 +177,7 @@ func (c *Client) getBlockNumber(ctx context.Context, reqData *ReqData) (int, err
 	}
 
 	if len(r.Data.Events) == 0 {
-		return 0, errors.New("no events found")
+		return 0, errNoEventsFound
 	}
 
 	firstEvent := r.Data.Events[0]
@@ -176,7 +185,7 @@ func (c *Client) getBlockNumber(ctx context.Context, reqData *ReqData) (int, err
 	blockTimestamp := time.Unix(int64(firstEvent.BlockTimestamp), 0)
 
 	if time.Since(blockTimestamp) > maxBlockAge {
-		return 0, fmt.Errorf("block with timestamp %s is too old", blockTimestamp.Format(time.RFC3339))
+		return 0, errBlockIsTooOld
 	}
 
 	return firstEvent.BlockNum, nil
@@ -189,7 +198,20 @@ type EventListReqBody struct {
 	Call   string `json:"call"`
 }
 
+var (
+	errMissingModuleName = errors.New("missing module name")
+	errMissingCallName   = errors.New("missing call name")
+)
+
 func (c *Client) createRequest(ctx context.Context, reqData *ReqData) (*http.Request, error) {
+	if reqData.Module == "" {
+		return nil, errMissingModuleName
+	}
+
+	if reqData.Call == "" {
+		return nil, errMissingCallName
+	}
+
 	b, err := json.Marshal(EventListReqBody{
 		Row:    1,
 		Page:   0,

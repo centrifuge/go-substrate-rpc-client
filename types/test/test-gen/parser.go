@@ -52,6 +52,12 @@ func (p *Parser) ParseField(field reflect.StructField) (*FieldInfo, error) {
 	}, nil
 }
 
+var (
+	errApiURLMissing     = errors.New("api URL missing")
+	errWsURLMissing      = errors.New("ws URL missing")
+	errBlockchainMissing = errors.New("blockchain missing")
+)
+
 func (p *Parser) parseClientOpts(field reflect.StructField) (*ClientOpts, error) {
 	wsURL := field.Tag.Get(WsURLTagName)
 	apiURL := field.Tag.Get(ApiURLTagName)
@@ -61,17 +67,17 @@ func (p *Parser) parseClientOpts(field reflect.StructField) (*ClientOpts, error)
 	}
 
 	if wsURL != "" {
-		return nil, errors.New("api URL missing")
+		return nil, errApiURLMissing
 	}
 
 	if apiURL != "" {
-		return nil, errors.New("ws URL missing")
+		return nil, errWsURLMissing
 	}
 
 	blockchain := field.Tag.Get(BlockchainTagName)
 
 	if blockchain == "" {
-		return nil, errors.New("no blockchain provided")
+		return nil, errBlockchainMissing
 	}
 
 	return &ClientOpts{
