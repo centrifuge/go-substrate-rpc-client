@@ -122,7 +122,7 @@ type Seal struct {
 
 // ConsensusEngineID is a 4-byte identifier (actually a [u8; 4]) identifying the engine, e.g. for Aura it would be
 // [b'a', b'u', b'r', b'a']
-type ConsensusEngineID U32
+type ConsensusEngineID [4]byte
 
 type Consensus struct {
 	ConsensusEngineID ConsensusEngineID

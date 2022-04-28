@@ -30,9 +30,9 @@ var exampleHeader = Header{
 	Digest: Digest{
 		{IsOther: true, AsOther: Bytes{4, 5}},
 		{IsChangesTrieRoot: true, AsChangesTrieRoot: Hash{6, 7}},
-		{IsConsensus: true, AsConsensus: Consensus{ConsensusEngineID: 9, Bytes: Bytes{10, 11, 12}}},
-		{IsSeal: true, AsSeal: Seal{ConsensusEngineID: 11, Bytes: Bytes{12, 13, 14}}},
-		{IsPreRuntime: true, AsPreRuntime: PreRuntime{ConsensusEngineID: 13, Bytes: Bytes{14, 15, 16}}},
+		{IsConsensus: true, AsConsensus: Consensus{ConsensusEngineID: [4]byte{9}, Bytes: Bytes{10, 11, 12}}},
+		{IsSeal: true, AsSeal: Seal{ConsensusEngineID: [4]byte{11}, Bytes: Bytes{12, 13, 14}}},
+		{IsPreRuntime: true, AsPreRuntime: PreRuntime{ConsensusEngineID: [4]byte{13}, Bytes: Bytes{14, 15, 16}}},
 	},
 }
 
