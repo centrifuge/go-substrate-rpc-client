@@ -2578,8 +2578,10 @@ type EventChildBountiesCanceled struct {
 	Topics     []Hash
 }
 
-type ClassID U32
-type InstanceID U32
+// NOTE - In cent-chain, the following are overwritten to these values instead of the default u32.
+
+type ClassID U64
+type InstanceID U128
 
 // EventUniquesApprovalCancelled is emitted when an approval for a delegate account to transfer the instance of
 // an asset class was cancelled by its owner
