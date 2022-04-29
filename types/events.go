@@ -2578,17 +2578,12 @@ type EventChildBountiesCanceled struct {
 	Topics     []Hash
 }
 
-// NOTE - In cent-chain, the following are overwritten to these values instead of the default u32.
-
-type ClassID U64
-type InstanceID U128
-
 // EventUniquesApprovalCancelled is emitted when an approval for a delegate account to transfer the instance of
 // an asset class was cancelled by its owner
 type EventUniquesApprovalCancelled struct {
 	Phase      Phase
-	ClassID    ClassID
-	InstanceID InstanceID
+	ClassID    U64
+	InstanceID U128
 	Owner      AccountID
 	Delegate   AccountID
 	Topics     []Hash
@@ -2598,8 +2593,8 @@ type EventUniquesApprovalCancelled struct {
 // for transfer by a `delegate`.
 type EventUniquesApprovedTransfer struct {
 	Phase      Phase
-	ClassID    ClassID
-	InstanceID InstanceID
+	ClassID    U64
+	InstanceID U128
 	Owner      AccountID
 	Delegate   AccountID
 	Topics     []Hash
@@ -2608,14 +2603,14 @@ type EventUniquesApprovedTransfer struct {
 // EventUniquesAssetStatusChanged is emitted when an asset `class` has had its attributes changed by the `Force` origin
 type EventUniquesAssetStatusChanged struct {
 	Phase   Phase
-	ClassID ClassID
+	ClassID U64
 	Topics  []Hash
 }
 
 // EventUniquesAttributeCleared is emitted when an attribute metadata has been cleared for an asset class or instance
 type EventUniquesAttributeCleared struct {
 	Phase         Phase
-	ClassID       ClassID
+	ClassID       U64
 	MaybeInstance OptionU32
 	Key           Bytes
 	Topics        []Hash
@@ -2624,7 +2619,7 @@ type EventUniquesAttributeCleared struct {
 // EventUniquesAttributeSet is emitted when a new attribute metadata has been set for an asset class or instance
 type EventUniquesAttributeSet struct {
 	Phase         Phase
-	ClassID       ClassID
+	ClassID       U64
 	MaybeInstance OptionU32
 	Key           Bytes
 	Value         Bytes
@@ -2634,8 +2629,8 @@ type EventUniquesAttributeSet struct {
 // EventUniquesBurned is emitted when an asset `instance` was destroyed
 type EventUniquesBurned struct {
 	Phase      Phase
-	ClassID    ClassID
-	InstanceID InstanceID
+	ClassID    U64
+	InstanceID U128
 	Owner      AccountID
 	Topics     []Hash
 }
@@ -2643,21 +2638,21 @@ type EventUniquesBurned struct {
 // EventUniquesClassFrozen is emitted when some asset `class` was frozen
 type EventUniquesClassFrozen struct {
 	Phase   Phase
-	ClassID ClassID
+	ClassID U64
 	Topics  []Hash
 }
 
 // EventUniquesClassMetadataCleared is emitted when metadata has been cleared for an asset class
 type EventUniquesClassMetadataCleared struct {
 	Phase   Phase
-	ClassID ClassID
+	ClassID U64
 	Topics  []Hash
 }
 
 // EventUniquesClassMetadataSet is emitted when new metadata has been set for an asset class
 type EventUniquesClassMetadataSet struct {
 	Phase    Phase
-	ClassID  ClassID
+	ClassID  U64
 	Data     Bytes
 	IsFrozen Bool
 	Topics   []Hash
@@ -2666,14 +2661,14 @@ type EventUniquesClassMetadataSet struct {
 // EventUniquesClassThawed is emitted when some asset `class` was thawed
 type EventUniquesClassThawed struct {
 	Phase   Phase
-	ClassID ClassID
+	ClassID U64
 	Topics  []Hash
 }
 
 // EventUniquesCreated is emitted when an asset class was created
 type EventUniquesCreated struct {
 	Phase   Phase
-	ClassID ClassID
+	ClassID U64
 	Creator AccountID
 	Owner   AccountID
 	Topics  []Hash
@@ -2682,14 +2677,14 @@ type EventUniquesCreated struct {
 // EventUniquesDestroyed is emitted when an asset `class` was destroyed
 type EventUniquesDestroyed struct {
 	Phase   Phase
-	ClassID ClassID
+	ClassID U64
 	Topics  []Hash
 }
 
 // EventUniquesForceCreated is emitted when an asset class was force-created
 type EventUniquesForceCreated struct {
 	Phase   Phase
-	ClassID ClassID
+	ClassID U64
 	Owner   AccountID
 	Topics  []Hash
 }
@@ -2697,16 +2692,16 @@ type EventUniquesForceCreated struct {
 // EventUniquesFrozen is emitted when some asset `instance` was frozen
 type EventUniquesFrozen struct {
 	Phase      Phase
-	ClassID    ClassID
-	InstanceID InstanceID
+	ClassID    U64
+	InstanceID U128
 	Topics     []Hash
 }
 
 // EventUniquesIssued is emitted when an asset instance was issued
 type EventUniquesIssued struct {
 	Phase      Phase
-	ClassID    ClassID
-	InstanceID InstanceID
+	ClassID    U64
+	InstanceID U128
 	Owner      AccountID
 	Topics     []Hash
 }
@@ -2714,16 +2709,16 @@ type EventUniquesIssued struct {
 // EventUniquesMetadataCleared is emitted when metadata has been cleared for an asset instance
 type EventUniquesMetadataCleared struct {
 	Phase      Phase
-	ClassID    ClassID
-	InstanceID InstanceID
+	ClassID    U64
+	InstanceID U128
 	Topics     []Hash
 }
 
 // EventUniquesMetadataSet is emitted when metadata has been set for an asset instance
 type EventUniquesMetadataSet struct {
 	Phase      Phase
-	ClassID    ClassID
-	InstanceID InstanceID
+	ClassID    U64
+	InstanceID U128
 	Data       Bytes
 	IsFrozen   Bool
 	Topics     []Hash
@@ -2732,7 +2727,7 @@ type EventUniquesMetadataSet struct {
 // EventUniquesOwnerChanged is emitted when the owner changed
 type EventUniquesOwnerChanged struct {
 	Phase    Phase
-	ClassID  ClassID
+	ClassID  U64
 	NewOwner AccountID
 	Topics   []Hash
 }
@@ -2740,7 +2735,7 @@ type EventUniquesOwnerChanged struct {
 // EventUniquesRedeposited is emitted when metadata has been cleared for an asset instance
 type EventUniquesRedeposited struct {
 	Phase               Phase
-	ClassID             ClassID
+	ClassID             U64
 	SuccessfulInstances []U128
 	Topics              []Hash
 }
@@ -2748,7 +2743,7 @@ type EventUniquesRedeposited struct {
 // EventUniquesTeamChanged is emitted when the management team changed
 type EventUniquesTeamChanged struct {
 	Phase   Phase
-	ClassID ClassID
+	ClassID U64
 	Issuer  AccountID
 	Admin   AccountID
 	Freezer AccountID
@@ -2758,16 +2753,16 @@ type EventUniquesTeamChanged struct {
 // EventUniquesThawed is emitted when some asset instance was thawed
 type EventUniquesThawed struct {
 	Phase      Phase
-	ClassID    ClassID
-	InstanceID InstanceID
+	ClassID    U64
+	InstanceID U128
 	Topics     []Hash
 }
 
 // EventUniquesTransferred is emitted when some asset instance was transferred
 type EventUniquesTransferred struct {
 	Phase      Phase
-	ClassID    ClassID
-	InstanceID InstanceID
+	ClassID    U64
+	InstanceID U128
 	From       AccountID
 	To         AccountID
 	Topics     []Hash
