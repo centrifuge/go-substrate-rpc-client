@@ -17,3 +17,8 @@ services:
       - TEST_PRIV_KEY=//Alice
     volumes:
       - "$PWD:/go-substrate-rpc-client"
+
+#networks:
+#  default:
+#    external:
+#      name: your-network

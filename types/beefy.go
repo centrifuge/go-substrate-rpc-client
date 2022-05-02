@@ -18,9 +18,14 @@ package types
 
 import "github.com/ComposableFi/go-substrate-rpc-client/v4/scale"
 
+type Payload struct {
+	Id    [2]byte
+	Value []byte
+}
+
 // Commitment is a beefy commitment
 type Commitment struct {
-	Payload        H256
+	Payload        []Payload
 	BlockNumber    U32
 	ValidatorSetID U64
 }
@@ -29,6 +34,41 @@ type Commitment struct {
 type SignedCommitment struct {
 	Commitment Commitment
 	Signatures []OptionBeefySignature
+}
+
+type CompactSignedCommitment struct {
+	Commitment        Commitment
+	SignaturesFrom    []byte
+	ValidatorSetLen   uint32
+	SignaturesCompact []BeefySignature
+}
+
+const CONTAINER_BIT_SIZE = 8
+
+func (cs *CompactSignedCommitment) Unpack() SignedCommitment {
+	var bits []byte
+
+	for _, block := range cs.SignaturesFrom {
+		for i := 0; i < CONTAINER_BIT_SIZE; i++ {
+			bits = append(bits, (block>>(CONTAINER_BIT_SIZE-i-1))&1)
+		}
+	}
+
+	bits = bits[:cs.ValidatorSetLen]
+
+	var sigs []OptionBeefySignature
+	count := 0
+	for _, v := range bits {
+		if v == 1 {
+			sigs = append(sigs, OptionBeefySignature{option{true}, cs.SignaturesCompact[count]})
+			count++
+		} else {
+			sigs = append(sigs, OptionBeefySignature{option: option{false}})
+
+		}
+	}
+
+	return SignedCommitment{Commitment: cs.Commitment, Signatures: sigs}
 }
 
 // BeefySignature is a beefy signature

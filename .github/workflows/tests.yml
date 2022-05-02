@@ -1,7 +1,4 @@
-on:
-  push:
-    branches: [master]
-  pull_request:
+on: [push]
 name: Tests
 jobs:
   tests:
