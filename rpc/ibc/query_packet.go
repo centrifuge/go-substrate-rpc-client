@@ -4,6 +4,15 @@ import (
 	chantypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
 )
 
+func (i IBC) QueryPackets(channelid, portid string, seqs []uint64) ([]chantypes.Packet, error) {
+	var res []chantypes.Packet
+	err := i.client.Call(&res, "ibc_queryPackets", channelid, portid, seqs)
+	if err != nil {
+		return []chantypes.Packet{}, err
+	}
+	return res, nil
+}
+
 func (i IBC) QueryPacketCommitments(height uint64, channelid, portid string) (*chantypes.QueryPacketCommitmentsResponse, error) {
 	var res *chantypes.QueryPacketCommitmentsResponse
 	err := i.client.Call(&res, "ibc_queryPacketCommitments", height, channelid, portid)
