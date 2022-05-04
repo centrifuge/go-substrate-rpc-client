@@ -164,6 +164,18 @@ func (i U128) Encode(encoder scale.Encoder) error {
 	return encoder.Write(b)
 }
 
+func (i U128) GobEncode() ([]byte, error) {
+	return i.Int.GobEncode()
+}
+
+func (i *U128) GobDecode(b []byte) error {
+	if i.Int == nil {
+		i.Int = big.NewInt(0)
+	}
+
+	return i.Int.GobDecode(b)
+}
+
 // U256 is an usigned 256-bit integer, it is represented as a big.Int in Go.
 type U256 struct {
 	*big.Int
