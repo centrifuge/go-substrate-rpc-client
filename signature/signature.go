@@ -17,10 +17,13 @@
 package signature
 
 import (
+	"errors"
 	"fmt"
-	"github.com/vedhavyas/go-subkey"
 	"os"
 	"strconv"
+
+	"github.com/vedhavyas/go-subkey"
+	"github.com/vedhavyas/go-subkey/sr25519"
 
 	"golang.org/x/crypto/blake2b"
 )
@@ -38,25 +41,24 @@ type KeyringPair struct {
 // Leave network empty for default behavior
 func KeyringPairFromSecret(seedOrPhrase string, network uint8) (KeyringPair, error) {
 	_, _ = subkey.Derive(nil, "")
-	//scheme := sr25519.Scheme{}
-	//kyr, err := subkey.DeriveKeyPair(scheme, seedOrPhrase)
-	//if err != nil {
-	//	return KeyringPair{}, err
-	//}
-	//
-	//ss58Address, err := kyr.SS58Address(network)
-	//if err != nil {
-	//	return KeyringPair{}, err
-	//}
-	//
-	//var pk = kyr.Public()
-	//
-	//return KeyringPair{
-	//	URI:       seedOrPhrase,
-	//	Address:   ss58Address,
-	//	PublicKey: pk,
-	//}, nil
-	return KeyringPair{}, nil
+	scheme := sr25519.Scheme{}
+	kyr, err := subkey.Derive(scheme, seedOrPhrase)
+	if err != nil {
+		return KeyringPair{}, err
+	}
+
+	ss58Address, err := kyr.SS58Address(network)
+	if err != nil {
+		return KeyringPair{}, err
+	}
+
+	var pk = kyr.Public()
+
+	return KeyringPair{
+		URI:       seedOrPhrase,
+		Address:   ss58Address,
+		PublicKey: pk,
+	}, nil
 }
 
 var TestKeyringPairAlice = KeyringPair{
@@ -74,19 +76,18 @@ func Sign(data []byte, privateKeyURI string) ([]byte, error) {
 		data = h[:]
 	}
 
-	//scheme := sr25519.Scheme{}
-	//kyr, err := subkey.DeriveKeyPair(scheme, privateKeyURI)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//signature, err := kyr.Sign(data)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//return signature, nil
-	return nil, nil
+	scheme := sr25519.Scheme{}
+	kyr, err := subkey.Derive(scheme, privateKeyURI)
+	if err != nil {
+		return nil, err
+	}
+
+	signature, err := kyr.Sign(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return signature, nil
 }
 
 // Verify verifies data using the provided signature and the key under the derivation path. Requires the subkey
@@ -98,20 +99,19 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 		data = h[:]
 	}
 
-	//scheme := sr25519.Scheme{}
-	//kyr, err := subkey.DeriveKeyPair(scheme, privateKeyURI)
-	//if err != nil {
-	//	return false, err
-	//}
-	//
-	//if len(sig) != 64 {
-	//	return false, errors.New("wrong signature length")
-	//}
-	//
-	//v := kyr.Verify(data, sig)
+	scheme := sr25519.Scheme{}
+	kyr, err := subkey.Derive(scheme, privateKeyURI)
+	if err != nil {
+		return false, err
+	}
 
-	//return v, nil
-	return false, nil
+	if len(sig) != 64 {
+		return false, errors.New("wrong signature length")
+	}
+
+	v := kyr.Verify(data, sig)
+
+	return v, nil
 }
 
 // LoadKeyringPairFromEnv looks up whether the env variable TEST_PRIV_KEY is set and is not empty and tries to use its
