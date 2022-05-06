@@ -17,6 +17,7 @@
 package state
 
 import (
+	"fmt"
 	"github.com/ComposableFi/go-substrate-rpc-client/v4/client"
 	"github.com/ComposableFi/go-substrate-rpc-client/v4/types"
 )
@@ -35,10 +36,14 @@ func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
 	var res string
 	err := client.CallWithBlockHash(s.client, &res, "state_getMetadata", blockHash)
 	if err != nil {
+		fmt.Println("getMetadata, CallWithBlockHash, s.client, blockHash, err", s.client, blockHash, err)
 		return nil, err
 	}
 
 	var metadata types.Metadata
 	err = types.DecodeFromHexString(res, &metadata)
+	if err != nil {
+		fmt.Println("getMetadata, DecodeFromHexString, err", err)
+	}
 	return &metadata, err
 }
