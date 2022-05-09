@@ -40,7 +40,6 @@ type KeyringPair struct {
 // KeyringPairFromSecret creates KeyPair based on seed/phrase and network
 // Leave network empty for default behavior
 func KeyringPairFromSecret(seedOrPhrase string, network uint8) (KeyringPair, error) {
-	_, _ = subkey.Derive(nil, "")
 	scheme := sr25519.Scheme{}
 	kyr, err := subkey.Derive(scheme, seedOrPhrase)
 	if err != nil {
