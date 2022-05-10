@@ -4,7 +4,7 @@ import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 
 type InstanceMetadata struct {
 	Deposit  U128
-	Data     [CentrifugeChainStringLimit]U8
+	Data     Bytes
 	IsFrozen bool
 }
 

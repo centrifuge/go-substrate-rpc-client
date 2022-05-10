@@ -2,14 +2,9 @@ package types
 
 import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 
-const (
-	// CentrifugeChainStringLimit is defined in the centrifuge-chain.
-	CentrifugeChainStringLimit = 256
-)
-
 type ClassMetadata struct {
 	Deposit  U128
-	Data     [CentrifugeChainStringLimit]U8
+	Data     Bytes
 	IsFrozen bool
 }
 
