@@ -85,17 +85,17 @@ type BodyPart struct {
 	IsMembers    bool
 	MembersCount U32
 
-	IsFraction bool
-	Nom        U32
-	Denom      U32
+	IsFraction    bool
+	FractionNom   U32
+	FractionDenom U32
 
-	IsAtLeastProportion bool
-	// Also contains Nom
-	// Also contains Denom
+	IsAtLeastProportion    bool
+	AtLeastProportionNom   U32
+	AtLeastProportionDenom U32
 
-	IsMoreThanProportion bool
-	// Also contains Nom
-	// Also contains Denom
+	IsMoreThanProportion    bool
+	MoreThanProportionNom   U32
+	MoreThanProportionDenom U32
 }
 
 func (b *BodyPart) Decode(decoder scale.Decoder) error {
@@ -114,27 +114,27 @@ func (b *BodyPart) Decode(decoder scale.Decoder) error {
 	case 2:
 		b.IsFraction = true
 
-		if err := decoder.Decode(&b.Nom); err != nil {
+		if err := decoder.Decode(&b.FractionNom); err != nil {
 			return err
 		}
 
-		return decoder.Decode(&b.Denom)
+		return decoder.Decode(&b.FractionDenom)
 	case 3:
 		b.IsAtLeastProportion = true
 
-		if err := decoder.Decode(&b.Nom); err != nil {
+		if err := decoder.Decode(&b.AtLeastProportionNom); err != nil {
 			return err
 		}
 
-		return decoder.Decode(&b.Denom)
+		return decoder.Decode(&b.AtLeastProportionDenom)
 	case 4:
 		b.IsMoreThanProportion = true
 
-		if err := decoder.Decode(&b.Nom); err != nil {
+		if err := decoder.Decode(&b.MoreThanProportionNom); err != nil {
 			return err
 		}
 
-		return decoder.Decode(&b.Denom)
+		return decoder.Decode(&b.MoreThanProportionDenom)
 	}
 
 	return nil
@@ -155,31 +155,31 @@ func (b BodyPart) Encode(encoder scale.Encoder) error {
 			return err
 		}
 
-		if err := encoder.Encode(b.Nom); err != nil {
+		if err := encoder.Encode(b.FractionNom); err != nil {
 			return err
 		}
 
-		return encoder.Encode(b.Denom)
+		return encoder.Encode(b.FractionDenom)
 	case b.IsAtLeastProportion:
 		if err := encoder.PushByte(3); err != nil {
 			return err
 		}
 
-		if err := encoder.Encode(b.Nom); err != nil {
+		if err := encoder.Encode(b.AtLeastProportionNom); err != nil {
 			return err
 		}
 
-		return encoder.Encode(b.Denom)
+		return encoder.Encode(b.AtLeastProportionDenom)
 	case b.IsMoreThanProportion:
 		if err := encoder.PushByte(4); err != nil {
 			return err
 		}
 
-		if err := encoder.Encode(b.Nom); err != nil {
+		if err := encoder.Encode(b.MoreThanProportionNom); err != nil {
 			return err
 		}
 
-		return encoder.Encode(b.Denom)
+		return encoder.Encode(b.MoreThanProportionDenom)
 	}
 
 	return nil

@@ -22,6 +22,25 @@ import (
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+func TestOptionAccountID_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, NewOptionAccountID(NewAccountID([]byte{0, 1, 2, 3, 4, 5, 6, 7})))
+	assertRoundtrip(t, NewOptionAccountIDEmpty())
+}
+
+func TestOptionAccountID_Encode(t *testing.T) {
+	assertEncode(t, []encodingAssert{
+		{NewOptionAccountID(NewAccountID([]byte{171, 18, 52})), MustHexDecodeString("0x01ab12340000000000000000000000000000000000000000000000000000000000")},
+		{NewOptionAccountIDEmpty(), MustHexDecodeString("0x00")},
+	})
+}
+
+func TestOptionAccountID_Decode(t *testing.T) {
+	assertDecode(t, []decodingAssert{
+		{MustHexDecodeString("0x01ab12340000000000000000000000000000000000000000000000000000000000"), NewOptionAccountID(NewAccountID([]byte{171, 18, 52}))},
+		{MustHexDecodeString("0x00"), NewOptionAccountIDEmpty()},
+	})
+}
+
 func TestAccountID_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewAccountID([]byte{}))
 	assertRoundtrip(t, NewAccountID([]byte{0, 1, 2, 3, 4, 5, 6, 7}))
