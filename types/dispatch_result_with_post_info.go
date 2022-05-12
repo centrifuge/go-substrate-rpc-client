@@ -9,6 +9,22 @@ type PostDispatchInfo struct {
 	PaysFee      Pays
 }
 
+func (p *PostDispatchInfo) Decode(decoder scale.Decoder) error {
+	if err := decoder.Decode(&p.ActualWeight); err != nil {
+		return err
+	}
+
+	return decoder.Decode(&p.PaysFee)
+}
+
+func (p PostDispatchInfo) Encode(encoder scale.Encoder) error {
+	if err := encoder.Encode(p.ActualWeight); err != nil {
+		return err
+	}
+
+	return encoder.Encode(p.PaysFee)
+}
+
 // DispatchErrorWithPostInfo is used in DispatchResultWithPostInfo.
 type DispatchErrorWithPostInfo struct {
 	PostInfo PostDispatchInfo
@@ -33,8 +49,11 @@ func (d DispatchErrorWithPostInfo) Encode(encoder scale.Encoder) error {
 
 // DispatchResultWithPostInfo can be returned from dispatchable functions.
 type DispatchResultWithPostInfo struct {
-	Ok    *PostDispatchInfo
-	Error *DispatchErrorWithPostInfo
+	IsOk bool
+	Ok   PostDispatchInfo
+
+	IsError bool
+	Error   DispatchErrorWithPostInfo
 }
 
 func (d *DispatchResultWithPostInfo) Decode(decoder scale.Decoder) error {
@@ -45,23 +64,33 @@ func (d *DispatchResultWithPostInfo) Decode(decoder scale.Decoder) error {
 
 	switch b {
 	case 0:
-		err = decoder.Decode(&d.Ok)
-		return nil
-	default:
-		derr := DispatchErrorWithPostInfo{}
-		err = decoder.Decode(&derr)
-		if err != nil {
-			return err
-		}
-		d.Error = &derr
-		return nil
+		d.IsOk = true
+
+		return decoder.Decode(&d.Ok)
+	case 1:
+		d.IsError = true
+
+		return decoder.Decode(&d.Error)
 	}
+
+	return nil
 }
 
 func (d DispatchResultWithPostInfo) Encode(encoder scale.Encoder) error {
-	if d.Ok != nil {
+	switch {
+	case d.IsOk:
+		if err := encoder.PushByte(0); err != nil {
+			return err
+		}
+
 		return encoder.Encode(d.Ok)
+	case d.IsError:
+		if err := encoder.PushByte(1); err != nil {
+			return err
+		}
+
+		return encoder.Encode(d.Error)
 	}
 
-	return d.Error.Encode(encoder)
+	return nil
 }

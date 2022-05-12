@@ -31,3 +31,19 @@ func TestOptionExecutionResult_Decode(t *testing.T) {
 		{MustHexDecodeString("0x00"), NewOptionBytesEmpty()},
 	})
 }
+
+func TestExecutionResult_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, testExecutionResult)
+}
+
+func TestExecutionResult_Encode(t *testing.T) {
+	assertEncode(t, []encodingAssert{
+		{testExecutionResult, MustHexDecodeString("0x0100000000")},
+	})
+}
+
+func TestExecutionResult_Decode(t *testing.T) {
+	assertDecode(t, []decodingAssert{
+		{MustHexDecodeString("0x0100000000"), testExecutionResult},
+	})
+}

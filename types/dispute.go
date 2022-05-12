@@ -2,20 +2,6 @@ package types
 
 import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 
-// /// Whether the dispute is local or remote.
-//#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, TypeInfo)]
-//pub enum DisputeLocation {
-//	Local,
-//	Remote,
-//}
-//
-///// The result of a dispute, whether the candidate is deemed valid (for) or invalid (against).
-//#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, TypeInfo)]
-//pub enum DisputeResult {
-//	Valid,
-//	Invalid,
-//}
-
 type DisputeLocation struct {
 	IsLocal bool
 

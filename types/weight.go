@@ -32,11 +32,20 @@ func NewWeight(u uint64) Weight {
 }
 
 func NewOptionWeight(value Weight) OptionWeight {
-	return OptionWeight{option{hasValue: true}, value}
+	return OptionWeight{
+		option: option{
+			hasValue: true,
+		},
+		value: value,
+	}
 }
 
 func NewOptionWeightEmpty() OptionWeight {
-	return OptionWeight{option: option{hasValue: false}}
+	return OptionWeight{
+		option: option{
+			hasValue: false,
+		},
+	}
 }
 
 func (o OptionWeight) Encode(encoder scale.Encoder) error {

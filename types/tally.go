@@ -2,9 +2,6 @@ package types
 
 import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 
-// Tally is a wrapper struct for the Referenda Tally:
-//
-// type Tally: VoteTally<Self::Votes> + Default + Clone + Codec + Eq + Debug + TypeInfo;
 type Tally struct {
 	Votes U128
 	Total U128
