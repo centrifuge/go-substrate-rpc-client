@@ -122,7 +122,7 @@ func (c *Client) getTestData(blockNumber int) (*TestData, error) {
 		return nil, fmt.Errorf("couldn't get latest metadata: %w", err)
 	}
 
-	encodedMetadata, err := types.EncodeToBytes(meta)
+	encodedMetadata, err := types.Encode(meta)
 
 	if err != nil {
 		return nil, fmt.Errorf("couldn't encode metadata: %w", err)

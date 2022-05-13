@@ -26,14 +26,14 @@ import (
 func ExampleExampleVec_simple() {
 	ingredients := []string{"salt", "sugar"}
 
-	encoded, err := EncodeToHexString(ingredients)
+	encoded, err := EncodeToHex(ingredients)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(encoded)
 
 	var decoded []string
-	err = DecodeFromHexString(encoded, &decoded)
+	err = DecodeFromHex(encoded, &decoded)
 	if err != nil {
 		panic(err)
 	}
@@ -57,12 +57,12 @@ func ExampleExampleVec_struct() {
 		Outstanding: []string{"Bob", "Carol"},
 	}
 
-	encoded, err := EncodeToBytes(votes)
+	encoded, err := Encode(votes)
 	if err != nil {
 		panic(err)
 	}
 	var decoded Votes
-	err = DecodeFromBytes(encoded, &decoded)
+	err = Decode(encoded, &decoded)
 	if err != nil {
 		panic(err)
 	}
@@ -87,14 +87,14 @@ func ExampleExampleVec_struct() {
 // 	myopt := NewMyOption(true)
 // 	// myopt := NewBool(true)
 
-// 	encoded, err := EncodeToHexString(myopt)
+// 	encoded, err := EncodeToHex(myopt)
 // 	if err != nil {
 // 		panic(err)
 // 	}
 // 	fmt.Println(encoded)
 
 // 	var decoded MyOption
-// 	err = DecodeFromHexString(encoded, &decoded)
+// 	err = DecodeFromHex(encoded, &decoded)
 // 	if err != nil {
 // 		panic(err)
 // 	}

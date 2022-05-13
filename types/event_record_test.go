@@ -53,23 +53,23 @@ var exampleEventFinEnc = []byte{0x1, 0x10, 0x27, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0
 	0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} //nolint:lll
 
 func TestEventSystemExtrinsicSuccess_Encode(t *testing.T) {
-	encoded, err := EncodeToBytes(exampleEventFin)
+	encoded, err := Encode(exampleEventFin)
 	assert.NoError(t, err)
 	assert.Equal(t, exampleEventFinEnc, encoded)
 
-	encoded, err = EncodeToBytes(exampleEventApp)
+	encoded, err = Encode(exampleEventApp)
 	assert.NoError(t, err)
 	assert.Equal(t, exampleEventAppEnc, encoded)
 }
 
 func TestEventSystemExtrinsicSuccess_Decode(t *testing.T) {
 	decoded := EventSystemExtrinsicSuccess{}
-	err := DecodeFromBytes(exampleEventFinEnc, &decoded)
+	err := Decode(exampleEventFinEnc, &decoded)
 	assert.NoError(t, err)
 	assert.Equal(t, exampleEventFin, decoded)
 
 	decoded = EventSystemExtrinsicSuccess{}
-	err = DecodeFromBytes(exampleEventAppEnc, &decoded)
+	err = Decode(exampleEventAppEnc, &decoded)
 	assert.NoError(t, err)
 	assert.Equal(t, exampleEventApp, decoded)
 }
@@ -264,7 +264,7 @@ func TestEventRecordsRaw_Decode(t *testing.T) {
 	)) //nolint:lll
 
 	var metadata Metadata
-	err := DecodeFromHexString(MetadataV14Data, &metadata)
+	err := DecodeFromHex(MetadataV14Data, &metadata)
 	if err != nil {
 		panic(err)
 	}

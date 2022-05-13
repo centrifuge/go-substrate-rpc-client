@@ -25,14 +25,14 @@ import (
 
 func TestExtrinsicEra_Immortal(t *testing.T) {
 	var e ExtrinsicEra
-	err := DecodeFromHexString("0x00", &e)
+	err := DecodeFromHex("0x00", &e)
 	assert.NoError(t, err)
 	assert.Equal(t, ExtrinsicEra{IsImmortalEra: true}, e)
 }
 
 func TestExtrinsicEra_Mortal(t *testing.T) {
 	var e ExtrinsicEra
-	err := DecodeFromHexString("0x4e9c", &e)
+	err := DecodeFromHex("0x4e9c", &e)
 	assert.NoError(t, err)
 	assert.Equal(t, ExtrinsicEra{
 		IsMortalEra: true, AsMortalEra: MortalEra{78, 156},
@@ -41,7 +41,7 @@ func TestExtrinsicEra_Mortal(t *testing.T) {
 
 func TestExtrinsicEra_EncodeDecode(t *testing.T) {
 	var e ExtrinsicEra
-	err := DecodeFromHexString("0x4e9c", &e)
+	err := DecodeFromHex("0x4e9c", &e)
 	assert.NoError(t, err)
 	assertRoundtrip(t, e)
 }

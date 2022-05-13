@@ -84,11 +84,11 @@ func TestClient_GetTestData(t *testing.T) {
 	defer ts.Close()
 
 	var metadata types.Metadata
-	err := types.DecodeFromHexString(types.MetadataV14Data, &metadata)
+	err := types.DecodeFromHex(types.MetadataV14Data, &metadata)
 	assert.EqualValues(t, metadata.Version, 14)
 	assert.Nil(t, err)
 
-	encodedMeta, err := types.EncodeToBytes(metadata)
+	encodedMeta, err := types.Encode(metadata)
 
 	assert.Nil(t, err)
 
@@ -428,7 +428,7 @@ func TestClient_GetTestData_BlockHashError(t *testing.T) {
 	defer ts.Close()
 
 	var metadata types.Metadata
-	err := types.DecodeFromHexString(types.MetadataV14Data, &metadata)
+	err := types.DecodeFromHex(types.MetadataV14Data, &metadata)
 	assert.EqualValues(t, metadata.Version, 14)
 	assert.Nil(t, err)
 
@@ -509,7 +509,7 @@ func TestClient_GetTestData_StorageError(t *testing.T) {
 	defer ts.Close()
 
 	var metadata types.Metadata
-	err := types.DecodeFromHexString(types.MetadataV14Data, &metadata)
+	err := types.DecodeFromHex(types.MetadataV14Data, &metadata)
 	assert.EqualValues(t, metadata.Version, 14)
 	assert.Nil(t, err)
 

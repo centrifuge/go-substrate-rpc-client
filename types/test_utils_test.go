@@ -121,7 +121,7 @@ type encodingAssert struct {
 
 func assertEncode(t *testing.T, encodingAsserts []encodingAssert) {
 	for _, test := range encodingAsserts {
-		result, err := EncodeToBytes(test.input)
+		result, err := Encode(test.input)
 		if err != nil {
 			t.Errorf("Encoding error for input %v: %v\n", test.input, err)
 		}
@@ -140,7 +140,7 @@ type decodingAssert struct {
 func assertDecode(t *testing.T, decodingAsserts []decodingAssert) {
 	for _, test := range decodingAsserts {
 		target := reflect.New(reflect.TypeOf(test.expected))
-		err := DecodeFromBytes(test.input, target.Interface())
+		err := Decode(test.input, target.Interface())
 		if err != nil {
 			t.Errorf("Encoding error for input %v: %v\n", test.input, err)
 		}
@@ -172,7 +172,7 @@ type encodeToHexAssert struct {
 
 func assertEncodeToHex(t *testing.T, encodeToHexAsserts []encodeToHexAssert) {
 	for _, test := range encodeToHexAsserts {
-		result, err := EncodeToHexString(test.input)
+		result, err := EncodeToHex(test.input)
 		if err != nil {
 			t.Errorf("Hex error for input %v: %v\n", test.input, err)
 		}

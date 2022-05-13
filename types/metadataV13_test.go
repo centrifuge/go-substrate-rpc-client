@@ -159,10 +159,10 @@ func TestMetadataV13_TestFindCallIndexWithUnknownFunction(t *testing.T) {
 
 func TestNewMetadataV13_Decode(t *testing.T) {
 	metadata := NewMetadataV13()
-	err := DecodeFromBytes(MustHexDecodeString(ExamplaryMetadataV13SubstrateString), metadata)
+	err := Decode(MustHexDecodeString(ExamplaryMetadataV13SubstrateString), metadata)
 	assert.EqualValues(t, metadata.Version, 13)
 	assert.NoError(t, err)
-	data, err := EncodeToBytes(metadata)
+	data, err := Encode(metadata)
 	assert.NoError(t, err)
 	assert.Equal(t, ExamplaryMetadataV13SubstrateString, HexEncodeToString(data))
 }

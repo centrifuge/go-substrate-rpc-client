@@ -28,7 +28,7 @@ var examplaryExtrinsicPayload = ExtrinsicPayloadV4{ExtrinsicPayloadV3: Extrinsic
 
 func TestExtrinsicPayload(t *testing.T) {
 	var era ExtrinsicEra
-	err := DecodeFromHexString("0x0703", &era)
+	err := DecodeFromHex("0x0703", &era)
 	assert.NoError(t, err)
 
 	p := ExtrinsicPayloadV4{
@@ -47,7 +47,7 @@ func TestExtrinsicPayload(t *testing.T) {
 
 	assert.Equal(t, examplaryExtrinsicPayload, p)
 
-	enc, err := EncodeToHexString(examplaryExtrinsicPayload)
+	enc, err := EncodeToHex(examplaryExtrinsicPayload)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x"+
@@ -64,7 +64,7 @@ func TestExtrinsicPayload(t *testing.T) {
 	// b := bytes.NewBuffer(MustHexDecodeString())
 
 	var dec ExtrinsicPayloadV4
-	err = DecodeFromHexString(enc, &dec)
+	err = DecodeFromHex(enc, &dec)
 	assert.Error(t, err)
 }
 
@@ -73,7 +73,7 @@ func TestExtrinsicPayload_Sign(t *testing.T) {
 	assert.NoError(t, err)
 
 	// verify sig
-	b, err := EncodeToBytes(examplaryExtrinsicPayload)
+	b, err := Encode(examplaryExtrinsicPayload)
 	assert.NoError(t, err)
 	ok, err := signature.Verify(b, sig[:], signature.TestKeyringPairAlice.URI)
 	assert.NoError(t, err)

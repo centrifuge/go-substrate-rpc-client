@@ -90,10 +90,10 @@ func TestNewMetadataV12_Decode(t *testing.T) {
 	for _, s := range tests {
 		t.Run(s.name, func(t *testing.T) {
 			metadata := NewMetadataV12()
-			err := DecodeFromBytes(MustHexDecodeString(s.hexData), metadata)
+			err := Decode(MustHexDecodeString(s.hexData), metadata)
 			assert.EqualValues(t, metadata.Version, 12)
 			assert.NoError(t, err)
-			data, err := EncodeToBytes(metadata)
+			data, err := Encode(metadata)
 			assert.NoError(t, err)
 			assert.Equal(t, s.hexData, HexEncodeToString(data))
 		})

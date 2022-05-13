@@ -81,14 +81,14 @@ func (a MyVal) Encode(encoder scale.Encoder) error {
 func ExampleExampleVecAny() {
 	myValSlice := []MyVal{{uint8(12)}, {"Abc"}}
 
-	encoded, err := EncodeToBytes(myValSlice)
+	encoded, err := Encode(myValSlice)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(encoded)
 
 	var decoded []MyVal
-	err = DecodeFromBytes(encoded, &decoded)
+	err = Decode(encoded, &decoded)
 	if err != nil {
 		panic(err)
 	}

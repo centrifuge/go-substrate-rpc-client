@@ -18,10 +18,10 @@ clean:				## cleanup
 	@docker-compose down
 
 lint:				## run linters on go code
-	@docker run -v `pwd`:/app -w /app golangci/golangci-lint:v1.36.0 golangci-lint run
+	@docker run -v `pwd`:/app -w /app golangci/golangci-lint:v1.45.2 golangci-lint run
 
 lint-fix: 			## run linters on go code and automatically fixes issues
-	@docker run -v `pwd`:/app -w /app golangci/golangci-lint:v1.36.0 golangci-lint run --fix
+	@docker run -v `pwd`:/app -w /app golangci/golangci-lint:v1.45.2 golangci-lint run --fix
 
 test: 				## run all tests in project against the RPC URL specified in the RPC_URL env variable or localhost while excluding gethrpc
 	@go test -race -count=1 `go list ./... | grep -v '/gethrpc'`

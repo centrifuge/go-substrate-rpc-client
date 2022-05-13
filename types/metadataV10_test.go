@@ -134,7 +134,7 @@ func TestFindStorageEntryMetadataV10(t *testing.T) {
 func TestMetadataV10_Decode(t *testing.T) {
 	metadata := NewMetadataV10()
 
-	err := DecodeFromBytes(MustHexDecodeString(ExamplaryMetadataV10String), metadata)
+	err := Decode(MustHexDecodeString(ExamplaryMetadataV10String), metadata)
 	assert.NoError(t, err)
 
 	assert.Equal(t, *ExamplaryMetadataV10, *metadata)
@@ -143,7 +143,7 @@ func TestMetadataV10_Decode(t *testing.T) {
 func TestMetadataV10Polkadot_Decode(t *testing.T) {
 	metadata := NewMetadataV10()
 
-	err := DecodeFromBytes(MustHexDecodeString(ExamplaryMetadataV10PolkadotString), metadata)
+	err := Decode(MustHexDecodeString(ExamplaryMetadataV10PolkadotString), metadata)
 	assert.NoError(t, err)
 
 	assert.Equal(t, *ExamplaryMetadataV10Polkadot, *metadata)

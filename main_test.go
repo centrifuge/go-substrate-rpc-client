@@ -132,7 +132,7 @@ func Example_listenToBalanceChange() {
 			}
 
 			var acc types.AccountInfo
-			if err = types.DecodeFromBytes(chng.StorageData, &acc); err != nil {
+			if err = types.Decode(chng.StorageData, &acc); err != nil {
 				panic(err)
 			}
 

@@ -67,7 +67,7 @@ func TestTypesDecode(t *testing.T) {
 
 			switch subdirEntry.Name() {
 			case "meta_bytes":
-				if err := types.DecodeFromBytes(b, &metadata); err != nil {
+				if err := types.Decode(b, &metadata); err != nil {
 					t.Errorf("Couldn't decode Metadata - %s", err)
 				}
 			case "storage_bytes":

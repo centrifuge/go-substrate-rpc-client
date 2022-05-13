@@ -40,7 +40,7 @@ func (s *state) getKeys(prefix types.StorageKey, blockHash *types.Hash) ([]types
 
 	keys := make([]types.StorageKey, len(res))
 	for i, r := range res {
-		err = types.DecodeFromHexString(r, &keys[i])
+		err = types.DecodeFromHex(r, &keys[i])
 		if err != nil {
 			return nil, err
 		}
