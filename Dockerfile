@@ -1,4 +1,4 @@
-FROM golang:1.17
+FROM golang:1.18
 
 RUN apt-get -y update && apt-get -y upgrade && apt-get -y install wget && apt-get install ca-certificates -y
 

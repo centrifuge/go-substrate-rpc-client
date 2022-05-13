@@ -46,7 +46,7 @@ type MultiLocationV0 struct {
 	X8   [8]JunctionV0
 }
 
-func (m *MultiLocationV0) Decode(decoder scale.Decoder) error {
+func (m *MultiLocationV0) Decode(decoder scale.Decoder) error { //nolint:dupl
 	b, err := decoder.ReadOneByte()
 	if err != nil {
 		return err

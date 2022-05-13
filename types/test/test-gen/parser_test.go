@@ -35,7 +35,7 @@ func TestParser_ParseField(t *testing.T) {
 		{
 			field: reflect.StructField{
 				Name: "Test_field",
-				Tag:  reflect.StructTag(fmt.Sprintf(`%s:"ws://test" %s:"http://test"`, WsURLTagName, ApiURLTagName)),
+				Tag:  reflect.StructTag(fmt.Sprintf(`%s:"ws://test" %s:"http://test"`, WsURLTagName, APIURLTagName)),
 			},
 			expectedFieldInfo: &FieldInfo{
 				ReqData: &ReqData{
@@ -43,7 +43,7 @@ func TestParser_ParseField(t *testing.T) {
 					Call:   "field",
 				},
 				ClientOpts: &ClientOpts{
-					ApiURL: "http://test",
+					APIURL: "http://test",
 					WsURL:  "ws://test",
 				},
 			},
@@ -60,7 +60,7 @@ func TestParser_ParseField(t *testing.T) {
 				},
 				ClientOpts: &ClientOpts{
 					Blockchain: "blockchainname",
-					ApiURL:     fmt.Sprintf(ApiURLFormat, "blockchainname"),
+					APIURL:     fmt.Sprintf(APIURLFormat, "blockchainname"),
 					WsURL:      fmt.Sprintf(WsURLFormat, "blockchainname"),
 				},
 			},
@@ -93,7 +93,7 @@ func TestParser_parseClientOpts(t *testing.T) {
 	parser := NewParser()
 
 	field := reflect.StructField{
-		Tag: reflect.StructTag(fmt.Sprintf(`%s:"ws://test" %s:"http://test"`, WsURLTagName, ApiURLTagName)),
+		Tag: reflect.StructTag(fmt.Sprintf(`%s:"ws://test" %s:"http://test"`, WsURLTagName, APIURLTagName)),
 	}
 
 	_, err := parser.parseClientOpts(field)
@@ -114,10 +114,10 @@ func TestParser_parseClientOpts(t *testing.T) {
 
 	_, err = parser.parseClientOpts(field)
 
-	assert.True(t, errors.Is(err, errApiURLMissing))
+	assert.True(t, errors.Is(err, errAPIURLMissing))
 
 	field = reflect.StructField{
-		Tag: reflect.StructTag(fmt.Sprintf(`%s:"http://test"`, ApiURLTagName)),
+		Tag: reflect.StructTag(fmt.Sprintf(`%s:"http://test"`, APIURLTagName)),
 	}
 
 	_, err = parser.parseClientOpts(field)

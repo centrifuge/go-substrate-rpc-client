@@ -149,7 +149,8 @@ type EventHRMPOpenChannelRequested struct {
 	Topics                 []Hash
 }
 
-// EventHRMPOpenChannelCanceled is emitted when an HRMP channel request sent by the receiver was canceled by either party.
+// EventHRMPOpenChannelCanceled is emitted when an HRMP channel request
+// sent by the receiver was canceled by either party.
 type EventHRMPOpenChannelCanceled struct {
 	Phase       Phase
 	ByParachain ParachainID
@@ -425,14 +426,16 @@ type EventParachainSystemUpgradeAuthorized struct {
 	Topics []Hash
 }
 
-// EventParachainSystemDownwardMessagesReceived is emitted when some downward messages have been received and will be processed.
+// EventParachainSystemDownwardMessagesReceived is emitted when some downward messages
+// have been received and will be processed.
 type EventParachainSystemDownwardMessagesReceived struct {
 	Phase  Phase
 	Count  U32
 	Topics []Hash
 }
 
-// EventParachainSystemDownwardMessagesProcessed is emitted when downward messages were processed using the given weight.
+// EventParachainSystemDownwardMessagesProcessed is emitted when downward messages
+// were processed using the given weight.
 type EventParachainSystemDownwardMessagesProcessed struct {
 	Phase         Phase
 	Weight        Weight
@@ -881,7 +884,8 @@ type EventAssetMetadataCleared struct {
 	Topics  []Hash
 }
 
-// EventAssetApprovedTransfer is emitted when (additional) funds have been approved for transfer to a destination account.
+// EventAssetApprovedTransfer is emitted when (additional) funds have been approved
+// for transfer to a destination account.
 type EventAssetApprovedTransfer struct {
 	Phase    Phase
 	AssetID  U32
@@ -900,8 +904,8 @@ type EventAssetApprovalCancelled struct {
 	Topics   []Hash
 }
 
-// EventAssetTransferredApproved is emitted when an `amount` was transferred in its entirety from `owner` to `destination` by
-// the approved `delegate`.
+// EventAssetTransferredApproved is emitted when an `amount` was transferred in its
+// entirety from `owner` to `destination` by the approved `delegate`.
 type EventAssetTransferredApproved struct {
 	Phase       Phase
 	AssetID     U32
@@ -936,8 +940,8 @@ type EventAuctionsAuctionClosed struct {
 	Topics       []Hash
 }
 
-// EventAuctionsReserved is emitted when funds were reserved for a winning bid. First balance is the extra amount reserved.
-// Second is the total.
+// EventAuctionsReserved is emitted when funds were reserved for a winning bid.
+// First balance is the extra amount reserved. Second is the total.
 type EventAuctionsReserved struct {
 	Phase         Phase
 	Bidder        AccountID
@@ -1209,7 +1213,8 @@ type EventElectionProviderMultiPhaseElectionFinalized struct {
 	Topics          []Hash
 }
 
-// EventElectionProviderMultiPhaseRewarded is emitted when an account has been rewarded for their signed submission being finalized.
+// EventElectionProviderMultiPhaseRewarded is emitted when an account has been rewarded for their
+// signed submission being finalized.
 type EventElectionProviderMultiPhaseRewarded struct {
 	Phase   Phase
 	Account AccountID
@@ -1217,7 +1222,8 @@ type EventElectionProviderMultiPhaseRewarded struct {
 	Topics  []Hash
 }
 
-// EventElectionProviderMultiPhaseSlashed is emitted when an account has been slashed for submitting an invalid signed submission.
+// EventElectionProviderMultiPhaseSlashed is emitted when an account has been slashed for
+// submitting an invalid signed submission.
 type EventElectionProviderMultiPhaseSlashed struct {
 	Phase   Phase
 	Account AccountID
@@ -1232,7 +1238,8 @@ type EventElectionProviderMultiPhaseSignedPhaseStarted struct {
 	Topics []Hash
 }
 
-// EventElectionProviderMultiPhaseUnsignedPhaseStarted is emitted when the unsigned phase of the given round has started.
+// EventElectionProviderMultiPhaseUnsignedPhaseStarted is emitted when the unsigned phase of
+// the given round has started.
 type EventElectionProviderMultiPhaseUnsignedPhaseStarted struct {
 	Phase  Phase
 	Round  U32
@@ -1347,8 +1354,8 @@ type EventCrowdloanWithdrew struct {
 	Topics    []Hash
 }
 
-// EventCrowdloanPartiallyRefunded is emitted when the loans in a fund have been partially dissolved, i.e. there are some left
-// over child keys that still need to be killed.
+// EventCrowdloanPartiallyRefunded is emitted when the loans in a fund have been partially dissolved, i.e.
+// there are some left over child keys that still need to be killed.
 type EventCrowdloanPartiallyRefunded struct {
 	Phase     Phase
 	FundIndex U32
@@ -2068,7 +2075,8 @@ type EventXcmPalletSent struct {
 	Topics      []Hash
 }
 
-// EventXcmPalletUnexpectedResponse is emitted when a query response which does not match a registered query is received.
+// EventXcmPalletUnexpectedResponse is emitted when a query response which does not match a registered query
+// is received.
 // This may be because a matching query was never registered, it may be because it is a duplicate response, or
 // because the query timed out.
 type EventXcmPalletUnexpectedResponse struct {
@@ -2078,8 +2086,8 @@ type EventXcmPalletUnexpectedResponse struct {
 	Topics         []Hash
 }
 
-// EventXcmPalletResponseReady is emitted when a query response has been received and is ready for taking with `take_response`.
-// There is no registered notification call.
+// EventXcmPalletResponseReady is emitted when a query response has been received and is ready for
+// taking with `take_response`. There is no registered notification call.
 type EventXcmPalletResponseReady struct {
 	Phase    Phase
 	QueryID  U64
@@ -2087,8 +2095,8 @@ type EventXcmPalletResponseReady struct {
 	Topics   []Hash
 }
 
-// EventXcmPalletNotified is emitted when a query response has been received and query is removed. The registered notification has
-// been dispatched and executed successfully.
+// EventXcmPalletNotified is emitted when a query response has been received and query is removed.
+// The registered notification has been dispatched and executed successfully.
 type EventXcmPalletNotified struct {
 	Phase       Phase
 	QueryID     U64
@@ -2097,8 +2105,9 @@ type EventXcmPalletNotified struct {
 	Topics      []Hash
 }
 
-// EventXcmPalletNotifyOverweight is emitted when a query response has been received and query is removed. The registered notification could
-// not be dispatched because the dispatch weight is greater than the maximum weight originally budgeted by this runtime for the query result.
+// EventXcmPalletNotifyOverweight is emitted when a query response has been received and query is removed.
+// The registered notification could not be dispatched because the dispatch weight is greater than
+// the maximum weight originally budgeted by this runtime for the query result.
 type EventXcmPalletNotifyOverweight struct {
 	Phase             Phase
 	QueryID           U64
@@ -2109,8 +2118,8 @@ type EventXcmPalletNotifyOverweight struct {
 	Topics            []Hash
 }
 
-// EventXcmPalletNotifyDispatchError is emitted when a query response has been received and query is removed. There was a general error with
-// dispatching the notification call.
+// EventXcmPalletNotifyDispatchError is emitted when a query response has been received and query is removed.
+// There was a general error with dispatching the notification call.
 type EventXcmPalletNotifyDispatchError struct {
 	Phase       Phase
 	QueryID     U64
@@ -2119,8 +2128,9 @@ type EventXcmPalletNotifyDispatchError struct {
 	Topics      []Hash
 }
 
-// EventXcmPalletNotifyDecodeFailed is emitted when a query response has been received and query is removed. The dispatch was unable to be
-// decoded into a `Call`; this might be due to dispatch function having a signature which is not `(origin, QueryId, Response)`.
+// EventXcmPalletNotifyDecodeFailed is emitted when a query response has been received and query is removed.
+// The dispatch was unable to be decoded into a `Call`; this might be due to dispatch function having a signature
+// which is not `(origin, QueryId, Response)`.
 type EventXcmPalletNotifyDecodeFailed struct {
 	Phase       Phase
 	QueryID     U64
@@ -2129,8 +2139,9 @@ type EventXcmPalletNotifyDecodeFailed struct {
 	Topics      []Hash
 }
 
-// EventXcmPalletInvalidResponder is emitted when the expected query response has been received but the origin location of the response does
-// not match that expected. The query remains registered for a later, valid, response to be received and acted upon.
+// EventXcmPalletInvalidResponder is emitted when the expected query response
+// has been received but the origin location of the response does not match that expected.
+// The query remains registered for a later, valid, response to be received and acted upon.
 type EventXcmPalletInvalidResponder struct {
 	Phase            Phase
 	OriginLocation   MultiLocationV1
@@ -2139,8 +2150,9 @@ type EventXcmPalletInvalidResponder struct {
 	Topics           []Hash
 }
 
-// EventXcmPalletInvalidResponderVersion is emitted when the expected query response has been received but the expected origin location placed in
-// storage by this runtime previously cannot be decoded. The query remains registered.
+// EventXcmPalletInvalidResponderVersion is emitted when the expected query response
+// has been received but the expected origin location placed in storage by this runtime
+// previously cannot be decoded. The query remains registered.
 // This is unexpected (since a location placed in storage in a previously executing
 // runtime should be readable prior to query timeout) and dangerous since the possibly
 // valid response will be dropped. Manual governance intervention is probably going to be
@@ -2170,7 +2182,8 @@ type EventXcmPalletAssetsTrapped struct {
 
 type XcmVersion U32
 
-// EventXcmPalletVersionChangeNotified is emitted when an XCM version change notification message has been attempted to be sent.
+// EventXcmPalletVersionChangeNotified is emitted when an XCM version change notification
+// message has been attempted to be sent.
 type EventXcmPalletVersionChangeNotified struct {
 	Phase       Phase
 	Destination MultiLocationV1
@@ -2187,8 +2200,8 @@ type EventXcmPalletSupportedVersionChanged struct {
 	Topics     []Hash
 }
 
-// EventXcmPalletNotifyTargetSendFail is emitted when a given location which had a version change subscription was dropped owing to an error
-// sending the notification to it.
+// EventXcmPalletNotifyTargetSendFail is emitted when a given location which had a version change
+// subscription was dropped owing to an error sending the notification to it.
 type EventXcmPalletNotifyTargetSendFail struct {
 	Phase    Phase
 	Location MultiLocationV1
@@ -2197,8 +2210,8 @@ type EventXcmPalletNotifyTargetSendFail struct {
 	Topics   []Hash
 }
 
-// EventXcmPalletNotifyTargetMigrationFail is emitted when a given location which had a version change subscription was dropped owing to an error
-// migrating the location to our new XCM format.
+// EventXcmPalletNotifyTargetMigrationFail is emitted when a given location which had a
+// version change subscription was dropped owing to an error migrating the location to our new XCM format.
 type EventXcmPalletNotifyTargetMigrationFail struct {
 	Phase    Phase
 	Location VersionedMultiLocation
@@ -2809,7 +2822,8 @@ type EventUMPUpwardMessagesReceived struct {
 }
 
 // EventUMPOverweightEnqueued is emitted when the weight budget was exceeded for an individual upward message.
-// This message can be later dispatched manually using `service_overweight` dispatchable using the assigned `overweight_index`.
+// This message can be later dispatched manually using `service_overweight` dispatchable using
+// the assigned `overweight_index`.
 type EventUMPOverweightEnqueued struct {
 	Phase           Phase
 	ParachainID     ParachainID
@@ -2819,8 +2833,8 @@ type EventUMPOverweightEnqueued struct {
 	Topics          []Hash
 }
 
-// EventUMPOverweightServiced is emitted when the upward message from the overweight queue was executed with the given actual weight
-// used.
+// EventUMPOverweightServiced is emitted when the upward message from the
+// overweight queue was executed with the given actual weight used.
 type EventUMPOverweightServiced struct {
 	Phase           Phase
 	OverweightIndex U64

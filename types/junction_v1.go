@@ -24,8 +24,8 @@ type JunctionV1 struct {
 	IsParachain bool
 	ParachainID UCompact
 
-	IsAccountId32        bool
-	AccountId32NetworkID NetworkID
+	IsAccountID32        bool
+	AccountID32NetworkID NetworkID
 	AccountID            []U8
 
 	IsAccountIndex64        bool
@@ -64,9 +64,9 @@ func (j *JunctionV1) Decode(decoder scale.Decoder) error {
 
 		return decoder.Decode(&j.ParachainID)
 	case 1:
-		j.IsAccountId32 = true
+		j.IsAccountID32 = true
 
-		if err := decoder.Decode(&j.AccountId32NetworkID); err != nil {
+		if err := decoder.Decode(&j.AccountID32NetworkID); err != nil {
 			return nil
 		}
 
@@ -114,7 +114,7 @@ func (j *JunctionV1) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (j JunctionV1) Encode(encoder scale.Encoder) error {
+func (j JunctionV1) Encode(encoder scale.Encoder) error { //nolint:funlen
 	switch {
 	case j.IsParachain:
 		if err := encoder.PushByte(0); err != nil {
@@ -122,12 +122,12 @@ func (j JunctionV1) Encode(encoder scale.Encoder) error {
 		}
 
 		return encoder.Encode(j.ParachainID)
-	case j.IsAccountId32:
+	case j.IsAccountID32:
 		if err := encoder.PushByte(1); err != nil {
 			return err
 		}
 
-		if err := encoder.Encode(j.AccountId32NetworkID); err != nil {
+		if err := encoder.Encode(j.AccountID32NetworkID); err != nil {
 			return err
 		}
 
@@ -215,7 +215,7 @@ type JunctionsV1 struct {
 	X8   [8]JunctionV1
 }
 
-func (j *JunctionsV1) Decode(decoder scale.Decoder) error {
+func (j *JunctionsV1) Decode(decoder scale.Decoder) error { //nolint:dupl
 	b, err := decoder.ReadOneByte()
 	if err != nil {
 		return err

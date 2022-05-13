@@ -69,6 +69,6 @@ type state struct {
 }
 
 // NewState creates a new state struct
-func NewState(c client.Client) *state {
+func NewState(c client.Client) State {
 	return &state{client: c}
 }

@@ -61,7 +61,7 @@ func (e *EventRecordsRaw) Decode(decoder scale.Decoder) error {
 // https://github.com/polkadot-js/api/blob/master/packages/api-augment/src/substrate/events.ts
 // https://github.com/polkadot-js/api/blob/master/packages/api-augment/src/polkadot/events.ts
 //
-//nolint:stylecheck,golint
+//nolint:stylecheck,lll,revive
 type EventRecords struct {
 	Auctions_AuctionStarted     []EventAuctionsAuctionStarted     `test-gen-blockchain:"polkadot"`
 	Auctions_AuctionClosed      []EventAuctionsAuctionClosed      `test-gen-blockchain:"polkadot"`
@@ -450,7 +450,7 @@ type EventRecords struct {
 // If this method returns an error like `unable to decode Phase for event #x: EOF`, it is likely that you have defined
 // a custom event record with a wrong type. For example your custom event record has a field with a length prefixed
 // type, such as types.Bytes, where your event in reallity contains a fixed width type, such as a types.U32.
-func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error {
+func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error { //nolint:funlen
 	log.Debug(fmt.Sprintf("will decode event records from raw hex: %#x", e))
 
 	// ensure t is a pointer

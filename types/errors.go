@@ -185,7 +185,7 @@ func (t TransactionalError) Encode(encoder scale.Encoder) error {
 type DispatchError struct {
 	IsOther bool
 	// Skipped by codec in substrate
-	//OtherString string
+	// OtherString string
 
 	IsCannotLookup bool
 

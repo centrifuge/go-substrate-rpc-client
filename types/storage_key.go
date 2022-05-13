@@ -38,7 +38,7 @@ func NewStorageKey(b []byte) StorageKey {
 // CreateStorageKey uses the given metadata and to derive the right hashing of method, prefix as well as arguments to
 // create a hashed StorageKey
 // Using variadic argument, so caller do not need to construct array of arguments
-func CreateStorageKey(meta *Metadata, prefix, method string, args ...[]byte) (StorageKey, error) {
+func CreateStorageKey(meta *Metadata, prefix, method string, args ...[]byte) (StorageKey, error) { //nolint:funlen
 	stringKey := []byte(prefix + " " + method)
 
 	validateAndTrimArgs := func(args [][]byte) ([][]byte, error) {
@@ -149,9 +149,14 @@ func createKeyMap(method, prefix string, args [][]byte, entryMeta StorageEntryMe
 }
 
 // createKey creates a key for a plain value
-func createKey(meta *Metadata, method, prefix string, stringKey, arg []byte, entryMeta StorageEntryMetadata) (
-	StorageKey, error) {
-
+func createKey(
+	meta *Metadata,
+	method,
+	prefix string,
+	stringKey,
+	arg []byte,
+	entryMeta StorageEntryMetadata,
+) (StorageKey, error) {
 	hasher, err := entryMeta.Hasher()
 	if err != nil {
 		return nil, err

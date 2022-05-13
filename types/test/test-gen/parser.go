@@ -25,11 +25,11 @@ import (
 
 const (
 	WsURLFormat  = "wss://%s.api.onfinality.io/public-ws"
-	ApiURLFormat = "https://%s.api.subscan.io/api/scan/events"
+	APIURLFormat = "https://%s.api.subscan.io/api/scan/events"
 
 	BlockchainTagName = "test-gen-blockchain"
 	WsURLTagName      = "test-gen-ws"
-	ApiURLTagName     = "test-gen-api"
+	APIURLTagName     = "test-gen-api"
 	SkipTagName       = "test-gen-skip"
 )
 
@@ -69,21 +69,21 @@ func (p *Parser) ParseField(field reflect.StructField) (*FieldInfo, error) {
 }
 
 var (
-	errApiURLMissing     = errors.New("api URL missing")
+	errAPIURLMissing     = errors.New("api URL missing")
 	errWsURLMissing      = errors.New("ws URL missing")
 	errBlockchainMissing = errors.New("blockchain missing")
 )
 
 func (p *Parser) parseClientOpts(field reflect.StructField) (*ClientOpts, error) {
 	wsURL := field.Tag.Get(WsURLTagName)
-	apiURL := field.Tag.Get(ApiURLTagName)
+	apiURL := field.Tag.Get(APIURLTagName)
 
 	if wsURL != "" && apiURL != "" {
-		return &ClientOpts{WsURL: wsURL, ApiURL: apiURL}, nil
+		return &ClientOpts{WsURL: wsURL, APIURL: apiURL}, nil
 	}
 
 	if wsURL != "" {
-		return nil, errApiURLMissing
+		return nil, errAPIURLMissing
 	}
 
 	if apiURL != "" {
@@ -99,7 +99,7 @@ func (p *Parser) parseClientOpts(field reflect.StructField) (*ClientOpts, error)
 	return &ClientOpts{
 		Blockchain: blockchain,
 		WsURL:      fmt.Sprintf(WsURLFormat, blockchain),
-		ApiURL:     fmt.Sprintf(ApiURLFormat, blockchain),
+		APIURL:     fmt.Sprintf(APIURLFormat, blockchain),
 	}, nil
 }
 

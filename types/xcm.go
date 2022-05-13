@@ -278,7 +278,7 @@ type MultiAssetV0 struct {
 	ConcreteNonFungibleInstance AssetInstance
 }
 
-func (m *MultiAssetV0) Decode(decoder scale.Decoder) error {
+func (m *MultiAssetV0) Decode(decoder scale.Decoder) error { //nolint:funlen
 	b, err := decoder.ReadOneByte()
 	if err != nil {
 		return err
@@ -346,7 +346,7 @@ func (m *MultiAssetV0) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (m MultiAssetV0) Encode(encoder scale.Encoder) error {
+func (m MultiAssetV0) Encode(encoder scale.Encoder) error { //nolint:funlen
 	switch {
 	case m.IsNone:
 		return encoder.PushByte(0)
@@ -876,13 +876,13 @@ type Instruction struct {
 	TrapCode U64
 
 	IsSubscribeVersion                bool
-	SubscribeVersionQueryId           U64
+	SubscribeVersionQueryID           U64
 	SubscribeVersionMaxResponseWeight U64
 
 	IsUnsubscribeVersion bool
 }
 
-func (i *Instruction) Decode(decoder scale.Decoder) error {
+func (i *Instruction) Decode(decoder scale.Decoder) error { //nolint:gocyclo,funlen
 	b, err := decoder.ReadOneByte()
 	if err != nil {
 		return err
@@ -1102,7 +1102,7 @@ func (i *Instruction) Decode(decoder scale.Decoder) error {
 	case 26:
 		i.IsSubscribeVersion = true
 
-		if err := decoder.Decode(&i.SubscribeVersionQueryId); err != nil {
+		if err := decoder.Decode(&i.SubscribeVersionQueryID); err != nil {
 			return err
 		}
 
@@ -1114,7 +1114,7 @@ func (i *Instruction) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (i Instruction) Encode(encoder scale.Encoder) error {
+func (i Instruction) Encode(encoder scale.Encoder) error { //nolint:gocyclo,funlen
 	switch {
 	case i.IsWithdrawAsset:
 		if err := encoder.PushByte(0); err != nil {
@@ -1377,7 +1377,7 @@ func (i Instruction) Encode(encoder scale.Encoder) error {
 			return err
 		}
 
-		if err := encoder.Encode(i.SubscribeVersionQueryId); err != nil {
+		if err := encoder.Encode(i.SubscribeVersionQueryID); err != nil {
 			return err
 		}
 

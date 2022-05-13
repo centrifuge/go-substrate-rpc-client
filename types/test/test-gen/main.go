@@ -25,7 +25,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
-func main() {
+func main() { //nolint: funlen
 	ctx := context.Background()
 	args := os.Args
 
@@ -104,7 +104,6 @@ func main() {
 			count++
 		}
 	}
-
 }
 
 func writeTestData(
@@ -154,7 +153,7 @@ func writeTestData(
 		"Blockchain - %s\nBlock number - %d\nApi URL - %s\nWs URL - %s\n",
 		testData.Blockchain,
 		testData.BlockNumber,
-		testData.ApiURL,
+		testData.APIURL,
 		testData.WsURL,
 	)
 

@@ -76,7 +76,7 @@ type XCMError struct {
 	IsWeightNotComputable bool
 }
 
-func (x *XCMError) Decode(decoder scale.Decoder) error {
+func (x *XCMError) Decode(decoder scale.Decoder) error { //nolint: funlen
 	b, err := decoder.ReadOneByte()
 	if err != nil {
 		return err
@@ -148,7 +148,7 @@ func (x *XCMError) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (x XCMError) Encode(encoder scale.Encoder) error {
+func (x XCMError) Encode(encoder scale.Encoder) error { //nolint:gocyclo,funlen
 	switch {
 	case x.IsOverflow:
 		return encoder.PushByte(0)

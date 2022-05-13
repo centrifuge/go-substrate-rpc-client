@@ -971,7 +971,7 @@ var (
 				case 26:
 					i.IsSubscribeVersion = true
 
-					c.Fuzz(&i.SubscribeVersionQueryId)
+					c.Fuzz(&i.SubscribeVersionQueryID)
 
 					c.Fuzz(&i.SubscribeVersionMaxResponseWeight)
 				case 27:

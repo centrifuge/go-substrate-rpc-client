@@ -33,7 +33,7 @@ import (
 
 type ClientOpts struct {
 	Blockchain string
-	ApiURL     string
+	APIURL     string
 	WsURL      string
 }
 
@@ -61,7 +61,7 @@ func NewClient(opts ClientOpts) (*Client, error) {
 
 	return &Client{
 		blockchain: opts.Blockchain,
-		apiURL:     opts.ApiURL,
+		apiURL:     opts.APIURL,
 		http:       http.DefaultClient,
 		wsURL:      opts.WsURL,
 		sapi:       sapi,
@@ -72,8 +72,8 @@ type EventListResponseEvent struct {
 	EventIndex     string `json:"event_index"`
 	BlockNum       int    `json:"block_num"`
 	ExtrinsicIdx   int    `json:"extrinsic_idx"`
-	ModuleId       string `json:"module_id"`
-	EventId        string `json:"event_id"`
+	ModuleID       string `json:"module_id"`
+	EventID        string `json:"event_id"`
 	Params         string `json:"params"`
 	Phase          int    `json:"phase"`
 	EventIdx       int    `json:"event_idx"`
@@ -108,7 +108,7 @@ type TestData struct {
 	Blockchain  string
 	BlockNumber int
 
-	ApiURL string
+	APIURL string
 	WsURL  string
 
 	Meta        []byte
@@ -149,7 +149,7 @@ func (c *Client) getTestData(blockNumber int) (*TestData, error) {
 	return &TestData{
 		Blockchain:  c.blockchain,
 		BlockNumber: blockNumber,
-		ApiURL:      c.apiURL,
+		APIURL:      c.apiURL,
 		WsURL:       c.wsURL,
 		Meta:        encodedMetadata,
 		StorageData: *storageData,

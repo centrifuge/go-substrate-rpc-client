@@ -96,8 +96,8 @@ func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
 	if err != nil {
 		return err
 	}
-	prefixed := append(bprefix, dec...)
-	return DecodeFromBytes(prefixed, e)
+	bprefix = append(bprefix, dec...)
+	return DecodeFromBytes(bprefix, e)
 }
 
 // MarshalJSON returns a JSON encoded byte array of Extrinsic

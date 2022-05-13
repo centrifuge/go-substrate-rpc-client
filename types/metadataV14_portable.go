@@ -140,7 +140,6 @@ func (d Si1TypeParameter) Encode(encoder scale.Encoder) error {
 	}
 
 	return encoder.EncodeOption(d.HasType, &d.Type)
-
 }
 
 type Si1TypeDef struct {
@@ -211,7 +210,7 @@ func (d *Si1TypeDef) Decode(decoder scale.Decoder) error {
 	}
 }
 
-func (d Si1TypeDef) Encode(encoder scale.Encoder) error {
+func (d Si1TypeDef) Encode(encoder scale.Encoder) error { //nolint:funlen
 	switch {
 	case d.IsComposite:
 		err := encoder.PushByte(0)

@@ -120,8 +120,8 @@ func MustHexDecodeString(str string) []byte {
 	return bz
 }
 
-// HexEncode encodes bytes to a hex string. Contrary to hex.EncodeToString, this function prefixes the hex string
-// with "0x"
+// HexEncodeToString encodes bytes to a hex string. Contrary to hex.EncodeToString,
+// this function prefixes the hex string with "0x"
 func HexEncodeToString(b []byte) string {
 	return "0x" + hex.EncodeToString(b)
 }

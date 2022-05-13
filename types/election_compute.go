@@ -71,7 +71,8 @@ const (
 	OnChain ElectionCompute = 0
 	// Signed means that the result was submitted and accepted to the chain via a signed transaction.
 	Signed ElectionCompute = 1
-	// Unsigned means that the result was submitted and accepted to the chain via an unsigned transaction (by an authority).
+	// Unsigned means that the result was submitted and accepted to the chain via
+	// an unsigned transaction (by an authority).
 	Unsigned ElectionCompute = 2
 )
 

@@ -34,8 +34,8 @@ var (
 		ParachainID: 11,
 	}
 	testJunction3 = JunctionV0{
-		IsAccountId32: true,
-		AccountId32NetworkID: NetworkID{
+		IsAccountID32: true,
+		AccountID32NetworkID: NetworkID{
 			IsAny: true,
 		},
 		AccountID: []U8{1, 2, 3},
@@ -92,9 +92,9 @@ var (
 
 					c.Fuzz(&j.ParachainID)
 				case 2:
-					j.IsAccountId32 = true
+					j.IsAccountID32 = true
 
-					c.Fuzz(&j.AccountId32NetworkID)
+					c.Fuzz(&j.AccountID32NetworkID)
 
 					c.Fuzz(&j.AccountID)
 				case 3:
