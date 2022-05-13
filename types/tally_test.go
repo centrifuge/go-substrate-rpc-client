@@ -17,23 +17,31 @@
 package types_test
 
 import (
+	"math/big"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
-	"github.com/stretchr/testify/assert"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
-func TestBeefySignature(t *testing.T) {
-	empty := types.NewOptionBeefySignatureEmpty()
-	assert.True(t, empty.IsNone())
-	assert.False(t, empty.IsSome())
+var (
+	testTally = Tally{
+		Votes: NewU128(*big.NewInt(123)),
+		Total: NewU128(*big.NewInt(456)),
+	}
+)
 
-	sig := types.NewOptionBeefySignature(types.BeefySignature{})
-	sig.SetNone()
-	assert.True(t, sig.IsNone())
-	sig.SetSome(types.BeefySignature{})
-	assert.True(t, sig.IsSome())
-	ok, _ := sig.Unwrap()
-	assert.True(t, ok)
-	assertRoundtrip(t, sig)
+func TestTally_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[Tally](t, 100)
+}
+
+func TestTally_Encode(t *testing.T) {
+	assertEncode(t, []encodingAssert{
+		{testTally, MustHexDecodeString("0x7b000000000000000000000000000000c8010000000000000000000000000000")},
+	})
+}
+
+func TestTally_Decode(t *testing.T) {
+	assertDecode(t, []decodingAssert{
+		{MustHexDecodeString("0x7b000000000000000000000000000000c8010000000000000000000000000000"), testTally},
+	})
 }

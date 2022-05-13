@@ -1,7 +1,25 @@
+// Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
+//
+// Copyright 2019 Centrifuge GmbH
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package types_test
 
 import (
 	"testing"
+
+	fuzz "github.com/google/gofuzz"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
@@ -50,19 +68,92 @@ var (
 			IsLimitReached: true,
 		},
 	}
+
+	tokenErrorFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(t *TokenError, c fuzz.Continue) {
+			switch c.Intn(7) {
+			case 0:
+				t.IsNoFunds = true
+			case 1:
+				t.IsWouldDie = true
+			case 2:
+				t.IsBelowMinimum = true
+			case 3:
+				t.IsCannotCreate = true
+			case 4:
+				t.IsUnknownAsset = true
+			case 5:
+				t.IsFrozen = true
+			case 6:
+				t.IsUnsupported = true
+			}
+		}),
+	}
+
+	arithmeticErrorFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(a *ArithmeticError, c fuzz.Continue) {
+			switch c.Intn(3) {
+			case 0:
+				a.IsUnderflow = true
+			case 1:
+				a.IsOverflow = true
+			case 2:
+				a.IsDivisionByZero = true
+			}
+		}),
+	}
+
+	transactionalErrorFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(t *TransactionalError, c fuzz.Continue) {
+			r := c.RandBool()
+			t.IsLimitReached = r
+			t.IsNoLayer = !r
+		}),
+	}
+
+	dispatchErrorFuzzOpts = combineFuzzOpts(
+		tokenErrorFuzzOpts,
+		arithmeticErrorFuzzOpts,
+		transactionalErrorFuzzOpts,
+		[]fuzzOpt{
+			withFuzzFuncs(func(d *DispatchError, c fuzz.Continue) {
+				switch c.Intn(10) {
+				case 0:
+					d.IsOther = true
+				case 1:
+					d.IsCannotLookup = true
+				case 2:
+					d.IsBadOrigin = true
+				case 3:
+					d.IsModule = true
+
+					c.Fuzz(&d.ModuleError)
+				case 4:
+					d.IsConsumerRemaining = true
+				case 5:
+					d.IsNoProviders = true
+				case 6:
+					d.IsTooManyConsumers = true
+				case 7:
+					d.IsToken = true
+
+					c.Fuzz(&d.TokenError)
+				case 8:
+					d.IsArithmetic = true
+
+					c.Fuzz(&d.ArithmeticError)
+				case 9:
+					d.IsTransactional = true
+
+					c.Fuzz(&d.TransactionalError)
+				}
+			}),
+		},
+	)
 )
 
 func TestDispatchError_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, testDispatchError1)
-	assertRoundtrip(t, testDispatchError2)
-	assertRoundtrip(t, testDispatchError3)
-	assertRoundtrip(t, testDispatchError4)
-	assertRoundtrip(t, testDispatchError5)
-	assertRoundtrip(t, testDispatchError6)
-	assertRoundtrip(t, testDispatchError7)
-	assertRoundtrip(t, testDispatchError8)
-	assertRoundtrip(t, testDispatchError9)
-	assertRoundtrip(t, testDispatchError10)
+	assertRoundTripFuzz[DispatchError](t, 1000, dispatchErrorFuzzOpts...)
 }
 
 func TestDispatchError_Encode(t *testing.T) {

@@ -1,3 +1,19 @@
+// Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
+//
+// Copyright 2019 Centrifuge GmbH
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package types
 
 import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
@@ -156,7 +172,7 @@ func (a AssetInstance) Encode(encoder scale.Encoder) error {
 
 type Fungibility struct {
 	IsFungible bool
-	Amount     U128
+	Amount     UCompact
 
 	IsNonFungible bool
 	AssetInstance AssetInstance
@@ -280,51 +296,51 @@ func (m *MultiAssetV0) Decode(decoder scale.Decoder) error {
 	case 4:
 		m.IsAllAbstractFungible = true
 
-		return decoder.Decode(m.AllAbstractFungibleID)
+		return decoder.Decode(&m.AllAbstractFungibleID)
 	case 5:
 		m.IsAllAbstractNonFungible = true
 
-		return decoder.Decode(m.AllAbstractNonFungibleClass)
+		return decoder.Decode(&m.AllAbstractNonFungibleClass)
 	case 6:
 		m.IsAllConcreteFungible = true
 
-		return decoder.Decode(m.AllConcreteFungibleID)
+		return decoder.Decode(&m.AllConcreteFungibleID)
 	case 7:
 		m.IsAllConcreteNonFungible = true
 
-		return decoder.Decode(m.AllConcreteNonFungibleClass)
+		return decoder.Decode(&m.AllConcreteNonFungibleClass)
 	case 8:
 		m.IsAbstractFungible = true
 
-		if err := decoder.Decode(m.AbstractFungibleID); err != nil {
+		if err := decoder.Decode(&m.AbstractFungibleID); err != nil {
 			return err
 		}
 
-		return decoder.Decode(m.AbstractFungible)
+		return decoder.Decode(&m.AbstractFungible)
 	case 9:
 		m.IsAbstractNonFungible = true
 
-		if err := decoder.Decode(m.AbstractNonFungibleClass); err != nil {
+		if err := decoder.Decode(&m.AbstractNonFungibleClass); err != nil {
 			return err
 		}
 
-		return decoder.Decode(m.AbstractNonFungibleInstance)
+		return decoder.Decode(&m.AbstractNonFungibleInstance)
 	case 10:
 		m.IsConcreteFungible = true
 
-		if err := decoder.Decode(m.ConcreteFungibleID); err != nil {
+		if err := decoder.Decode(&m.ConcreteFungibleID); err != nil {
 			return err
 		}
 
-		return decoder.Decode(m.ConcreteFungibleAmount)
+		return decoder.Decode(&m.ConcreteFungibleAmount)
 	case 11:
 		m.IsConcreteNonFungible = true
 
-		if err := decoder.Decode(m.ConcreteNonFungibleClass); err != nil {
+		if err := decoder.Decode(&m.ConcreteNonFungibleClass); err != nil {
 			return err
 		}
 
-		return decoder.Decode(m.ConcreteNonFungibleInstance)
+		return decoder.Decode(&m.ConcreteNonFungibleInstance)
 	}
 
 	return nil
@@ -415,6 +431,46 @@ type VersionedMultiAssets struct {
 
 	IsV1          bool
 	MultiAssetsV1 MultiAssetsV1
+}
+
+func (v *VersionedMultiAssets) Decode(decoder scale.Decoder) error {
+	b, err := decoder.ReadOneByte()
+
+	if err != nil {
+		return err
+	}
+
+	switch b {
+	case 0:
+		v.IsV0 = true
+
+		return decoder.Decode(&v.MultiAssetsV0)
+	case 1:
+		v.IsV1 = true
+
+		return decoder.Decode(&v.MultiAssetsV1)
+	}
+
+	return nil
+}
+
+func (v VersionedMultiAssets) Encode(encoder scale.Encoder) error {
+	switch {
+	case v.IsV0:
+		if err := encoder.PushByte(0); err != nil {
+			return err
+		}
+
+		return encoder.Encode(v.MultiAssetsV0)
+	case v.IsV1:
+		if err := encoder.PushByte(1); err != nil {
+			return err
+		}
+
+		return encoder.Encode(v.MultiAssetsV1)
+	}
+
+	return nil
 }
 
 type Response struct {
@@ -539,8 +595,6 @@ func (e *EncodedCall) Decode(decoder scale.Decoder) error {
 func (e EncodedCall) Encode(encoder scale.Encoder) error {
 	return encoder.Encode(e.Call)
 }
-
-type InteriorMultiLocation JunctionsV1
 
 type WildFungibility struct {
 	IsFungible    bool
@@ -762,7 +816,7 @@ type Instruction struct {
 	IsClearOrigin bool
 
 	IsDescendOrigin       bool
-	DescendOriginLocation InteriorMultiLocation
+	DescendOriginLocation JunctionsV1
 
 	IsReportError                bool
 	ReportErrorQueryID           U64

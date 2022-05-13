@@ -19,21 +19,28 @@ package types_test
 import (
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
-	"github.com/stretchr/testify/assert"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
-func TestBeefySignature(t *testing.T) {
-	empty := types.NewOptionBeefySignatureEmpty()
-	assert.True(t, empty.IsNone())
-	assert.False(t, empty.IsSome())
+var (
+	testLotteryCallIndex = LotteryCallIndex{
+		PalletIndex: 52,
+		CallIndex:   32,
+	}
+)
 
-	sig := types.NewOptionBeefySignature(types.BeefySignature{})
-	sig.SetNone()
-	assert.True(t, sig.IsNone())
-	sig.SetSome(types.BeefySignature{})
-	assert.True(t, sig.IsSome())
-	ok, _ := sig.Unwrap()
-	assert.True(t, ok)
-	assertRoundtrip(t, sig)
+func TestLotteryCallIndex_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[LotteryCallIndex](t, 100)
+}
+
+func TestLotteryCallIndex_Encode(t *testing.T) {
+	assertEncode(t, []encodingAssert{
+		{testLotteryCallIndex, MustHexDecodeString("0x3420")},
+	})
+}
+
+func TestLotteryCallIndex_Decode(t *testing.T) {
+	assertDecode(t, []decodingAssert{
+		{MustHexDecodeString("0x3420"), testLotteryCallIndex},
+	})
 }

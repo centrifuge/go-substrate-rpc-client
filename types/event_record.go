@@ -197,10 +197,10 @@ type EventRecords struct {
 	Grandpa_Paused         []EventGrandpaPaused         `test-gen-blockchain:"polkadot"`
 	Grandpa_Resumed        []EventGrandpaResumed        `test-gen-blockchain:"polkadot"`
 
-	HRMP_OpenChannelRequested []EventHRMPOpenChannelRequested `test-gen-blockchain:"polkadot"`
-	HRMP_OpenChannelCanceled  []EventHRMPOpenChannelCanceled  `test-gen-blockchain:"polkadot"`
-	HRMP_OpenChannelAccepted  []EventHRMPOpenChannelAccepted  `test-gen-blockchain:"polkadot"`
-	HRMP_ChannelClosed        []EventHRMPChannelClosed        `test-gen-blockchain:"polkadot"`
+	Hrmp_OpenChannelRequested []EventHRMPOpenChannelRequested `test-gen-blockchain:"polkadot"`
+	Hrmp_OpenChannelCanceled  []EventHRMPOpenChannelCanceled  `test-gen-blockchain:"polkadot"`
+	Hrmp_OpenChannelAccepted  []EventHRMPOpenChannelAccepted  `test-gen-blockchain:"polkadot"`
+	Hrmp_ChannelClosed        []EventHRMPChannelClosed        `test-gen-blockchain:"polkadot"`
 
 	Identity_IdentityCleared      []EventIdentityCleared              `test-gen-blockchain:"centrifuge-parachain"`
 	Identity_IdentityKilled       []EventIdentityKilled               `test-gen-blockchain:"centrifuge-parachain"`
@@ -246,10 +246,10 @@ type EventRecords struct {
 	Paras_PvfCheckAccepted     []EventParasPvfCheckAccepted     `test-gen-blockchain:"polkadot"`
 	Paras_PvfCheckRejected     []EventParasPvfCheckRejected     `test-gen-blockchain:"polkadot"`
 
-	ParaDisputes_DisputeInitiated []EventParaDisputesDisputeInitiated `test-gen-skip:"true"`
-	ParaDisputes_DisputeConcluded []EventParaDisputesDisputeConcluded `test-gen-skip:"true"`
-	ParaDisputes_DisputeTimedOut  []EventParaDisputesDisputeTimedOut  `test-gen-skip:"true"`
-	ParaDisputes_Revert           []EventParaDisputesRevert           `test-gen-skip:"true"`
+	ParasDisputes_DisputeInitiated []EventParasDisputesDisputeInitiated `test-gen-skip:"true"`
+	ParasDisputes_DisputeConcluded []EventParasDisputesDisputeConcluded `test-gen-skip:"true"`
+	ParasDisputes_DisputeTimedOut  []EventParasDisputesDisputeTimedOut  `test-gen-skip:"true"`
+	ParasDisputes_Revert           []EventParasDisputesRevert           `test-gen-skip:"true"`
 
 	ParaInclusion_CandidateBacked   []EventParaInclusionCandidateBacked   `test-gen-blockchain:"polkadot"`
 	ParaInclusion_CandidateIncluded []EventParaInclusionCandidateIncluded `test-gen-blockchain:"polkadot"`
@@ -408,13 +408,13 @@ type EventRecords struct {
 	Uniques_Thawed               []EventUniquesThawed               `test-gen-blockchain:"altair"`
 	Uniques_Transferred          []EventUniquesTransferred          `test-gen-blockchain:"altair"`
 
-	UMP_InvalidFormat          []EventUMPInvalidFormat          `test-gen-blockchain:"polkadot"`
-	UMP_UnsupportedVersion     []EventUMPUnsupportedVersion     `test-gen-blockchain:"polkadot"`
-	UMP_ExecutedUpward         []EventUMPExecutedUpward         `test-gen-blockchain:"polkadot"`
-	UMP_WeightExhausted        []EventUMPWeightExhausted        `test-gen-blockchain:"polkadot"`
-	UMP_UpwardMessagesReceived []EventUMPUpwardMessagesReceived `test-gen-blockchain:"polkadot"`
-	UMP_OverweightEnqueued     []EventUMPOverweightEnqueued     `test-gen-blockchain:"polkadot"`
-	UMP_OverweightServiced     []EventUMPOverweightServiced     `test-gen-blockchain:"polkadot"`
+	Ump_InvalidFormat          []EventUMPInvalidFormat          `test-gen-blockchain:"polkadot"`
+	Ump_UnsupportedVersion     []EventUMPUnsupportedVersion     `test-gen-blockchain:"polkadot"`
+	Ump_ExecutedUpward         []EventUMPExecutedUpward         `test-gen-blockchain:"polkadot"`
+	Ump_WeightExhausted        []EventUMPWeightExhausted        `test-gen-blockchain:"polkadot"`
+	Ump_UpwardMessagesReceived []EventUMPUpwardMessagesReceived `test-gen-blockchain:"polkadot"`
+	Ump_OverweightEnqueued     []EventUMPOverweightEnqueued     `test-gen-blockchain:"polkadot"`
+	Ump_OverweightServiced     []EventUMPOverweightServiced     `test-gen-blockchain:"polkadot"`
 
 	Utility_BatchCompleted   []EventUtilityBatchCompleted   `test-gen-blockchain:"centrifuge-parachain"`
 	Utility_BatchInterrupted []EventUtilityBatchInterrupted `test-gen-blockchain:"centrifuge-parachain"`

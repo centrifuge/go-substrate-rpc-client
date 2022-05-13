@@ -19,12 +19,28 @@ package types_test
 import (
 	"testing"
 
+	fuzz "github.com/google/gofuzz"
+
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+var (
+	optionAccountIDFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(o *OptionAccountID, c fuzz.Continue) {
+			if c.RandBool() {
+				*o = NewOptionAccountIDEmpty()
+				return
+			}
+			var accId AccountID
+			c.Fuzz(&accId)
+
+			*o = NewOptionAccountID(accId)
+		}),
+	}
+)
+
 func TestOptionAccountID_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewOptionAccountID(NewAccountID([]byte{0, 1, 2, 3, 4, 5, 6, 7})))
-	assertRoundtrip(t, NewOptionAccountIDEmpty())
+	assertRoundTripFuzz[OptionAccountID](t, 100, optionAccountIDFuzzOpts...)
 }
 
 func TestOptionAccountID_Encode(t *testing.T) {
@@ -42,8 +58,7 @@ func TestOptionAccountID_Decode(t *testing.T) {
 }
 
 func TestAccountID_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewAccountID([]byte{}))
-	assertRoundtrip(t, NewAccountID([]byte{0, 1, 2, 3, 4, 5, 6, 7}))
+	assertRoundTripFuzz[AccountID](t, 100, withNilChance(0.01))
 }
 
 func TestAccountID_EncodedLength(t *testing.T) {

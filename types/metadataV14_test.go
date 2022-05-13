@@ -1,3 +1,19 @@
+// Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
+//
+// Copyright 2019 Centrifuge GmbH
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package types_test
 
 import (
@@ -274,4 +290,25 @@ func TestSi1TypeDecodeEncode(t *testing.T) {
 	DecodeFromHexString(encoded, &decoded)
 
 	assert.Equal(t, ti, decoded)
+}
+
+func TestMetadataV14_FindError(t *testing.T) {
+	var meta Metadata
+	err := DecodeFromHexString(MetadataV14Data, &meta)
+	assert.NoError(t, err)
+
+	// System - SpecVersionNeedsToIncrease
+	metaErr, err := meta.FindError(0, 1)
+	assert.NoError(t, err)
+	assert.NotNil(t, metaErr)
+
+	// System - no error at index
+	metaErr, err = meta.FindError(0, 6)
+	assert.Error(t, err)
+	assert.Nil(t, metaErr)
+
+	// No module at index
+	metaErr, err = meta.FindError(200, 0)
+	assert.Error(t, err)
+	assert.Nil(t, metaErr)
 }

@@ -19,28 +19,42 @@ package types_test
 import (
 	"testing"
 
+	fuzz "github.com/google/gofuzz"
+
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
 var (
-	testHRMPChannelID = HRMPChannelID{
-		Sender:    11,
-		Recipient: 45,
+	testMigrationCompute1 = MigrationCompute{
+		IsSigned: true,
+	}
+	testMigrationCompute2 = MigrationCompute{
+		IsAuto: true,
+	}
+
+	migrationComputeFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(m *MigrationCompute, c fuzz.Continue) {
+			r := c.RandBool()
+			m.IsSigned = r
+			m.IsAuto = !r
+		}),
 	}
 )
 
-func TestHRMPChannelID_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[HRMPChannelID](t, 1000)
+func TestMigrationCompute_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[MigrationCompute](t, 100, migrationComputeFuzzOpts...)
 }
 
-func TestHRMPChannelID_Encode(t *testing.T) {
+func TestMigrationCompute_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{testHRMPChannelID, MustHexDecodeString("0x0b0000002d000000")},
+		{testMigrationCompute1, MustHexDecodeString("0x00")},
+		{testMigrationCompute2, MustHexDecodeString("0x01")},
 	})
 }
 
-func TestHRMPChannelID_Decode(t *testing.T) {
+func TestMigrationCompute_Decode(t *testing.T) {
 	assertDecode(t, []decodingAssert{
-		{MustHexDecodeString("0x0b0000002d000000"), testHRMPChannelID},
+		{MustHexDecodeString("0x00"), testMigrationCompute1},
+		{MustHexDecodeString("0x01"), testMigrationCompute2},
 	})
 }

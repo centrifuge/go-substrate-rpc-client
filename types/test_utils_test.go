@@ -24,8 +24,61 @@ import (
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	fuzz "github.com/google/gofuzz"
 	"github.com/stretchr/testify/assert"
 )
+
+type fuzzOpt func(f *fuzz.Fuzzer)
+
+func withNilChance(p float64) fuzzOpt {
+	return func(f *fuzz.Fuzzer) {
+		f.NilChance(p)
+	}
+}
+
+func withFuzzFuncs(fuzzFns ...any) fuzzOpt {
+	return func(f *fuzz.Fuzzer) {
+		f.Funcs(fuzzFns...)
+	}
+}
+
+func withNumElements(atLeast, atMost int) fuzzOpt {
+	return func(f *fuzz.Fuzzer) {
+		f.NumElements(atLeast, atMost)
+	}
+}
+
+func withMaxDepth(depth int) fuzzOpt {
+	return func(f *fuzz.Fuzzer) {
+		f.MaxDepth(depth)
+	}
+}
+
+func combineFuzzOpts(optsSlice ...[]fuzzOpt) []fuzzOpt {
+	var o []fuzzOpt
+
+	for _, opts := range optsSlice {
+		o = append(o, opts...)
+	}
+
+	return o
+}
+
+func assertRoundTripFuzz[T any](t *testing.T, fuzzCount int, fuzzOpts ...fuzzOpt) {
+	f := fuzz.New().NilChance(0).Funcs()
+
+	for _, opt := range fuzzOpts {
+		opt(f)
+	}
+
+	for i := 0; i < fuzzCount; i++ {
+		var fuzzData T
+
+		f.Fuzz(&fuzzData)
+
+		assertRoundtrip(t, fuzzData)
+	}
+}
 
 type encodedLengthAssert struct {
 	input    interface{}

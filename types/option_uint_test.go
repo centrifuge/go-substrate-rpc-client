@@ -17,15 +17,33 @@
 package types_test
 
 import (
+	"math/big"
 	"testing"
+
+	fuzz "github.com/google/gofuzz"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+var (
+	optionU128FuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(o *OptionU128, c fuzz.Continue) {
+			if c.RandBool() {
+				*o = NewOptionU128Empty()
+				return
+			}
+
+			var u U128
+
+			c.Fuzz(&u)
+
+			*o = NewOptionU128(u)
+		}),
+	}
+)
+
 func TestOptionU8_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewOptionU8(NewU8(7)))
-	assertRoundtrip(t, NewOptionU8(NewU8(0)))
-	assertRoundtrip(t, NewOptionU8Empty())
+	assertRoundTripFuzz[OptionU128](t, 100, optionU128FuzzOpts...)
 }
 
 func TestOptionU16_EncodeDecode(t *testing.T) {
@@ -44,4 +62,10 @@ func TestOptionU64_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewOptionU64(NewU64(28)))
 	assertRoundtrip(t, NewOptionU64(NewU64(0)))
 	assertRoundtrip(t, NewOptionU64Empty())
+}
+
+func TestOptionU128_EncodeDecode(t *testing.T) {
+	assertRoundtrip(t, NewOptionU128(NewU128(*big.NewInt(123))))
+	assertRoundtrip(t, NewOptionU128(NewU128(*big.NewInt(0))))
+	assertRoundtrip(t, NewOptionU128Empty())
 }

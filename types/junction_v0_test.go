@@ -1,8 +1,26 @@
+// Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
+//
+// Copyright 2019 Centrifuge GmbH
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package types_test
 
 import (
 	"math/big"
 	"testing"
+
+	fuzz "github.com/google/gofuzz"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
@@ -59,19 +77,66 @@ var (
 			IsVoice: true,
 		},
 	}
+
+	junctionV0FuzzOpts = combineFuzzOpts(
+		networkIDFuzzOpts,
+		bodyIDFuzzOpts,
+		bodyPartFuzzOpts,
+		[]fuzzOpt{
+			withFuzzFuncs(func(j *JunctionV0, c fuzz.Continue) {
+				switch c.Intn(10) {
+				case 0:
+					j.IsParent = true
+				case 1:
+					j.IsParachain = true
+
+					c.Fuzz(&j.ParachainID)
+				case 2:
+					j.IsAccountId32 = true
+
+					c.Fuzz(&j.AccountId32NetworkID)
+
+					c.Fuzz(&j.AccountID)
+				case 3:
+					j.IsAccountIndex64 = true
+
+					c.Fuzz(&j.AccountIndex64NetworkID)
+
+					c.Fuzz(&j.AccountIndex)
+				case 4:
+					j.IsAccountKey20 = true
+
+					c.Fuzz(&j.AccountKey20NetworkID)
+
+					c.Fuzz(&j.AccountKey)
+				case 5:
+					j.IsPalletInstance = true
+
+					c.Fuzz(&j.PalletIndex)
+				case 6:
+					j.IsGeneralIndex = true
+
+					c.Fuzz(&j.GeneralIndex)
+				case 7:
+					j.IsGeneralKey = true
+
+					c.Fuzz(&j.GeneralKey)
+				case 8:
+					j.IsOnlyChild = true
+				case 9:
+					j.IsPlurality = true
+
+					c.Fuzz(&j.PluralityID)
+
+					c.Fuzz(&j.PluralityPart)
+				}
+			}),
+		},
+	)
 )
 
 func TestJunctionV0_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, testJunction1)
-	assertRoundtrip(t, testJunction2)
-	assertRoundtrip(t, testJunction3)
-	assertRoundtrip(t, testJunction4)
-	assertRoundtrip(t, testJunction5)
-	assertRoundtrip(t, testJunction6)
-	assertRoundtrip(t, testJunction7)
-	assertRoundtrip(t, testJunction8)
-	assertRoundtrip(t, testJunction9)
-	assertRoundtrip(t, testJunction10)
+	assertRoundTripFuzz[JunctionV0](t, 1000, junctionV0FuzzOpts...)
 }
 
 func TestJunctionV0_Encode(t *testing.T) {

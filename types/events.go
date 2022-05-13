@@ -330,34 +330,34 @@ type EventParasPvfCheckRejected struct {
 	Topics      []Hash
 }
 
-// EventParaDisputesDisputeInitiated is emitted when a dispute has been initiated.
-type EventParaDisputesDisputeInitiated struct {
+// EventParasDisputesDisputeInitiated is emitted when a dispute has been initiated.
+type EventParasDisputesDisputeInitiated struct {
 	Phase           Phase
 	CandidateHash   Hash
 	DisputeLocation DisputeLocation
 	Topics          []Hash
 }
 
-// EventParaDisputesDisputeConcluded is emitted when a dispute has concluded for or against a candidate.
-type EventParaDisputesDisputeConcluded struct {
+// EventParasDisputesDisputeConcluded is emitted when a dispute has concluded for or against a candidate.
+type EventParasDisputesDisputeConcluded struct {
 	Phase           Phase
 	CandidateHash   Hash
 	DisputeLocation DisputeResult
 	Topics          []Hash
 }
 
-// EventParaDisputesDisputeTimedOut is emitted when a dispute has timed out due to insufficient participation.
-type EventParaDisputesDisputeTimedOut struct {
+// EventParasDisputesDisputeTimedOut is emitted when a dispute has timed out due to insufficient participation.
+type EventParasDisputesDisputeTimedOut struct {
 	Phase         Phase
 	CandidateHash Hash
 	Topics        []Hash
 }
 
-// EventParaDisputesRevert is emitted when a dispute has concluded with supermajority against a candidate.
+// EventParasDisputesRevert is emitted when a dispute has concluded with supermajority against a candidate.
 // Block authors should no longer build on top of this head and should
 // instead revert the block at the given height. This should be the
 // number of the child of the last known valid block in the chain.
-type EventParaDisputesRevert struct {
+type EventParasDisputesRevert struct {
 	Phase       Phase
 	BlockNumber U32
 	Topics      []Hash
@@ -2771,21 +2771,21 @@ type EventUniquesTransferred struct {
 // EventUMPInvalidFormat is emitted when the upward message is invalid XCM.
 type EventUMPInvalidFormat struct {
 	Phase     Phase
-	MessageID []U8
+	MessageID [32]U8
 	Topics    []Hash
 }
 
 // EventUMPUnsupportedVersion is emitted when the upward message is unsupported version of XCM.
 type EventUMPUnsupportedVersion struct {
 	Phase     Phase
-	MessageID []U8
+	MessageID [32]U8
 	Topics    []Hash
 }
 
 // EventUMPExecutedUpward is emitted when the upward message executed with the given outcome.
 type EventUMPExecutedUpward struct {
 	Phase     Phase
-	MessageID []U8
+	MessageID [32]U8
 	Outcome   Outcome
 	Topics    []Hash
 }
@@ -2793,7 +2793,7 @@ type EventUMPExecutedUpward struct {
 // EventUMPWeightExhausted is emitted when the weight limit for handling upward messages was reached.
 type EventUMPWeightExhausted struct {
 	Phase     Phase
-	MessageID []U8
+	MessageID [32]U8
 	Remaining Weight
 	Required  Weight
 	Topics    []Hash
@@ -2813,7 +2813,7 @@ type EventUMPUpwardMessagesReceived struct {
 type EventUMPOverweightEnqueued struct {
 	Phase           Phase
 	ParachainID     ParachainID
-	MessageID       []U8
+	MessageID       [32]U8
 	OverweightIndex U64
 	RequiredWeight  Weight
 	Topics          []Hash

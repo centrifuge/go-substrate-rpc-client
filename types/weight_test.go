@@ -19,12 +19,30 @@ package types_test
 import (
 	"testing"
 
+	fuzz "github.com/google/gofuzz"
+
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+var (
+	optionWeightFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(o *OptionWeight, c fuzz.Continue) {
+			if c.RandBool() {
+				*o = NewOptionWeightEmpty()
+				return
+			}
+
+			var weight Weight
+
+			c.Fuzz(&weight)
+
+			*o = NewOptionWeight(weight)
+		}),
+	}
+)
+
 func TestOptionWeight_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewOptionWeight(NewWeight(0)))
-	assertRoundtrip(t, NewOptionWeightEmpty())
+	assertRoundTripFuzz[OptionWeight](t, 100, optionWeightFuzzOpts...)
 }
 
 func TestOptionWeight_Encode(t *testing.T) {
@@ -46,8 +64,7 @@ func TestOptionWeight_Decode(t *testing.T) {
 }
 
 func TestWeight_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewWeight(0))
-	assertRoundtrip(t, NewWeight(12))
+	assertRoundTripFuzz[Weight](t, 100)
 }
 
 func TestWeight_EncodedLength(t *testing.T) {
