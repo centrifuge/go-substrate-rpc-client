@@ -19,21 +19,50 @@ package types_test
 import (
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	fuzz "github.com/google/gofuzz"
+
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBeefySignature(t *testing.T) {
-	empty := types.NewOptionBeefySignatureEmpty()
+	empty := NewOptionBeefySignatureEmpty()
 	assert.True(t, empty.IsNone())
 	assert.False(t, empty.IsSome())
 
-	sig := types.NewOptionBeefySignature(types.BeefySignature{})
+	sig := NewOptionBeefySignature(BeefySignature{})
 	sig.SetNone()
 	assert.True(t, sig.IsNone())
-	sig.SetSome(types.BeefySignature{})
+	sig.SetSome(BeefySignature{})
 	assert.True(t, sig.IsSome())
 	ok, _ := sig.Unwrap()
 	assert.True(t, ok)
 	assertRoundtrip(t, sig)
+}
+
+func TestBeefySignature_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[BeefySignature](t, 100)
+	assertDecodeNilData[BeefySignature](t)
+	assertEncodeEmptyObj[BeefySignature](t, 65)
+}
+
+var (
+	optionBeefySignatureFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(o *OptionBeefySignature, c fuzz.Continue) {
+			if c.RandBool() {
+				*o = NewOptionBeefySignatureEmpty()
+				return
+			}
+
+			var b BeefySignature
+			c.Fuzz(&b)
+
+			*o = NewOptionBeefySignature(b)
+		}),
+	}
+)
+
+func TestOptionBeefySignature_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[OptionBeefySignature](t, 100, optionBeefySignatureFuzzOpts...)
+	assertEncodeEmptyObj[OptionBeefySignature](t, 1)
 }

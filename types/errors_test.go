@@ -154,6 +154,8 @@ var (
 
 func TestDispatchError_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[DispatchError](t, 1000, dispatchErrorFuzzOpts...)
+	assertDecodeNilData[DispatchError](t)
+	assertEncodeEmptyObj[DispatchError](t, 0)
 }
 
 func TestDispatchError_Encode(t *testing.T) {

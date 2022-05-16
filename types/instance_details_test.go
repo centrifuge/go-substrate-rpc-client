@@ -48,6 +48,8 @@ var (
 
 func TestInstanceDetails_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[InstanceDetails](t, 1000, instanceDetailsFuzzOpts...)
+	assertDecodeNilData[InstanceDetails](t)
+	assertEncodeEmptyObj[InstanceDetails](t, 50)
 }
 
 func TestInstanceDetails_Encode(t *testing.T) {

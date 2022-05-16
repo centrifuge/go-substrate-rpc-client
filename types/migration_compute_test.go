@@ -43,6 +43,8 @@ var (
 
 func TestMigrationCompute_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[MigrationCompute](t, 100, migrationComputeFuzzOpts...)
+	assertDecodeNilData[MigrationCompute](t)
+	assertEncodeEmptyObj[MigrationCompute](t, 0)
 }
 
 func TestMigrationCompute_Encode(t *testing.T) {

@@ -149,6 +149,8 @@ var (
 
 func TestMultiLocationV0_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[MultiLocationV0](t, 1000, multiLocationV0FuzzOpts...)
+	assertDecodeNilData[MultiLocationV0](t)
+	assertEncodeEmptyObj[MultiLocationV0](t, 0)
 }
 
 func TestMultiLocationV0_Encode(t *testing.T) {

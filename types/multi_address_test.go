@@ -19,33 +19,64 @@ package types_test
 import (
 	"testing"
 
+	fuzz "github.com/google/gofuzz"
+
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewMultiAddressFromAccountID(t *testing.T) {
-	assertRoundtrip(t, types.NewMultiAddressFromAccountID(signature.TestKeyringPairAlice.PublicKey))
+var (
+	multiAddressFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(m *MultiAddress, c fuzz.Continue) {
+			switch c.Intn(5) {
+			case 0:
+				m.IsID = true
+				c.Fuzz(&m.AsID)
+			case 1:
+				m.IsIndex = true
+				c.Fuzz(&m.AsIndex)
+			case 2:
+				m.IsRaw = true
+				c.Fuzz(&m.AsRaw)
+			case 3:
+				m.IsAddress32 = true
+				c.Fuzz(&m.AsAddress32)
+			case 4:
+				m.IsAddress20 = true
+				c.Fuzz(&m.AsAddress20)
+			}
+		}),
+	}
+)
 
-	_, err := types.NewMultiAddressFromHexAccountID("123!")
+func TestMultiAddress_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[MultiAddress](t, 100, multiAddressFuzzOpts...)
+	assertDecodeNilData[MultiAddress](t)
+}
+
+func TestNewMultiAddressFromAccountID(t *testing.T) {
+	assertRoundtrip(t, NewMultiAddressFromAccountID(signature.TestKeyringPairAlice.PublicKey))
+
+	_, err := NewMultiAddressFromHexAccountID("123!")
 	assert.Error(t, err)
 
-	addr, err := types.NewMultiAddressFromHexAccountID(types.HexEncodeToString(signature.TestKeyringPairAlice.PublicKey))
+	addr, err := NewMultiAddressFromHexAccountID(HexEncodeToString(signature.TestKeyringPairAlice.PublicKey))
 	assert.NoError(t, err)
 	assertRoundtrip(t, addr)
-	assertRoundtrip(t, types.MultiAddress{
+	assertRoundtrip(t, MultiAddress{
 		IsIndex: true,
 		AsIndex: 100,
 	})
-	assertRoundtrip(t, types.MultiAddress{
+	assertRoundtrip(t, MultiAddress{
 		IsRaw: true,
 		AsRaw: []byte{1, 2, 3},
 	})
-	assertRoundtrip(t, types.MultiAddress{
+	assertRoundtrip(t, MultiAddress{
 		IsAddress32: true,
 		AsAddress32: [32]byte{},
 	})
-	assertRoundtrip(t, types.MultiAddress{
+	assertRoundtrip(t, MultiAddress{
 		IsAddress20: true,
 		AsAddress20: [20]byte{},
 	})

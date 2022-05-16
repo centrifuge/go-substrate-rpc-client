@@ -23,6 +23,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestData_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[Data](t, 100)
+	assertEncodeEmptyObj[Data](t, 0)
+}
+
 func TestData_EncodedLength(t *testing.T) {
 	assertEncodedLength(t, []encodedLengthAssert{
 		{Data([]byte{12, 251, 42}), 3},
@@ -62,6 +67,9 @@ func TestData_Hex(t *testing.T) {
 		{Data([]byte{0, 1}), "0x0001"},
 		{Data([]byte{18, 52, 86}), "0x123456"},
 	})
+
+	assertEqual(t, NewData([]byte{0, 0, 0}).Hex(), "0x000000")
+	assertEqual(t, NewData([]byte{171, 18, 52}).Hex(), "0xab1234")
 }
 
 func TestData_String(t *testing.T) {

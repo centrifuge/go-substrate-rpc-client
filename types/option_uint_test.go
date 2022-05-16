@@ -20,6 +20,8 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	fuzz "github.com/google/gofuzz"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
@@ -44,6 +46,82 @@ var (
 
 func TestOptionU8_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[OptionU128](t, 100, optionU128FuzzOpts...)
+	assertEncodeEmptyObj[OptionU128](t, 1)
+}
+
+func TestOptionU8_OptionMethods(t *testing.T) {
+	o := NewOptionU8Empty()
+	o.SetSome(11)
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, U8(0), v)
+}
+
+func TestOptionU16_OptionMethods(t *testing.T) {
+	o := NewOptionU16Empty()
+	o.SetSome(11)
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, U16(0), v)
+}
+
+func TestOptionU32_OptionMethods(t *testing.T) {
+	o := NewOptionU32Empty()
+	o.SetSome(11)
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, U32(0), v)
+}
+
+func TestOptionU64_OptionMethods(t *testing.T) {
+	o := NewOptionU64Empty()
+	o.SetSome(11)
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, U64(0), v)
+}
+
+func TestOptionU128_OptionMethods(t *testing.T) {
+	o := NewOptionU128Empty()
+	o.SetSome(NewU128(*big.NewInt(11)))
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, NewU128(*big.NewInt(0)), v)
 }
 
 func TestOptionU16_EncodeDecode(t *testing.T) {

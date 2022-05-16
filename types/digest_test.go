@@ -24,6 +24,12 @@ import (
 
 func TestDigest_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, Digest{testDigestItem1, testDigestItem2})
+	assertRoundTripFuzz[Digest](t, 100, digestItemFuzzOpts...)
+}
+
+func TestDigest_JSONMarshalUnmarshal(t *testing.T) {
+	d := Digest{testDigestItem1, testDigestItem2}
+	assertJSONRoundTrip(t, &d)
 }
 
 func TestDigest_Encode(t *testing.T) {

@@ -33,6 +33,8 @@ var (
 
 func TestClassMetadata_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[ClassMetadata](t, 1000)
+	assertDecodeNilData[ClassMetadata](t)
+	assertEncodeEmptyObj[ClassMetadata](t, 18)
 }
 
 func TestClassMetadata_Encode(t *testing.T) {

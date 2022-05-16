@@ -19,6 +19,8 @@ package types_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	fuzz "github.com/google/gofuzz"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
@@ -41,6 +43,7 @@ var (
 
 func TestOptionAccountID_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[OptionAccountID](t, 100, optionAccountIDFuzzOpts...)
+	assertEncodeEmptyObj[OptionAccountID](t, 1)
 }
 
 func TestOptionAccountID_Encode(t *testing.T) {
@@ -57,8 +60,25 @@ func TestOptionAccountID_Decode(t *testing.T) {
 	})
 }
 
+func TestOptionAccountID_OptionMethods(t *testing.T) {
+	o := NewOptionAccountIDEmpty()
+	o.SetSome(NewAccountID([]byte("acc-id")))
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, NewAccountID([]byte{}), v)
+}
+
 func TestAccountID_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[AccountID](t, 100, withNilChance(0.01))
+	assertDecodeNilData[AccountID](t)
+	assertEncodeEmptyObj[AccountID](t, 32)
 }
 
 func TestAccountID_EncodedLength(t *testing.T) {

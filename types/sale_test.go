@@ -34,6 +34,8 @@ var (
 
 func TestTranche_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[Tranche](t, 100)
+	assertDecodeNilData[Tranche](t)
+	assertEncodeEmptyObj[Tranche](t, 24)
 }
 
 func TestTranche_Encode(t *testing.T) {
@@ -96,6 +98,8 @@ var (
 
 func TestCurrencyID_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[CurrencyID](t, 1000, currencyIDFuzzOpts...)
+	assertDecodeNilData[CurrencyID](t)
+	assertEncodeEmptyObj[CurrencyID](t, 0)
 }
 
 func TestCurrencyID_Encode(t *testing.T) {
@@ -129,6 +133,8 @@ var (
 
 func TestPrice_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[Price](t, 100, currencyIDFuzzOpts...)
+	assertDecodeNilData[Price](t)
+	assertEncodeEmptyObj[Price](t, 16)
 }
 
 func TestPrice_Encode(t *testing.T) {
@@ -152,6 +158,8 @@ var (
 
 func TestSale_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[Sale](t, 100, currencyIDFuzzOpts...)
+	assertDecodeNilData[Sale](t)
+	assertEncodeEmptyObj[Sale](t, 48)
 }
 
 func TestSale_Encode(t *testing.T) {

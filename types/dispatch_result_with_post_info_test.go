@@ -70,6 +70,8 @@ var (
 
 func TestDispatchResultWithPostInfo_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[DispatchResultWithPostInfo](t, 1000, dispatchResultWithPostInfoFuzzOpts...)
+	assertDecodeNilData[DispatchResultWithPostInfo](t)
+	assertEncodeEmptyObj[DispatchResultWithPostInfo](t, 0)
 }
 
 func TestDispatchResultWithPostInfo_Encode(t *testing.T) {

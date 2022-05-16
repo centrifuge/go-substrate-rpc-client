@@ -55,6 +55,7 @@ var (
 
 func TestOptionElectionCompute_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[OptionElectionCompute](t, 100, optionElectionComputeFuzzOpts...)
+	assertEncodeEmptyObj[ElectionCompute](t, 1)
 }
 
 func TestOptionElectionCompute_Encode(t *testing.T) {
@@ -75,6 +76,21 @@ func TestOptionElectionCompute_Decode(t *testing.T) {
 	})
 }
 
+func TestOptionElectionCompute_OptionMethods(t *testing.T) {
+	o := NewOptionElectionComputeEmpty()
+	o.SetSome(NewElectionCompute(1))
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, NewElectionCompute(0), v)
+}
+
 func TestElectionComputeEncodeDecode(t *testing.T) {
 	//decode error
 	decoder := scale.NewDecoder(bytes.NewReader([]byte{5}))
@@ -83,4 +99,6 @@ func TestElectionComputeEncodeDecode(t *testing.T) {
 	assert.Error(t, err)
 
 	assertRoundTripFuzz[ElectionCompute](t, 100, electionComputeFuzzOpts...)
+	assertDecodeNilData[ElectionCompute](t)
+	assertEncodeEmptyObj[ElectionCompute](t, 1)
 }

@@ -183,6 +183,18 @@ func ExampleExtrinsic() {
 	fmt.Printf("%#v", extEnc)
 }
 
+func TestExtrinsic_JSONMarshalUnmarshal(t *testing.T) {
+	c, err := NewCall(ExamplaryMetadataV4,
+		"balances.transfer", NewAddressFromAccountID(MustHexDecodeString(
+			"0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")),
+		NewUCompactFromUInt(6969))
+	assert.NoError(t, err)
+
+	ext := NewExtrinsic(c)
+
+	assertJSONRoundTrip(t, &ext)
+}
+
 func TestCall(t *testing.T) {
 	c := Call{CallIndex{6, 1}, Args{0, 0, 0}}
 

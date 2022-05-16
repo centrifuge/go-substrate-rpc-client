@@ -75,6 +75,8 @@ var (
 
 func TestBodyID_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[BodyID](t, 1000, bodyIDFuzzOpts...)
+	assertDecodeNilData[BodyID](t)
+	assertEncodeEmptyObj[BodyID](t, 0)
 }
 
 func TestBodyID_Encode(t *testing.T) {
@@ -152,6 +154,8 @@ var (
 
 func TestBodyPart_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[BodyPart](t, 1000, bodyPartFuzzOpts...)
+	assertDecodeNilData[BodyPart](t)
+	assertEncodeEmptyObj[BodyPart](t, 0)
 }
 
 func TestBodyPart_Encode(t *testing.T) {

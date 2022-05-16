@@ -70,6 +70,8 @@ var (
 
 func TestOutcome_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[Outcome](t, 100, outcomeFuzzOpts...)
+	assertDecodeNilData[Outcome](t)
+	assertEncodeEmptyObj[Outcome](t, 0)
 }
 
 func TestOutcome_Encode(t *testing.T) {

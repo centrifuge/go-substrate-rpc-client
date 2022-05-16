@@ -40,6 +40,8 @@ var (
 
 func TestClassDetails_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[ClassDetails](t, 1000)
+	assertDecodeNilData[ClassDetails](t)
+	assertEncodeEmptyObj[ClassDetails](t, 158)
 }
 
 func TestClassDetails_Encode(t *testing.T) {

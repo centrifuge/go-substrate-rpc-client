@@ -75,6 +75,33 @@ func TestParser_ParseField(t *testing.T) {
 	}
 }
 
+func TestParser_ParseField_ParseClientOptsErr(t *testing.T) {
+	parser := NewParser()
+
+	f := reflect.StructField{
+		Tag: reflect.StructTag(WsURLTagName),
+	}
+
+	r, err := parser.ParseField(f)
+	assert.NotNil(t, err)
+	assert.Nil(t, r)
+
+}
+
+func TestParser_ParseField_ParseReqDataErr(t *testing.T) {
+	parser := NewParser()
+
+	f := reflect.StructField{
+		Name: "incorrect_field_name",
+		Tag:  reflect.StructTag(fmt.Sprintf(`%s:"blockchainname"`, BlockchainTagName)),
+	}
+
+	r, err := parser.ParseField(f)
+	assert.NotNil(t, err)
+	assert.Nil(t, r)
+
+}
+
 func TestParser_CanSkip(t *testing.T) {
 	parser := NewParser()
 

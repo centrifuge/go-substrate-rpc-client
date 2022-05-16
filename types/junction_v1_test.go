@@ -132,6 +132,8 @@ var (
 
 func TestJunctionV1_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[JunctionV1](t, 1000, junctionV1FuzzOpts...)
+	assertDecodeNilData[JunctionV1](t)
+	assertEncodeEmptyObj[JunctionV1](t, 0)
 }
 
 func TestJunctionV1_Encode(t *testing.T) {
@@ -288,6 +290,8 @@ var (
 
 func TestJunctionsV1_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[JunctionsV1](t, 1000, junctionsV1FuzzOpts...)
+	assertDecodeNilData[JunctionsV1](t)
+	assertEncodeEmptyObj[JunctionsV1](t, 0)
 }
 
 func TestJunctionsV1_Encode(t *testing.T) {

@@ -636,8 +636,6 @@ func (p *Pays) Decode(decoder scale.Decoder) error {
 		p.IsYes = true
 	case 1:
 		p.IsNo = true
-	default:
-		return fmt.Errorf("unknown DispatchClass enum: %v", b)
 	}
 
 	return nil
@@ -1088,9 +1086,41 @@ type DemocracyVote struct {
 	Conviction DemocracyConviction
 }
 
+func (d *DemocracyVote) Decode(decoder scale.Decoder) error {
+	if err := decoder.Decode(&d.Aye); err != nil {
+		return err
+	}
+
+	return decoder.Decode(&d.Conviction)
+}
+
+func (d DemocracyVote) Encode(encoder scale.Encoder) error {
+	if err := encoder.Encode(d.Aye); err != nil {
+		return err
+	}
+
+	return encoder.Encode(d.Conviction)
+}
+
 type VoteAccountVoteAsStandard struct {
 	Vote    DemocracyVote
 	Balance U128
+}
+
+func (v *VoteAccountVoteAsStandard) Decode(decoder scale.Decoder) error {
+	if err := decoder.Decode(&v.Vote); err != nil {
+		return err
+	}
+
+	return decoder.Decode(&v.Balance)
+}
+
+func (v VoteAccountVoteAsStandard) Encode(encoder scale.Encoder) error {
+	if err := encoder.Encode(v.Vote); err != nil {
+		return err
+	}
+
+	return encoder.Encode(v.Balance)
 }
 
 type VoteAccountVoteAsSplit struct {
@@ -1107,19 +1137,42 @@ type VoteAccountVote struct {
 
 func (vv *VoteAccountVote) Decode(decoder scale.Decoder) error {
 	b, err := decoder.ReadOneByte()
+
+	if err != nil {
+		return err
+	}
+
 	switch b {
 	case 0:
 		vv.IsStandard = true
+
+		return decoder.Decode(&vv.AsStandard)
 	case 1:
 		vv.IsSplit = true
-	default:
-		return fmt.Errorf("unknown VoteAccountVote enum: %v", b)
+
+		return decoder.Decode(&vv.AsSplit)
 	}
-	return err
+
+	return nil
 }
 
 func (vv VoteAccountVote) Encode(encoder scale.Encoder) error {
-	return encoder.Encode(vv)
+	switch {
+	case vv.IsStandard:
+		if err := encoder.PushByte(0); err != nil {
+			return err
+		}
+
+		return encoder.Encode(vv.AsStandard)
+	case vv.IsSplit:
+		if err := encoder.PushByte(1); err != nil {
+			return err
+		}
+
+		return encoder.Encode(vv.AsSplit)
+	}
+
+	return nil
 }
 
 // EventDemocracyStarted is emitted when a referendum has begun.
@@ -3066,7 +3119,12 @@ func (d DispatchResult) Encode(encoder scale.Encoder) error {
 	if d.Ok {
 		return encoder.PushByte(0)
 	}
-	return d.Error.Encode(encoder)
+
+	if err := encoder.PushByte(1); err != nil {
+		return err
+	}
+
+	return encoder.Encode(d.Error)
 }
 
 // EventUtility is emitted when a multisig operation has been executed. First param is the account that is

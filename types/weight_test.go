@@ -19,6 +19,8 @@ package types_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	fuzz "github.com/google/gofuzz"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
@@ -43,6 +45,7 @@ var (
 
 func TestOptionWeight_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[OptionWeight](t, 100, optionWeightFuzzOpts...)
+	assertEncodeEmptyObj[OptionWeight](t, 1)
 }
 
 func TestOptionWeight_Encode(t *testing.T) {
@@ -63,8 +66,25 @@ func TestOptionWeight_Decode(t *testing.T) {
 	})
 }
 
+func TestOptionWeight_OptionMethods(t *testing.T) {
+	o := NewOptionWeightEmpty()
+	o.SetSome(Weight(11))
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, Weight(0), v)
+}
+
 func TestWeight_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[Weight](t, 100)
+	assertDecodeNilData[Weight](t)
+	assertEncodeEmptyObj[Weight](t, 8)
 }
 
 func TestWeight_EncodedLength(t *testing.T) {

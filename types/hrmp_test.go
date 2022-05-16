@@ -31,6 +31,8 @@ var (
 
 func TestHRMPChannelID_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[HRMPChannelID](t, 1000)
+	assertDecodeNilData[HRMPChannelID](t)
+	assertEncodeEmptyObj[HRMPChannelID](t, 8)
 }
 
 func TestHRMPChannelID_Encode(t *testing.T) {

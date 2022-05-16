@@ -24,6 +24,9 @@ import (
 
 func TestSignature_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewSignature(hash64))
+	assertRoundTripFuzz[Signature](t, 100)
+	assertDecodeNilData[Signature](t)
+	assertEncodeEmptyObj[Signature](t, 64)
 }
 
 func TestSignature_EncodedLength(t *testing.T) {
@@ -46,6 +49,8 @@ func TestSignature_Hex(t *testing.T) {
 	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewSignature(hash64), "0x01020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304"}, //nolint:lll
 	})
+
+	assertEqual(t, "0x01020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304", NewSignature(hash64).Hex())
 }
 
 func TestSignature_String(t *testing.T) {
@@ -64,6 +69,9 @@ func TestSignature_Eq(t *testing.T) {
 
 func TestEcdsaSignature_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewEcdsaSignature(hash65))
+	assertRoundTripFuzz[EcdsaSignature](t, 100)
+	assertDecodeNilData[EcdsaSignature](t)
+	assertEncodeEmptyObj[EcdsaSignature](t, 65)
 }
 
 func TestEcdsaSignature_EncodedLength(t *testing.T) {
@@ -86,6 +94,9 @@ func TestEcdsaSignature_Hex(t *testing.T) {
 	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewEcdsaSignature(hash65), "0x0102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405"}, //nolint:lll
 	})
+
+	assertEqual(t, "0x0102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405", NewEcdsaSignature(hash65).Hex())
+
 }
 
 func TestEcdsaSignature_String(t *testing.T) {

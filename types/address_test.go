@@ -17,8 +17,13 @@
 package types_test
 
 import (
+	"bytes"
 	"encoding/binary"
 	"testing"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+
+	fuzz "github.com/google/gofuzz"
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/hash"
@@ -40,9 +45,26 @@ func TestChecksum(t *testing.T) {
 	assert.Equal(t, ss58d[len(ss58d)-2:], res[:2]) // Verified checksum
 }
 
+var (
+	addressFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(a *Address, c fuzz.Continue) {
+			if c.RandBool() {
+				a.IsAccountID = true
+				c.Fuzz(&a.AsAccountID)
+
+				return
+			}
+
+			a.IsAccountIndex = true
+			c.Fuzz(&a.AsAccountIndex)
+		}),
+	}
+)
+
 func TestAddress_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewAddressFromAccountID([]byte{128, 42}))
-	assertRoundtrip(t, NewAddressFromAccountIndex(421))
+	assertRoundTripFuzz[Address](t, 100, addressFuzzOpts...)
+	assertDecodeNilData[Address](t)
+	assertEncodeEmptyObj[Address](t, 1)
 }
 
 func TestAddress_Encode(t *testing.T) {
@@ -110,6 +132,13 @@ func TestAddress_Decode(t *testing.T) {
 		})))},
 		{[]byte{23}, NewAddressFromAccountIndex(uint32(23))},
 	})
+
+	_, err := NewAddressFromHexAccountID("zzz")
+	assert.NotNil(t, err)
+
+	a := new(Address)
+	err = a.Decode(*scale.NewDecoder(bytes.NewReader([]byte{0xfe})))
+	assert.NotNil(t, err)
 }
 
 func TestAddress_DecodeWithOptions(t *testing.T) {

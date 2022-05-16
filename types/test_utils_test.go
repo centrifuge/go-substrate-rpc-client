@@ -65,7 +65,7 @@ func combineFuzzOpts(optsSlice ...[]fuzzOpt) []fuzzOpt {
 }
 
 func assertRoundTripFuzz[T any](t *testing.T, fuzzCount int, fuzzOpts ...fuzzOpt) {
-	f := fuzz.New().NilChance(0).Funcs()
+	f := fuzz.New().NilChance(0)
 
 	for _, opt := range fuzzOpts {
 		opt(f)
@@ -78,6 +78,23 @@ func assertRoundTripFuzz[T any](t *testing.T, fuzzCount int, fuzzOpts ...fuzzOpt
 
 		assertRoundtrip(t, fuzzData)
 	}
+}
+
+func assertDecodeNilData[T any](t *testing.T) {
+	var obj T
+
+	err := scale.NewDecoder(bytes.NewReader(nil)).Decode(&obj)
+	assert.NotNil(t, err)
+}
+
+func assertEncodeEmptyObj[T any](t *testing.T, expectedByteLen int) {
+	var obj T
+
+	var buffer = bytes.Buffer{}
+
+	err := scale.NewEncoder(&buffer).Encode(obj)
+	assert.Nil(t, err)
+	assert.Len(t, buffer.Bytes(), expectedByteLen)
 }
 
 type encodedLengthAssert struct {
@@ -209,4 +226,22 @@ func assertEq(t *testing.T, eqAsserts []eqAssert) {
 			t.Errorf("Fail, input %v, other %v, expected %v, result %v\n", test.input, test.other, test.expected, result)
 		}
 	}
+}
+
+type jsonMarshalerUnmarshaler[T any] interface {
+	UnmarshalJSON([]byte) error
+	MarshalJSON() ([]byte, error)
+
+	*T // helper type that allows us to instantiate a non-nil T
+}
+
+func assertJSONRoundTrip[T any, U jsonMarshalerUnmarshaler[T]](t *testing.T, value U) {
+	b, err := value.MarshalJSON()
+	assert.NoError(t, err)
+
+	tt := U(new(T))
+	err = tt.UnmarshalJSON(b)
+	assert.NoError(t, err)
+
+	assertEqual(t, value, tt)
 }

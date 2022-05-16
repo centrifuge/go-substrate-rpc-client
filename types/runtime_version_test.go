@@ -58,3 +58,8 @@ func TestRuntimeVersionAPI_Encode_Decode(t *testing.T) {
 
 	assert.Equal(t, exampleRuntimeVersionAPI, output)
 }
+
+func TestRuntimeVersionAPI_JSONMarshalUnmarshal(t *testing.T) {
+	r := exampleRuntimeVersionAPI
+	assertJSONRoundTrip(t, &r)
+}

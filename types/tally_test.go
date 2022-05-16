@@ -32,6 +32,8 @@ var (
 
 func TestTally_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[Tally](t, 100)
+	assertDecodeNilData[Tally](t)
+	assertEncodeEmptyObj[Tally](t, 32)
 }
 
 func TestTally_Encode(t *testing.T) {

@@ -56,6 +56,8 @@ var (
 
 func TestAssetID_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[AssetID](t, 100, assetIDFuzzOpts...)
+	assertDecodeNilData[AssetID](t)
+	assertEncodeEmptyObj[AssetID](t, 0)
 }
 
 func TestAssetID_Encode(t *testing.T) {
@@ -137,6 +139,8 @@ var (
 
 func TestAssetInstance_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[AssetInstance](t, 1000, assetInstanceFuzzOpts...)
+	assertDecodeNilData[AssetInstance](t)
+	assertEncodeEmptyObj[AssetInstance](t, 0)
 }
 
 func TestAssetInstance_Encode(t *testing.T) {
@@ -192,6 +196,8 @@ var (
 
 func TestFungibility_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[Fungibility](t, 1000, fungibilityFuzzOpts...)
+	assertDecodeNilData[Fungibility](t)
+	assertEncodeEmptyObj[Fungibility](t, 0)
 }
 
 func TestFungibility_Encode(t *testing.T) {
@@ -223,6 +229,8 @@ var (
 
 func TestMultiAssetV1_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[MultiAssetV1](t, 1000, multiAssetV1FuzzOpts...)
+	assertDecodeNilData[MultiAssetV1](t)
+	assertEncodeEmptyObj[MultiAssetV1](t, 0)
 }
 
 func TestMultiAssetV1_Encode(t *testing.T) {
@@ -257,6 +265,7 @@ var (
 
 func TestMultiAssetsV1_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[MultiAssetsV1](t, 100, multiAssetV1FuzzOpts...)
+	assertEncodeEmptyObj[MultiAssetsV1](t, 1)
 }
 
 func TestMultiAssetsV1_Encode(t *testing.T) {
@@ -389,6 +398,8 @@ var (
 
 func TestMultiAssetV0_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[MultiAssetV0](t, 1000, multiAssetV0FuzzOpts...)
+	assertDecodeNilData[MultiAssetV0](t)
+	assertEncodeEmptyObj[MultiAssetV0](t, 0)
 }
 
 func TestMultiAssetV0_Encode(t *testing.T) {
@@ -459,6 +470,8 @@ var (
 
 func TestVersionedMultiAssets_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[VersionedMultiAssets](t, 1000, versionedMultiAssetsFuzzOpts...)
+	assertDecodeNilData[VersionedMultiAssets](t)
+	assertEncodeEmptyObj[VersionedMultiAssets](t, 0)
 }
 
 func TestVersionedMultiAssets_Encode(t *testing.T) {
@@ -532,6 +545,8 @@ var (
 
 func TestResponse_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[Response](t, 1000, responseFuzzOpts...)
+	assertDecodeNilData[Response](t)
+	assertEncodeEmptyObj[Response](t, 0)
 }
 
 func TestResponse_Encode(t *testing.T) {
@@ -584,6 +599,8 @@ var (
 
 func TestOriginKind_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[OriginKind](t, 1000, originKindFuzzOpts...)
+	assertDecodeNilData[OriginKind](t)
+	assertEncodeEmptyObj[OriginKind](t, 0)
 }
 
 func TestOriginKind_Encode(t *testing.T) {
@@ -612,6 +629,7 @@ var (
 
 func TestEncodedCall_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[EncodedCall](t, 100)
+	assertEncodeEmptyObj[EncodedCall](t, 1)
 }
 
 func TestEncodedCall_Encode(t *testing.T) {
@@ -644,6 +662,8 @@ var (
 
 func TestWildFungibility_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[WildFungibility](t, 100, wildFungibilityFuzzOpts...)
+	assertDecodeNilData[WildFungibility](t)
+	assertEncodeEmptyObj[WildFungibility](t, 0)
 }
 
 func TestWildFungibility_Encode(t *testing.T) {
@@ -690,6 +710,8 @@ var (
 
 func TestWildMultiAsset_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[WildMultiAsset](t, 100, wildMultiAssetFuzzOpts...)
+	assertDecodeNilData[WildMultiAsset](t)
+	assertEncodeEmptyObj[WildMultiAsset](t, 0)
 }
 
 func TestWildMultiAsset_Encode(t *testing.T) {
@@ -735,6 +757,8 @@ var (
 
 func TestMultiAssetFilter_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[MultiAssetFilter](t, 100, multiAssetFilterFuzzOpts...)
+	assertDecodeNilData[MultiAssetFilter](t)
+	assertEncodeEmptyObj[MultiAssetFilter](t, 0)
 }
 
 func TestMultiAssetFilter_Encode(t *testing.T) {
@@ -786,6 +810,8 @@ var (
 
 func TestWeightLimit_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[WeightLimit](t, 100, weightLimitFuzzOpts...)
+	assertDecodeNilData[WeightLimit](t)
+	assertEncodeEmptyObj[WeightLimit](t, 0)
 }
 
 func TestWeightLimit_Encode(t *testing.T) {
@@ -984,4 +1010,6 @@ var (
 
 func TestInstruction_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[Instruction](t, 1000, instructionFuzzOpts...)
+	assertDecodeNilData[Instruction](t)
+	assertEncodeEmptyObj[Instruction](t, 0)
 }

@@ -17,9 +17,14 @@
 package types_test
 
 import (
+	"bytes"
 	"fmt"
 	"math/big"
 	"testing"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+
+	fuzz "github.com/google/gofuzz"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/stretchr/testify/assert"
@@ -51,6 +56,19 @@ var exampleEventAppEnc = []byte{0x0, 0x2a, 0x0, 0x0, 0x0, 0x10, 0x27, 0x0, 0x0, 
 
 var exampleEventFinEnc = []byte{0x1, 0x10, 0x27, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4, 0x1, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 	0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} //nolint:lll
+
+var (
+	eventSystemExtrinsicSuccessFuzzOpts = combineFuzzOpts(
+		phaseFuzzOpts,
+		dispatchInfoFuzzOpts,
+	)
+)
+
+func TestEventSystemExtrinsicSuccess_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[EventSystemExtrinsicSuccess](t, 100, eventSystemExtrinsicSuccessFuzzOpts...)
+	assertDecodeNilData[EventSystemExtrinsicSuccess](t)
+	assertEncodeEmptyObj[EventSystemExtrinsicSuccess](t, 9)
+}
 
 func TestEventSystemExtrinsicSuccess_Encode(t *testing.T) {
 	encoded, err := Encode(exampleEventFin)
@@ -263,8 +281,16 @@ func TestEventRecordsRaw_Decode(t *testing.T) {
 			"00", // Topics
 	)) //nolint:lll
 
+	var b []byte
+
+	buf := bytes.NewBuffer(b)
+
+	err := e.Encode(*scale.NewEncoder(buf))
+	assert.Nil(t, err)
+	assert.True(t, len(buf.Bytes()) > 0)
+
 	var metadata Metadata
-	err := DecodeFromHex(MetadataV14Data, &metadata)
+	err = DecodeFromHex(MetadataV14Data, &metadata)
 	if err != nil {
 		panic(err)
 	}
@@ -292,12 +318,29 @@ func TestEventRecordsRaw_Decode(t *testing.T) {
 }
 
 func TestDispatchError(t *testing.T) {
-	assertRoundtrip(t, DispatchError{IsOther: true})
-	assertRoundtrip(t, DispatchError{IsModule: true, ModuleError: ModuleError{Index: 0xf1, Error: 0xa2}})
+	assertRoundTripFuzz[DispatchError](t, 1000, dispatchErrorFuzzOpts...)
+	assertDecodeNilData[DispatchError](t)
+	assertEncodeEmptyObj[DispatchError](t, 0)
 }
 
+var (
+	phaseFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(p *Phase, c fuzz.Continue) {
+			switch c.Intn(3) {
+			case 0:
+				p.IsApplyExtrinsic = true
+				c.Fuzz(&p.AsApplyExtrinsic)
+			case 1:
+				p.IsFinalization = true
+			case 2:
+				p.IsInitialization = true
+			}
+		}),
+	}
+)
+
 func TestPhase(t *testing.T) {
-	assertRoundtrip(t, Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 43})
-	assertRoundtrip(t, Phase{IsFinalization: true})
-	assertRoundtrip(t, Phase{IsInitialization: true})
+	assertRoundTripFuzz[Phase](t, 100, phaseFuzzOpts...)
+	assertDecodeNilData[Phase](t)
+	assertEncodeEmptyObj[Phase](t, 0)
 }

@@ -19,6 +19,8 @@ package types_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	fuzz "github.com/google/gofuzz"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
@@ -53,6 +55,7 @@ var (
 
 func TestOptionMultiLocation_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[OptionMultiLocationV1](t, 1000, optionMultiLocationV1FuzzOpts...)
+	assertEncodeEmptyObj[OptionMultiLocationV1](t, 1)
 }
 
 func TestOptionMultiLocation_Encode(t *testing.T) {
@@ -69,6 +72,21 @@ func TestOptionMultiLocation_Decode(t *testing.T) {
 	})
 }
 
+func TestOptionMultiLocation_OptionMethods(t *testing.T) {
+	o := NewOptionMultiLocationV1Empty()
+	o.SetSome(testMultiLocationV1n1)
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, MultiLocationV1{}, v)
+}
+
 var (
 	testMultiLocationV1n1 = MultiLocationV1{
 		Parents:  4,
@@ -81,8 +99,9 @@ var (
 )
 
 func TestMultiLocationV1_EncodeDecode(t *testing.T) {
-
 	assertRoundTripFuzz[MultiLocationV1](t, 100, multiLocationV1FuzzOpts...)
+	assertDecodeNilData[MultiLocationV1](t)
+	assertEncodeEmptyObj[MultiLocationV1](t, 1)
 }
 
 func TestMultiLocationV1_Encode(t *testing.T) {
@@ -128,6 +147,8 @@ var (
 
 func TestVersionedMultiLocation_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[VersionedMultiLocation](t, 1000, versionedMultiLocationFuzzOpts...)
+	assertDecodeNilData[VersionedMultiLocation](t)
+	assertEncodeEmptyObj[VersionedMultiLocation](t, 0)
 }
 
 func TestVersionedMultiLocation_Encode(t *testing.T) {

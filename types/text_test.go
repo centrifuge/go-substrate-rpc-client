@@ -25,6 +25,8 @@ import (
 func TestString_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewText(""))
 	assertRoundtrip(t, NewText("My nice string"))
+	assertRoundTripFuzz[Text](t, 100)
+	assertEncodeEmptyObj[Text](t, 1)
 }
 
 func TestString_EncodedLength(t *testing.T) {

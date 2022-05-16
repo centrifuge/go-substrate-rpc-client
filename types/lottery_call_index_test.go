@@ -31,6 +31,8 @@ var (
 
 func TestLotteryCallIndex_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[LotteryCallIndex](t, 100)
+	assertDecodeNilData[LotteryCallIndex](t)
+	assertEncodeEmptyObj[LotteryCallIndex](t, 2)
 }
 
 func TestLotteryCallIndex_Encode(t *testing.T) {

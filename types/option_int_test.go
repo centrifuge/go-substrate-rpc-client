@@ -19,8 +19,70 @@ package types_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
+
+func TestOptionI8_OptionMethods(t *testing.T) {
+	o := NewOptionI8Empty()
+	o.SetSome(11)
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, I8(0), v)
+}
+
+func TestOptionI16_OptionMethods(t *testing.T) {
+	o := NewOptionI16Empty()
+	o.SetSome(11)
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, I16(0), v)
+}
+
+func TestOptionI32_OptionMethods(t *testing.T) {
+	o := NewOptionI32Empty()
+	o.SetSome(11)
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, I32(0), v)
+}
+
+func TestOptionI64_OptionMethods(t *testing.T) {
+	o := NewOptionI64Empty()
+	o.SetSome(11)
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, I64(0), v)
+}
 
 func TestOptionI8_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewOptionI8(NewI8(7)))

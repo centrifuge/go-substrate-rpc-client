@@ -95,4 +95,6 @@ var (
 
 func TestXCMError_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[XCMError](t, 1000, xcmErrorFuzzOpts...)
+	assertDecodeNilData[XCMError](t)
+	assertEncodeEmptyObj[XCMError](t, 0)
 }

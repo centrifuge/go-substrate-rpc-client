@@ -17,10 +17,20 @@
 package types_test
 
 import (
+	"bytes"
 	"testing"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/stretchr/testify/assert"
+)
+
+var (
+	extrinsicSignatureV3FuzzOpts = combineFuzzOpts(
+		addressFuzzOpts,
+		extrinsicEraFuzzOpts,
+	)
 )
 
 func TestExtrinsicSignatureV3_EncodeDecode(t *testing.T) {
@@ -34,7 +44,19 @@ func TestExtrinsicSignatureV3_EncodeDecode(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, sig, sigDec)
+
+	assertRoundTripFuzz[ExtrinsicSignatureV3](t, 1000, extrinsicSignatureV3FuzzOpts...)
+	assertDecodeNilData[ExtrinsicSignatureV3](t)
+	assertEncodeEmptyObj[ExtrinsicSignatureV3](t, 69)
 }
+
+var (
+	extrinsicSignatureV4FuzzOpts = combineFuzzOpts(
+		multiAddressFuzzOpts,
+		multiSignatureFuzzOpts,
+		extrinsicEraFuzzOpts,
+	)
+)
 
 func TestExtrinsicSignatureV4_EncodeDecode(t *testing.T) {
 	sig := ExtrinsicSignatureV4{Signer: MultiAddress{IsID: true, AsID: AccountID{0xd4, 0x35, 0x93, 0xc7, 0x15,
@@ -48,6 +70,17 @@ func TestExtrinsicSignatureV4_EncodeDecode(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, sig, sigDec)
+
+	assertRoundTripFuzz[ExtrinsicSignatureV4](t, 1000, extrinsicSignatureV4FuzzOpts...)
+	assertDecodeNilData[ExtrinsicSignatureV4](t)
+
+	var (
+		ext ExtrinsicSignatureV4
+		b   []byte
+	)
+
+	err = scale.NewEncoder(bytes.NewBuffer(b)).Encode(ext)
+	assert.NoError(t, err)
 }
 
 func TestExtrinsicSignatureV4_EncodeDecodeWithOpts(t *testing.T) {

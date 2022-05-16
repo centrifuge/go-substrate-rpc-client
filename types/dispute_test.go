@@ -19,6 +19,8 @@ package types_test
 import (
 	"testing"
 
+	fuzz "github.com/google/gofuzz"
+
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
@@ -39,9 +41,25 @@ var (
 	}
 )
 
+var (
+	disputeLocationFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(d *DisputeLocation, c fuzz.Continue) {
+			if c.RandBool() {
+				d.IsLocal = true
+				return
+			}
+
+			d.IsRemote = true
+		}),
+	}
+)
+
 func TestDisputeLocation_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, testDisputeLocation1)
 	assertRoundtrip(t, testDisputeLocation2)
+	assertRoundTripFuzz[DisputeLocation](t, 100, disputeLocationFuzzOpts...)
+	assertDecodeNilData[DisputeLocation](t)
+	assertEncodeEmptyObj[DisputeLocation](t, 0)
 }
 
 func TestDisputeLocation_Encode(t *testing.T) {
@@ -58,9 +76,26 @@ func TestDisputeLocation_Decode(t *testing.T) {
 	})
 }
 
+var (
+	disputeResultFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(d *DisputeResult, c fuzz.Continue) {
+			if c.RandBool() {
+				d.IsValid = true
+				return
+			}
+
+			d.IsInvalid = true
+			return
+		}),
+	}
+)
+
 func TestDisputeResult_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, testDisputeResult1)
 	assertRoundtrip(t, testDisputeResult2)
+	assertRoundTripFuzz[DisputeResult](t, 100, disputeResultFuzzOpts...)
+	assertDecodeNilData[DisputeResult](t)
+	assertEncodeEmptyObj[DisputeResult](t, 0)
 }
 
 func TestDisputeResult_Encode(t *testing.T) {

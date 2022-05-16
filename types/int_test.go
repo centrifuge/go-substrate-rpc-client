@@ -67,6 +67,11 @@ func TestI8_Eq(t *testing.T) {
 	})
 }
 
+func TestI8_JSONMarshalUnmarshal(t *testing.T) {
+	i := NewI8(1)
+	assertJSONRoundTrip(t, &i)
+}
+
 func TestI16_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewI16(0))
 	assertRoundtrip(t, NewI16(12))
@@ -108,6 +113,11 @@ func TestI16_Eq(t *testing.T) {
 		{NewI16(23), NewU16(23), false},
 		{NewI16(23), NewBool(false), false},
 	})
+}
+
+func TestI16_JSONMarshalUnmarshal(t *testing.T) {
+	i := NewI16(1)
+	assertJSONRoundTrip(t, &i)
 }
 
 func TestI32_EncodeDecode(t *testing.T) {
@@ -153,6 +163,11 @@ func TestI32_Eq(t *testing.T) {
 	})
 }
 
+func TestI32_JSONMarshalUnmarshal(t *testing.T) {
+	i := NewI32(1)
+	assertJSONRoundTrip(t, &i)
+}
+
 func TestI64_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewI64(0))
 	assertRoundtrip(t, NewI64(12))
@@ -194,6 +209,11 @@ func TestI64_Eq(t *testing.T) {
 		{NewI64(23), NewU64(23), false},
 		{NewI64(23), NewBool(false), false},
 	})
+}
+
+func TestI64_JSONMarshalUnmarshal(t *testing.T) {
+	i := NewI64(1)
+	assertJSONRoundTrip(t, &i)
 }
 
 func TestI128_EncodeDecode(t *testing.T) {

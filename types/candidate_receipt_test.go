@@ -46,6 +46,8 @@ var (
 
 func TestCandidateReceipt_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[CandidateReceipt](t, 1000)
+	assertDecodeNilData[CandidateReceipt](t)
+	assertEncodeEmptyObj[CandidateReceipt](t, 324)
 }
 
 func TestCandidateReceipt_Encode(t *testing.T) {

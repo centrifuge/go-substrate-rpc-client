@@ -59,6 +59,8 @@ var (
 
 func TestNetworkID_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[NetworkID](t, 100, networkIDFuzzOpts...)
+	assertDecodeNilData[NetworkID](t)
+	assertEncodeEmptyObj[NetworkID](t, 0)
 }
 
 func TestNetworkID_Encode(t *testing.T) {

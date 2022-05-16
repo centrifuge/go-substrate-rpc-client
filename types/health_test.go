@@ -26,6 +26,9 @@ func TestHealth_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, Health{3, false, true})
 	assertRoundtrip(t, Health{1, true, true})
 	assertRoundtrip(t, Health{0, true, false})
+	assertRoundTripFuzz[Health](t, 100)
+	assertDecodeNilData[Health](t)
+	assertEncodeEmptyObj[Health](t, 10)
 }
 
 func TestHealth_Encode(t *testing.T) {

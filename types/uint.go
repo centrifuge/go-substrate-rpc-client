@@ -153,6 +153,10 @@ func (i *U128) Decode(decoder scale.Decoder) error {
 
 // Encode implements encoding as per the Scale specification
 func (i U128) Encode(encoder scale.Encoder) error {
+	if i.Int == nil {
+		i.Int = big.NewInt(0)
+	}
+
 	b, err := BigIntToUintBytes(i.Int, 16)
 	if err != nil {
 		return err
@@ -213,6 +217,10 @@ func (i *U256) Decode(decoder scale.Decoder) error {
 
 // Encode implements encoding as per the Scale specification
 func (i U256) Encode(encoder scale.Encoder) error {
+	if i.Int == nil {
+		i.Int = big.NewInt(0)
+	}
+
 	b, err := BigIntToUintBytes(i.Int, 32)
 	if err != nil {
 		return err
