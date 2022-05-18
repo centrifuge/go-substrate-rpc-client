@@ -23,7 +23,7 @@ import (
 
 // GetStorage retreives the stored data and decodes them into the provided interface. Ok is true if the value is not
 // empty.
-func (s *State) GetStorage(key types.StorageKey, target interface{}, blockHash types.Hash) (ok bool, err error) {
+func (s *state) GetStorage(key types.StorageKey, target interface{}, blockHash types.Hash) (ok bool, err error) {
 	raw, err := s.getStorageRaw(key, &blockHash)
 	if err != nil {
 		return false, err
@@ -31,12 +31,12 @@ func (s *State) GetStorage(key types.StorageKey, target interface{}, blockHash t
 	if len(*raw) == 0 {
 		return false, nil
 	}
-	return true, types.DecodeFromBytes(*raw, target)
+	return true, types.Decode(*raw, target)
 }
 
 // GetStorageLatest retreives the stored data for the latest block height and decodes them into the provided interface.
 // Ok is true if the value is not empty.
-func (s *State) GetStorageLatest(key types.StorageKey, target interface{}) (ok bool, err error) {
+func (s *state) GetStorageLatest(key types.StorageKey, target interface{}) (ok bool, err error) {
 	raw, err := s.getStorageRaw(key, nil)
 	if err != nil {
 		return false, err
@@ -44,20 +44,20 @@ func (s *State) GetStorageLatest(key types.StorageKey, target interface{}) (ok b
 	if len(*raw) == 0 {
 		return false, nil
 	}
-	return true, types.DecodeFromBytes(*raw, target)
+	return true, types.Decode(*raw, target)
 }
 
 // GetStorageRaw retreives the stored data as raw bytes, without decoding them
-func (s *State) GetStorageRaw(key types.StorageKey, blockHash types.Hash) (*types.StorageDataRaw, error) {
+func (s *state) GetStorageRaw(key types.StorageKey, blockHash types.Hash) (*types.StorageDataRaw, error) {
 	return s.getStorageRaw(key, &blockHash)
 }
 
 // GetStorageRawLatest retreives the stored data for the latest block height as raw bytes, without decoding them
-func (s *State) GetStorageRawLatest(key types.StorageKey) (*types.StorageDataRaw, error) {
+func (s *state) GetStorageRawLatest(key types.StorageKey) (*types.StorageDataRaw, error) {
 	return s.getStorageRaw(key, nil)
 }
 
-func (s *State) getStorageRaw(key types.StorageKey, blockHash *types.Hash) (*types.StorageDataRaw, error) {
+func (s *state) getStorageRaw(key types.StorageKey, blockHash *types.Hash) (*types.StorageDataRaw, error) {
 	var res string
 	err := client.CallWithBlockHash(s.client, &res, "state_getStorage", blockHash, key.Hex())
 	if err != nil {

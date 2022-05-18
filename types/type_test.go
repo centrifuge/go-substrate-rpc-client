@@ -25,6 +25,8 @@ import (
 func TestType_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, Type(""))
 	assertRoundtrip(t, Type("Custom Type"))
+	assertRoundTripFuzz[Type](t, 100)
+	assertEncodeEmptyObj[Type](t, 1)
 }
 
 func TestType_EncodedLength(t *testing.T) {

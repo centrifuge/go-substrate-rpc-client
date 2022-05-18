@@ -17,7 +17,7 @@ const (
 )
 
 // LocalStorageGet retrieves the stored data
-func (c *Offchain) LocalStorageGet(kind StorageKind, key []byte) (*types.StorageDataRaw, error) {
+func (c *offchain) LocalStorageGet(kind StorageKind, key []byte) (*types.StorageDataRaw, error) {
 	var res string
 
 	err := c.client.Call(&res, "offchain_localStorageGet", kind, fmt.Sprintf("%#x", key))
@@ -39,7 +39,7 @@ func (c *Offchain) LocalStorageGet(kind StorageKind, key []byte) (*types.Storage
 }
 
 // LocalStorageSet saves the data
-func (c *Offchain) LocalStorageSet(kind StorageKind, key []byte, value []byte) error {
+func (c *offchain) LocalStorageSet(kind StorageKind, key []byte, value []byte) error {
 	var res string
 
 	err := c.client.Call(&res, "offchain_localStorageSet", kind, fmt.Sprintf("%#x", key), fmt.Sprintf("%#x", value))

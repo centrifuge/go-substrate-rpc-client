@@ -23,7 +23,7 @@ import (
 )
 
 func TestSystem_Chain(t *testing.T) {
-	c, err := system.Chain()
+	c, err := testSystem.Chain()
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.chain, c)
 }

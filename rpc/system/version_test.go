@@ -23,7 +23,7 @@ import (
 )
 
 func TestSystem_Version(t *testing.T) {
-	v, err := system.Version()
+	v, err := testSystem.Version()
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.version, v)
 }

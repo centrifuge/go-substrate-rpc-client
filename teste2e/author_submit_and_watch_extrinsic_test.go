@@ -86,6 +86,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 
 		sub, err = api.RPC.Author.SubmitAndWatchExtrinsic(ext)
 		if err != nil {
+			nonce++
 			continue
 		}
 

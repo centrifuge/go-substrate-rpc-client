@@ -32,9 +32,8 @@ type Hexer interface {
 	Hex() string
 }
 
-// EncodeToBytes encodes `value` with the scale codec with passed EncoderOptions, returning []byte
-// TODO rename to Encode
-func EncodeToBytes(value interface{}) ([]byte, error) {
+// Encode encodes `value` with the scale codec with passed EncoderOptions, returning []byte
+func Encode(value interface{}) ([]byte, error) {
 	var buffer = bytes.Buffer{}
 	err := scale.NewEncoder(&buffer).Encode(value)
 	if err != nil {
@@ -43,10 +42,9 @@ func EncodeToBytes(value interface{}) ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
-// EncodeToHexString encodes `value` with the scale codec, returning a hex string (prefixed by 0x)
-// TODO rename to EncodeToHex
-func EncodeToHexString(value interface{}) (string, error) {
-	bz, err := EncodeToBytes(value)
+// EncodeToHex encodes `value` with the scale codec, returning a hex string (prefixed by 0x)
+func EncodeToHex(value interface{}) (string, error) {
+	bz, err := Encode(value)
 	if err != nil {
 		return "", err
 	}
@@ -54,20 +52,18 @@ func EncodeToHexString(value interface{}) (string, error) {
 	return fmt.Sprintf("%#x", bz), nil
 }
 
-// DecodeFromBytes decodes `bz` with the scale codec into `target`. `target` should be a pointer.
-// TODO rename to Decode
-func DecodeFromBytes(bz []byte, target interface{}) error {
+// Decode decodes `bz` with the scale codec into `target`. `target` should be a pointer.
+func Decode(bz []byte, target interface{}) error {
 	return scale.NewDecoder(bytes.NewReader(bz)).Decode(target)
 }
 
-// DecodeFromHexString decodes `str` with the scale codec into `target`. `target` should be a pointer.
-// TODO rename to DecodeFromHex
-func DecodeFromHexString(str string, target interface{}) error {
+// DecodeFromHex decodes `str` with the scale codec into `target`. `target` should be a pointer.
+func DecodeFromHex(str string, target interface{}) error {
 	bz, err := HexDecodeString(str)
 	if err != nil {
 		return err
 	}
-	return DecodeFromBytes(bz, target)
+	return Decode(bz, target)
 }
 
 // EncodedLength returns the length of the value when encoded as a byte array
@@ -82,7 +78,7 @@ func EncodedLength(value interface{}) (int, error) {
 
 // GetHash returns a hash of the value
 func GetHash(value interface{}) (Hash, error) {
-	enc, err := EncodeToBytes(value)
+	enc, err := Encode(value)
 	if err != nil {
 		return Hash{}, err
 	}
@@ -120,8 +116,8 @@ func MustHexDecodeString(str string) []byte {
 	return bz
 }
 
-// HexEncode encodes bytes to a hex string. Contrary to hex.EncodeToString, this function prefixes the hex string
-// with "0x"
+// HexEncodeToString encodes bytes to a hex string. Contrary to hex.EncodeToString,
+// this function prefixes the hex string with "0x"
 func HexEncodeToString(b []byte) string {
 	return "0x" + hex.EncodeToString(b)
 }

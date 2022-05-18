@@ -62,7 +62,7 @@ func (s *FinalizedHeadsSubscription) Unsubscribe() {
 
 // SubscribeFinalizedHeads subscribes the best finalized headers, returning a subscription that will
 // receive server notifications containing the Header.
-func (c *Chain) SubscribeFinalizedHeads() (*FinalizedHeadsSubscription, error) {
+func (c *chain) SubscribeFinalizedHeads() (*FinalizedHeadsSubscription, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
 	defer cancel()
 

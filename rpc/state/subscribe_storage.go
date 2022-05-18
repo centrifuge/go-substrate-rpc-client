@@ -66,7 +66,7 @@ func (s *StorageSubscription) Unsubscribe() {
 // Slow subscribers will be dropped eventually. Client buffers up to 20000 notifications before considering the
 // subscriber dead. The subscription Err channel will receive ErrSubscriptionQueueOverflow. Use a sufficiently
 // large buffer on the channel or ensure that the channel usually has at least one reader to prevent this issue.
-func (s *State) SubscribeStorageRaw(keys []types.StorageKey) (
+func (s *state) SubscribeStorageRaw(keys []types.StorageKey) (
 	*StorageSubscription, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
 	defer cancel()

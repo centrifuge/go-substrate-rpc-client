@@ -384,7 +384,7 @@ func TestStorageKey_Encode(t *testing.T) {
 func TestStorageKey_Decode(t *testing.T) {
 	bz := []byte{12, 251, 42}
 	decoded := make(StorageKey, len(bz))
-	err := DecodeFromBytes(bz, &decoded)
+	err := Decode(bz, &decoded)
 	assert.NoError(t, err)
 	assert.Equal(t, StorageKey(bz), decoded)
 }
@@ -430,7 +430,7 @@ func TestStorageKey_Eq(t *testing.T) {
 
 func DecodedMetadataV14Example() *Metadata {
 	var metadata Metadata
-	err := DecodeFromHexString(MetadataV14Data, &metadata)
+	err := DecodeFromHex(MetadataV14Data, &metadata)
 	if err != nil {
 		panic("failed to decode the example metadata v14")
 	}

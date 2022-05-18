@@ -31,14 +31,14 @@ func ExampleExampleStruct() {
 
 	dog := Animal{Name: "Bello", Legs: 2, Children: []string{"Sam"}}
 
-	encoded, err := EncodeToHexString(dog)
+	encoded, err := EncodeToHex(dog)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(encoded)
 
 	var decoded Animal
-	err = DecodeFromHexString(encoded, &decoded)
+	err = DecodeFromHex(encoded, &decoded)
 	if err != nil {
 		panic(err)
 	}

@@ -19,12 +19,72 @@ package types_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	fuzz "github.com/google/gofuzz"
+
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+var (
+	optionWeightFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(o *OptionWeight, c fuzz.Continue) {
+			if c.RandBool() {
+				*o = NewOptionWeightEmpty()
+				return
+			}
+
+			var weight Weight
+
+			c.Fuzz(&weight)
+
+			*o = NewOptionWeight(weight)
+		}),
+	}
+)
+
+func TestOptionWeight_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[OptionWeight](t, 100, optionWeightFuzzOpts...)
+	assertEncodeEmptyObj[OptionWeight](t, 1)
+}
+
+func TestOptionWeight_Encode(t *testing.T) {
+	assertEncode(t, []encodingAssert{
+		{NewOptionWeight(NewWeight(0)), MustHexDecodeString("0x010000000000000000")},
+		{NewOptionWeight(NewWeight(1)), MustHexDecodeString("0x010100000000000000")},
+		{NewOptionWeight(NewWeight(2)), MustHexDecodeString("0x010200000000000000")},
+		{NewOptionWeightEmpty(), MustHexDecodeString("0x00")},
+	})
+}
+
+func TestOptionWeight_Decode(t *testing.T) {
+	assertDecode(t, []decodingAssert{
+		{MustHexDecodeString("0x010000000000000000"), NewOptionWeight(NewWeight(0))},
+		{MustHexDecodeString("0x010100000000000000"), NewOptionWeight(NewWeight(1))},
+		{MustHexDecodeString("0x010200000000000000"), NewOptionWeight(NewWeight(2))},
+		{MustHexDecodeString("0x00"), NewOptionWeightEmpty()},
+	})
+}
+
+func TestOptionWeight_OptionMethods(t *testing.T) {
+	o := NewOptionWeightEmpty()
+	o.SetSome(Weight(11))
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, Weight(0), v)
+}
+
 func TestWeight_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewWeight(0))
-	assertRoundtrip(t, NewWeight(12))
+	assertRoundTripFuzz[Weight](t, 100)
+	assertDecodeNilData[Weight](t)
+	assertEncodeEmptyObj[Weight](t, 8)
 }
 
 func TestWeight_EncodedLength(t *testing.T) {

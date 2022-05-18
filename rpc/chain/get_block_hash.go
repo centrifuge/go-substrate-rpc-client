@@ -21,16 +21,16 @@ import (
 )
 
 // GetBlockHash returns the block hash for a specific block height
-func (c *Chain) GetBlockHash(blockNumber uint64) (types.Hash, error) {
+func (c *chain) GetBlockHash(blockNumber uint64) (types.Hash, error) {
 	return c.getBlockHash(&blockNumber)
 }
 
 // GetBlockHashLatest returns the latest block hash
-func (c *Chain) GetBlockHashLatest() (types.Hash, error) {
+func (c *chain) GetBlockHashLatest() (types.Hash, error) {
 	return c.getBlockHash(nil)
 }
 
-func (c *Chain) getBlockHash(blockNumber *uint64) (types.Hash, error) {
+func (c *chain) getBlockHash(blockNumber *uint64) (types.Hash, error) {
 	var res string
 	var err error
 

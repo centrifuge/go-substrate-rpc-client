@@ -24,13 +24,13 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/config"
 )
 
-var chain *Chain
+var testChain Chain
 
 func TestMain(m *testing.M) {
 	cl, err := client.Connect(config.Default().RPCURL)
 	if err != nil {
 		panic(err)
 	}
-	chain = NewChain(cl)
+	testChain = NewChain(cl)
 	os.Exit(m.Run())
 }

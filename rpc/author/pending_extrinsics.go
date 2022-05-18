@@ -21,7 +21,7 @@ import (
 )
 
 // PendingExtrinsics returns all pending extrinsics, potentially grouped by sender
-func (a *Author) PendingExtrinsics() ([]types.Extrinsic, error) {
+func (a *author) PendingExtrinsics() ([]types.Extrinsic, error) {
 	var res []string
 	err := a.client.Call(&res, "author_pendingExtrinsics")
 	if err != nil {
@@ -30,7 +30,7 @@ func (a *Author) PendingExtrinsics() ([]types.Extrinsic, error) {
 
 	xts := make([]types.Extrinsic, len(res))
 	for i, re := range res {
-		err = types.DecodeFromHexString(re, &xts[i])
+		err = types.DecodeFromHex(re, &xts[i])
 		if err != nil {
 			return nil, err
 		}

@@ -128,7 +128,7 @@ func (e ExtrinsicStatus) Encode(encoder scale.Encoder) error {
 	return nil
 }
 
-func (e *ExtrinsicStatus) UnmarshalJSON(b []byte) error {
+func (e *ExtrinsicStatus) UnmarshalJSON(b []byte) error { //nolint:funlen
 	input := strings.TrimSpace(string(b))
 	if len(input) >= 2 && input[0] == '"' && input[len(input)-1] == '"' {
 		input = input[1 : len(input)-1]

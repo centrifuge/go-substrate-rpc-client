@@ -23,7 +23,7 @@ import (
 )
 
 func TestSystem_Peers(t *testing.T) {
-	p, err := system.Peers()
+	p, err := testSystem.Peers()
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.peers, p)
 }

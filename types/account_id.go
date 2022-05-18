@@ -16,6 +16,46 @@
 
 package types
 
+import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+
+type OptionAccountID struct {
+	option
+	value AccountID
+}
+
+func NewOptionAccountID(value AccountID) OptionAccountID {
+	return OptionAccountID{option{hasValue: true}, value}
+}
+
+func NewOptionAccountIDEmpty() OptionAccountID {
+	return OptionAccountID{option: option{hasValue: false}}
+}
+
+func (o *OptionAccountID) Decode(decoder scale.Decoder) error {
+	return decoder.DecodeOption(&o.hasValue, &o.value)
+}
+
+func (o OptionAccountID) Encode(encoder scale.Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
+}
+
+// SetSome sets a value
+func (o *OptionAccountID) SetSome(value AccountID) {
+	o.hasValue = true
+	o.value = value
+}
+
+// SetNone removes a value and marks it as missing
+func (o *OptionAccountID) SetNone() {
+	o.hasValue = false
+	o.value = AccountID{}
+}
+
+// Unwrap returns a flag that indicates whether a value is present and the stored value
+func (o *OptionAccountID) Unwrap() (ok bool, value AccountID) {
+	return o.hasValue, o.value
+}
+
 // AccountID represents a public key (an 32 byte array)
 type AccountID [32]byte
 

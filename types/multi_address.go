@@ -1,8 +1,22 @@
+// Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
+//
+// Copyright 2019 Centrifuge GmbH
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package types
 
 import (
-	"fmt"
-
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 )
 
@@ -40,82 +54,68 @@ func (m MultiAddress) Encode(encoder scale.Encoder) error {
 	var err error
 	switch {
 	case m.IsID:
-		err = encoder.PushByte(0)
-		if err != nil {
+		if err = encoder.PushByte(0); err != nil {
 			return err
 		}
-		err = encoder.Encode(m.AsID)
-		if err != nil {
-			return err
-		}
+
+		return encoder.Encode(m.AsID)
 	case m.IsIndex:
-		err = encoder.PushByte(1)
-		if err != nil {
+		if err = encoder.PushByte(1); err != nil {
 			return err
 		}
-		err = encoder.Encode(m.AsIndex)
-		if err != nil {
-			return err
-		}
+
+		return encoder.Encode(m.AsIndex)
 	case m.IsRaw:
-		err = encoder.PushByte(2)
-		if err != nil {
+		if err = encoder.PushByte(2); err != nil {
 			return err
 		}
-		err = encoder.Encode(m.AsRaw)
-		if err != nil {
-			return err
-		}
+
+		return encoder.Encode(m.AsRaw)
 	case m.IsAddress32:
-		err = encoder.PushByte(3)
-		if err != nil {
+		if err = encoder.PushByte(3); err != nil {
 			return err
 		}
-		err = encoder.Encode(m.AsAddress32)
-		if err != nil {
-			return err
-		}
+
+		return encoder.Encode(m.AsAddress32)
 	case m.IsAddress20:
-		err = encoder.PushByte(4)
-		if err != nil {
+		if err = encoder.PushByte(4); err != nil {
 			return err
 		}
-		err = encoder.Encode(m.AsAddress20)
-		if err != nil {
-			return err
-		}
-	default:
-		return fmt.Errorf("invalid variant for MultiAddress")
+
+		return encoder.Encode(m.AsAddress20)
 	}
 
 	return nil
 }
 
 func (m *MultiAddress) Decode(decoder scale.Decoder) error {
-	tag, err := decoder.ReadOneByte()
+	b, err := decoder.ReadOneByte()
 	if err != nil {
 		return err
 	}
 
-	switch tag {
+	switch b {
 	case 0:
 		m.IsID = true
-		err = decoder.Decode(&m.AsID)
+
+		return decoder.Decode(&m.AsID)
 	case 1:
 		m.IsIndex = true
-		err = decoder.Decode(&m.AsIndex)
+
+		return decoder.Decode(&m.AsIndex)
 	case 2:
 		m.IsRaw = true
-		err = decoder.Decode(&m.AsRaw)
+
+		return decoder.Decode(&m.AsRaw)
 	case 3:
 		m.IsAddress32 = true
-		err = decoder.Decode(&m.AsAddress32)
+
+		return decoder.Decode(&m.AsAddress32)
 	case 4:
 		m.IsAddress20 = true
-		err = decoder.Decode(&m.AsAddress20)
-	default:
-		err = fmt.Errorf("invalid variant for MultiAddress: %v", tag)
+
+		return decoder.Decode(&m.AsAddress20)
 	}
 
-	return err
+	return nil
 }

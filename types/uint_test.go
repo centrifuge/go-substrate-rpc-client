@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/stretchr/testify/assert"
 )
@@ -66,6 +67,12 @@ func TestU8_Eq(t *testing.T) {
 	})
 }
 
+func TestU8_MarshalUnmarshal(t *testing.T) {
+	u := NewU8(3)
+
+	assertJSONRoundTrip(t, &u)
+}
+
 func TestU16_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewU16(0))
 	assertRoundtrip(t, NewU16(12))
@@ -104,6 +111,12 @@ func TestU16_Eq(t *testing.T) {
 		{NewU16(23), NewU16(23), true},
 		{NewU16(23), NewBool(false), false},
 	})
+}
+
+func TestU16_MarshalUnmarshal(t *testing.T) {
+	u := NewU16(3)
+
+	assertJSONRoundTrip(t, &u)
 }
 
 func TestU32_EncodeDecode(t *testing.T) {
@@ -146,6 +159,12 @@ func TestU32_Eq(t *testing.T) {
 	})
 }
 
+func TestU32_MarshalUnmarshal(t *testing.T) {
+	u := NewU32(3)
+
+	assertJSONRoundTrip(t, &u)
+}
+
 func TestU64_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewU64(0))
 	assertRoundtrip(t, NewU64(12))
@@ -171,6 +190,25 @@ func TestU64_Hex(t *testing.T) {
 	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewU64(29), "0x1d00000000000000"},
 	})
+}
+
+func TestU64_String(t *testing.T) {
+	assertString(t, []stringAssert{
+		{NewU64(29), "29"},
+	})
+}
+
+func TestU64_Eq(t *testing.T) {
+	assertEq(t, []eqAssert{
+		{NewU64(23), NewU64(23), true},
+		{NewU64(23), NewBool(false), false},
+	})
+}
+
+func TestU64_MarshalUnmarshal(t *testing.T) {
+	u := NewU64(3)
+
+	assertJSONRoundTrip(t, &u)
 }
 
 func TestUCompact_EncodeDecode(t *testing.T) {
@@ -246,19 +284,6 @@ func TestUCompact_EncodeNegative(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestU64_String(t *testing.T) {
-	assertString(t, []stringAssert{
-		{NewU64(29), "29"},
-	})
-}
-
-func TestU64_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
-		{NewU64(23), NewU64(23), true},
-		{NewU64(23), NewBool(false), false},
-	})
-}
-
 func TestU128_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewU128(*big.NewInt(0)))
 	assertRoundtrip(t, NewU128(*big.NewInt(12)))
@@ -266,6 +291,8 @@ func TestU128_EncodeDecode(t *testing.T) {
 	bigPos := big.NewInt(0)
 	bigPos.SetBytes([]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16})
 	assertRoundtrip(t, NewU128(*bigPos))
+
+	assertDecodeNilData[U128](t)
 }
 
 func TestU128_EncodedLength(t *testing.T) {
@@ -327,6 +354,19 @@ func TestU128_Eq(t *testing.T) {
 	})
 }
 
+func TestU128_GobEncodeDecode(t *testing.T) {
+	u := NewU128(*big.NewInt(123))
+	b, err := u.GobEncode()
+	assert.NoError(t, err)
+
+	target := new(U128)
+
+	err = target.GobDecode(b)
+	assert.NoError(t, err)
+
+	assertEqual(t, u, *target)
+}
+
 func TestU256_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewU256(*big.NewInt(0)))
 	assertRoundtrip(t, NewU256(*big.NewInt(12)))
@@ -335,6 +375,8 @@ func TestU256_EncodeDecode(t *testing.T) {
 	bigPos.SetBytes([]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 		17, 18, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32})
 	assertRoundtrip(t, NewU256(*bigPos))
+
+	assertDecodeNilData[U256](t)
 }
 
 func TestU256_EncodedLength(t *testing.T) {

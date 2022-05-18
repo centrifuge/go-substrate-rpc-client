@@ -21,7 +21,7 @@ import (
 )
 
 // Properties retrieves a custom set of properties as a JSON object, defined in the chain spec
-func (c *System) Properties() (types.ChainProperties, error) {
+func (c *system) Properties() (types.ChainProperties, error) {
 	var p types.ChainProperties
 	err := c.client.Call(&p, "system_properties")
 	return p, err

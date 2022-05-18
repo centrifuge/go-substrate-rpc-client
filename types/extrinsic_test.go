@@ -34,7 +34,7 @@ func TestExtrinsic_Unsigned_EncodeDecode(t *testing.T) {
 
 	ext := NewExtrinsic(c)
 
-	extEnc, err := EncodeToHexString(ext)
+	extEnc, err := EncodeToHex(ext)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x"+
@@ -47,18 +47,18 @@ func TestExtrinsic_Unsigned_EncodeDecode(t *testing.T) {
 		extEnc)
 
 	var extDec Extrinsic
-	err = DecodeFromHexString(extEnc, &extDec)
+	err = DecodeFromHex(extEnc, &extDec)
 	assert.NoError(t, err)
 
 	assert.Equal(t, ext, extDec)
 }
 
 func TestExtrinsic_Signed_EncodeDecode(t *testing.T) {
-	extEnc, err := EncodeToHexString(ExamplaryExtrinsic)
+	extEnc, err := EncodeToHex(ExamplaryExtrinsic)
 	assert.NoError(t, err)
 
 	var extDec Extrinsic
-	err = DecodeFromHexString(extEnc, &extDec)
+	err = DecodeFromHex(extEnc, &extDec)
 	assert.NoError(t, err)
 
 	assert.Equal(t, ExamplaryExtrinsic, extDec)
@@ -92,7 +92,7 @@ func TestExtrinsic_Sign(t *testing.T) {
 
 	assert.True(t, ext.IsSigned())
 
-	extEnc, err := EncodeToHexString(ext)
+	extEnc, err := EncodeToHex(ext)
 	assert.NoError(t, err)
 
 	// extEnc will have the structure of the following. It can't be tested, since the signature is different on every
@@ -111,13 +111,13 @@ func TestExtrinsic_Sign(t *testing.T) {
 	// "e56c", // amount, compact
 
 	var extDec Extrinsic
-	err = DecodeFromHexString(extEnc, &extDec)
+	err = DecodeFromHex(extEnc, &extDec)
 	assert.NoError(t, err)
 
 	assert.Equal(t, uint8(ExtrinsicVersion4), extDec.Type())
 	assert.Equal(t, signature.TestKeyringPairAlice.PublicKey, extDec.Signature.Signer.AsID[:])
 
-	mb, err := EncodeToBytes(extDec.Method)
+	mb, err := Encode(extDec.Method)
 	assert.NoError(t, err)
 
 	verifyPayload := ExtrinsicPayloadV4{
@@ -134,7 +134,7 @@ func TestExtrinsic_Sign(t *testing.T) {
 	}
 
 	// verify sig
-	b, err := EncodeToBytes(verifyPayload)
+	b, err := Encode(verifyPayload)
 	assert.NoError(t, err)
 	ok, err := signature.Verify(b, extDec.Signature.Signature.AsSr25519[:], signature.TestKeyringPairAlice.URI)
 	assert.NoError(t, err)
@@ -175,7 +175,7 @@ func ExampleExtrinsic() {
 
 	fmt.Printf("%#v", ext)
 
-	extEnc, err := EncodeToHexString(ext)
+	extEnc, err := EncodeToHex(ext)
 	if err != nil {
 		panic(err)
 	}
@@ -183,10 +183,22 @@ func ExampleExtrinsic() {
 	fmt.Printf("%#v", extEnc)
 }
 
+func TestExtrinsic_JSONMarshalUnmarshal(t *testing.T) {
+	c, err := NewCall(ExamplaryMetadataV4,
+		"balances.transfer", NewAddressFromAccountID(MustHexDecodeString(
+			"0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")),
+		NewUCompactFromUInt(6969))
+	assert.NoError(t, err)
+
+	ext := NewExtrinsic(c)
+
+	assertJSONRoundTrip(t, &ext)
+}
+
 func TestCall(t *testing.T) {
 	c := Call{CallIndex{6, 1}, Args{0, 0, 0}}
 
-	enc, err := EncodeToHexString(c)
+	enc, err := EncodeToHex(c)
 	assert.NoError(t, err)
 	assert.Equal(t, "0x0601000000", enc)
 }
@@ -198,7 +210,7 @@ func TestNewCallV4(t *testing.T) {
 	c, err := NewCall(ExamplaryMetadataV4, "balances.transfer", addr, NewUCompactFromUInt(1000))
 	assert.NoError(t, err)
 
-	enc, err := EncodeToHexString(c)
+	enc, err := EncodeToHex(c)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x0300ff8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48a10f", enc)
@@ -208,7 +220,7 @@ func TestNewCallV7(t *testing.T) {
 	c, err := NewCall(&exampleMetadataV7, "Module2.my function", U8(3))
 	assert.NoError(t, err)
 
-	enc, err := EncodeToHexString(c)
+	enc, err := EncodeToHex(c)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x010003", enc)
@@ -218,7 +230,7 @@ func TestNewCallV8(t *testing.T) {
 	c, err := NewCall(&exampleMetadataV8, "Module2.my function", U8(3))
 	assert.NoError(t, err)
 
-	enc, err := EncodeToHexString(c)
+	enc, err := EncodeToHex(c)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "0x010003", enc)

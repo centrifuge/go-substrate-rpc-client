@@ -23,8 +23,9 @@ import (
 )
 
 func TestBool_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewBool(true))
-	assertRoundtrip(t, NewBool(false))
+	assertRoundTripFuzz[Bool](t, 100)
+	assertDecodeNilData[Bool](t)
+	assertEncodeEmptyObj[Bool](t, 1)
 }
 
 func TestBool_EncodedLength(t *testing.T) {

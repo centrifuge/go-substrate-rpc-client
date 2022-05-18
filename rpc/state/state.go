@@ -16,14 +16,59 @@
 
 package state
 
-import "github.com/centrifuge/go-substrate-rpc-client/v4/client"
+import (
+	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+)
 
-// State exposes methods for querying state
-type State struct {
+type State interface {
+	GetStorage(key types.StorageKey, target interface{}, blockHash types.Hash) (ok bool, err error)
+	GetStorageLatest(key types.StorageKey, target interface{}) (ok bool, err error)
+	GetStorageRaw(key types.StorageKey, blockHash types.Hash) (*types.StorageDataRaw, error)
+	GetStorageRawLatest(key types.StorageKey) (*types.StorageDataRaw, error)
+
+	GetChildStorageSize(childStorageKey, key types.StorageKey, blockHash types.Hash) (types.U64, error)
+	GetChildStorageSizeLatest(childStorageKey, key types.StorageKey) (types.U64, error)
+	GetChildStorage(childStorageKey, key types.StorageKey, target interface{}, blockHash types.Hash) (ok bool, err error)
+	GetChildStorageLatest(childStorageKey, key types.StorageKey, target interface{}) (ok bool, err error)
+	GetChildStorageRaw(childStorageKey, key types.StorageKey, blockHash types.Hash) (*types.StorageDataRaw, error)
+	GetChildStorageRawLatest(childStorageKey, key types.StorageKey) (*types.StorageDataRaw, error)
+
+	GetMetadata(blockHash types.Hash) (*types.Metadata, error)
+	GetMetadataLatest() (*types.Metadata, error)
+
+	GetStorageHash(key types.StorageKey, blockHash types.Hash) (types.Hash, error)
+	GetStorageHashLatest(key types.StorageKey) (types.Hash, error)
+
+	SubscribeStorageRaw(keys []types.StorageKey) (*StorageSubscription, error)
+
+	GetRuntimeVersion(blockHash types.Hash) (*types.RuntimeVersion, error)
+	GetRuntimeVersionLatest() (*types.RuntimeVersion, error)
+
+	GetChildKeys(childStorageKey, prefix types.StorageKey, blockHash types.Hash) ([]types.StorageKey, error)
+	GetChildKeysLatest(childStorageKey, prefix types.StorageKey) ([]types.StorageKey, error)
+
+	SubscribeRuntimeVersion() (*RuntimeVersionSubscription, error)
+
+	QueryStorage(keys []types.StorageKey, startBlock types.Hash, block types.Hash) ([]types.StorageChangeSet, error)
+	QueryStorageLatest(keys []types.StorageKey, startBlock types.Hash) ([]types.StorageChangeSet, error)
+
+	GetKeys(prefix types.StorageKey, blockHash types.Hash) ([]types.StorageKey, error)
+	GetKeysLatest(prefix types.StorageKey) ([]types.StorageKey, error)
+
+	GetStorageSize(key types.StorageKey, blockHash types.Hash) (types.U64, error)
+	GetStorageSizeLatest(key types.StorageKey) (types.U64, error)
+
+	GetChildStorageHash(childStorageKey, key types.StorageKey, blockHash types.Hash) (types.Hash, error)
+	GetChildStorageHashLatest(childStorageKey, key types.StorageKey) (types.Hash, error)
+}
+
+// state exposes methods for querying state
+type state struct {
 	client client.Client
 }
 
-// NewState creates a new State struct
-func NewState(c client.Client) *State {
-	return &State{client: c}
+// NewState creates a new state struct
+func NewState(c client.Client) State {
+	return &state{client: c}
 }

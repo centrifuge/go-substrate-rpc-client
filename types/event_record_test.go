@@ -17,9 +17,14 @@
 package types_test
 
 import (
+	"bytes"
 	"fmt"
 	"math/big"
 	"testing"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+
+	fuzz "github.com/google/gofuzz"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/stretchr/testify/assert"
@@ -52,24 +57,37 @@ var exampleEventAppEnc = []byte{0x0, 0x2a, 0x0, 0x0, 0x0, 0x10, 0x27, 0x0, 0x0, 
 var exampleEventFinEnc = []byte{0x1, 0x10, 0x27, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4, 0x1, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 	0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} //nolint:lll
 
+var (
+	eventSystemExtrinsicSuccessFuzzOpts = combineFuzzOpts(
+		phaseFuzzOpts,
+		dispatchInfoFuzzOpts,
+	)
+)
+
+func TestEventSystemExtrinsicSuccess_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[EventSystemExtrinsicSuccess](t, 100, eventSystemExtrinsicSuccessFuzzOpts...)
+	assertDecodeNilData[EventSystemExtrinsicSuccess](t)
+	assertEncodeEmptyObj[EventSystemExtrinsicSuccess](t, 9)
+}
+
 func TestEventSystemExtrinsicSuccess_Encode(t *testing.T) {
-	encoded, err := EncodeToBytes(exampleEventFin)
+	encoded, err := Encode(exampleEventFin)
 	assert.NoError(t, err)
 	assert.Equal(t, exampleEventFinEnc, encoded)
 
-	encoded, err = EncodeToBytes(exampleEventApp)
+	encoded, err = Encode(exampleEventApp)
 	assert.NoError(t, err)
 	assert.Equal(t, exampleEventAppEnc, encoded)
 }
 
 func TestEventSystemExtrinsicSuccess_Decode(t *testing.T) {
 	decoded := EventSystemExtrinsicSuccess{}
-	err := DecodeFromBytes(exampleEventFinEnc, &decoded)
+	err := Decode(exampleEventFinEnc, &decoded)
 	assert.NoError(t, err)
 	assert.Equal(t, exampleEventFin, decoded)
 
 	decoded = EventSystemExtrinsicSuccess{}
-	err = DecodeFromBytes(exampleEventAppEnc, &decoded)
+	err = Decode(exampleEventAppEnc, &decoded)
 	assert.NoError(t, err)
 	assert.Equal(t, exampleEventApp, decoded)
 }
@@ -121,14 +139,12 @@ func ExampleEventRecordsRaw_Decode() {
 			"01" + // Operational
 			"01" + // PaysFee
 			"00" +
-
 			"0001000000" +
 			"0000" +
 			"1027000000000000" + // Weight
 			"01" + // operational
 			"01" + // PaysFee
 			"00" +
-
 			"0001000000" + // ApplyExtrinsic(1)
 			"0302" + // Balances_Transfer
 			"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d" + // From
@@ -163,66 +179,66 @@ func ExampleEventRecordsRaw_Decode() {
 
 func TestEventRecordsRaw_Decode(t *testing.T) {
 	e := EventRecordsRaw(MustHexDecodeString(
-		"0x40" + // (len 15) << 2
+		"0x40" + // (len 16) << 2
 
 			"0000000000" + // ApplyExtrinsic(0)
-			"0300" + // Balances_Endowed
+			"0600" + // Balances_Endowed
 			"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d" + // Who
 			"676b95d82b0400000000000000000000" + // Balance U128
 			"00" + // Topics
 
 			"0000000000" + // ApplyExtrinsic(0)
-			"0301" + // Balances_DustLost
+			"0601" + // Balances_DustLost
 			"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d" + // Who
 			"676b95d82b0400000000000000000000" + // Balance U128
 			"00" + // Topics
 
 			"0001000000" + // ApplyExtrinsic(1)
-			"0302" + // Balances_Transfer
+			"0602" + // Balances_Transfer
 			"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d" + // From
 			"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48" + // To
 			"391b0000000000000000000000000000" + // Value
 			"00" + // Topics
 
 			"0000000000" + // ApplyExtrinsic(0)
-			"0303" + // Balances_BalanceSet
+			"0603" + // Balances_BalanceSet
 			"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d" + // Who
 			"676b95d82b0400000000000000000000" + // Free U128
 			"676b95d82b0400000000000000000000" + // Reserved U128
 			"00" + // Topics
 
 			"0000000000" + // ApplyExtrinsic(0)
-			"0304" + // Balances_Deposit
+			"0607" + // Balances_Deposit
 			"d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d" + // Who
 			"676b95d82b0400000000000000000000" + // Balance U128
 			"00" + // Topics
 
 			"0000000000" + // ApplyExtrinsic(0)
-			"0200" + // Indices_IndexAssigned
+			"0500" + // Indices_IndexAssigned
 			"8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48" + // Who
 			"39300000" + // AccountIndex
 			"00" + // Topics
 
 			"0000000000" + // ApplyExtrinsic(0)
-			"0201" + // Indices_IndexFreed
+			"0501" + // Indices_IndexFreed
 			"39300000" + // AccountIndex
 			"00" + // Topics
 
 			"0000000000" + // ApplyExtrinsic(0)
-			"1000" + // Offences_Offence
+			"1700" + // Offences_Offence
 			"696d2d6f6e6c696e653a6f66666c696e" + // Kind
 			"10c5000000" + // OpaqueTimeSlot
 			"00" + // Topics
 
 			"0000000000" + // ApplyExtrinsic(0)
-			"0400" + // Staking_EraPayout
+			"0A00" + // Staking_EraPaid
 			"c6000000" + // Era Index U32
 			"676b95d82b0400000000000000000000" + // Balance U128
 			"00000000000000000000000000000000" + // Remainder U128
 			"00" + // Topics
 
 			"0000000000" + // ApplyExtrinsic(0)
-			"0500" + // Session_NewSession
+			"0B00" + // Session_NewSession
 			"c6000000" + // SessionIndex U32
 			"00" + // Topics
 
@@ -265,36 +281,66 @@ func TestEventRecordsRaw_Decode(t *testing.T) {
 			"00", // Topics
 	)) //nolint:lll
 
+	var b []byte
+
+	buf := bytes.NewBuffer(b)
+
+	err := e.Encode(*scale.NewEncoder(buf))
+	assert.Nil(t, err)
+	assert.True(t, len(buf.Bytes()) > 0)
+
+	var metadata Metadata
+	err = DecodeFromHex(MetadataV14Data, &metadata)
+	if err != nil {
+		panic(err)
+	}
 	events := EventRecords{}
-	err := e.DecodeEventRecords(ExamplaryMetadataV11Substrate, &events)
+	err = e.DecodeEventRecords(&metadata, &events)
 	if err != nil {
 		panic(err)
 	}
 
 	exp := EventRecords{
-		Balances_Endowed:             []EventBalancesEndowed{EventBalancesEndowed{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Who: AccountID{0xd4, 0x35, 0x93, 0xc7, 0x15, 0xfd, 0xd3, 0x1c, 0x61, 0x14, 0x1a, 0xbd, 0x4, 0xa9, 0x9f, 0xd6, 0x82, 0x2c, 0x85, 0x58, 0x85, 0x4c, 0xcd, 0xe3, 0x9a, 0x56, 0x84, 0xe7, 0xa5, 0x6d, 0xa2, 0x7d}, Balance: NewU128(*big.NewInt(4586363775847)), Topics: []Hash(nil)}},
-		Balances_DustLost:            []EventBalancesDustLost{EventBalancesDustLost{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Who: AccountID{0xd4, 0x35, 0x93, 0xc7, 0x15, 0xfd, 0xd3, 0x1c, 0x61, 0x14, 0x1a, 0xbd, 0x4, 0xa9, 0x9f, 0xd6, 0x82, 0x2c, 0x85, 0x58, 0x85, 0x4c, 0xcd, 0xe3, 0x9a, 0x56, 0x84, 0xe7, 0xa5, 0x6d, 0xa2, 0x7d}, Balance: NewU128(*big.NewInt(4586363775847)), Topics: []Hash(nil)}},
-		Balances_Transfer:            []EventBalancesTransfer{EventBalancesTransfer{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x1, IsFinalization: false}, From: AccountID{0xd4, 0x35, 0x93, 0xc7, 0x15, 0xfd, 0xd3, 0x1c, 0x61, 0x14, 0x1a, 0xbd, 0x4, 0xa9, 0x9f, 0xd6, 0x82, 0x2c, 0x85, 0x58, 0x85, 0x4c, 0xcd, 0xe3, 0x9a, 0x56, 0x84, 0xe7, 0xa5, 0x6d, 0xa2, 0x7d}, To: AccountID{0x8e, 0xaf, 0x4, 0x15, 0x16, 0x87, 0x73, 0x63, 0x26, 0xc9, 0xfe, 0xa1, 0x7e, 0x25, 0xfc, 0x52, 0x87, 0x61, 0x36, 0x93, 0xc9, 0x12, 0x90, 0x9c, 0xb2, 0x26, 0xaa, 0x47, 0x94, 0xf2, 0x6a, 0x48}, Value: NewU128(*big.NewInt(6969)), Topics: []Hash(nil)}},
-		Balances_BalanceSet:          []EventBalancesBalanceSet{EventBalancesBalanceSet{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Who: AccountID{0xd4, 0x35, 0x93, 0xc7, 0x15, 0xfd, 0xd3, 0x1c, 0x61, 0x14, 0x1a, 0xbd, 0x4, 0xa9, 0x9f, 0xd6, 0x82, 0x2c, 0x85, 0x58, 0x85, 0x4c, 0xcd, 0xe3, 0x9a, 0x56, 0x84, 0xe7, 0xa5, 0x6d, 0xa2, 0x7d}, Free: NewU128(*big.NewInt(4586363775847)), Reserved: NewU128(*big.NewInt(4586363775847)), Topics: []Hash(nil)}},
-		Balances_Deposit:             []EventBalancesDeposit{EventBalancesDeposit{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Who: AccountID{0xd4, 0x35, 0x93, 0xc7, 0x15, 0xfd, 0xd3, 0x1c, 0x61, 0x14, 0x1a, 0xbd, 0x4, 0xa9, 0x9f, 0xd6, 0x82, 0x2c, 0x85, 0x58, 0x85, 0x4c, 0xcd, 0xe3, 0x9a, 0x56, 0x84, 0xe7, 0xa5, 0x6d, 0xa2, 0x7d}, Balance: NewU128(*big.NewInt(4586363775847)), Topics: []Hash(nil)}},
-		Balances_Reserved:            []EventBalancesReserved(nil),
-		Balances_Unreserved:          []EventBalancesUnreserved(nil),
-		Balances_ReservedRepatriated: []EventBalancesReserveRepatriated(nil),
-		Grandpa_NewAuthorities:       []EventGrandpaNewAuthorities(nil),
-		Grandpa_Paused:               []EventGrandpaPaused(nil),
-		Grandpa_Resumed:              []EventGrandpaResumed(nil), ImOnline_HeartbeatReceived: []EventImOnlineHeartbeatReceived(nil), ImOnline_AllGood: []EventImOnlineAllGood(nil), ImOnline_SomeOffline: []EventImOnlineSomeOffline(nil), Indices_IndexAssigned: []EventIndicesIndexAssigned{EventIndicesIndexAssigned{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, AccountID: AccountID{0x8e, 0xaf, 0x4, 0x15, 0x16, 0x87, 0x73, 0x63, 0x26, 0xc9, 0xfe, 0xa1, 0x7e, 0x25, 0xfc, 0x52, 0x87, 0x61, 0x36, 0x93, 0xc9, 0x12, 0x90, 0x9c, 0xb2, 0x26, 0xaa, 0x47, 0x94, 0xf2, 0x6a, 0x48}, AccountIndex: 0x3039, Topics: []Hash(nil)}}, Indices_IndexFreed: []EventIndicesIndexFreed{EventIndicesIndexFreed{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, AccountIndex: 0x3039, Topics: []Hash(nil)}}, Indices_IndexFrozen: []EventIndicesIndexFrozen(nil), Offences_Offence: []EventOffencesOffence{EventOffencesOffence{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Kind: Bytes16{0x69, 0x6d, 0x2d, 0x6f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x3a, 0x6f, 0x66, 0x66, 0x6c, 0x69, 0x6e}, OpaqueTimeSlot: Bytes{0xc5, 0x0, 0x0, 0x0}, Topics: []Hash(nil)}}, Session_NewSession: []EventSessionNewSession{EventSessionNewSession{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, SessionIndex: 0xc6, Topics: []Hash(nil)}}, Staking_EraPayout: []EventStakingEraPayout{EventStakingEraPayout{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, EraIndex: 0xc6, ValidatorPayout: NewU128(*big.NewInt(4586363775847)), Remainder: NewU128(*big.NewInt(0)), Topics: []Hash(nil)}}, Staking_Reward: []EventStakingReward(nil), Staking_Slash: []EventStakingSlash(nil), Staking_OldSlashingReportDiscarded: []EventStakingOldSlashingReportDiscarded(nil), Staking_StakingElection: []EventStakingStakingElection(nil), Staking_SolutionStored: []EventStakingSolutionStored(nil), Staking_Bonded: []EventStakingBonded(nil), Staking_Unbonded: []EventStakingUnbonded(nil), Staking_Withdrawn: []EventStakingWithdrawn(nil), System_ExtrinsicSuccess: []EventSystemExtrinsicSuccess{EventSystemExtrinsicSuccess{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, DispatchInfo: DispatchInfo{Weight: 0x2710, Class: DispatchClass{IsNormal: false, IsOperational: true}, PaysFee: Pays{IsYes: true}}, Topics: []Hash(nil)}, EventSystemExtrinsicSuccess{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x1, IsFinalization: false}, DispatchInfo: DispatchInfo{Weight: 0x2710, Class: DispatchClass{IsNormal: true, IsOperational: false}, PaysFee: Pays{IsYes: true}}, Topics: []Hash(nil)}}, System_ExtrinsicFailed: []EventSystemExtrinsicFailed{EventSystemExtrinsicFailed{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x2, IsFinalization: false}, DispatchError: DispatchError{HasModule: true, Module: 0xb, Error: 0x0}, DispatchInfo: DispatchInfo{Weight: 0x2710, Class: DispatchClass{IsNormal: false, IsOperational: true}, PaysFee: Pays{IsYes: true}}, Topics: []Hash(nil)}}, System_CodeUpdated: []EventSystemCodeUpdated{EventSystemCodeUpdated{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Topics: []Hash(nil)}}, System_NewAccount: []EventSystemNewAccount{EventSystemNewAccount{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Who: AccountID{0x8e, 0xaf, 0x4, 0x15, 0x16, 0x87, 0x73, 0x63, 0x26, 0xc9, 0xfe, 0xa1, 0x7e, 0x25, 0xfc, 0x52, 0x87, 0x61, 0x36, 0x93, 0xc9, 0x12, 0x90, 0x9c, 0xb2, 0x26, 0xaa, 0x47, 0x94, 0xf2, 0x6a, 0x48}, Topics: []Hash(nil)}}, System_KilledAccount: []EventSystemKilledAccount{EventSystemKilledAccount{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Who: AccountID{0x8e, 0xaf, 0x4, 0x15, 0x16, 0x87, 0x73, 0x63, 0x26, 0xc9, 0xfe, 0xa1, 0x7e, 0x25, 0xfc, 0x52, 0x87, 0x61, 0x36, 0x93, 0xc9, 0x12, 0x90, 0x9c, 0xb2, 0x26, 0xaa, 0x47, 0x94, 0xf2, 0x6a, 0x48}, Topics: []Hash(nil)}}, Assets_Issued: []EventAssetIssued(nil), Assets_Transferred: []EventAssetTransferred(nil), Assets_Destroyed: []EventAssetDestroyed(nil), Democracy_Proposed: []EventDemocracyProposed(nil), Democracy_Tabled: []EventDemocracyTabled(nil), Democracy_ExternalTabled: []EventDemocracyExternalTabled(nil), Democracy_Started: []EventDemocracyStarted(nil), Democracy_Passed: []EventDemocracyPassed(nil), Democracy_NotPassed: []EventDemocracyNotPassed(nil), Democracy_Cancelled: []EventDemocracyCancelled(nil), Democracy_Executed: []EventDemocracyExecuted(nil), Democracy_Delegated: []EventDemocracyDelegated(nil), Democracy_Undelegated: []EventDemocracyUndelegated(nil), Democracy_Vetoed: []EventDemocracyVetoed(nil), Democracy_PreimageNoted: []EventDemocracyPreimageNoted(nil), Democracy_PreimageUsed: []EventDemocracyPreimageUsed(nil), Democracy_PreimageInvalid: []EventDemocracyPreimageInvalid(nil), Democracy_PreimageMissing: []EventDemocracyPreimageMissing(nil), Democracy_PreimageReaped: []EventDemocracyPreimageReaped(nil), Democracy_Unlocked: []EventDemocracyUnlocked(nil), Council_Proposed: []EventCollectiveProposed(nil), Council_Voted: []EventCollectiveVoted(nil), Council_Approved: []EventCollectiveApproved(nil), Council_Disapproved: []EventCollectiveDisapproved(nil), Council_Executed: []EventCollectiveExecuted(nil), Council_MemberExecuted: []EventCollectiveMemberExecuted(nil), Council_Closed: []EventCollectiveClosed(nil), TechnicalCommittee_Proposed: []EventTechnicalCommitteeProposed(nil), TechnicalCommittee_Voted: []EventTechnicalCommitteeVoted(nil), TechnicalCommittee_Approved: []EventTechnicalCommitteeApproved(nil), TechnicalCommittee_Disapproved: []EventTechnicalCommitteeDisapproved(nil), TechnicalCommittee_Executed: []EventTechnicalCommitteeExecuted(nil), TechnicalCommittee_MemberExecuted: []EventTechnicalCommitteeMemberExecuted(nil), TechnicalCommittee_Closed: []EventTechnicalCommitteeClosed(nil), Elections_NewTerm: []EventElectionsNewTerm(nil), Elections_EmptyTerm: []EventElectionsEmptyTerm(nil), Elections_MemberKicked: []EventElectionsMemberKicked(nil), Elections_MemberRenounced: []EventElectionsMemberRenounced(nil), Elections_VoterReported: []EventElectionsVoterReported(nil), Identity_IdentitySet: []EventIdentitySet(nil), Identity_IdentityCleared: []EventIdentityCleared(nil), Identity_IdentityKilled: []EventIdentityKilled(nil), Identity_JudgementRequested: []EventIdentityJudgementRequested(nil), Identity_JudgementUnrequested: []EventIdentityJudgementUnrequested(nil), Identity_JudgementGiven: []EventIdentityJudgementGiven(nil), Identity_RegistrarAdded: []EventIdentityRegistrarAdded(nil), Identity_SubIdentityAdded: []EventIdentitySubIdentityAdded(nil), Identity_SubIdentityRemoved: []EventIdentitySubIdentityRemoved(nil), Identity_SubIdentityRevoked: []EventIdentitySubIdentityRevoked(nil), Society_Founded: []EventSocietyFounded(nil), Society_Bid: []EventSocietyBid(nil), Society_Vouch: []EventSocietyVouch(nil), Society_AutoUnbid: []EventSocietyAutoUnbid(nil), Society_Unbid: []EventSocietyUnbid(nil), Society_Unvouch: []EventSocietyUnvouch(nil), Society_Inducted: []EventSocietyInducted(nil), Society_SuspendedMemberJudgement: []EventSocietySuspendedMemberJudgement(nil), Society_CandidateSuspended: []EventSocietyCandidateSuspended(nil), Society_MemberSuspended: []EventSocietyMemberSuspended(nil), Society_Challenged: []EventSocietyChallenged(nil), Society_Vote: []EventSocietyVote(nil), Society_DefenderVote: []EventSocietyDefenderVote(nil), Society_NewMaxMembers: []EventSocietyNewMaxMembers(nil), Society_Unfounded: []EventSocietyUnfounded(nil), Society_Deposit: []EventSocietyDeposit(nil), Recovery_RecoveryCreated: []EventRecoveryCreated(nil), Recovery_RecoveryInitiated: []EventRecoveryInitiated(nil), Recovery_RecoveryVouched: []EventRecoveryVouched(nil), Recovery_RecoveryClosed: []EventRecoveryClosed(nil), Recovery_AccountRecovered: []EventRecoveryAccountRecovered(nil), Recovery_RecoveryRemoved: []EventRecoveryRemoved(nil), Vesting_VestingUpdated: []EventVestingVestingUpdated(nil), Vesting_VestingCompleted: []EventVestingVestingCompleted(nil), Scheduler_Scheduled: []EventSchedulerScheduled(nil), Scheduler_Canceled: []EventSchedulerCanceled(nil), Scheduler_Dispatched: []EventSchedulerDispatched(nil), Proxy_ProxyExecuted: []EventProxyProxyExecuted(nil), Proxy_AnonymousCreated: []EventProxyAnonymousCreated(nil), Sudo_Sudid: []EventSudoSudid(nil), Sudo_KeyChanged: []EventSudoKeyChanged(nil), Sudo_SudoAsDone: []EventSudoAsDone(nil), Treasury_Proposed: []EventTreasuryProposed(nil), Treasury_Spending: []EventTreasurySpending(nil), Treasury_Awarded: []EventTreasuryAwarded(nil), Treasury_Rejected: []EventTreasuryRejected(nil), Treasury_Burnt: []EventTreasuryBurnt(nil), Treasury_Rollover: []EventTreasuryRollover(nil), Treasury_Deposit: []EventTreasuryDeposit(nil), Treasury_NewTip: []EventTreasuryNewTip(nil), Treasury_TipClosing: []EventTreasuryTipClosing(nil), Treasury_TipClosed: []EventTreasuryTipClosed(nil), Treasury_TipRetracted: []EventTreasuryTipRetracted(nil), Contracts_Instantiated: []EventContractsInstantiated(nil), Contracts_Evicted: []EventContractsEvicted(nil), Contracts_Restored: []EventContractsRestored(nil), Contracts_CodeStored: []EventContractsCodeStored(nil), Contracts_ScheduleUpdated: []EventContractsScheduleUpdated(nil), Contracts_ContractExecution: []EventContractsContractExecution(nil), Utility_BatchInterrupted: []EventUtilityBatchInterrupted(nil), Utility_BatchCompleted: []EventUtilityBatchCompleted(nil), Multisig_NewMultisig: []EventMultisigNewMultisig(nil), Multisig_MultisigApproval: []EventMultisigApproval(nil), Multisig_MultisigExecuted: []EventMultisigExecuted(nil), Multisig_MultisigCancelled: []EventMultisigCancelled(nil)}
+		Balances_Endowed:            []EventBalancesEndowed{EventBalancesEndowed{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Who: AccountID{0xd4, 0x35, 0x93, 0xc7, 0x15, 0xfd, 0xd3, 0x1c, 0x61, 0x14, 0x1a, 0xbd, 0x4, 0xa9, 0x9f, 0xd6, 0x82, 0x2c, 0x85, 0x58, 0x85, 0x4c, 0xcd, 0xe3, 0x9a, 0x56, 0x84, 0xe7, 0xa5, 0x6d, 0xa2, 0x7d}, Balance: NewU128(*big.NewInt(4586363775847)), Topics: []Hash(nil)}},
+		Balances_DustLost:           []EventBalancesDustLost{EventBalancesDustLost{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Who: AccountID{0xd4, 0x35, 0x93, 0xc7, 0x15, 0xfd, 0xd3, 0x1c, 0x61, 0x14, 0x1a, 0xbd, 0x4, 0xa9, 0x9f, 0xd6, 0x82, 0x2c, 0x85, 0x58, 0x85, 0x4c, 0xcd, 0xe3, 0x9a, 0x56, 0x84, 0xe7, 0xa5, 0x6d, 0xa2, 0x7d}, Balance: NewU128(*big.NewInt(4586363775847)), Topics: []Hash(nil)}},
+		Balances_Transfer:           []EventBalancesTransfer{EventBalancesTransfer{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x1, IsFinalization: false}, From: AccountID{0xd4, 0x35, 0x93, 0xc7, 0x15, 0xfd, 0xd3, 0x1c, 0x61, 0x14, 0x1a, 0xbd, 0x4, 0xa9, 0x9f, 0xd6, 0x82, 0x2c, 0x85, 0x58, 0x85, 0x4c, 0xcd, 0xe3, 0x9a, 0x56, 0x84, 0xe7, 0xa5, 0x6d, 0xa2, 0x7d}, To: AccountID{0x8e, 0xaf, 0x4, 0x15, 0x16, 0x87, 0x73, 0x63, 0x26, 0xc9, 0xfe, 0xa1, 0x7e, 0x25, 0xfc, 0x52, 0x87, 0x61, 0x36, 0x93, 0xc9, 0x12, 0x90, 0x9c, 0xb2, 0x26, 0xaa, 0x47, 0x94, 0xf2, 0x6a, 0x48}, Value: NewU128(*big.NewInt(6969)), Topics: []Hash(nil)}},
+		Balances_BalanceSet:         []EventBalancesBalanceSet{EventBalancesBalanceSet{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Who: AccountID{0xd4, 0x35, 0x93, 0xc7, 0x15, 0xfd, 0xd3, 0x1c, 0x61, 0x14, 0x1a, 0xbd, 0x4, 0xa9, 0x9f, 0xd6, 0x82, 0x2c, 0x85, 0x58, 0x85, 0x4c, 0xcd, 0xe3, 0x9a, 0x56, 0x84, 0xe7, 0xa5, 0x6d, 0xa2, 0x7d}, Free: NewU128(*big.NewInt(4586363775847)), Reserved: NewU128(*big.NewInt(4586363775847)), Topics: []Hash(nil)}},
+		Balances_Deposit:            []EventBalancesDeposit{EventBalancesDeposit{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Who: AccountID{0xd4, 0x35, 0x93, 0xc7, 0x15, 0xfd, 0xd3, 0x1c, 0x61, 0x14, 0x1a, 0xbd, 0x4, 0xa9, 0x9f, 0xd6, 0x82, 0x2c, 0x85, 0x58, 0x85, 0x4c, 0xcd, 0xe3, 0x9a, 0x56, 0x84, 0xe7, 0xa5, 0x6d, 0xa2, 0x7d}, Balance: NewU128(*big.NewInt(4586363775847)), Topics: []Hash(nil)}},
+		Balances_Reserved:           []EventBalancesReserved(nil),
+		Balances_Unreserved:         []EventBalancesUnreserved(nil),
+		Balances_ReserveRepatriated: []EventBalancesReserveRepatriated(nil),
+		Grandpa_NewAuthorities:      []EventGrandpaNewAuthorities(nil),
+		Grandpa_Paused:              []EventGrandpaPaused(nil),
+		Grandpa_Resumed:             []EventGrandpaResumed(nil), ImOnline_HeartbeatReceived: []EventImOnlineHeartbeatReceived(nil), ImOnline_AllGood: []EventImOnlineAllGood(nil), ImOnline_SomeOffline: []EventImOnlineSomeOffline(nil), Indices_IndexAssigned: []EventIndicesIndexAssigned{EventIndicesIndexAssigned{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, AccountID: AccountID{0x8e, 0xaf, 0x4, 0x15, 0x16, 0x87, 0x73, 0x63, 0x26, 0xc9, 0xfe, 0xa1, 0x7e, 0x25, 0xfc, 0x52, 0x87, 0x61, 0x36, 0x93, 0xc9, 0x12, 0x90, 0x9c, 0xb2, 0x26, 0xaa, 0x47, 0x94, 0xf2, 0x6a, 0x48}, AccountIndex: 0x3039, Topics: []Hash(nil)}}, Indices_IndexFreed: []EventIndicesIndexFreed{EventIndicesIndexFreed{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, AccountIndex: 0x3039, Topics: []Hash(nil)}}, Indices_IndexFrozen: []EventIndicesIndexFrozen(nil), Offences_Offence: []EventOffencesOffence{EventOffencesOffence{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Kind: Bytes16{0x69, 0x6d, 0x2d, 0x6f, 0x6e, 0x6c, 0x69, 0x6e, 0x65, 0x3a, 0x6f, 0x66, 0x66, 0x6c, 0x69, 0x6e}, OpaqueTimeSlot: Bytes{0xc5, 0x0, 0x0, 0x0}, Topics: []Hash(nil)}}, Session_NewSession: []EventSessionNewSession{EventSessionNewSession{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, SessionIndex: 0xc6, Topics: []Hash(nil)}}, Staking_EraPaid: []EventStakingEraPaid{EventStakingEraPaid{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, EraIndex: 0xc6, ValidatorPayout: NewU128(*big.NewInt(4586363775847)), Remainder: NewU128(*big.NewInt(0)), Topics: []Hash(nil)}}, Staking_Rewarded: []EventStakingRewarded(nil), Staking_Slashed: []EventStakingSlashed(nil), Staking_OldSlashingReportDiscarded: []EventStakingOldSlashingReportDiscarded(nil), Staking_StakersElected: []EventStakingStakersElected(nil), Staking_Bonded: []EventStakingBonded(nil), Staking_Unbonded: []EventStakingUnbonded(nil), Staking_Withdrawn: []EventStakingWithdrawn(nil), System_ExtrinsicSuccess: []EventSystemExtrinsicSuccess{EventSystemExtrinsicSuccess{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, DispatchInfo: DispatchInfo{Weight: 0x2710, Class: DispatchClass{IsNormal: false, IsOperational: true}, PaysFee: Pays{IsYes: true}}, Topics: []Hash(nil)}, EventSystemExtrinsicSuccess{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x1, IsFinalization: false}, DispatchInfo: DispatchInfo{Weight: 0x2710, Class: DispatchClass{IsNormal: true, IsOperational: false}, PaysFee: Pays{IsYes: true}}, Topics: []Hash(nil)}}, System_ExtrinsicFailed: []EventSystemExtrinsicFailed{EventSystemExtrinsicFailed{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x2, IsFinalization: false}, DispatchError: DispatchError{IsModule: true, ModuleError: ModuleError{Index: 0xb, Error: 0x0}}, DispatchInfo: DispatchInfo{Weight: 0x2710, Class: DispatchClass{IsNormal: false, IsOperational: true}, PaysFee: Pays{IsYes: true}}, Topics: []Hash(nil)}}, System_CodeUpdated: []EventSystemCodeUpdated{EventSystemCodeUpdated{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Topics: []Hash(nil)}}, System_NewAccount: []EventSystemNewAccount{EventSystemNewAccount{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Who: AccountID{0x8e, 0xaf, 0x4, 0x15, 0x16, 0x87, 0x73, 0x63, 0x26, 0xc9, 0xfe, 0xa1, 0x7e, 0x25, 0xfc, 0x52, 0x87, 0x61, 0x36, 0x93, 0xc9, 0x12, 0x90, 0x9c, 0xb2, 0x26, 0xaa, 0x47, 0x94, 0xf2, 0x6a, 0x48}, Topics: []Hash(nil)}}, System_KilledAccount: []EventSystemKilledAccount{EventSystemKilledAccount{Phase: Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 0x0, IsFinalization: false}, Who: AccountID{0x8e, 0xaf, 0x4, 0x15, 0x16, 0x87, 0x73, 0x63, 0x26, 0xc9, 0xfe, 0xa1, 0x7e, 0x25, 0xfc, 0x52, 0x87, 0x61, 0x36, 0x93, 0xc9, 0x12, 0x90, 0x9c, 0xb2, 0x26, 0xaa, 0x47, 0x94, 0xf2, 0x6a, 0x48}, Topics: []Hash(nil)}}, Assets_Issued: []EventAssetIssued(nil), Assets_Transferred: []EventAssetTransferred(nil), Assets_Destroyed: []EventAssetDestroyed(nil), Democracy_Proposed: []EventDemocracyProposed(nil), Democracy_Tabled: []EventDemocracyTabled(nil), Democracy_ExternalTabled: []EventDemocracyExternalTabled(nil), Democracy_Started: []EventDemocracyStarted(nil), Democracy_Passed: []EventDemocracyPassed(nil), Democracy_NotPassed: []EventDemocracyNotPassed(nil), Democracy_Cancelled: []EventDemocracyCancelled(nil), Democracy_Executed: []EventDemocracyExecuted(nil), Democracy_Delegated: []EventDemocracyDelegated(nil), Democracy_Undelegated: []EventDemocracyUndelegated(nil), Democracy_Vetoed: []EventDemocracyVetoed(nil), Democracy_PreimageNoted: []EventDemocracyPreimageNoted(nil), Democracy_PreimageUsed: []EventDemocracyPreimageUsed(nil), Democracy_PreimageInvalid: []EventDemocracyPreimageInvalid(nil), Democracy_PreimageMissing: []EventDemocracyPreimageMissing(nil), Democracy_PreimageReaped: []EventDemocracyPreimageReaped(nil), Council_Proposed: []EventCouncilProposed(nil), Council_Voted: []EventCouncilVoted(nil), Council_Approved: []EventCouncilApproved(nil), Council_Disapproved: []EventCouncilDisapproved(nil), Council_Executed: []EventCouncilExecuted(nil), Council_MemberExecuted: []EventCouncilMemberExecuted(nil), Council_Closed: []EventCouncilClosed(nil), TechnicalCommittee_Proposed: []EventTechnicalCommitteeProposed(nil), TechnicalCommittee_Voted: []EventTechnicalCommitteeVoted(nil), TechnicalCommittee_Approved: []EventTechnicalCommitteeApproved(nil), TechnicalCommittee_Disapproved: []EventTechnicalCommitteeDisapproved(nil), TechnicalCommittee_Executed: []EventTechnicalCommitteeExecuted(nil), TechnicalCommittee_MemberExecuted: []EventTechnicalCommitteeMemberExecuted(nil), TechnicalCommittee_Closed: []EventTechnicalCommitteeClosed(nil), Elections_NewTerm: []EventElectionsNewTerm(nil), Elections_EmptyTerm: []EventElectionsEmptyTerm(nil), Elections_MemberKicked: []EventElectionsMemberKicked(nil), Elections_Renounced: []EventElectionsRenounced(nil), Identity_IdentitySet: []EventIdentitySet(nil), Identity_IdentityCleared: []EventIdentityCleared(nil), Identity_IdentityKilled: []EventIdentityKilled(nil), Identity_JudgementRequested: []EventIdentityJudgementRequested(nil), Identity_JudgementUnrequested: []EventIdentityJudgementUnrequested(nil), Identity_JudgementGiven: []EventIdentityJudgementGiven(nil), Identity_RegistrarAdded: []EventIdentityRegistrarAdded(nil), Identity_SubIdentityAdded: []EventIdentitySubIdentityAdded(nil), Identity_SubIdentityRemoved: []EventIdentitySubIdentityRemoved(nil), Identity_SubIdentityRevoked: []EventIdentitySubIdentityRevoked(nil), Society_Founded: []EventSocietyFounded(nil), Society_Bid: []EventSocietyBid(nil), Society_Vouch: []EventSocietyVouch(nil), Society_AutoUnbid: []EventSocietyAutoUnbid(nil), Society_Unbid: []EventSocietyUnbid(nil), Society_Unvouch: []EventSocietyUnvouch(nil), Society_Inducted: []EventSocietyInducted(nil), Society_SuspendedMemberJudgement: []EventSocietySuspendedMemberJudgement(nil), Society_CandidateSuspended: []EventSocietyCandidateSuspended(nil), Society_MemberSuspended: []EventSocietyMemberSuspended(nil), Society_Challenged: []EventSocietyChallenged(nil), Society_Vote: []EventSocietyVote(nil), Society_DefenderVote: []EventSocietyDefenderVote(nil), Society_NewMaxMembers: []EventSocietyNewMaxMembers(nil), Society_Unfounded: []EventSocietyUnfounded(nil), Society_Deposit: []EventSocietyDeposit(nil), Recovery_RecoveryCreated: []EventRecoveryCreated(nil), Recovery_RecoveryInitiated: []EventRecoveryInitiated(nil), Recovery_RecoveryVouched: []EventRecoveryVouched(nil), Recovery_RecoveryClosed: []EventRecoveryClosed(nil), Recovery_AccountRecovered: []EventRecoveryAccountRecovered(nil), Recovery_RecoveryRemoved: []EventRecoveryRemoved(nil), Vesting_VestingUpdated: []EventVestingVestingUpdated(nil), Vesting_VestingCompleted: []EventVestingVestingCompleted(nil), Scheduler_Scheduled: []EventSchedulerScheduled(nil), Scheduler_Canceled: []EventSchedulerCanceled(nil), Scheduler_Dispatched: []EventSchedulerDispatched(nil), Proxy_ProxyExecuted: []EventProxyProxyExecuted(nil), Proxy_AnonymousCreated: []EventProxyAnonymousCreated(nil), Sudo_Sudid: []EventSudoSudid(nil), Sudo_KeyChanged: []EventSudoKeyChanged(nil), Sudo_SudoAsDone: []EventSudoAsDone(nil), Treasury_Proposed: []EventTreasuryProposed(nil), Treasury_Spending: []EventTreasurySpending(nil), Treasury_Awarded: []EventTreasuryAwarded(nil), Treasury_Rejected: []EventTreasuryRejected(nil), Treasury_Burnt: []EventTreasuryBurnt(nil), Treasury_Rollover: []EventTreasuryRollover(nil), Treasury_Deposit: []EventTreasuryDeposit(nil), Tips_NewTip: []EventTipsNewTip(nil), Tips_TipClosing: []EventTipsTipClosing(nil), Tips_TipClosed: []EventTipsTipClosed(nil), Tips_TipRetracted: []EventTipsTipRetracted(nil), Contracts_Instantiated: []EventContractsInstantiated(nil), Contracts_ContractEmitted: []EventContractsContractEmitted(nil), Contracts_ContractCodeUpdated: []EventContractsContractCodeUpdated(nil), Contracts_CodeStored: []EventContractsCodeStored(nil), Utility_BatchInterrupted: []EventUtilityBatchInterrupted(nil), Utility_BatchCompleted: []EventUtilityBatchCompleted(nil), Multisig_NewMultisig: []EventMultisigNewMultisig(nil), Multisig_MultisigApproval: []EventMultisigApproval(nil), Multisig_MultisigExecuted: []EventMultisigExecuted(nil), Multisig_MultisigCancelled: []EventMultisigCancelled(nil)}
 	//nolint:lll
 
 	assert.Equal(t, exp, events)
 }
 
 func TestDispatchError(t *testing.T) {
-	assertRoundtrip(t, DispatchError{HasModule: true, Module: 0xf1, Error: 0xa2})
-	assertRoundtrip(t, DispatchError{HasModule: false, Error: 0xa2})
+	assertRoundTripFuzz[DispatchError](t, 1000, dispatchErrorFuzzOpts...)
+	assertDecodeNilData[DispatchError](t)
+	assertEncodeEmptyObj[DispatchError](t, 0)
 }
 
+var (
+	phaseFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(p *Phase, c fuzz.Continue) {
+			switch c.Intn(3) {
+			case 0:
+				p.IsApplyExtrinsic = true
+				c.Fuzz(&p.AsApplyExtrinsic)
+			case 1:
+				p.IsFinalization = true
+			case 2:
+				p.IsInitialization = true
+			}
+		}),
+	}
+)
+
 func TestPhase(t *testing.T) {
-	assertRoundtrip(t, Phase{IsApplyExtrinsic: true, AsApplyExtrinsic: 43})
-	assertRoundtrip(t, Phase{IsFinalization: true})
-	assertRoundtrip(t, Phase{IsInitialization: true})
+	assertRoundTripFuzz[Phase](t, 100, phaseFuzzOpts...)
+	assertDecodeNilData[Phase](t)
+	assertEncodeEmptyObj[Phase](t, 0)
 }

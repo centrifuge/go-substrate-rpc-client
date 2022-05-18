@@ -54,7 +54,7 @@ func TestChain_SubscribeBeefyJustifications(t *testing.T) {
 			fmt.Printf("encoded msg: %#v\n", msg)
 
 			s := &types.SignedCommitment{}
-			err := types.DecodeFromHexString(msg.(string), s)
+			err := types.DecodeFromHex(msg.(string), s)
 			if err != nil {
 				panic(err)
 			}

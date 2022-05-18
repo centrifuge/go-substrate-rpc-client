@@ -26,7 +26,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
-var state *State
+var testState State
 
 func TestMain(m *testing.M) {
 	s := rpcmocksrv.New()
@@ -41,7 +41,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	state = NewState(cl)
+	testState = NewState(cl)
 
 	os.Exit(m.Run())
 }

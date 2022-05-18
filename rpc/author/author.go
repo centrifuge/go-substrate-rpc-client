@@ -16,14 +16,23 @@
 
 package author
 
-import "github.com/centrifuge/go-substrate-rpc-client/v4/client"
+import (
+	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+)
 
-// Author exposes methods for authoring of network items
-type Author struct {
+type Author interface {
+	SubmitAndWatchExtrinsic(xt types.Extrinsic) (*ExtrinsicStatusSubscription, error)
+	PendingExtrinsics() ([]types.Extrinsic, error)
+	SubmitExtrinsic(xt types.Extrinsic) (types.Hash, error)
+}
+
+// author exposes methods for authoring of network items
+type author struct {
 	client client.Client
 }
 
-// NewAuthor creates a new Author struct
-func NewAuthor(cl client.Client) *Author {
-	return &Author{cl}
+// NewAuthor creates a new author struct
+func NewAuthor(cl client.Client) Author {
+	return &author{cl}
 }

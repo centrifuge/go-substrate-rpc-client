@@ -1,6 +1,23 @@
+// Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
+//
+// Copyright 2019 Centrifuge GmbH
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package types
 
 import (
+	"errors"
 	"fmt"
 	"hash"
 	"strings"
@@ -125,6 +142,37 @@ func (m *MetadataV14) FindStorageEntryMetadata(module string, fn string) (Storag
 		return nil, fmt.Errorf("storage %v not found within module %v", fn, module)
 	}
 	return nil, fmt.Errorf("module %v not found in metadata", module)
+}
+
+func (m *MetadataV14) FindError(moduleIndex U8, errorIndex U8) (*MetadataError, error) {
+	for _, mod := range m.Pallets {
+		if int(mod.Index) == int(moduleIndex) {
+			if mod.HasErrors {
+				errorType := mod.Errors.Type
+				errType, ok := m.EfficientLookup[errorType.Int64()]
+
+				if !ok {
+					return nil, errors.New("error type not found")
+				}
+
+				if !errType.Def.IsVariant {
+					return nil, errors.New("error type definition is not a variant")
+				}
+
+				for _, variant := range errType.Def.Variant.Variants {
+					if variant.Index == errorIndex {
+						return NewMetadataError(variant), nil
+					}
+				}
+
+				return nil, fmt.Errorf("error at index %d not found", errorIndex)
+			}
+
+			return nil, fmt.Errorf("module %d has no errors", moduleIndex)
+		}
+	}
+
+	return nil, fmt.Errorf("could not find error at index %d for module %d", errorIndex, moduleIndex)
 }
 
 func (m *MetadataV14) FindConstantValue(module Text, constant Text) ([]byte, error) {

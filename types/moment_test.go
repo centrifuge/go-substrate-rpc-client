@@ -17,8 +17,14 @@
 package types_test
 
 import (
+	"bytes"
+	"math"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
@@ -26,6 +32,18 @@ import (
 func TestMoment_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewMoment(time.Unix(1575470205, 874000000000)))
 	assertRoundtrip(t, NewMoment(time.Unix(0, 0)))
+
+	m := new(Moment)
+
+	var b []byte
+
+	buf := bytes.NewBuffer(b)
+
+	err := scale.NewEncoder(buf).Encode(uint64(math.MaxUint64))
+	assert.NoError(t, err)
+
+	err = m.Decode(*scale.NewDecoder(buf))
+	assert.NotNil(t, err)
 }
 
 func TestMoment_EncodedLength(t *testing.T) {

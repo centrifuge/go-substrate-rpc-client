@@ -19,12 +19,66 @@ package types_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	fuzz "github.com/google/gofuzz"
+
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+var (
+	optionAccountIDFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(o *OptionAccountID, c fuzz.Continue) {
+			if c.RandBool() {
+				*o = NewOptionAccountIDEmpty()
+				return
+			}
+			var accId AccountID
+			c.Fuzz(&accId)
+
+			*o = NewOptionAccountID(accId)
+		}),
+	}
+)
+
+func TestOptionAccountID_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[OptionAccountID](t, 100, optionAccountIDFuzzOpts...)
+	assertEncodeEmptyObj[OptionAccountID](t, 1)
+}
+
+func TestOptionAccountID_Encode(t *testing.T) {
+	assertEncode(t, []encodingAssert{
+		{NewOptionAccountID(NewAccountID([]byte{171, 18, 52})), MustHexDecodeString("0x01ab12340000000000000000000000000000000000000000000000000000000000")},
+		{NewOptionAccountIDEmpty(), MustHexDecodeString("0x00")},
+	})
+}
+
+func TestOptionAccountID_Decode(t *testing.T) {
+	assertDecode(t, []decodingAssert{
+		{MustHexDecodeString("0x01ab12340000000000000000000000000000000000000000000000000000000000"), NewOptionAccountID(NewAccountID([]byte{171, 18, 52}))},
+		{MustHexDecodeString("0x00"), NewOptionAccountIDEmpty()},
+	})
+}
+
+func TestOptionAccountID_OptionMethods(t *testing.T) {
+	o := NewOptionAccountIDEmpty()
+	o.SetSome(NewAccountID([]byte("acc-id")))
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, NewAccountID([]byte{}), v)
+}
+
 func TestAccountID_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewAccountID([]byte{}))
-	assertRoundtrip(t, NewAccountID([]byte{0, 1, 2, 3, 4, 5, 6, 7}))
+	assertRoundTripFuzz[AccountID](t, 100, withNilChance(0.01))
+	assertDecodeNilData[AccountID](t)
+	assertEncodeEmptyObj[AccountID](t, 32)
 }
 
 func TestAccountID_EncodedLength(t *testing.T) {

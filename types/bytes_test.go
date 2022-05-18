@@ -17,15 +17,18 @@
 package types_test
 
 import (
+	"bytes"
 	"testing"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+	"github.com/stretchr/testify/assert"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
 func TestBytes_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewBytes(MustHexDecodeString("0x00")))
-	assertRoundtrip(t, NewBytes(MustHexDecodeString("0xab1234")))
-	assertRoundtrip(t, NewBytes(MustHexDecodeString("0x0001")))
+	assertRoundTripFuzz[Bytes](t, 100)
+	assertEncodeEmptyObj[Bytes](t, 1)
 }
 
 func TestBytes_EncodedLength(t *testing.T) {
@@ -168,4 +171,11 @@ func TestBytes1024_EncodeDecode(t *testing.T) {
 
 func TestBytes2048_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewBytes2048([2048]byte{0, 255, 0, 42}))
+}
+
+func TestBytesBare_Decode(t *testing.T) {
+	b := new(BytesBare)
+
+	err := b.Decode(*scale.NewDecoder(bytes.NewReader(nil)))
+	assert.NotNil(t, err)
 }

@@ -16,7 +16,11 @@
 
 package types
 
-import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+import (
+	"math/big"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+)
 
 // OptionU8 is a structure that can store a U8 or a missing value
 type OptionU8 struct {
@@ -179,5 +183,46 @@ func (o *OptionU64) SetNone() {
 
 // Unwrap returns a flag that indicates whether a value is present and the stored value
 func (o OptionU64) Unwrap() (ok bool, value U64) {
+	return o.hasValue, o.value
+}
+
+// OptionU128 is a structure that can store a U128 or a missing value
+type OptionU128 struct {
+	option
+	value U128
+}
+
+// NewOptionU128 creates an OptionU128 with a value
+func NewOptionU128(value U128) OptionU128 {
+	return OptionU128{option{true}, value}
+}
+
+// NewOptionU128Empty creates an OptionU128 without a value
+func NewOptionU128Empty() OptionU128 {
+	return OptionU128{option: option{false}}
+}
+
+func (o OptionU128) Encode(encoder scale.Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
+}
+
+func (o *OptionU128) Decode(decoder scale.Decoder) error {
+	return decoder.DecodeOption(&o.hasValue, &o.value)
+}
+
+// SetSome sets a value
+func (o *OptionU128) SetSome(value U128) {
+	o.hasValue = true
+	o.value = value
+}
+
+// SetNone removes a value and marks it as missing
+func (o *OptionU128) SetNone() {
+	o.hasValue = false
+	o.value = NewU128(*big.NewInt(0))
+}
+
+// Unwrap returns a flag that indicates whether a value is present and the stored value
+func (o OptionU128) Unwrap() (ok bool, value U128) {
 	return o.hasValue, o.value
 }

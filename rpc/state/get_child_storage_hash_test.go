@@ -24,13 +24,13 @@ import (
 )
 
 func TestState_GetChildStorageHashLatest(t *testing.T) {
-	hash, err := state.GetChildStorageHashLatest(childStorageKey, key)
+	hash, err := testState.GetChildStorageHashLatest(childStorageKey, key)
 	assert.NoError(t, err)
 	assert.Equal(t, types.NewHash(types.MustHexDecodeString(mockSrv.childStorageTrieHashHex)), hash)
 }
 
 func TestState_GetChildStorageHash(t *testing.T) {
-	hash, err := state.GetChildStorageHash(childStorageKey, key, mockSrv.blockHashLatest)
+	hash, err := testState.GetChildStorageHash(childStorageKey, key, mockSrv.blockHashLatest)
 	assert.NoError(t, err)
 	assert.Equal(t, types.NewHash(types.MustHexDecodeString(mockSrv.childStorageTrieHashHex)), hash)
 }

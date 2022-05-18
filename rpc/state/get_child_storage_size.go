@@ -22,16 +22,16 @@ import (
 )
 
 // GetChildStorageSize retreives the child storage size for the given key
-func (s *State) GetChildStorageSize(childStorageKey, key types.StorageKey, blockHash types.Hash) (types.U64, error) {
+func (s *state) GetChildStorageSize(childStorageKey, key types.StorageKey, blockHash types.Hash) (types.U64, error) {
 	return s.getChildStorageSize(childStorageKey, key, &blockHash)
 }
 
 // GetChildStorageSizeLatest retreives the child storage size for the given key for the latest block height
-func (s *State) GetChildStorageSizeLatest(childStorageKey, key types.StorageKey) (types.U64, error) {
+func (s *state) GetChildStorageSizeLatest(childStorageKey, key types.StorageKey) (types.U64, error) {
 	return s.getChildStorageSize(childStorageKey, key, nil)
 }
 
-func (s *State) getChildStorageSize(childStorageKey, key types.StorageKey, blockHash *types.Hash) (types.U64, error) {
+func (s *state) getChildStorageSize(childStorageKey, key types.StorageKey, blockHash *types.Hash) (types.U64, error) {
 	var res types.U64
 	err := client.CallWithBlockHash(s.client, &res, "state_getChildStorageSize", blockHash, childStorageKey.Hex(),
 		key.Hex())

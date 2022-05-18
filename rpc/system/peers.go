@@ -21,7 +21,7 @@ import (
 )
 
 // Peers retrieves the currently connected peers
-func (c *System) Peers() ([]types.PeerInfo, error) {
+func (c *system) Peers() ([]types.PeerInfo, error) {
 	var p []types.PeerInfo
 	err := c.client.Call(&p, "system_peers")
 	return p, err

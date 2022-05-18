@@ -23,13 +23,13 @@ import (
 )
 
 func TestChain_GetFinalizedHead(t *testing.T) {
-	res, err := chain.GetFinalizedHead()
+	res, err := testChain.GetFinalizedHead()
 	assert.NoError(t, err)
 
-	header, err := chain.GetHeaderLatest()
+	header, err := testChain.GetHeaderLatest()
 	assert.NoError(t, err)
 
-	fheader, err := chain.GetHeader(res)
+	fheader, err := testChain.GetHeader(res)
 	assert.NoError(t, err)
 
 	assert.True(t, header.Number > fheader.Number)

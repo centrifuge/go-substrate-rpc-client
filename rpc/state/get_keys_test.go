@@ -25,14 +25,14 @@ import (
 
 func TestState_GetKeysLatest(t *testing.T) {
 	prefix := types.NewStorageKey(types.MustHexDecodeString(mockSrv.storageKeyHex))[:8]
-	keys, err := state.GetKeysLatest(prefix)
+	keys, err := testState.GetKeysLatest(prefix)
 	assert.NoError(t, err)
 	assert.Equal(t, []types.StorageKey{types.MustHexDecodeString(mockSrv.storageKeyHex)}, keys)
 }
 
 func TestState_GetKeys(t *testing.T) {
 	prefix := types.NewStorageKey(types.MustHexDecodeString(mockSrv.storageKeyHex))[:8]
-	keys, err := state.GetKeys(prefix, mockSrv.blockHashLatest)
+	keys, err := testState.GetKeys(prefix, mockSrv.blockHashLatest)
 	assert.NoError(t, err)
 	assert.Equal(t, []types.StorageKey{types.MustHexDecodeString(mockSrv.storageKeyHex)}, keys)
 }
