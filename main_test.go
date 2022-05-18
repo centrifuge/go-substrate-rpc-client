@@ -49,7 +49,7 @@ func Example_simpleConnect() {
 	}
 
 	fmt.Printf("You are connected to chain %v using %v v%v\n", chain, nodeName, nodeVersion)
-	// Output: You are connected to chain Development using Parity Polkadot v0.9.17-de0ecd4760-x86_64-linux-gnu
+	// Output: You are connected to chain Development using Parity Polkadot v0.9.21-56cbe45f6c9
 }
 
 func Example_listenToNewBlocks() {

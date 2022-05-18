@@ -3,7 +3,7 @@ version: '2'
 services:
   substrate:
     container_name: substrate
-    image: parity/polkadot:v0.9.17
+    image: parity/polkadot:v0.9.21
     ports:
       - 9933:9933
       - 9944:9944
