@@ -334,7 +334,13 @@ func (a *Args) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-type Justification Bytes
+
+type Justification struct {
+	ConsensusEngineId ConsensusEngineID
+	EncodedJustification Bytes
+}
+
+type Justifications []Justification
 
 type SignaturePayload struct {
 	Address        Address
