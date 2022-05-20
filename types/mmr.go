@@ -14,13 +14,8 @@ type GenerateMmrProofResponse struct {
 // GenerateMmrBatchProofResponse contains the generate batch proof rpc response
 type GenerateMmrBatchProofResponse struct {
 	BlockHash H256
-	Leaves    []LeafWithIndex
+	Leaves    []MmrLeaf
 	Proof     MmrBatchProof
-}
-
-type LeafWithIndex struct {
-	Leaf  MmrLeaf
-	Index uint64
 }
 
 type OpaqueLeafWithIndex struct {
@@ -73,21 +68,18 @@ func (d *GenerateMmrBatchProofResponse) UnmarshalJSON(bz []byte) error {
 		return err
 	}
 
-	var opaqueLeaves []OpaqueLeafWithIndex
+	var opaqueLeaves [][]byte
 	err = DecodeFromHexString(tmp.Leaves, &opaqueLeaves)
 	if err != nil {
 		return err
 	}
 	for _, leaf := range opaqueLeaves {
 		var mmrLeaf MmrLeaf
-		err := DecodeFromBytes(leaf.Leaf, &mmrLeaf)
+		err := DecodeFromBytes(leaf, &mmrLeaf)
 		if err != nil {
 			return err
 		}
-		d.Leaves = append(d.Leaves, LeafWithIndex{
-			Leaf:  mmrLeaf,
-			Index: leaf.Index,
-		})
+		d.Leaves = append(d.Leaves, mmrLeaf)
 	}
 	err = DecodeFromHexString(tmp.Proof, &d.Proof)
 	if err != nil {
