@@ -4,18 +4,36 @@ import (
 	clienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
 )
 
-func (i IBC) QueryClientStateResponse(height int64, srcClientId string) (*clienttypes.QueryClientStateResponse, error) {
+func (i IBC) QueryClientStateResponse(
+	height int64,
+	srcClientID string,
+) (
+	*clienttypes.QueryClientStateResponse,
+	error,
+) {
 	var res *clienttypes.QueryClientStateResponse
-	err := i.client.Call(&res, "ibc_queryClientState", height, srcClientId)
+	err := i.client.Call(&res, "ibc_queryClientState", height, srcClientID)
 	if err != nil {
 		return &clienttypes.QueryClientStateResponse{}, err
 	}
 	return res, nil
 }
 
-func (i IBC) QueryClientConsensusState(clientid string, revisionHeight, revisionNumber uint64, latestConsensusState bool) (*clienttypes.QueryConsensusStateResponse, error) {
+func (i IBC) QueryClientConsensusState(
+	clientid string,
+	revisionHeight,
+	revisionNumber uint64,
+	latestConsensusState bool) (
+	*clienttypes.QueryConsensusStateResponse,
+	error,
+) {
 	var res *clienttypes.QueryConsensusStateResponse
-	err := i.client.Call(&res, "ibc_queryClientConsensusState", clientid, revisionHeight, revisionNumber, latestConsensusState)
+	err := i.client.Call(&res,
+		"ibc_queryClientConsensusState",
+		clientid,
+		revisionHeight,
+		revisionNumber,
+		latestConsensusState)
 	if err != nil {
 		return &clienttypes.QueryConsensusStateResponse{}, err
 	}
@@ -30,7 +48,12 @@ func (i IBC) QueryUpgradedClient(height int64) (*clienttypes.QueryClientStateRes
 	return res, nil
 }
 
-func (i IBC) QueryUpgradedConsState(height int64) (*clienttypes.QueryConsensusStateResponse, error) {
+func (i IBC) QueryUpgradedConsState(
+	height int64,
+) (
+	*clienttypes.QueryConsensusStateResponse,
+	error,
+) {
 	var res *clienttypes.QueryConsensusStateResponse
 	err := i.client.Call(&res, "ibc_queryUpgradedConnectionState", height)
 	if err != nil {
@@ -39,7 +62,10 @@ func (i IBC) QueryUpgradedConsState(height int64) (*clienttypes.QueryConsensusSt
 	return res, nil
 }
 
-func (i IBC) QueryClients() (clienttypes.IdentifiedClientStates, error) {
+func (i IBC) QueryClients() (
+	clienttypes.IdentifiedClientStates,
+	error,
+) {
 	var res clienttypes.IdentifiedClientStates
 	err := i.client.Call(&res, "ibc_queryClients")
 	if err != nil {

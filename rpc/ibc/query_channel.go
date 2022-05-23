@@ -5,7 +5,14 @@ import (
 	chantypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
 )
 
-func (i IBC) QueryChannelClient(height uint32, channelid, portid string) (*clienttypes.IdentifiedClientState, error) {
+func (i IBC) QueryChannelClient(
+	height uint32,
+	channelid,
+	portid string,
+) (
+	*clienttypes.IdentifiedClientState,
+	error,
+) {
 	var res clienttypes.IdentifiedClientState
 	err := i.client.Call(&res, "ibc_queryChannelClient", height, channelid, portid)
 	if err != nil {
@@ -14,7 +21,13 @@ func (i IBC) QueryChannelClient(height uint32, channelid, portid string) (*clien
 	return &res, nil
 }
 
-func (i IBC) QueryConnectionChannels(height uint32, connectionid string) (*chantypes.QueryChannelsResponse, error) {
+func (i IBC) QueryConnectionChannels(
+	height uint32,
+	connectionid string,
+) (
+	*chantypes.QueryChannelsResponse,
+	error,
+) {
 	var res *chantypes.QueryChannelsResponse
 	err := i.client.Call(&res, "ibc_queryConnectionChannels", height, connectionid)
 	if err != nil {
@@ -23,7 +36,10 @@ func (i IBC) QueryConnectionChannels(height uint32, connectionid string) (*chant
 	return res, nil
 }
 
-func (i IBC) QueryChannels() (*chantypes.QueryChannelsResponse, error) {
+func (i IBC) QueryChannels() (
+	*chantypes.QueryChannelsResponse,
+	error,
+) {
 	var res *chantypes.QueryChannelsResponse
 	err := i.client.Call(&res, "ibc_queryChannels")
 	if err != nil {
