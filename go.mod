@@ -13,7 +13,7 @@ require (
 	github.com/pierrec/xxHash v0.1.5
 	github.com/rs/cors v1.8.2
 	github.com/stretchr/testify v1.7.0
-	github.com/vedhavyas/go-subkey v1.0.3
+	github.com/vedhavyas/go-subkey v1.0.0
 	golang.org/x/crypto v0.0.0-20220128200615-198e4374d7ed
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 )
