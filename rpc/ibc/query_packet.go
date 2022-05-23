@@ -13,7 +13,7 @@ func (i IBC) QueryPackets(
 	error,
 ) {
 	var res []chantypes.Packet
-	err := i.client.Call(&res, "ibc_queryPackets", channelid, portid, seqs)
+	err := i.client.Call(&res, queryPacketsMethod, channelid, portid, seqs)
 	if err != nil {
 		return []chantypes.Packet{}, err
 	}
@@ -28,7 +28,7 @@ func (i IBC) QueryPacketCommitments(
 	error,
 ) {
 	var res *chantypes.QueryPacketCommitmentsResponse
-	err := i.client.Call(&res, "ibc_queryPacketCommitments", height, channelid, portid)
+	err := i.client.Call(&res, queryPacketCommitmentsMethod, height, channelid, portid)
 	if err != nil {
 		return &chantypes.QueryPacketCommitmentsResponse{}, err
 	}
@@ -44,7 +44,7 @@ func (i IBC) QueryPacketAcknowledgements(
 	error,
 ) {
 	var res *chantypes.QueryPacketAcknowledgementsResponse
-	err := i.client.Call(&res, "ibc_queryPacketAcknowledgements", height, channelid, portid)
+	err := i.client.Call(&res, queryPacketAcknowledgementsMethod, height, channelid, portid)
 	if err != nil {
 		return &chantypes.QueryPacketAcknowledgementsResponse{}, err
 	}
@@ -60,7 +60,7 @@ func (i IBC) QueryUnreceivedPackets(
 	[]uint64, error,
 ) {
 	var res []uint64
-	err := i.client.Call(&res, "ibc_queryUnreceivedPackets", height, channelid, portid, seqs)
+	err := i.client.Call(&res, queryUnreceivedPacketsMethod, height, channelid, portid, seqs)
 	if err != nil {
 		return []uint64{}, err
 	}
@@ -77,7 +77,7 @@ func (i IBC) QueryUnreceivedAcknowledgements(
 	error,
 ) {
 	var res []uint64
-	err := i.client.Call(&res, "ibc_queryUnreceivedAcknowledgement", height, channelid, portid, seqs)
+	err := i.client.Call(&res, queryUnreceivedAcknowledgementMethod, height, channelid, portid, seqs)
 	if err != nil {
 		return []uint64{}, err
 	}
@@ -93,7 +93,7 @@ func (i IBC) QueryNextSeqRecv(
 	error,
 ) {
 	var res *chantypes.QueryNextSequenceReceiveResponse
-	err := i.client.Call(&res, "ibc_queryNextSeqRecv", height, channelid, portid)
+	err := i.client.Call(&res, queryNextSeqRecvMethod, height, channelid, portid)
 	if err != nil {
 		return &chantypes.QueryNextSequenceReceiveResponse{}, err
 	}
@@ -109,7 +109,7 @@ func (i IBC) QueryPacketCommitment(
 	error,
 ) {
 	var res *chantypes.QueryPacketCommitmentResponse
-	err := i.client.Call(&res, "ibc_queryPacketCommitment", height, channelid, portid)
+	err := i.client.Call(&res, queryPacketCommitmentMethod, height, channelid, portid)
 	if err != nil {
 		return &chantypes.QueryPacketCommitmentResponse{}, err
 	}
@@ -126,7 +126,7 @@ func (i IBC) QueryPacketAcknowledgement(
 	error,
 ) {
 	var res *chantypes.QueryPacketAcknowledgementResponse
-	err := i.client.Call(&res, "ibc_queryPacketAcknowledgement", height, channelid, portid, seq)
+	err := i.client.Call(&res, queryPacketAcknowledgementMethod, height, channelid, portid, seq)
 	if err != nil {
 		return &chantypes.QueryPacketAcknowledgementResponse{}, err
 	}
@@ -143,7 +143,7 @@ func (i IBC) QueryPacketReceipt(
 	error,
 ) {
 	var res *chantypes.QueryPacketReceiptResponse
-	err := i.client.Call(&res, "ibc_queryPacketReceipt", height, channelid, portid, seq)
+	err := i.client.Call(&res, queryPacketReceiptMethod, height, channelid, portid, seq)
 	if err != nil {
 		return &chantypes.QueryPacketReceiptResponse{}, err
 	}

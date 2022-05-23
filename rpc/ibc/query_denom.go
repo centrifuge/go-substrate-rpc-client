@@ -11,7 +11,7 @@ func (i IBC) QueryDenomTrace(
 	error,
 ) {
 	var res transfertypes.QueryDenomTraceResponse
-	err := i.client.Call(&res, "ibc_queryDenomTrace", denom)
+	err := i.client.Call(&res, queryDenomTraceMethod, denom)
 	if err != nil {
 		return transfertypes.QueryDenomTraceResponse{}, err
 	}
@@ -27,7 +27,7 @@ func (i IBC) QueryDenomTraces(
 	error,
 ) {
 	var res *transfertypes.QueryDenomTracesResponse
-	err := i.client.Call(&res, "ibc_queryDenomTraces", offset, limit, height)
+	err := i.client.Call(&res, queryDenomTracesMethod, offset, limit, height)
 	if err != nil {
 		return &transfertypes.QueryDenomTracesResponse{}, err
 	}

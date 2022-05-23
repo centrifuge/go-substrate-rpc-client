@@ -11,7 +11,7 @@ func (i IBC) QueryBalanceWithAddress(
 	error,
 ) {
 	var res sdk.Coins
-	err := i.client.Call(&res, "ibc_queryBalanceWithAddress", addr)
+	err := i.client.Call(&res, queryBalanceWithAddressMethod, addr)
 	if err != nil {
 		return sdk.Coins{}, err
 	}

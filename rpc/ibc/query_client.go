@@ -12,7 +12,7 @@ func (i IBC) QueryClientStateResponse(
 	error,
 ) {
 	var res *clienttypes.QueryClientStateResponse
-	err := i.client.Call(&res, "ibc_queryClientState", height, srcClientID)
+	err := i.client.Call(&res, queryClientStateMethod, height, srcClientID)
 	if err != nil {
 		return &clienttypes.QueryClientStateResponse{}, err
 	}
@@ -29,7 +29,7 @@ func (i IBC) QueryClientConsensusState(
 ) {
 	var res *clienttypes.QueryConsensusStateResponse
 	err := i.client.Call(&res,
-		"ibc_queryClientConsensusState",
+		queryClientConsensusStateMethod,
 		clientid,
 		revisionHeight,
 		revisionNumber,
@@ -41,7 +41,7 @@ func (i IBC) QueryClientConsensusState(
 }
 func (i IBC) QueryUpgradedClient(height int64) (*clienttypes.QueryClientStateResponse, error) {
 	var res *clienttypes.QueryClientStateResponse
-	err := i.client.Call(&res, "ibc_queryUpgradedClient", height)
+	err := i.client.Call(&res, queryUpgradedClientMethod, height)
 	if err != nil {
 		return &clienttypes.QueryClientStateResponse{}, err
 	}
@@ -55,7 +55,7 @@ func (i IBC) QueryUpgradedConsState(
 	error,
 ) {
 	var res *clienttypes.QueryConsensusStateResponse
-	err := i.client.Call(&res, "ibc_queryUpgradedConnectionState", height)
+	err := i.client.Call(&res, queryUpgradedConnectionStateMethod, height)
 	if err != nil {
 		return &clienttypes.QueryConsensusStateResponse{}, err
 	}
@@ -67,7 +67,7 @@ func (i IBC) QueryClients() (
 	error,
 ) {
 	var res clienttypes.IdentifiedClientStates
-	err := i.client.Call(&res, "ibc_queryClients")
+	err := i.client.Call(&res, queryClientsMethod)
 	if err != nil {
 		return clienttypes.IdentifiedClientStates{}, err
 	}

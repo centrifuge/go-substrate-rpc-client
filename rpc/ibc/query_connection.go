@@ -12,7 +12,7 @@ func (i IBC) QueryConnection(
 	error,
 ) {
 	var res *conntypes.QueryConnectionResponse
-	err := i.client.Call(&res, "ibc_queryConnection", height, connectionID)
+	err := i.client.Call(&res, queryConnectionMethod, height, connectionID)
 	if err != nil {
 		return &conntypes.QueryConnectionResponse{}, err
 	}
@@ -24,7 +24,7 @@ func (i IBC) QueryConnections() (
 	error,
 ) {
 	var res *conntypes.QueryConnectionsResponse
-	err := i.client.Call(&res, "ibc_queryConnections")
+	err := i.client.Call(&res, queryConnectionsMethod)
 	if err != nil {
 		return &conntypes.QueryConnectionsResponse{}, err
 	}
@@ -39,7 +39,7 @@ func (i IBC) QueryConnectionsUsingClient(
 	error,
 ) {
 	var res *conntypes.QueryConnectionsResponse
-	err := i.client.Call(&res, "ibc_queryConnectionUsingClient", height, clientid)
+	err := i.client.Call(&res, queryConnectionUsingClientMethod, height, clientid)
 	if err != nil {
 		return &conntypes.QueryConnectionsResponse{}, err
 	}

@@ -14,7 +14,7 @@ func (i IBC) QueryChannelClient(
 	error,
 ) {
 	var res clienttypes.IdentifiedClientState
-	err := i.client.Call(&res, "ibc_queryChannelClient", height, channelid, portid)
+	err := i.client.Call(&res, queryChannelClientMethod, height, channelid, portid)
 	if err != nil {
 		return &clienttypes.IdentifiedClientState{}, err
 	}
@@ -29,7 +29,7 @@ func (i IBC) QueryConnectionChannels(
 	error,
 ) {
 	var res *chantypes.QueryChannelsResponse
-	err := i.client.Call(&res, "ibc_queryConnectionChannels", height, connectionid)
+	err := i.client.Call(&res, queryConnectionChannelsMethod, height, connectionid)
 	if err != nil {
 		return &chantypes.QueryChannelsResponse{}, err
 	}
@@ -41,7 +41,7 @@ func (i IBC) QueryChannels() (
 	error,
 ) {
 	var res *chantypes.QueryChannelsResponse
-	err := i.client.Call(&res, "ibc_queryChannels")
+	err := i.client.Call(&res, queryChannelsMethod)
 	if err != nil {
 		return &chantypes.QueryChannelsResponse{}, err
 	}
