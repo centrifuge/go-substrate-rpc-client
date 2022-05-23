@@ -24,6 +24,7 @@ import (
 
 	"github.com/vedhavyas/go-subkey"
 	"github.com/vedhavyas/go-subkey/sr25519"
+
 	"golang.org/x/crypto/blake2b"
 )
 
@@ -40,7 +41,7 @@ type KeyringPair struct {
 // Leave network empty for default behavior
 func KeyringPairFromSecret(seedOrPhrase string, network uint8) (KeyringPair, error) {
 	scheme := sr25519.Scheme{}
-	kyr, err := subkey.DeriveKeyPair(scheme, seedOrPhrase)
+	kyr, err := subkey.Derive(scheme, seedOrPhrase)
 	if err != nil {
 		return KeyringPair{}, err
 	}
@@ -75,7 +76,7 @@ func Sign(data []byte, privateKeyURI string) ([]byte, error) {
 	}
 
 	scheme := sr25519.Scheme{}
-	kyr, err := subkey.DeriveKeyPair(scheme, privateKeyURI)
+	kyr, err := subkey.Derive(scheme, privateKeyURI)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +99,7 @@ func Verify(data []byte, sig []byte, privateKeyURI string) (bool, error) {
 	}
 
 	scheme := sr25519.Scheme{}
-	kyr, err := subkey.DeriveKeyPair(scheme, privateKeyURI)
+	kyr, err := subkey.Derive(scheme, privateKeyURI)
 	if err != nil {
 		return false, err
 	}
