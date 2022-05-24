@@ -17,21 +17,21 @@
 package state
 
 import (
-	"github.com/snowfork/go-substrate-rpc-client/v4/client"
-	"github.com/snowfork/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
 // QueryStorageAt ...
-func (s *State) QueryStorageAt(keys []types.StorageKey, block types.Hash) ([]types.StorageChangeSet, error) {
+func (s *state) QueryStorageAt(keys []types.StorageKey, block types.Hash) ([]types.StorageChangeSet, error) {
 	return s.queryStorageAt(keys, &block)
 }
 
 // QueryStorageAtLatest ...
-func (s *State) QueryStorageAtLatest(keys []types.StorageKey) ([]types.StorageChangeSet, error) {
+func (s *state) QueryStorageAtLatest(keys []types.StorageKey) ([]types.StorageChangeSet, error) {
 	return s.queryStorageAt(keys, nil)
 }
 
-func (s *State) queryStorageAt(keys []types.StorageKey, block *types.Hash) ([]types.StorageChangeSet, error) {
+func (s *state) queryStorageAt(keys []types.StorageKey, block *types.Hash) ([]types.StorageChangeSet, error) {
 	hexKeys := make([]string, len(keys))
 	for i, key := range keys {
 		hexKeys[i] = key.Hex()

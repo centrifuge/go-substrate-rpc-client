@@ -150,6 +150,17 @@ func (s *MockSrv) QueryStorage(keys []string, startBlock string, block *string) 
 	return mockSrv.storageChangeSets
 }
 
+func (s *MockSrv) QueryStorageAt(keys []string, hash *string) []types.StorageChangeSet {
+	if len(keys) != 1 {
+		panic("keys need to have len of 1 in tests")
+	}
+	if keys[0] != mockSrv.storageKeyHex {
+		panic("key not found")
+	}
+
+	return mockSrv.storageChangeSets
+}
+
 // func (s *MockSrv) SubscribeStorage(args []string) {
 // 	fmt.Println("Hit")
 // }
