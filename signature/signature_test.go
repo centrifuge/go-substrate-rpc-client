@@ -17,28 +17,21 @@
 package signature_test
 
 import (
-	"bytes"
 	"testing"
 
-	"github.com/ComposableFi/go-substrate-rpc-client/v4/scale"
 	"github.com/ComposableFi/go-substrate-rpc-client/v4/types"
 	"github.com/stretchr/testify/require"
 )
 
 func TestDecodeSubstrateMessage(t *testing.T) {
-	hex := "0xeee4318d5f09f8e6bb227855f3d1f265ce2bd6303316c560b9c1bc31be8149e761010000000000000000000014013845a96faf999274e973735201a2a0e70c7ebec67d016a1e1d5a68cd3205a41a708588694d948865da4f640cb58ca097a2dcb51baa33606453271136ca1ae7d1000001e05c7d9481cb6d7ae52c1a1b7608e1f55cf3e63a177306bca813a38c375da18f48f875874ef4a4931cbc9d7509ef9c3fa8144ea4407a65c2d31376341e981f560001b85e8d525f60a5f26a2350bd0b632d4c9f505bdd0d826f314cb9524a88a8b36f59e678dfc266ee8676db39a993b350ce5bbc33ab514bcac710c0ba4eedc10c7e0001626fe670748b10bbdecdacfc8253b7819afca627ee9a2787149d664aff76daa94a3bc509172cf444eca4a93025c8f90e5a56e4eff0b16f11511bebbbdbaecce300"
-	signedCommitment := &types.SignedCommitment{}
+	hex := "0x046d68809de63e597f2ff84b4e287c829b93a3aad304b1aebd51ec2d7392d41047e951c723040000690000000000000004d80500000010d260924684152d72c9d81d028382b4847f895ac6081cdcaa93c37e00df3b275b7fbc96c10c6fc86743d3aaba0bf59278822b1610218858edfbaf77a9884ee031004f733874acfbdd9d3e45e9b1247647d02761d1673c303a7982cd6eb5d573eb3036415493a0d655937c64a9536b3113747ec972022b7250c89c30888a45a3908c013251044285c3000d54d0fc0572a0559473e7e223175daa44046b3523d4c4ef7a71f6a4287cc7030d8fd30f504ea0360e0a4c3047e33f8f5d4e4c11f867cbac700047e643aee47dacc161c8cb049597f30a0c74ed596cd78b94f21526c1d744835758ad4492002c5890a0f45990aa175a320a676ce89977cffbe2eb73b2cf16d62900"
+	compactCommitment := types.CompactSignedCommitment{}
 
-	bz, err := types.HexDecodeString(hex)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	// attempt to decode the SignedCommitments
+	err := types.DecodeFromHexString(hex, &compactCommitment)
+	require.NoError(t, err)
 
-	err = scale.NewDecoder(bytes.NewReader(bz)).Decode(signedCommitment)
-
-	if err != nil {
-		require.NoError(t, err)
-	}
+	signedCommitment := compactCommitment.Unpack()
 
 	t.Logf("COMMITMENT %#v \n", signedCommitment.Commitment)
 
