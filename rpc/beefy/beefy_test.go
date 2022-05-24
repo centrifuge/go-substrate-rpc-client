@@ -8,7 +8,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/config"
 )
 
-var beefy *Beefy
+var beefy Beefy
 
 func TestMain(m *testing.M) {
 	cl, err := client.Connect(config.Default().RPCURL)

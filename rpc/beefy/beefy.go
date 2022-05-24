@@ -26,6 +26,6 @@ type Beefy struct {
 }
 
 // NewBeefy creates a new Chain struct
-func NewBeefy(cl client.Client) *Beefy {
-	return &Beefy{cl}
+func NewBeefy(cl client.Client) Beefy {
+	return Beefy{cl}
 }

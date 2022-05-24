@@ -8,6 +8,6 @@ type MMR struct {
 }
 
 // NewMMR creates a new MMR struct
-func NewMMR(c client.Client) *MMR {
-	return &MMR{client: c}
+func NewMMR(c client.Client) MMR {
+	return MMR{client: c}
 }
