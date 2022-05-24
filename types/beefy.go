@@ -100,7 +100,6 @@ func (o OptionBeefySignature) Unwrap() (ok bool, value BeefySignature) {
 const containerBitSize = 8
 
 func (s *SignedCommitment) Decode(decoder scale.Decoder) error {
-
 	compact := CompactSignedCommitment{}
 
 	err := decoder.Decode(&compact)
