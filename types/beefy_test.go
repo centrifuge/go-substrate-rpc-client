@@ -44,19 +44,19 @@ func TestBeefySignature(t *testing.T) {
 	assertRoundtrip(t, sig)
 }
 
-func makeCommitment() (*types.Commitment, error) {
-	data, err := types.EncodeToBytes([]byte("Hello World!"))
+func makeCommitment() (*Commitment, error) {
+	data, err := Encode([]byte("Hello World!"))
 	if err != nil {
 		return nil, err
 	}
 
-	payloadItem := types.PayloadItem{
+	payloadItem := PayloadItem{
 		ID:   [2]byte{'m', 'h'},
 		Data: data,
 	}
 
-	commitment := types.Commitment{
-		Payload:        []types.PayloadItem{payloadItem},
+	commitment := Commitment{
+		Payload:        []PayloadItem{payloadItem},
 		BlockNumber:    5,
 		ValidatorSetID: 0,
 	}
@@ -64,16 +64,16 @@ func makeCommitment() (*types.Commitment, error) {
 	return &commitment, nil
 }
 
-func makeLargeCommitment() (*types.Commitment, error) {
-	data := types.MustHexDecodeString("0xb5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c")
+func makeLargeCommitment() (*Commitment, error) {
+	data := MustHexDecodeString("0xb5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c")
 
-	payloadItem := types.PayloadItem{
+	payloadItem := PayloadItem{
 		ID:   [2]byte{'m', 'h'},
 		Data: data,
 	}
 
-	commitment := types.Commitment{
-		Payload:        []types.PayloadItem{payloadItem},
+	commitment := Commitment{
+		Payload:        []PayloadItem{payloadItem},
 		BlockNumber:    5,
 		ValidatorSetID: 3,
 	}
@@ -85,7 +85,7 @@ func TestCommitment_Encode(t *testing.T) {
 	c, err := makeCommitment()
 	assert.NoError(t, err)
 	assertEncode(t, []encodingAssert{
-		{c, types.MustHexDecodeString("0x046d68343048656c6c6f20576f726c6421050000000000000000000000")},
+		{c, MustHexDecodeString("0x046d68343048656c6c6f20576f726c6421050000000000000000000000")},
 	})
 }
 
@@ -93,7 +93,7 @@ func TestLargeCommitment_Encode(t *testing.T) {
 	c, err := makeLargeCommitment()
 	assert.NoError(t, err)
 	fmt.Println(len(c.Payload[0].Data))
-	fmt.Println(types.EncodeToHexString(c))
+	fmt.Println(EncodeToHex(c))
 }
 
 func TestCommitment_Decode(t *testing.T) {
@@ -102,7 +102,7 @@ func TestCommitment_Decode(t *testing.T) {
 
 	assertDecode(t, []decodingAssert{
 		{
-			input:    types.MustHexDecodeString("0x046d68343048656c6c6f20576f726c6421050000000000000000000000"),
+			input:    MustHexDecodeString("0x046d68343048656c6c6f20576f726c6421050000000000000000000000"),
 			expected: *c,
 		},
 	})
@@ -119,19 +119,19 @@ func TestSignedCommitment_Decode(t *testing.T) {
 	c, err := makeCommitment()
 	assert.NoError(t, err)
 
-	s := types.SignedCommitment{
+	s := SignedCommitment{
 		Commitment: *c,
-		Signatures: []types.OptionBeefySignature{
-			types.NewOptionBeefySignatureEmpty(),
-			types.NewOptionBeefySignatureEmpty(),
-			types.NewOptionBeefySignature(sig1),
-			types.NewOptionBeefySignature(sig2),
+		Signatures: []OptionBeefySignature{
+			NewOptionBeefySignatureEmpty(),
+			NewOptionBeefySignatureEmpty(),
+			NewOptionBeefySignature(sig1),
+			NewOptionBeefySignature(sig2),
 		},
 	}
 
 	assertDecode(t, []decodingAssert{
 		{
-			input:    types.MustHexDecodeString("0x046d68343048656c6c6f20576f726c642105000000000000000000000004300400000008558455ad81279df0795cc985580e4fb75d72d948d1107b2ac80a09abed4da8480c746cc321f2319a5e99a830e314d10dd3cd68ce3dc0c33c86e99bcb7816f9ba012d6e1f8105c337a86cdd9aaacdc496577f3db8c55ef9e6fd48f2c5c05a2274707491635d8ba3df64f324575b7b2a34487bca2324b6a0046395a71681be3d0c2a00"),
+			input:    MustHexDecodeString("0x046d68343048656c6c6f20576f726c642105000000000000000000000004300400000008558455ad81279df0795cc985580e4fb75d72d948d1107b2ac80a09abed4da8480c746cc321f2319a5e99a830e314d10dd3cd68ce3dc0c33c86e99bcb7816f9ba012d6e1f8105c337a86cdd9aaacdc496577f3db8c55ef9e6fd48f2c5c05a2274707491635d8ba3df64f324575b7b2a34487bca2324b6a0046395a71681be3d0c2a00"),
 			expected: s,
 		},
 	})
@@ -141,19 +141,19 @@ func TestSignedCommitment_EncodeDecode(t *testing.T) {
 	c, err := makeCommitment()
 	assert.NoError(t, err)
 
-	s := types.SignedCommitment{
+	s := SignedCommitment{
 		Commitment: *c,
-		Signatures: []types.OptionBeefySignature{
-			types.NewOptionBeefySignatureEmpty(),
-			types.NewOptionBeefySignatureEmpty(),
-			types.NewOptionBeefySignature(sig1),
-			types.NewOptionBeefySignature(sig1),
-			types.NewOptionBeefySignatureEmpty(),
-			types.NewOptionBeefySignatureEmpty(),
-			types.NewOptionBeefySignatureEmpty(),
-			types.NewOptionBeefySignatureEmpty(),
-			types.NewOptionBeefySignatureEmpty(),
-			types.NewOptionBeefySignature(sig1),
+		Signatures: []OptionBeefySignature{
+			NewOptionBeefySignatureEmpty(),
+			NewOptionBeefySignatureEmpty(),
+			NewOptionBeefySignature(sig1),
+			NewOptionBeefySignature(sig1),
+			NewOptionBeefySignatureEmpty(),
+			NewOptionBeefySignatureEmpty(),
+			NewOptionBeefySignatureEmpty(),
+			NewOptionBeefySignatureEmpty(),
+			NewOptionBeefySignatureEmpty(),
+			NewOptionBeefySignature(sig1),
 		},
 	}
 

@@ -21,20 +21,20 @@ func (d *GenerateMMRProofResponse) UnmarshalJSON(bz []byte) error {
 	if err := json.Unmarshal(bz, &tmp); err != nil {
 		return err
 	}
-	err := DecodeFromHexString(tmp.BlockHash, &d.BlockHash)
+	err := DecodeFromHex(tmp.BlockHash, &d.BlockHash)
 	if err != nil {
 		return err
 	}
 	var encodedLeaf MMREncodableOpaqueLeaf
-	err = DecodeFromHexString(tmp.Leaf, &encodedLeaf)
+	err = DecodeFromHex(tmp.Leaf, &encodedLeaf)
 	if err != nil {
 		return err
 	}
-	err = DecodeFromBytes(encodedLeaf, &d.Leaf)
+	err = Decode(encodedLeaf, &d.Leaf)
 	if err != nil {
 		return err
 	}
-	err = DecodeFromHexString(tmp.Proof, &d.Proof)
+	err = DecodeFromHex(tmp.Proof, &d.Proof)
 	if err != nil {
 		return err
 	}

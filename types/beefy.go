@@ -194,7 +194,7 @@ func makeChunks(slice []byte, chunkSize int) [][]byte {
 // UnmarshalText deserializes hex string into a SignedCommitment.
 // Used for decoding JSON-RPC subscription messages (beefy_subscribeJustifications)
 func (s *SignedCommitment) UnmarshalText(text []byte) error {
-	return DecodeFromHexString(string(text), s)
+	return DecodeFromHex(string(text), s)
 }
 
 func (o OptionalSignedCommitment) Encode(encoder scale.Encoder) error {
