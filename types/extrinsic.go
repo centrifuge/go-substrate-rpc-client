@@ -71,19 +71,19 @@ func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
 	// extrinsics didn't have the length, cater for both approaches. This is very
 	// inconsistent with any other `Vec<u8>` implementation
 	var l UCompact
-	err := DecodeFromHexString(tmp, &l)
+	err := DecodeFromHex(tmp, &l)
 	if err != nil {
 		return err
 	}
 
-	prefix, err := EncodeToHexString(l)
+	prefix, err := EncodeToHex(l)
 	if err != nil {
 		return err
 	}
 
 	// determine whether length prefix is there
 	if strings.HasPrefix(tmp, prefix) {
-		return DecodeFromHexString(tmp, e)
+		return DecodeFromHex(tmp, e)
 	}
 
 	// not there, prepend with compact encoded length prefix
@@ -92,17 +92,17 @@ func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
 		return err
 	}
 	length := NewUCompactFromUInt(uint64(len(dec)))
-	bprefix, err := EncodeToBytes(length)
+	bprefix, err := Encode(length)
 	if err != nil {
 		return err
 	}
-	prefixed := append(bprefix, dec...)
-	return DecodeFromBytes(prefixed, e)
+	bprefix = append(bprefix, dec...)
+	return Decode(bprefix, e)
 }
 
 // MarshalJSON returns a JSON encoded byte array of Extrinsic
 func (e Extrinsic) MarshalJSON() ([]byte, error) {
-	s, err := EncodeToHexString(e)
+	s, err := EncodeToHex(e)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error
 		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(), e.Type())
 	}
 
-	mb, err := EncodeToBytes(e.Method)
+	mb, err := Encode(e.Method)
 	if err != nil {
 		return err
 	}
@@ -267,7 +267,7 @@ func NewCall(m *Metadata, call string, args ...interface{}) (Call, error) {
 
 	var a []byte
 	for _, arg := range args {
-		e, err := EncodeToBytes(arg)
+		e, err := Encode(arg)
 		if err != nil {
 			return Call{}, err
 		}

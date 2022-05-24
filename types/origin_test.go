@@ -30,6 +30,7 @@ func newOrigin() Origin {
 
 func TestOrigin_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, newOrigin())
+	assertEncodeEmptyObj[Origin](t, 0)
 }
 
 func TestOrigin_EncodedLength(t *testing.T) {

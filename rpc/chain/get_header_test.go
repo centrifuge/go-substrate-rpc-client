@@ -23,16 +23,16 @@ import (
 )
 
 func TestChain_GetHeaderLatest(t *testing.T) {
-	header, err := chain.GetHeaderLatest()
+	header, err := testChain.GetHeaderLatest()
 	assert.NoError(t, err)
 	assert.NotEmpty(t, header.Number)
 }
 
 func TestChain_GetHeader(t *testing.T) {
-	res, err := chain.GetFinalizedHead()
+	res, err := testChain.GetFinalizedHead()
 	assert.NoError(t, err)
 
-	header, err := chain.GetHeader(res)
+	header, err := testChain.GetHeader(res)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, header)
 }

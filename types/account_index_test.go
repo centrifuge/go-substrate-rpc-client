@@ -23,7 +23,9 @@ import (
 )
 
 func TestAccountIndex_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewAccountIndex(336794129))
+	assertRoundTripFuzz[AccountIndex](t, 100)
+	assertDecodeNilData[AccountID](t)
+	assertEncodeEmptyObj[AccountID](t, 32)
 }
 
 func TestAccountIndex_EncodedLength(t *testing.T) {

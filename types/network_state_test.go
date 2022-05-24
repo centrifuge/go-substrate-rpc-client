@@ -24,6 +24,8 @@ import (
 
 func TestNetworkState_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NetworkState{NewText("ab123")})
+	assertRoundTripFuzz[NetworkState](t, 100)
+	assertEncodeEmptyObj[NetworkState](t, 1)
 }
 
 func TestNetworkState_Encode(t *testing.T) {

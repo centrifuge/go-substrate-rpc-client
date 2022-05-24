@@ -108,6 +108,156 @@ func TestOptionBytes_Decode(t *testing.T) {
 	})
 }
 
+func TestOptionBytes_OptionMethods(t *testing.T) {
+	o := NewOptionBytesEmpty()
+	o.SetSome(Bytes{1, 2, 3})
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, Bytes{}, v)
+}
+
+func TestOptionBytes8_OptionMethods(t *testing.T) {
+	o := NewOptionBytes8Empty()
+	o.SetSome(Bytes8{1, 2, 3})
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, Bytes8{}, v)
+}
+
+func TestOptionBytes16_OptionMethods(t *testing.T) {
+	o := NewOptionBytes16Empty()
+	o.SetSome(Bytes16{1, 2, 3})
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, Bytes16{}, v)
+}
+
+func TestOptionBytes32_OptionMethods(t *testing.T) {
+	o := NewOptionBytes32Empty()
+	o.SetSome(Bytes32{1, 2, 3})
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, Bytes32{}, v)
+}
+
+func TestOptionBytes64_OptionMethods(t *testing.T) {
+	o := NewOptionBytes64Empty()
+	o.SetSome(Bytes64{1, 2, 3})
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, Bytes64{}, v)
+}
+
+func TestOptionBytes128_OptionMethods(t *testing.T) {
+	o := NewOptionBytes128Empty()
+	o.SetSome(Bytes128{1, 2, 3})
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, Bytes128{}, v)
+}
+
+func TestOptionBytes256_OptionMethods(t *testing.T) {
+	o := NewOptionBytes256Empty()
+	o.SetSome(Bytes256{1, 2, 3})
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, Bytes256{}, v)
+}
+
+func TestOptionBytes512_OptionMethods(t *testing.T) {
+	o := NewOptionBytes512Empty()
+	o.SetSome(Bytes512{1, 2, 3})
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, Bytes512{}, v)
+}
+
+func TestOptionBytes1024_OptionMethods(t *testing.T) {
+	o := NewOptionBytes1024Empty()
+	o.SetSome(Bytes1024{1, 2, 3})
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, Bytes1024{}, v)
+}
+
+func TestOptionBytes2048_OptionMethods(t *testing.T) {
+	o := NewOptionBytes2048Empty()
+	o.SetSome(Bytes2048{1, 2, 3})
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, Bytes2048{}, v)
+}
+
 func TestOptionBytes16_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewOptionBytes16(NewBytes16([16]byte{12})))
 	assertRoundtrip(t, NewOptionBytes16(NewBytes16([16]byte{})))

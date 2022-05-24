@@ -49,7 +49,7 @@ func Example_simpleConnect() {
 	}
 
 	fmt.Printf("You are connected to chain %v using %v v%v\n", chain, nodeName, nodeVersion)
-	// Output: You are connected to chain Development using Substrate Node v3.0.0-dev-1b646b2-x86_64-linux-gnu
+	// Output: You are connected to chain Development using Parity Polkadot v0.9.21-56cbe45f6c9
 }
 
 func Example_listenToNewBlocks() {
@@ -132,7 +132,7 @@ func Example_listenToBalanceChange() {
 			}
 
 			var acc types.AccountInfo
-			if err = types.DecodeFromBytes(chng.StorageData, &acc); err != nil {
+			if err = types.Decode(chng.StorageData, &acc); err != nil {
 				panic(err)
 			}
 
@@ -365,11 +365,11 @@ func Example_displaySystemEvents() {
 				fmt.Printf("\tSession:NewSession:: (phase=%#v)\n", e.Phase)
 				fmt.Printf("\t\t%v\n", e.SessionIndex)
 			}
-			for _, e := range events.Staking_Reward {
+			for _, e := range events.Staking_Rewarded {
 				fmt.Printf("\tStaking:Reward:: (phase=%#v)\n", e.Phase)
 				fmt.Printf("\t\t%v\n", e.Amount)
 			}
-			for _, e := range events.Staking_Slash {
+			for _, e := range events.Staking_Slashed {
 				fmt.Printf("\tStaking:Slash:: (phase=%#v)\n", e.Phase)
 				fmt.Printf("\t\t%#x%v\n", e.AccountID, e.Balance)
 			}

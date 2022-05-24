@@ -17,13 +17,78 @@
 package types_test
 
 import (
+	"bytes"
 	"testing"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+	"github.com/stretchr/testify/assert"
+
+	fuzz "github.com/google/gofuzz"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+var (
+	changesTrieSignalFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(c *ChangesTrieSignal, fc fuzz.Continue) {
+			c.IsNewConfiguration = true
+			fc.Fuzz(&c.AsNewConfiguration)
+
+			return
+		}),
+	}
+)
+
+func TestChangesTrieSignal_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[ChangesTrieSignal](t, 100, changesTrieSignalFuzzOpts...)
+	assertDecodeNilData[ChangesTrieSignal](t)
+
+	var c ChangesTrieSignal
+
+	err := c.Encode(*scale.NewEncoder(bytes.NewBuffer(nil)))
+	assert.NotNil(t, err)
+
+	cc := new(ChangesTrieSignal)
+
+	err = cc.Decode(*scale.NewDecoder(bytes.NewReader([]byte{2})))
+	assert.NotNil(t, err)
+}
+
 var testDigestItem1 = DigestItem{IsOther: true, AsOther: NewBytes([]byte{0xab})}
 var testDigestItem2 = DigestItem{IsChangesTrieRoot: true, AsChangesTrieRoot: NewHash([]byte{0x01, 0x02, 0x03})}
+
+var (
+	digestItemFuzzOpts = combineFuzzOpts(
+		changesTrieSignalFuzzOpts,
+		[]fuzzOpt{
+			withFuzzFuncs(func(d *DigestItem, c fuzz.Continue) {
+				vals := []int{0, 2, 4, 5, 6, 7}
+				r := c.Intn(len(vals))
+
+				switch vals[r] {
+				case 0:
+					d.IsOther = true
+					c.Fuzz(&d.AsOther)
+				case 2:
+					d.IsChangesTrieRoot = true
+					c.Fuzz(&d.AsChangesTrieRoot)
+				case 4:
+					d.IsConsensus = true
+					c.Fuzz(&d.AsConsensus)
+				case 5:
+					d.IsSeal = true
+					c.Fuzz(&d.AsSeal)
+				case 6:
+					d.IsPreRuntime = true
+					c.Fuzz(&d.AsPreRuntime)
+				case 7:
+					d.IsChangesTrieSignal = true
+					c.Fuzz(&d.AsChangesTrieSignal)
+				}
+			}),
+		},
+	)
+)
 
 func TestDigestItem_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, testDigestItem1)
@@ -44,4 +109,8 @@ func TestDigestItem_EncodeDecode(t *testing.T) {
 		IsChangesTrieSignal: true,
 		AsChangesTrieSignal: ChangesTrieSignal{IsNewConfiguration: true, AsNewConfiguration: NewBytes([]byte{1, 2, 3})},
 	})
+
+	assertRoundTripFuzz[DigestItem](t, 100, digestItemFuzzOpts...)
+	assertDecodeNilData[DigestItem](t)
+	assertEncodeEmptyObj[DigestItem](t, 0)
 }

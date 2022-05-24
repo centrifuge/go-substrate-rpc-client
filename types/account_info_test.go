@@ -23,7 +23,9 @@ import (
 )
 
 func TestAccountInfoV4_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewAccountInfoV4([]byte{1, 2, 3}, 13))
+	assertRoundTripFuzz[AccountInfoV4](t, 100)
+	assertDecodeNilData[AccountInfoV4](t)
+	assertEncodeEmptyObj[AccountInfoV4](t, 9)
 }
 
 func TestAccountInfoV4_EncodedLength(t *testing.T) {

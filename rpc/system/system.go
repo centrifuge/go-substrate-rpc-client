@@ -18,14 +18,25 @@ package system
 
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
-// System exposes methods for retrieval of system data
-type System struct {
+type System interface {
+	Properties() (types.ChainProperties, error)
+	Health() (types.Health, error)
+	Peers() ([]types.PeerInfo, error)
+	Name() (types.Text, error)
+	Chain() (types.Text, error)
+	Version() (types.Text, error)
+	NetworkState() (types.NetworkState, error)
+}
+
+// system exposes methods for retrieval of system data
+type system struct {
 	client client.Client
 }
 
-// NewSystem creates a new System struct
-func NewSystem(cl client.Client) *System {
-	return &System{cl}
+// NewSystem creates a new system struct
+func NewSystem(cl client.Client) System {
+	return &system{cl}
 }

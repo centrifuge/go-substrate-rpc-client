@@ -23,13 +23,13 @@ import (
 )
 
 func TestState_GetChildStorageSizeLatest(t *testing.T) {
-	size, err := state.GetChildStorageSizeLatest(childStorageKey, key)
+	size, err := testState.GetChildStorageSizeLatest(childStorageKey, key)
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.childStorageTrieSize, size)
 }
 
 func TestState_GetChildStorageSize(t *testing.T) {
-	size, err := state.GetChildStorageSize(childStorageKey, key, mockSrv.blockHashLatest)
+	size, err := testState.GetChildStorageSize(childStorageKey, key, mockSrv.blockHashLatest)
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.childStorageTrieSize, size)
 }

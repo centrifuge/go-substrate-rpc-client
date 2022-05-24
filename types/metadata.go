@@ -19,6 +19,7 @@ package types
 import (
 	"fmt"
 	"hash"
+	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/xxhash"
@@ -183,6 +184,36 @@ func (m Metadata) Encode(encoder scale.Encoder) error {
 	}
 
 	return err
+}
+
+type MetadataError struct {
+	Name  string
+	Value string
+}
+
+const (
+	metadataErrorValueSeparator = ", "
+)
+
+func NewMetadataError(variant Si1Variant) *MetadataError {
+	var docs []string
+
+	for _, doc := range variant.Docs {
+		docs = append(docs, string(doc))
+	}
+
+	return &MetadataError{
+		Name:  string(variant.Name),
+		Value: strings.Join(docs, metadataErrorValueSeparator),
+	}
+}
+
+func (m *Metadata) FindError(moduleIndex U8, errorIndex U8) (*MetadataError, error) {
+	if m.Version != 14 {
+		return nil, fmt.Errorf("invalid metadata version %d", m.Version)
+	}
+
+	return m.AsMetadataV14.FindError(moduleIndex, errorIndex)
 }
 
 func (m *Metadata) FindConstantValue(module string, constantName string) ([]byte, error) {

@@ -23,13 +23,13 @@ import (
 )
 
 func TestState_GetRuntimeVersionLatest(t *testing.T) {
-	rv, err := state.GetRuntimeVersionLatest()
+	rv, err := testState.GetRuntimeVersionLatest()
 	assert.NoError(t, err)
 	assert.Equal(t, &mockSrv.runtimeVersion, rv)
 }
 
 func TestState_GetRuntimeVersion(t *testing.T) {
-	rv, err := state.GetRuntimeVersion(mockSrv.blockHashLatest)
+	rv, err := testState.GetRuntimeVersion(mockSrv.blockHashLatest)
 	assert.NoError(t, err)
 	assert.Equal(t, &mockSrv.runtimeVersion, rv)
 }

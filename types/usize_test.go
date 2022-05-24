@@ -27,6 +27,12 @@ func TestUSize_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, USize(12))
 }
 
+func TestUsize_JSONMarshalUnmarshal(t *testing.T) {
+	u := USize(11)
+
+	assertJSONRoundTrip(t, &u)
+}
+
 func TestUSize_EncodedLength(t *testing.T) {
 	assertEncodedLength(t, []encodedLengthAssert{{USize(13), 4}})
 }

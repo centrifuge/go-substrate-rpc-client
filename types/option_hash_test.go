@@ -19,8 +19,70 @@ package types_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
+
+func TestOptionHash_OptionMethods(t *testing.T) {
+	o := NewOptionHashEmpty()
+	o.SetSome(NewHash(hash20))
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, Hash{}, v)
+}
+
+func TestOptionH160_OptionMethods(t *testing.T) {
+	o := NewOptionH160Empty()
+	o.SetSome(NewH160(hash20))
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, H160{}, v)
+}
+
+func TestOptionH256_OptionMethods(t *testing.T) {
+	o := NewOptionH256Empty()
+	o.SetSome(NewH256(hash20))
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, H256{}, v)
+}
+
+func TestOptionH512_OptionMethods(t *testing.T) {
+	o := NewOptionH512Empty()
+	o.SetSome(NewH512(hash20))
+
+	ok, v := o.Unwrap()
+	assert.True(t, ok)
+	assert.NotNil(t, v)
+
+	o.SetNone()
+
+	ok, v = o.Unwrap()
+	assert.False(t, ok)
+	assert.Equal(t, H512{}, v)
+}
 
 func TestOptionH160_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewOptionH160(NewH160(hash20)))

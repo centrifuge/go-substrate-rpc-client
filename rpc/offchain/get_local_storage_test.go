@@ -15,14 +15,14 @@ func TestOffchain_LocalStorageGetSet(t *testing.T) {
 
 	value := []byte{0, 1, 2}
 
-	data, err := offchain.LocalStorageGet(Persistent, key)
+	data, err := testOffchain.LocalStorageGet(Persistent, key)
 	assert.NoError(t, err)
 	assert.Empty(t, data)
 
-	err = offchain.LocalStorageSet(Persistent, key, value)
+	err = testOffchain.LocalStorageSet(Persistent, key, value)
 	assert.NoError(t, err)
 
-	data, err = offchain.LocalStorageGet(Persistent, key)
+	data, err = testOffchain.LocalStorageGet(Persistent, key)
 	assert.NoError(t, err)
 
 	assert.Equal(t, value, []byte(*data))

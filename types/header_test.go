@@ -36,8 +36,25 @@ var exampleHeader = Header{
 	},
 }
 
+func TestBlockNumber_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[BlockNumber](t, 100)
+	assertEncodeEmptyObj[BlockNumber](t, 1)
+}
+
+func TestBlockNumber_JSONMarshalUnmarshal(t *testing.T) {
+	b := BlockNumber(1)
+	assertJSONRoundTrip(t, &b)
+}
+
+var (
+	headerFuzzOpts = digestItemFuzzOpts
+)
+
 func TestHeader_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, exampleHeader)
+	assertRoundTripFuzz[Header](t, 100, headerFuzzOpts...)
+	assertDecodeNilData[Header](t)
+	assertEncodeEmptyObj[Header](t, 98)
 }
 
 func TestHeader_EncodedLength(t *testing.T) {

@@ -1,10 +1,28 @@
+// Go Substrate RPC Client (GSRPC) provides APIs and types around Polkadot and any Substrate-based chain RPC calls
+//
+// Copyright 2019 Centrifuge GmbH
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package types_test
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	fuzz "github.com/google/gofuzz"
+
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,14 +30,14 @@ var sig1 = [65]byte{85, 132, 85, 173, 129, 39, 157, 240, 121, 92, 201, 133, 88, 
 var sig2 = [65]byte{45, 110, 31, 129, 5, 195, 55, 168, 108, 221, 154, 170, 205, 196, 150, 87, 127, 61, 184, 197, 94, 249, 230, 253, 72, 242, 197, 192, 90, 34, 116, 112, 116, 145, 99, 93, 139, 163, 223, 100, 243, 36, 87, 91, 123, 42, 52, 72, 123, 202, 35, 36, 182, 160, 4, 99, 149, 167, 22, 129, 190, 61, 12, 42, 0}
 
 func TestBeefySignature(t *testing.T) {
-	empty := types.NewOptionBeefySignatureEmpty()
+	empty := NewOptionBeefySignatureEmpty()
 	assert.True(t, empty.IsNone())
 	assert.False(t, empty.IsSome())
 
-	sig := types.NewOptionBeefySignature(types.BeefySignature{})
+	sig := NewOptionBeefySignature(BeefySignature{})
 	sig.SetNone()
 	assert.True(t, sig.IsNone())
-	sig.SetSome(types.BeefySignature{})
+	sig.SetSome(BeefySignature{})
 	assert.True(t, sig.IsSome())
 	ok, _ := sig.Unwrap()
 	assert.True(t, ok)
@@ -140,4 +158,31 @@ func TestSignedCommitment_EncodeDecode(t *testing.T) {
 	}
 
 	assertRoundtrip(t, s)
+}
+
+func TestBeefySignature_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[BeefySignature](t, 100)
+	assertDecodeNilData[BeefySignature](t)
+	assertEncodeEmptyObj[BeefySignature](t, 65)
+}
+
+var (
+	optionBeefySignatureFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(o *OptionBeefySignature, c fuzz.Continue) {
+			if c.RandBool() {
+				*o = NewOptionBeefySignatureEmpty()
+				return
+			}
+
+			var b BeefySignature
+			c.Fuzz(&b)
+
+			*o = NewOptionBeefySignature(b)
+		}),
+	}
+)
+
+func TestOptionBeefySignature_EncodeDecode(t *testing.T) {
+	assertRoundTripFuzz[OptionBeefySignature](t, 100, optionBeefySignatureFuzzOpts...)
+	assertEncodeEmptyObj[OptionBeefySignature](t, 1)
 }

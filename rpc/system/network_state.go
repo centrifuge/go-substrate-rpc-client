@@ -21,7 +21,7 @@ import (
 )
 
 // NetworkState retrieves the current state of the network
-func (c *System) NetworkState() (types.NetworkState, error) {
+func (c *system) NetworkState() (types.NetworkState, error) {
 	var n types.NetworkState
 	err := c.client.Call(&n, "system_networkState")
 	return n, err

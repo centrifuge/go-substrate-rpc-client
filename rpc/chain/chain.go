@@ -18,14 +18,27 @@ package chain
 
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
-// Chain exposes methods for retrieval of chain data
-type Chain struct {
+type Chain interface {
+	SubscribeFinalizedHeads() (*FinalizedHeadsSubscription, error)
+	SubscribeNewHeads() (*NewHeadsSubscription, error)
+	GetBlockHash(blockNumber uint64) (types.Hash, error)
+	GetBlockHashLatest() (types.Hash, error)
+	GetFinalizedHead() (types.Hash, error)
+	GetBlock(blockHash types.Hash) (*types.SignedBlock, error)
+	GetBlockLatest() (*types.SignedBlock, error)
+	GetHeader(blockHash types.Hash) (*types.Header, error)
+	GetHeaderLatest() (*types.Header, error)
+}
+
+// chain exposes methods for retrieval of chain data
+type chain struct {
 	client client.Client
 }
 
-// NewChain creates a new Chain struct
-func NewChain(cl client.Client) *Chain {
-	return &Chain{cl}
+// NewChain creates a new chain struct
+func NewChain(cl client.Client) Chain {
+	return &chain{cl}
 }

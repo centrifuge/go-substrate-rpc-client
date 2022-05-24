@@ -153,6 +153,10 @@ func (i *U128) Decode(decoder scale.Decoder) error {
 
 // Encode implements encoding as per the Scale specification
 func (i U128) Encode(encoder scale.Encoder) error {
+	if i.Int == nil {
+		i.Int = big.NewInt(0)
+	}
+
 	b, err := BigIntToUintBytes(i.Int, 16)
 	if err != nil {
 		return err
@@ -162,6 +166,18 @@ func (i U128) Encode(encoder scale.Encoder) error {
 	scale.Reverse(b)
 
 	return encoder.Write(b)
+}
+
+func (i U128) GobEncode() ([]byte, error) {
+	return i.Int.GobEncode()
+}
+
+func (i *U128) GobDecode(b []byte) error {
+	if i.Int == nil {
+		i.Int = big.NewInt(0)
+	}
+
+	return i.Int.GobDecode(b)
 }
 
 // U256 is an usigned 256-bit integer, it is represented as a big.Int in Go.
@@ -201,6 +217,10 @@ func (i *U256) Decode(decoder scale.Decoder) error {
 
 // Encode implements encoding as per the Scale specification
 func (i U256) Encode(encoder scale.Encoder) error {
+	if i.Int == nil {
+		i.Int = big.NewInt(0)
+	}
+
 	b, err := BigIntToUintBytes(i.Int, 32)
 	if err != nil {
 		return err

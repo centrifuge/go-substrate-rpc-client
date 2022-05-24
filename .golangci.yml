@@ -37,6 +37,7 @@ run:
   skip-files:
     - types/metadataV[0-9]+_examplary.go
     - types/metadataV[0-9]+_examplary_string.go
+    - types/test/test-gen/client_mocks.go
   #   - ".*\\.my\\.go$"
   #   - lib/bad.go
 
@@ -58,24 +59,23 @@ linters:
     - deadcode
     - dupl
     - errcheck
-    # - funlen - TODO: enable it when golangci.com will support it.
-    # - godox - TODO: enable it when golangci.com will support it.
+    - funlen
+    - godox
     - gochecknoinits
     - goconst
     - gocritic
     - gocyclo
     - gofmt
     - goimports
-    - golint
+    - revive
     - gosec
     - gosimple
     - govet
     - ineffassign
-    - interfacer
     - lll
     - misspell
     - nakedret
-    - scopelint
+    - exportloopref
     - staticcheck
     - structcheck
     - stylecheck
@@ -84,7 +84,7 @@ linters:
     - unparam
     - unused
     - varcheck
-    # - whitespace - TODO: enable it when golangci.com will support it.
+    - whitespace
 
   # don't enable:
   # - depguard - until https://github.com/OpenPeeDeeP/depguard/issues/7 gets fixed

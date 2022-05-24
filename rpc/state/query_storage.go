@@ -22,17 +22,17 @@ import (
 )
 
 // QueryStorage queries historical storage entries (by key) starting from a start block until an end block
-func (s *State) QueryStorage(keys []types.StorageKey, startBlock types.Hash, block types.Hash) (
+func (s *state) QueryStorage(keys []types.StorageKey, startBlock types.Hash, block types.Hash) (
 	[]types.StorageChangeSet, error) {
 	return s.queryStorage(keys, startBlock, &block)
 }
 
 // QueryStorageLatest queries historical storage entries (by key) starting from a start block until the latest block
-func (s *State) QueryStorageLatest(keys []types.StorageKey, startBlock types.Hash) ([]types.StorageChangeSet, error) {
+func (s *state) QueryStorageLatest(keys []types.StorageKey, startBlock types.Hash) ([]types.StorageChangeSet, error) {
 	return s.queryStorage(keys, startBlock, nil)
 }
 
-func (s *State) queryStorage(keys []types.StorageKey, startBlock types.Hash, block *types.Hash) (
+func (s *state) queryStorage(keys []types.StorageKey, startBlock types.Hash, block *types.Hash) (
 	[]types.StorageChangeSet, error) {
 	hexKeys := make([]string, len(keys))
 	for i, key := range keys {

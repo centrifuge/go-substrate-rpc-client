@@ -21,7 +21,7 @@ import (
 )
 
 // Name retrieves the node name
-func (c *System) Name() (types.Text, error) {
+func (c *system) Name() (types.Text, error) {
 	var t types.Text
 	err := c.client.Call(&t, "system_name")
 	return t, err

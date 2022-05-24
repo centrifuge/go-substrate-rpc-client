@@ -19,6 +19,8 @@ package types_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
@@ -28,6 +30,9 @@ var hash20 = []byte{
 
 func TestH160_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewH160(hash20))
+	assertRoundTripFuzz[H160](t, 100)
+	assertDecodeNilData[H160](t)
+	assertEncodeEmptyObj[H160](t, 20)
 }
 
 func TestH160_EncodedLength(t *testing.T) {
@@ -50,6 +55,8 @@ func TestH160_Hex(t *testing.T) {
 	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewH160(hash20), "0x0102030405060708090001020304050607080900"},
 	})
+
+	assert.Equal(t, "0x0102030405060708090001020304050607080900", NewH160(hash20).Hex())
 }
 
 func TestH160_String(t *testing.T) {
@@ -73,6 +80,9 @@ var hash32 = []byte{
 
 func TestH256_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewH256(hash32))
+	assertRoundTripFuzz[H256](t, 100)
+	assertDecodeNilData[H256](t)
+	assertEncodeEmptyObj[H256](t, 32)
 }
 
 func TestH256_EncodedLength(t *testing.T) {
@@ -95,6 +105,9 @@ func TestH256_Hex(t *testing.T) {
 	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewH256(hash32), "0x0102030405060708090001020304050607080900010203040506070809000102"},
 	})
+
+	assert.Equal(t, "0x0102030405060708090001020304050607080900010203040506070809000102", NewH256(hash32).Hex())
+
 }
 
 func TestH256_String(t *testing.T) {
@@ -113,6 +126,9 @@ func TestH256_Eq(t *testing.T) {
 
 func TestHash_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewHash(hash32))
+	assertRoundTripFuzz[Hash](t, 100)
+	assertDecodeNilData[Hash](t)
+	assertEncodeEmptyObj[Hash](t, 32)
 }
 
 func TestHash_EncodedLength(t *testing.T) {
@@ -135,6 +151,8 @@ func TestHash_Hex(t *testing.T) {
 	assertEncodeToHex(t, []encodeToHexAssert{
 		{NewHash(hash32), "0x0102030405060708090001020304050607080900010203040506070809000102"},
 	})
+
+	assertEqual(t, "0x0102030405060708090001020304050607080900010203040506070809000102", NewHash(hash32).Hex())
 }
 
 func TestHash_String(t *testing.T) {
@@ -165,6 +183,9 @@ var hash65 = []byte{
 
 func TestH512_EncodeDecode(t *testing.T) {
 	assertRoundtrip(t, NewH512(hash64))
+	assertRoundTripFuzz[H512](t, 100)
+	assertDecodeNilData[H512](t)
+	assertEncodeEmptyObj[H512](t, 64)
 }
 
 func TestH512_EncodedLength(t *testing.T) {

@@ -25,7 +25,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
-var system *System
+var testSystem System
 
 func TestMain(m *testing.M) {
 	s := rpcmocksrv.New()
@@ -39,7 +39,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	system = NewSystem(cl)
+	testSystem = NewSystem(cl)
 
 	os.Exit(m.Run())
 }

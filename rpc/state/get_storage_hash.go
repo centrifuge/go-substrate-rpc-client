@@ -22,16 +22,16 @@ import (
 )
 
 // GetStorageHash retreives the storage hash for the given key
-func (s *State) GetStorageHash(key types.StorageKey, blockHash types.Hash) (types.Hash, error) {
+func (s *state) GetStorageHash(key types.StorageKey, blockHash types.Hash) (types.Hash, error) {
 	return s.getStorageHash(key, &blockHash)
 }
 
 // GetStorageHashLatest retreives the storage hash for the given key for the latest block height
-func (s *State) GetStorageHashLatest(key types.StorageKey) (types.Hash, error) {
+func (s *state) GetStorageHashLatest(key types.StorageKey) (types.Hash, error) {
 	return s.getStorageHash(key, nil)
 }
 
-func (s *State) getStorageHash(key types.StorageKey, blockHash *types.Hash) (types.Hash, error) {
+func (s *state) getStorageHash(key types.StorageKey, blockHash *types.Hash) (types.Hash, error) {
 	var res string
 	err := client.CallWithBlockHash(s.client, &res, "state_getStorageHash", blockHash, key.Hex())
 	if err != nil {

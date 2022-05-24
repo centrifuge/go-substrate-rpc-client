@@ -25,7 +25,7 @@ import (
 
 func TestState_GetStorageHashLatest(t *testing.T) {
 	key := types.NewStorageKey(types.MustHexDecodeString("0x3a636f6465"))
-	hash, err := state.GetStorageHashLatest(key)
+	hash, err := testState.GetStorageHashLatest(key)
 	assert.NoError(t, err)
 	var expected types.Hash
 	copy(expected[:], types.MustHexDecodeString(mockSrv.storageHashHex))
@@ -34,7 +34,7 @@ func TestState_GetStorageHashLatest(t *testing.T) {
 
 func TestState_GetStorageHash(t *testing.T) {
 	key := types.NewStorageKey(types.MustHexDecodeString("0x3a636f6465"))
-	hash, err := state.GetStorageHash(key, mockSrv.blockHashLatest)
+	hash, err := testState.GetStorageHash(key, mockSrv.blockHashLatest)
 	assert.NoError(t, err)
 	var expected types.Hash
 	copy(expected[:], types.MustHexDecodeString(mockSrv.storageHashHex))

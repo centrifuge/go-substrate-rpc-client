@@ -22,16 +22,16 @@ import (
 )
 
 // GetMetadata returns the metadata at the given block
-func (s *State) GetMetadata(blockHash types.Hash) (*types.Metadata, error) {
+func (s *state) GetMetadata(blockHash types.Hash) (*types.Metadata, error) {
 	return s.getMetadata(&blockHash)
 }
 
 // GetMetadataLatest returns the latest metadata
-func (s *State) GetMetadataLatest() (*types.Metadata, error) {
+func (s *state) GetMetadataLatest() (*types.Metadata, error) {
 	return s.getMetadata(nil)
 }
 
-func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
+func (s *state) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
 	var res string
 	err := client.CallWithBlockHash(s.client, &res, "state_getMetadata", blockHash)
 	if err != nil {
@@ -39,6 +39,6 @@ func (s *State) getMetadata(blockHash *types.Hash) (*types.Metadata, error) {
 	}
 
 	var metadata types.Metadata
-	err = types.DecodeFromHexString(res, &metadata)
+	err = types.DecodeFromHex(res, &metadata)
 	return &metadata, err
 }
