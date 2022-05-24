@@ -17,8 +17,8 @@
 package types
 
 type SignedBlock struct {
-	Block         Block         `json:"block"`
-	Justification Justification `json:"justification"`
+	Block         Block          `json:"block"`
+	Justifications Justifications `json:"justification"`
 }
 
 // Block encoded with header and extrinsics
