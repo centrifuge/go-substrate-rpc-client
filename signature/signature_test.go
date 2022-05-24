@@ -22,6 +22,7 @@ import (
 
 	"github.com/ComposableFi/go-substrate-rpc-client/v4/scale"
 	"github.com/ComposableFi/go-substrate-rpc-client/v4/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDecodeSubstrateMessage(t *testing.T) {
@@ -30,12 +31,13 @@ func TestDecodeSubstrateMessage(t *testing.T) {
 
 	bz, err := types.HexDecodeString(hex)
 	if err != nil {
-		t.Error(err)
+		require.NoError(t, err)
 	}
-	errr := scale.NewDecoder(bytes.NewReader(bz)).Decode(signedCommitment)
 
-	if errr != nil {
-		t.Errorf("error decoding %+v ", errr.Error())
+	err = scale.NewDecoder(bytes.NewReader(bz)).Decode(signedCommitment)
+
+	if err != nil {
+		require.NoError(t, err)
 	}
 
 	t.Logf("COMMITMENT %#v \n", signedCommitment.Commitment)
