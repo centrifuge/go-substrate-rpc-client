@@ -21,12 +21,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
-// QueryStorageAt ...
+// QueryStorageAt performs a low-level storage query
 func (s *state) QueryStorageAt(keys []types.StorageKey, block types.Hash) ([]types.StorageChangeSet, error) {
 	return s.queryStorageAt(keys, &block)
 }
 
-// QueryStorageAtLatest ...
+// QueryStorageAtLatest performs a low-level storage query
 func (s *state) QueryStorageAtLatest(keys []types.StorageKey) ([]types.StorageChangeSet, error) {
 	return s.queryStorageAt(keys, nil)
 }
