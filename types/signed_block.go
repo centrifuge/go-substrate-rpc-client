@@ -17,7 +17,7 @@
 package types
 
 type SignedBlock struct {
-	Block         Block          `json:"block"`
+	Block          Block          `json:"block"`
 	Justifications Justifications `json:"justification"`
 }
 
