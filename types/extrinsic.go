@@ -335,7 +335,7 @@ func (a *Args) Decode(decoder scale.Decoder) error {
 }
 
 type Justification struct {
-	ConsensusEngineId    ConsensusEngineID
+	ConsensusEngineID    ConsensusEngineID
 	EncodedJustification Bytes
 }
 

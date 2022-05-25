@@ -20,6 +20,9 @@ clean:				## cleanup
 lint:				## run linters on go code
 	@docker run -v `pwd`:/app -w /app golangci/golangci-lint:v1.36.0 golangci-lint run
 
+lint_no_docker:
+	@golangci-lint run
+
 lint-fix: 			## run linters on go code and automatically fixes issues
 	@docker run -v `pwd`:/app -w /app golangci/golangci-lint:v1.36.0 golangci-lint run --fix
 
