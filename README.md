@@ -44,4 +44,7 @@ Visit https://polkadot.js.org/apps for inspection
 
 ### Adding support for new RPC methods
 
-After adding new methods, update the RPC mocks by running `go generate ./...`
+After adding support for new methods, update the RPC mocks.
+
+1. Install [mockery](https://github.com/vektra/mockery)
+2. Run `go generate ./...`
