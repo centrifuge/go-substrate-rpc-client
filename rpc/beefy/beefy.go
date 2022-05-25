@@ -14,18 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:generate mockery --name Beefy
+
 package beefy
 
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+type Beefy interface {
+	GetFinalizedHead() (types.Hash, error)
+	SubscribeJustifications() (*JustificationsSubscription, error)
+}
+
 // Beefy exposes methods for retrieval of chain data
-type Beefy struct {
+type beefy struct {
 	client client.Client
 }
 
 // NewBeefy creates a new Chain struct
 func NewBeefy(cl client.Client) Beefy {
-	return Beefy{cl}
+	return &beefy{cl}
 }

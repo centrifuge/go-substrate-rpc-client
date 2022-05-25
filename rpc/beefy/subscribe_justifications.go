@@ -62,7 +62,7 @@ func (s *JustificationsSubscription) Unsubscribe() {
 
 // SubscribeJustifications subscribes beefy justifications, returning a subscription that will
 // receive server notifications containing the Header.
-func (b *Beefy) SubscribeJustifications() (*JustificationsSubscription, error) {
+func (b *beefy) SubscribeJustifications() (*JustificationsSubscription, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
 	defer cancel()
 

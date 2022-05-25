@@ -28,6 +28,10 @@ import (
 	"time"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
+	mockClient "github.com/centrifuge/go-substrate-rpc-client/v4/client/mocks"
+	mockChain "github.com/centrifuge/go-substrate-rpc-client/v4/rpc/chain/mocks"
+	mockState "github.com/centrifuge/go-substrate-rpc-client/v4/rpc/state/mocks"
+
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpcmocksrv"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
@@ -63,9 +67,9 @@ func TestClient_NewClient(t *testing.T) {
 }
 
 func TestClient_GetTestData(t *testing.T) {
-	chainMock := NewChainMock(t)
-	stateMock := NewStateMock(t)
-	clientMock := NewClientMock(t)
+	chainMock := mockChain.NewChain(t)
+	stateMock := mockState.NewState(t)
+	clientMock := mockClient.NewClient(t)
 
 	moduleName := "test-module"
 	callName := "test-call"
