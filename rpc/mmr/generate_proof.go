@@ -32,9 +32,9 @@ func (c *MMR) generateProof(leafIndex uint64, blockHash *types.Hash) (types.Gene
 	return res, nil
 }
 
-func (c *MMR) generateBatchProof(indeces []uint64, blockHash *types.Hash) (types.GenerateMmrBatchProofResponse, error) {
+func (c *MMR) generateBatchProof(indices []uint64, blockHash *types.Hash) (types.GenerateMmrBatchProofResponse, error) {
 	var res types.GenerateMmrBatchProofResponse
-	err := client.CallWithBlockHash(c.client, &res, "mmr_generateBatchProof", blockHash, indeces)
+	err := client.CallWithBlockHash(c.client, &res, "mmr_generateBatchProof", blockHash, indices)
 	if err != nil {
 		return types.GenerateMmrBatchProofResponse{}, err
 	}

@@ -19,7 +19,7 @@ package types
 import "github.com/ComposableFi/go-substrate-rpc-client/v4/scale"
 
 type Payload struct {
-	Id    [2]byte
+	ID    [2]byte
 	Value []byte
 }
 
@@ -43,14 +43,14 @@ type CompactSignedCommitment struct {
 	SignaturesCompact []BeefySignature
 }
 
-const CONTAINER_BIT_SIZE = 8
+const ContainerBitSize = 8
 
 func (cs *CompactSignedCommitment) Unpack() SignedCommitment {
 	var bits []byte
 
 	for _, block := range cs.SignaturesFrom {
-		for i := 0; i < CONTAINER_BIT_SIZE; i++ {
-			bits = append(bits, (block>>(CONTAINER_BIT_SIZE-i-1))&1)
+		for i := 0; i < ContainerBitSize; i++ {
+			bits = append(bits, (block>>(ContainerBitSize-i-1))&1)
 		}
 	}
 

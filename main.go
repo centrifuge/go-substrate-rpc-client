@@ -18,6 +18,7 @@ package gsrpc
 
 import (
 	"fmt"
+
 	"github.com/ComposableFi/go-substrate-rpc-client/v4/client"
 	"github.com/ComposableFi/go-substrate-rpc-client/v4/rpc"
 )
