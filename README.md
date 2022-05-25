@@ -41,3 +41,7 @@ Visit https://polkadot.js.org/apps for inspection
 
 **Note**: To use a custom Substrate endpoint, first set the enviromment variable before running the tests:
 `export RPC_URL="http://example.com:9934"`
+
+### Adding support for new RPC methods
+
+After adding new methods, update the RPC mocks by running `go generate ./...`

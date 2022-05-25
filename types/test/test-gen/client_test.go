@@ -337,9 +337,9 @@ func TestClient_GetTestData_BlockTooOld(t *testing.T) {
 }
 
 func TestClient_GetTestData_MetadataError(t *testing.T) {
-	chainMock := NewChainMock(t)
-	stateMock := NewStateMock(t)
-	clientMock := NewClientMock(t)
+	chainMock := mockChain.NewChain(t)
+	stateMock := mockState.NewState(t)
+	clientMock := mockClient.NewClient(t)
 
 	moduleName := "test-module"
 	callName := "test-call"
@@ -411,9 +411,9 @@ func TestClient_GetTestData_MetadataError(t *testing.T) {
 }
 
 func TestClient_GetTestData_InvalidMetadata(t *testing.T) {
-	chainMock := NewChainMock(t)
-	stateMock := NewStateMock(t)
-	clientMock := NewClientMock(t)
+	chainMock := mockChain.NewChain(t)
+	stateMock := mockState.NewState(t)
+	clientMock := mockClient.NewClient(t)
 
 	moduleName := "test-module"
 	callName := "test-call"
@@ -486,9 +486,9 @@ func TestClient_GetTestData_InvalidMetadata(t *testing.T) {
 }
 
 func TestClient_GetTestData_StorageKeyCreationError(t *testing.T) {
-	chainMock := NewChainMock(t)
-	stateMock := NewStateMock(t)
-	clientMock := NewClientMock(t)
+	chainMock := mockChain.NewChain(t)
+	stateMock := mockState.NewState(t)
+	clientMock := mockClient.NewClient(t)
 
 	moduleName := "test-module"
 	callName := "test-call"
@@ -565,9 +565,9 @@ func TestClient_GetTestData_StorageKeyCreationError(t *testing.T) {
 }
 
 func TestClient_GetTestData_BlockHashError(t *testing.T) {
-	chainMock := NewChainMock(t)
-	stateMock := NewStateMock(t)
-	clientMock := NewClientMock(t)
+	chainMock := mockChain.NewChain(t)
+	stateMock := mockState.NewState(t)
+	clientMock := mockClient.NewClient(t)
 
 	moduleName := "test-module"
 	callName := "test-call"
@@ -646,9 +646,9 @@ func TestClient_GetTestData_BlockHashError(t *testing.T) {
 }
 
 func TestClient_GetTestData_StorageError(t *testing.T) {
-	chainMock := NewChainMock(t)
-	stateMock := NewStateMock(t)
-	clientMock := NewClientMock(t)
+	chainMock := mockChain.NewChain(t)
+	stateMock := mockState.NewState(t)
+	clientMock := mockClient.NewClient(t)
 
 	moduleName := "test-module"
 	callName := "test-call"
