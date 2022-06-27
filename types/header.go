@@ -69,3 +69,41 @@ func (b *BlockNumber) Decode(decoder scale.Decoder) error {
 	*b = BlockNumber(u.Uint64())
 	return err
 }
+
+type OptionBlockNumber struct {
+	option
+	value BlockNumber
+}
+
+func NewOptionBlockNumber(value BlockNumber) OptionBlockNumber {
+	return OptionBlockNumber{option{hasValue: true}, value}
+}
+
+func NewOptionBlockNumberEmpty() OptionBlockNumber {
+	return OptionBlockNumber{option: option{hasValue: false}}
+}
+
+func (o *OptionBlockNumber) Decode(decoder scale.Decoder) error {
+	return decoder.DecodeOption(&o.hasValue, &o.value)
+}
+
+func (o OptionBlockNumber) Encode(encoder scale.Encoder) error {
+	return encoder.EncodeOption(o.hasValue, o.value)
+}
+
+// SetSome sets a value
+func (o *OptionBlockNumber) SetSome(value BlockNumber) {
+	o.hasValue = true
+	o.value = value
+}
+
+// SetNone removes a value and marks it as missing
+func (o *OptionBlockNumber) SetNone() {
+	o.hasValue = false
+	o.value = BlockNumber(0)
+}
+
+// Unwrap returns a flag that indicates whether a value is present and the stored value
+func (o *OptionBlockNumber) Unwrap() (ok bool, value BlockNumber) {
+	return o.hasValue, o.value
+}
