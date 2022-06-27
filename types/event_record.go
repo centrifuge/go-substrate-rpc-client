@@ -116,8 +116,6 @@ type EventRecords struct {
 	ChildBounties_Claimed  []EventChildBountiesClaimed  `test-gen-skip:"true"`
 	ChildBounties_Canceled []EventChildBountiesCanceled `test-gen-skip:"true"`
 
-	Claims_Claimed []EventClaimsClaimed `test-gen-blockchain:"polkadot"`
-
 	CollatorSelection_NewInvulnerables     []EventCollatorSelectionNewInvulnerables     `test-gen-blockchain:"altair"`
 	CollatorSelection_NewDesiredCandidates []EventCollatorSelectionNewDesiredCandidates `test-gen-blockchain:"altair"`
 	CollatorSelection_NewCandidacyBond     []EventCollatorSelectionNewCandidacyBond     `test-gen-blockchain:"altair"`
