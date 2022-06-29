@@ -42,6 +42,11 @@ func Encode(value interface{}) ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
+// EncodeToBytes encodes `value` with the scale codec with passed EncoderOptions, returning []byte
+func EncodeToBytes(value interface{}) ([]byte, error) {
+	return Encode(value)
+}
+
 // EncodeToHex encodes `value` with the scale codec, returning a hex string (prefixed by 0x)
 func EncodeToHex(value interface{}) (string, error) {
 	bz, err := Encode(value)
@@ -55,6 +60,11 @@ func EncodeToHex(value interface{}) (string, error) {
 // Decode decodes `bz` with the scale codec into `target`. `target` should be a pointer.
 func Decode(bz []byte, target interface{}) error {
 	return scale.NewDecoder(bytes.NewReader(bz)).Decode(target)
+}
+
+// Decode decodes `bz` with the scale codec into `target`. `target` should be a pointer.
+func DecodeFromBytes(bz []byte, target interface{}) error {
+	return Decode(bz, target)
 }
 
 // DecodeFromHex decodes `str` with the scale codec into `target`. `target` should be a pointer.

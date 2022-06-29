@@ -193,6 +193,7 @@ type DispatchError struct {
 
 	IsModule    bool
 	ModuleError ModuleError
+	Error       U8
 
 	IsConsumerRemaining bool
 
@@ -226,7 +227,9 @@ func (d *DispatchError) Decode(decoder scale.Decoder) error {
 	case 3:
 		d.IsModule = true
 
-		return decoder.Decode(&d.ModuleError)
+		res := decoder.Decode(&d.ModuleError)
+		d.Error = d.ModuleError.Error
+		return res
 	case 4:
 		d.IsConsumerRemaining = true
 	case 5:
