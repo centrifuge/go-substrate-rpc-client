@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:generate mockery --name Offchain
+//go:generate mockery --name Offchain --filename offchain.go
 
 package offchain
 
