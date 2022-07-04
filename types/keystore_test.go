@@ -10,16 +10,11 @@ import (
 )
 
 var (
-	keyPurpose1        = KeyPurpose{IsP2PDiscovery: true}
-	keyPurpose2        = KeyPurpose{IsP2PDocumentSigning: true}
+	keyPurpose1        = KeyPurposeP2PDiscovery
+	keyPurpose2        = KeyPurposeP2PDocumentSigning
 	keyPurposeFuzzOpts = []fuzzOpt{
 		withFuzzFuncs(func(k *KeyPurpose, c fuzz.Continue) {
-			switch c.Intn(2) {
-			case 0:
-				k.IsP2PDiscovery = true
-			case 1:
-				k.IsP2PDocumentSigning = true
-			}
+			*k = KeyPurpose(c.Intn(2))
 		}),
 	}
 )
@@ -27,7 +22,7 @@ var (
 func TestKeyPurpose_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[KeyPurpose](t, 1000, keyPurposeFuzzOpts...)
 	assertDecodeNilData[KeyPurpose](t)
-	assertEncodeEmptyObj[KeyPurpose](t, 0)
+	assertEncodeEmptyObj[KeyPurpose](t, 1)
 }
 
 func TestKeyPurpose_Encode(t *testing.T) {
@@ -45,16 +40,11 @@ func TestKeyPurpose_Decode(t *testing.T) {
 }
 
 var (
-	keyType1        = KeyType{IsECDSA: true}
-	keyType2        = KeyType{IsEDDSA: true}
+	keyType1        = KeyTypeECDSA
+	keyType2        = KeyTypeEDDSA
 	keyTypeFuzzOpts = []fuzzOpt{
 		withFuzzFuncs(func(k *KeyType, c fuzz.Continue) {
-			switch c.Intn(2) {
-			case 0:
-				k.IsECDSA = true
-			case 1:
-				k.IsEDDSA = true
-			}
+			*k = KeyType(c.Intn(2))
 		}),
 	}
 )
@@ -62,7 +52,7 @@ var (
 func TestKeyType_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[KeyType](t, 1000, keyTypeFuzzOpts...)
 	assertDecodeNilData[KeyType](t)
-	assertEncodeEmptyObj[KeyType](t, 0)
+	assertEncodeEmptyObj[KeyType](t, 1)
 }
 
 func TestKeyType_Encode(t *testing.T) {
@@ -96,7 +86,7 @@ var (
 func TestKey_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[Key](t, 1000, keyFuzzOpts...)
 	assertDecodeNilData[Key](t)
-	assertEncodeEmptyObj[Key](t, 17)
+	assertEncodeEmptyObj[Key](t, 19)
 }
 
 func TestKey_Encode(t *testing.T) {
@@ -136,7 +126,7 @@ var (
 func TestKeyID_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[KeyID](t, 1000, keyIDFuzzOpts...)
 	assertDecodeNilData[KeyID](t)
-	assertEncodeEmptyObj[KeyID](t, 32)
+	assertEncodeEmptyObj[KeyID](t, 33)
 }
 
 func TestKeyID_Encode(t *testing.T) {
@@ -173,7 +163,7 @@ var (
 func TestAddKey_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[AddKey](t, 1000, addKeyFuzzOpts...)
 	assertDecodeNilData[AddKey](t)
-	assertEncodeEmptyObj[AddKey](t, 32)
+	assertEncodeEmptyObj[AddKey](t, 34)
 }
 
 func TestAddKey_Encode(t *testing.T) {
