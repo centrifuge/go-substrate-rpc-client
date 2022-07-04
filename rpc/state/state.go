@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:generate mockery --name State
+
 package state
 
 import (
@@ -52,6 +54,9 @@ type State interface {
 
 	QueryStorage(keys []types.StorageKey, startBlock types.Hash, block types.Hash) ([]types.StorageChangeSet, error)
 	QueryStorageLatest(keys []types.StorageKey, startBlock types.Hash) ([]types.StorageChangeSet, error)
+
+	QueryStorageAt(keys []types.StorageKey, block types.Hash) ([]types.StorageChangeSet, error)
+	QueryStorageAtLatest(keys []types.StorageKey) ([]types.StorageChangeSet, error)
 
 	GetKeys(prefix types.StorageKey, blockHash types.Hash) ([]types.StorageKey, error)
 	GetKeysLatest(prefix types.StorageKey) ([]types.StorageKey, error)

@@ -14,29 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package mmr
+package state
 
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
-// GenerateProof retrieves a MMR proof and leaf for the specified leave index, at the given blockHash (useful to query a
-// proof at an earlier block, likely with antoher MMR root)
-func (c *mmr) GenerateProof(leafIndex uint64, blockHash types.Hash) (types.GenerateMMRProofResponse, error) {
-	return c.generateProof(leafIndex, &blockHash)
+// QueryStorageAt performs a low-level storage query
+func (s *state) QueryStorageAt(keys []types.StorageKey, block types.Hash) ([]types.StorageChangeSet, error) {
+	return s.queryStorageAt(keys, &block)
 }
 
-// GenerateProofLatest retrieves the latest MMR proof and leaf for the specified leave index
-func (c *mmr) GenerateProofLatest(leafIndex uint64) (types.GenerateMMRProofResponse, error) {
-	return c.generateProof(leafIndex, nil)
+// QueryStorageAtLatest performs a low-level storage query
+func (s *state) QueryStorageAtLatest(keys []types.StorageKey) ([]types.StorageChangeSet, error) {
+	return s.queryStorageAt(keys, nil)
 }
 
-func (c *mmr) generateProof(leafIndex uint64, blockHash *types.Hash) (types.GenerateMMRProofResponse, error) {
-	var res types.GenerateMMRProofResponse
-	err := client.CallWithBlockHash(c.client, &res, "mmr_generateProof", blockHash, leafIndex)
+func (s *state) queryStorageAt(keys []types.StorageKey, block *types.Hash) ([]types.StorageChangeSet, error) {
+	hexKeys := make([]string, len(keys))
+	for i, key := range keys {
+		hexKeys[i] = key.Hex()
+	}
+
+	var res []types.StorageChangeSet
+	err := client.CallWithBlockHash(s.client, &res, "state_queryStorageAt", block, hexKeys)
 	if err != nil {
-		return types.GenerateMMRProofResponse{}, err
+		return nil, err
 	}
 
 	return res, nil

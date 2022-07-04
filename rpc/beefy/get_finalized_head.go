@@ -21,7 +21,7 @@ import (
 )
 
 // GetFinalizedHead returns the hash of the latest BEEFY block
-func (b *Beefy) GetFinalizedHead() (types.Hash, error) {
+func (b *beefy) GetFinalizedHead() (types.Hash, error) {
 	var res string
 
 	err := b.client.Call(&res, "beefy_getFinalizedHead")
