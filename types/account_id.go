@@ -16,7 +16,10 @@
 
 package types
 
-import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+import (
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+)
 
 type OptionAccountID struct {
 	option
@@ -58,6 +61,16 @@ func (o *OptionAccountID) Unwrap() (ok bool, value AccountID) {
 
 // AccountID represents a public key (an 32 byte array)
 type AccountID [32]byte
+
+func (a *AccountID) ToBytes() []byte {
+	b := a[:]
+
+	return b
+}
+
+func (a *AccountID) ToHexString() string {
+	return hexutil.Encode(a.ToBytes())
+}
 
 // NewAccountID creates a new AccountID type
 func NewAccountID(b []byte) AccountID {
