@@ -1086,20 +1086,39 @@ type DemocracyVote struct {
 	Conviction DemocracyConviction
 }
 
+const (
+	aye uint8 = 1 << 7
+)
+
+//nolint:lll
 func (d *DemocracyVote) Decode(decoder scale.Decoder) error {
-	if err := decoder.Decode(&d.Aye); err != nil {
+	b, err := decoder.ReadOneByte()
+
+	if err != nil {
 		return err
 	}
 
-	return decoder.Decode(&d.Conviction)
+	// As per:
+	// https://github.com/paritytech/substrate/blob/6a946fc36d68b89599d7ca1ab03803d10c78468c/frame/democracy/src/vote.rs#L44
+
+	d.Aye = (b & aye) == aye
+	d.Conviction = DemocracyConviction(b & (aye - 1))
+
+	return nil
 }
 
+//nolint:lll
 func (d DemocracyVote) Encode(encoder scale.Encoder) error {
-	if err := encoder.Encode(d.Aye); err != nil {
-		return err
+	// As per:
+	// https://github.com/paritytech/substrate/blob/6a946fc36d68b89599d7ca1ab03803d10c78468c/frame/democracy/src/vote.rs#L37
+
+	var val uint8
+
+	if d.Aye {
+		val = aye
 	}
 
-	return encoder.Encode(d.Conviction)
+	return encoder.PushByte(uint8(d.Conviction) | val)
 }
 
 type VoteAccountVoteAsStandard struct {
