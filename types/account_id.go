@@ -17,6 +17,8 @@
 package types
 
 import (
+	"bytes"
+
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )
@@ -70,6 +72,10 @@ func (a *AccountID) ToBytes() []byte {
 
 func (a *AccountID) ToHexString() string {
 	return hexutil.Encode(a.ToBytes())
+}
+
+func (a *AccountID) Equal(accountID *AccountID) bool {
+	return bytes.Equal(a.ToBytes(), accountID.ToBytes())
 }
 
 // NewAccountID creates a new AccountID type
