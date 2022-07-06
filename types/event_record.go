@@ -92,16 +92,16 @@ type EventRecords struct {
 
 	BagsList_Rebagged []EventBagsListRebagged `test-gen-blockchain:"polkadot"`
 
-	Balances_BalanceSet         []EventBalancesBalanceSet         `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_Deposit            []EventBalancesDeposit            `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_DustLost           []EventBalancesDustLost           `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_Endowed            []EventBalancesEndowed            `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_Reserved           []EventBalancesReserved           `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_ReserveRepatriated []EventBalancesReserveRepatriated `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_Slashed            []EventBalancesSlashed            `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_Transfer           []EventBalancesTransfer           `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_Unreserved         []EventBalancesUnreserved         `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_Withdraw           []EventBalancesWithdraw           `test-gen-blockchain:"centrifuge-parachain"`
+	Balances_BalanceSet         []EventBalancesBalanceSet         `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Balances_Deposit            []EventBalancesDeposit            `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Balances_DustLost           []EventBalancesDustLost           `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Balances_Endowed            []EventBalancesEndowed            `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Balances_Reserved           []EventBalancesReserved           `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Balances_ReserveRepatriated []EventBalancesReserveRepatriated `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Balances_Slashed            []EventBalancesSlashed            `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Balances_Transfer           []EventBalancesTransfer           `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Balances_Unreserved         []EventBalancesUnreserved         `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Balances_Withdraw           []EventBalancesWithdraw           `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
 
 	Bounties_BountyProposed     []EventBountiesBountyProposed     `test-gen-blockchain:"polkadot"`
 	Bounties_BountyRejected     []EventBountiesBountyRejected     `test-gen-blockchain:"polkadot"`
@@ -134,13 +134,13 @@ type EventRecords struct {
 	ConvictionVoting_Delegated   []EventConvictionVotingDelegated   `test-gen-skip:"true"`
 	ConvictionVoting_Undelegated []EventConvictionVotingUndelegated `test-gen-skip:"true"`
 
-	Council_Approved       []EventCouncilApproved       `test-gen-blockchain:"centrifuge-parachain"`
-	Council_Closed         []EventCouncilClosed         `test-gen-blockchain:"centrifuge-parachain"`
-	Council_Disapproved    []EventCouncilDisapproved    `test-gen-blockchain:"centrifuge-parachain"`
-	Council_Executed       []EventCouncilExecuted       `test-gen-blockchain:"centrifuge-parachain"`
-	Council_MemberExecuted []EventCouncilMemberExecuted `test-gen-blockchain:"centrifuge-parachain"`
-	Council_Proposed       []EventCouncilProposed       `test-gen-blockchain:"centrifuge-parachain"`
-	Council_Voted          []EventCouncilVoted          `test-gen-blockchain:"centrifuge-parachain"`
+	Council_Approved       []EventCouncilApproved       `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Council_Closed         []EventCouncilClosed         `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Council_Disapproved    []EventCouncilDisapproved    `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Council_Executed       []EventCouncilExecuted       `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Council_MemberExecuted []EventCouncilMemberExecuted `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Council_Proposed       []EventCouncilProposed       `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Council_Voted          []EventCouncilVoted          `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
 
 	Crowdloan_Created           []EventCrowdloanCreated           `test-gen-blockchain:"polkadot"`
 	Crowdloan_Contributed       []EventCrowdloanContributed       `test-gen-blockchain:"polkadot"`
@@ -153,25 +153,25 @@ type EventRecords struct {
 	Crowdloan_MemoUpdated       []EventCrowdloanMemoUpdated       `test-gen-blockchain:"polkadot"`
 	Crowdloan_AddedToNewRaise   []EventCrowdloanAddedToNewRaise   `test-gen-blockchain:"polkadot"`
 
-	Democracy_Blacklisted     []EventDemocracyBlacklisted     `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Cancelled       []EventDemocracyCancelled       `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Delegated       []EventDemocracyDelegated       `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Executed        []EventDemocracyExecuted        `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_ExternalTabled  []EventDemocracyExternalTabled  `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_NotPassed       []EventDemocracyNotPassed       `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Passed          []EventDemocracyPassed          `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_PreimageInvalid []EventDemocracyPreimageInvalid `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_PreimageMissing []EventDemocracyPreimageMissing `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_PreimageNoted   []EventDemocracyPreimageNoted   `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_PreimageReaped  []EventDemocracyPreimageReaped  `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_PreimageUsed    []EventDemocracyPreimageUsed    `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Proposed        []EventDemocracyProposed        `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Seconded        []EventDemocracySeconded        `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Started         []EventDemocracyStarted         `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Tabled          []EventDemocracyTabled          `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Undelegated     []EventDemocracyUndelegated     `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Vetoed          []EventDemocracyVetoed          `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Voted           []EventDemocracyVoted           `test-gen-blockchain:"centrifuge-parachain"`
+	Democracy_Blacklisted     []EventDemocracyBlacklisted     `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_Cancelled       []EventDemocracyCancelled       `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_Delegated       []EventDemocracyDelegated       `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_Executed        []EventDemocracyExecuted        `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_ExternalTabled  []EventDemocracyExternalTabled  `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_NotPassed       []EventDemocracyNotPassed       `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_Passed          []EventDemocracyPassed          `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_PreimageInvalid []EventDemocracyPreimageInvalid `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_PreimageMissing []EventDemocracyPreimageMissing `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_PreimageNoted   []EventDemocracyPreimageNoted   `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_PreimageReaped  []EventDemocracyPreimageReaped  `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_PreimageUsed    []EventDemocracyPreimageUsed    `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_Proposed        []EventDemocracyProposed        `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_Seconded        []EventDemocracySeconded        `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_Started         []EventDemocracyStarted         `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_Tabled          []EventDemocracyTabled          `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_Undelegated     []EventDemocracyUndelegated     `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_Vetoed          []EventDemocracyVetoed          `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Democracy_Voted           []EventDemocracyVoted           `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
 
 	ElectionProviderMultiPhase_SolutionStored       []EventElectionProviderMultiPhaseSolutionStored       `test-gen-blockchain:"polkadot"`
 	ElectionProviderMultiPhase_ElectionFinalized    []EventElectionProviderMultiPhaseElectionFinalized    `test-gen-blockchain:"polkadot"`
@@ -202,16 +202,16 @@ type EventRecords struct {
 	Hrmp_OpenChannelAccepted  []EventHRMPOpenChannelAccepted  `test-gen-blockchain:"polkadot"`
 	Hrmp_ChannelClosed        []EventHRMPChannelClosed        `test-gen-blockchain:"polkadot"`
 
-	Identity_IdentityCleared      []EventIdentityCleared              `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_IdentityKilled       []EventIdentityKilled               `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_IdentitySet          []EventIdentitySet                  `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_JudgementGiven       []EventIdentityJudgementGiven       `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_JudgementRequested   []EventIdentityJudgementRequested   `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_JudgementUnrequested []EventIdentityJudgementUnrequested `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_RegistrarAdded       []EventIdentityRegistrarAdded       `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_SubIdentityAdded     []EventIdentitySubIdentityAdded     `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_SubIdentityRemoved   []EventIdentitySubIdentityRemoved   `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_SubIdentityRevoked   []EventIdentitySubIdentityRevoked   `test-gen-blockchain:"centrifuge-parachain"`
+	Identity_IdentityCleared      []EventIdentityCleared              `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Identity_IdentityKilled       []EventIdentityKilled               `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Identity_IdentitySet          []EventIdentitySet                  `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Identity_JudgementGiven       []EventIdentityJudgementGiven       `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Identity_JudgementRequested   []EventIdentityJudgementRequested   `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Identity_JudgementUnrequested []EventIdentityJudgementUnrequested `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Identity_RegistrarAdded       []EventIdentityRegistrarAdded       `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Identity_SubIdentityAdded     []EventIdentitySubIdentityAdded     `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Identity_SubIdentityRemoved   []EventIdentitySubIdentityRemoved   `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Identity_SubIdentityRevoked   []EventIdentitySubIdentityRevoked   `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
 
 	ImOnline_AllGood           []EventImOnlineAllGood           `test-gen-blockchain:"polkadot"`
 	ImOnline_HeartbeatReceived []EventImOnlineHeartbeatReceived `test-gen-blockchain:"polkadot"`
@@ -255,21 +255,21 @@ type EventRecords struct {
 	ParaInclusion_CandidateIncluded []EventParaInclusionCandidateIncluded `test-gen-blockchain:"polkadot"`
 	ParaInclusion_CandidateTimedOut []EventParaInclusionCandidateTimedOut `test-gen-blockchain:"polkadot"`
 
-	ParachainSystem_ValidationFunctionStored    []EventParachainSystemValidationFunctionStored    `test-gen-blockchain:"centrifuge-parachain"`
-	ParachainSystem_ValidationFunctionApplied   []EventParachainSystemValidationFunctionApplied   `test-gen-blockchain:"centrifuge-parachain"`
-	ParachainSystem_ValidationFunctionDiscarded []EventParachainSystemValidationFunctionDiscarded `test-gen-blockchain:"centrifuge-parachain"`
-	ParachainSystem_UpgradeAuthorized           []EventParachainSystemUpgradeAuthorized           `test-gen-blockchain:"centrifuge-parachain"`
-	ParachainSystem_DownwardMessagesReceived    []EventParachainSystemDownwardMessagesReceived    `test-gen-blockchain:"centrifuge-parachain"`
-	ParachainSystem_DownwardMessagesProcessed   []EventParachainSystemDownwardMessagesProcessed   `test-gen-blockchain:"centrifuge-parachain"`
+	ParachainSystem_ValidationFunctionStored    []EventParachainSystemValidationFunctionStored    `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	ParachainSystem_ValidationFunctionApplied   []EventParachainSystemValidationFunctionApplied   `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	ParachainSystem_ValidationFunctionDiscarded []EventParachainSystemValidationFunctionDiscarded `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	ParachainSystem_UpgradeAuthorized           []EventParachainSystemUpgradeAuthorized           `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	ParachainSystem_DownwardMessagesReceived    []EventParachainSystemDownwardMessagesReceived    `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	ParachainSystem_DownwardMessagesProcessed   []EventParachainSystemDownwardMessagesProcessed   `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
 
 	Preimage_Cleared   []EventPreimageCleared   `test-gen-skip:"true"`
 	Preimage_Noted     []EventPreimageNoted     `test-gen-skip:"true"`
 	Preimage_Requested []EventPreimageRequested `test-gen-skip:"true"`
 
-	Proxy_Announced        []EventProxyAnnounced        `test-gen-blockchain:"centrifuge-parachain"`
-	Proxy_AnonymousCreated []EventProxyAnonymousCreated `test-gen-blockchain:"centrifuge-parachain"`
-	Proxy_Added            []EventProxyAdded            `test-gen-blockchain:"centrifuge-parachain"`
-	Proxy_ProxyExecuted    []EventProxyProxyExecuted    `test-gen-blockchain:"centrifuge-parachain"`
+	Proxy_Announced        []EventProxyAnnounced        `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Proxy_AnonymousCreated []EventProxyAnonymousCreated `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Proxy_Added            []EventProxyAdded            `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Proxy_ProxyExecuted    []EventProxyProxyExecuted    `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
 
 	Recovery_AccountRecovered  []EventRecoveryAccountRecovered `test-gen-skip:"true"`
 	Recovery_RecoveryClosed    []EventRecoveryClosed           `test-gen-skip:"true"`
@@ -301,7 +301,7 @@ type EventRecords struct {
 	Scheduler_Dispatched       []EventSchedulerDispatched       `test-gen-blockchain:"polkadot"`
 	Scheduler_Scheduled        []EventSchedulerScheduled        `test-gen-blockchain:"polkadot"`
 
-	Session_NewSession []EventSessionNewSession `test-gen-blockchain:"centrifuge-parachain"`
+	Session_NewSession []EventSessionNewSession `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
 
 	Slots_NewLeasePeriod []EventSlotsNewLeasePeriod `test-gen-blockchain:"polkadot"`
 	Slots_Leased         []EventSlotsLeased         `test-gen-blockchain:"polkadot"`
@@ -345,12 +345,12 @@ type EventRecords struct {
 	Sudo_Sudid      []EventSudoSudid      `test-gen-skip:"true"`
 	Sudo_SudoAsDone []EventSudoAsDone     `test-gen-skip:"true"`
 
-	System_CodeUpdated      []EventSystemCodeUpdated      `test-gen-blockchain:"centrifuge-parachain"`
-	System_ExtrinsicFailed  []EventSystemExtrinsicFailed  `test-gen-blockchain:"centrifuge-parachain"`
-	System_ExtrinsicSuccess []EventSystemExtrinsicSuccess `test-gen-blockchain:"centrifuge-parachain"`
-	System_KilledAccount    []EventSystemKilledAccount    `test-gen-blockchain:"centrifuge-parachain"`
-	System_NewAccount       []EventSystemNewAccount       `test-gen-blockchain:"centrifuge-parachain"`
-	System_Remarked         []EventSystemRemarked         `test-gen-blockchain:"centrifuge-parachain"`
+	System_CodeUpdated      []EventSystemCodeUpdated      `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	System_ExtrinsicFailed  []EventSystemExtrinsicFailed  `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	System_ExtrinsicSuccess []EventSystemExtrinsicSuccess `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	System_KilledAccount    []EventSystemKilledAccount    `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	System_NewAccount       []EventSystemNewAccount       `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	System_Remarked         []EventSystemRemarked         `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
 
 	TechnicalCommittee_Approved       []EventTechnicalCommitteeApproved       `test-gen-blockchain:"polkadot"`
 	TechnicalCommittee_Closed         []EventTechnicalCommitteeClosed         `test-gen-blockchain:"polkadot"`
@@ -416,13 +416,13 @@ type EventRecords struct {
 	Ump_OverweightEnqueued     []EventUMPOverweightEnqueued     `test-gen-blockchain:"polkadot"`
 	Ump_OverweightServiced     []EventUMPOverweightServiced     `test-gen-blockchain:"polkadot"`
 
-	Utility_BatchCompleted   []EventUtilityBatchCompleted   `test-gen-blockchain:"centrifuge-parachain"`
-	Utility_BatchInterrupted []EventUtilityBatchInterrupted `test-gen-blockchain:"centrifuge-parachain"`
-	Utility_DispatchedAs     []EventUtilityBatchInterrupted `test-gen-blockchain:"centrifuge-parachain"`
-	Utility_ItemCompleted    []EventUtilityItemCompleted    `test-gen-blockchain:"centrifuge-parachain"`
+	Utility_BatchCompleted   []EventUtilityBatchCompleted   `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Utility_BatchInterrupted []EventUtilityBatchInterrupted `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Utility_DispatchedAs     []EventUtilityBatchInterrupted `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Utility_ItemCompleted    []EventUtilityItemCompleted    `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
 
-	Vesting_VestingCompleted []EventVestingVestingCompleted `test-gen-blockchain:"centrifuge-parachain"`
-	Vesting_VestingUpdated   []EventVestingVestingUpdated   `test-gen-blockchain:"centrifuge-parachain"`
+	Vesting_VestingCompleted []EventVestingVestingCompleted `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
+	Vesting_VestingUpdated   []EventVestingVestingUpdated   `test-gen-ws:"wss://centrifuge-parachain.api.onfinality.io/public-ws" test-gen-api:"https://centrifuge.api.subscan.io/api/scan/events"`
 
 	Whitelist_CallWhitelisted           []EventWhitelistCallWhitelisted        `test-gen-skip:"true"`
 	Whitelist_WhitelistedCallRemoved    []EventWhitelistWhitelistedCallRemoved `test-gen-skip:"true"`
