@@ -2396,25 +2396,58 @@ type EventPreimageRequested struct {
 	Topics []Hash
 }
 
-type ProxyType byte
+type ProxyType uint8
 
 const (
-	Any         ProxyType = 0
-	NonTransfer ProxyType = 1
-	Governance  ProxyType = 2
-	Staking     ProxyType = 3
+	Any ProxyType = iota
+	NonTransfer
+	Governance
+	Staking
+	NonProxy
+	Borrow
+	ProxyTypePrice
+	Invest
+	ProxyManagement
+	KeystoreManagement
+	NFTMint
+	NFTTransfer
+	NFTManagement
+)
+
+var (
+	proxyTypeMap = map[ProxyType]struct{}{
+		Any:                {},
+		NonTransfer:        {},
+		Governance:         {},
+		Staking:            {},
+		NonProxy:           {},
+		Borrow:             {},
+		ProxyTypePrice:     {},
+		Invest:             {},
+		ProxyManagement:    {},
+		KeystoreManagement: {},
+		NFTMint:            {},
+		NFTTransfer:        {},
+		NFTManagement:      {},
+	}
 )
 
 func (pt *ProxyType) Decode(decoder scale.Decoder) error {
 	b, err := decoder.ReadOneByte()
-	vb := ProxyType(b)
-	switch vb {
-	case Any, NonTransfer, Governance, Staking:
-		*pt = vb
-	default:
-		return fmt.Errorf("unknown ProxyType enum: %v", vb)
+
+	if err != nil {
+		return err
 	}
-	return err
+
+	pb := ProxyType(b)
+
+	if _, ok := proxyTypeMap[pb]; !ok {
+		return fmt.Errorf("unknown ProxyType enum: %v", pb)
+	}
+
+	*pt = pb
+
+	return nil
 }
 
 func (pt ProxyType) Encode(encoder scale.Encoder) error {

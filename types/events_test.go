@@ -84,27 +84,18 @@ func TestDispatchResult_Decode(t *testing.T) {
 	assertEncodeEmptyObj[DispatchResult](t, 1)
 }
 
+var (
+	proxyTypeFuzzOpts = []fuzzOpt{
+		withFuzzFuncs(func(p *ProxyType, c fuzz.Continue) {
+			*p = ProxyType(c.Intn(13))
+		}),
+	}
+)
+
 func TestProxyTypeEncodeDecode(t *testing.T) {
-	// encode
-	pt := Governance
-	var buf bytes.Buffer
-	encoder := scale.NewEncoder(&buf)
-	assert.NoError(t, encoder.Encode(pt))
-	assert.Equal(t, buf.Len(), 1)
-	assert.Equal(t, buf.Bytes(), []byte{2})
-
-	//decode
-	decoder := scale.NewDecoder(bytes.NewReader(buf.Bytes()))
-	pt0 := ProxyType(0)
-	err := decoder.Decode(&pt0)
-	assert.NoError(t, err)
-	assert.Equal(t, pt0, Governance)
-
-	//decode error
-	decoder = scale.NewDecoder(bytes.NewReader([]byte{5}))
-	pt0 = ProxyType(0)
-	err = decoder.Decode(&pt0)
-	assert.Error(t, err)
+	assertRoundTripFuzz[ProxyType](t, 1000, proxyTypeFuzzOpts...)
+	assertDecodeNilData[ProxyType](t)
+	assertEncodeEmptyObj[ProxyType](t, 1)
 }
 
 var (
