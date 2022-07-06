@@ -43,6 +43,9 @@ generate-test-data:		## generate data for types decode test
 test-types-decode:      ## run tests for types decode
 	@go test -tags=types_test ./types/test/...
 
+generate-mocks:      ## generate mocks
+	@docker run -v `pwd`:/app -w /app --entrypoint /bin/sh vektra/mockery:v2.13.0-beta.1 -c 'go generate ./...'
+
 help: 				## shows this help
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
 

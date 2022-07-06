@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:generate mockery --name Chain
+//go:generate mockery --name Chain --filename chain.go
 
 package chain
 
