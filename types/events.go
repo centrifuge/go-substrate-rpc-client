@@ -2422,14 +2422,24 @@ type EventProxyAnonymousCreated struct {
 	Topics              []Hash
 }
 
-// EventProxyAdded is emitted when a proxy was added.
-type EventProxyAdded struct {
+// EventProxyProxyAdded is emitted when a proxy was added.
+type EventProxyProxyAdded struct {
 	Phase     Phase
 	Delegator AccountID
 	Delegatee AccountID
 	ProxyType ProxyType
 	Delay     U32
 	Topics    []Hash
+}
+
+// EventProxyProxyRemoved is emitted when a proxy was removed.
+type EventProxyProxyRemoved struct {
+	Phase       Phase
+	Delegator   AccountID
+	Delegatee   AccountID
+	ProxyType   ProxyType
+	BlockNumber U32
+	Topics      []Hash
 }
 
 // EventProxyAnnounced is emitted when an announcement was placed to make a call in the future
