@@ -2430,6 +2430,38 @@ var (
 		NFTTransfer:        {},
 		NFTManagement:      {},
 	}
+
+	ProxyTypeName = map[ProxyType]string{
+		Any:                "any",
+		NonTransfer:        "non_transfer",
+		Governance:         "governance",
+		Staking:            "staking",
+		NonProxy:           "non_proxy",
+		Borrow:             "borrow",
+		ProxyTypePrice:     "price",
+		Invest:             "invest",
+		ProxyManagement:    "proxy_management",
+		KeystoreManagement: "keystore_management",
+		NFTMint:            "nft_mint",
+		NFTTransfer:        "nft_transfer",
+		NFTManagement:      "nft_management",
+	}
+
+	ProxyTypeValue = map[string]ProxyType{
+		"any":                 Any,
+		"non_transfer":        NonTransfer,
+		"governance":          Governance,
+		"staking":             Staking,
+		"non_proxy":           NonProxy,
+		"borrow":              Borrow,
+		"price":               ProxyTypePrice,
+		"invest":              Invest,
+		"proxy_management":    ProxyManagement,
+		"keystore_management": KeystoreManagement,
+		"nft_mint":            NFTMint,
+		"nft_transfer":        NFTTransfer,
+		"nft_management":      NFTManagement,
+	}
 )
 
 func (pt *ProxyType) Decode(decoder scale.Decoder) error {
