@@ -17,6 +17,7 @@
 package types_test
 
 import (
+	"fmt"
 	"testing"
 
 	fuzz "github.com/google/gofuzz"
@@ -50,13 +51,23 @@ var (
 	}
 )
 
+func newTestMultiAddress() MultiAddress {
+	ma, err := NewMultiAddressFromAccountID(testAccountIDBytes)
+
+	if err != nil {
+		panic(fmt.Errorf("couldn't create test multi address: %w", err))
+	}
+
+	return ma
+}
+
 func TestMultiAddress_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[MultiAddress](t, 100, multiAddressFuzzOpts...)
 	assertDecodeNilData[MultiAddress](t)
 }
 
 func TestNewMultiAddressFromAccountID(t *testing.T) {
-	assertRoundtrip(t, NewMultiAddressFromAccountID(signature.TestKeyringPairAlice.PublicKey))
+	assertRoundtrip(t, newTestMultiAddress())
 
 	_, err := NewMultiAddressFromHexAccountID("123!")
 	assert.Error(t, err)

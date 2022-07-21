@@ -18,7 +18,9 @@ package types
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
+	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -81,6 +83,22 @@ func (a *AccountID) ToHexString() string {
 
 func (a *AccountID) Equal(accountID *AccountID) bool {
 	return bytes.Equal(a.ToBytes(), accountID.ToBytes())
+}
+
+func (a AccountID) MarshalJSON() ([]byte, error) {
+	return json.Marshal(a.ToHexString())
+}
+
+func (a *AccountID) UnmarshalJSON(data []byte) error {
+	accID, err := NewAccountIDFromHexString(strings.Trim(string(data), "\""))
+
+	if err != nil {
+		return err
+	}
+
+	*a = *accID
+
+	return nil
 }
 
 var (

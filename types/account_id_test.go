@@ -17,6 +17,8 @@
 package types_test
 
 import (
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -41,28 +43,41 @@ var (
 	}
 )
 
+func newTestAccountID() AccountID {
+	accID, err := NewAccountID(testAccountIDBytes)
+
+	if err != nil {
+		panic(fmt.Errorf("couldn't create test account ID: %w", err))
+	}
+
+	return *accID
+}
+
 func TestOptionAccountID_EncodeDecode(t *testing.T) {
 	assertRoundTripFuzz[OptionAccountID](t, 100, optionAccountIDFuzzOpts...)
 	assertEncodeEmptyObj[OptionAccountID](t, 1)
 }
 
+var testAccountIDBytes = []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32}
+
 func TestOptionAccountID_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewOptionAccountID(NewAccountID([]byte{171, 18, 52})), MustHexDecodeString("0x01ab12340000000000000000000000000000000000000000000000000000000000")},
+		{NewOptionAccountID(newTestAccountID()), MustHexDecodeString("0x010102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20")},
 		{NewOptionAccountIDEmpty(), MustHexDecodeString("0x00")},
 	})
 }
 
 func TestOptionAccountID_Decode(t *testing.T) {
 	assertDecode(t, []decodingAssert{
-		{MustHexDecodeString("0x01ab12340000000000000000000000000000000000000000000000000000000000"), NewOptionAccountID(NewAccountID([]byte{171, 18, 52}))},
+		{MustHexDecodeString("0x010102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20"), NewOptionAccountID(newTestAccountID())},
 		{MustHexDecodeString("0x00"), NewOptionAccountIDEmpty()},
 	})
 }
 
 func TestOptionAccountID_OptionMethods(t *testing.T) {
 	o := NewOptionAccountIDEmpty()
-	o.SetSome(NewAccountID([]byte("acc-id")))
+
+	o.SetSome(newTestAccountID())
 
 	ok, v := o.Unwrap()
 	assert.True(t, ok)
@@ -70,9 +85,11 @@ func TestOptionAccountID_OptionMethods(t *testing.T) {
 
 	o.SetNone()
 
+	var a AccountID
+
 	ok, v = o.Unwrap()
 	assert.False(t, ok)
-	assert.Equal(t, NewAccountID([]byte{}), v)
+	assert.Equal(t, a, v)
 }
 
 func TestAccountID_EncodeDecode(t *testing.T) {
@@ -83,49 +100,78 @@ func TestAccountID_EncodeDecode(t *testing.T) {
 
 func TestAccountID_EncodedLength(t *testing.T) {
 	assertEncodedLength(t, []encodedLengthAssert{
-		{NewAccountID([]byte{}), 32},
-		{NewAccountID([]byte{7, 6, 5, 4, 3, 2, 1, 0}), 32},
+		{newTestAccountID(), 32},
 	})
 }
 
 func TestAccountID_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{NewAccountID([]byte{0, 0, 0}), MustHexDecodeString("0x0000000000000000000000000000000000000000000000000000000000000000")},     //nolint:lll
-		{NewAccountID([]byte{171, 18, 52}), MustHexDecodeString("0xab12340000000000000000000000000000000000000000000000000000000000")}, //nolint:lll
+		{newTestAccountID(), MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20")}, //nolint:lll
 	})
 }
 
 func TestAccountID_Hash(t *testing.T) {
 	assertHash(t, []hashAssert{
-		{NewAccountID([]byte{0, 42, 254}), MustHexDecodeString(
-			"0x7834db8eb04aefe8272c32d8160ce4fa3cb31fc95882e5bd53860715731c8198")},
-		{NewAccountID([]byte{0, 0}), MustHexDecodeString(
-			"0x89eb0d6a8a691dae2cd15ed0369931ce0a949ecafa5c3f93f8121833646e15c3")},
+		{
+			newTestAccountID(),
+			MustHexDecodeString("0x441edc56cebc8e285d02267aa650819f15add7b06ef9b41b2690128dce655924"),
+		},
 	})
 }
 
 func TestAccountID_Hex(t *testing.T) {
 	assertEncodeToHex(t, []encodeToHexAssert{
-		{NewAccountID([]byte{0, 0, 0}), "0x0000000000000000000000000000000000000000000000000000000000000000"},
-		{NewAccountID([]byte{171, 18, 52}), "0xab12340000000000000000000000000000000000000000000000000000000000"},
+		{newTestAccountID(), "0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20"},
 	})
 }
 
 func TestAccountID_String(t *testing.T) {
 	assertString(t, []stringAssert{
-		{NewAccountID([]byte{0, 0, 0}), "[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]"},
-		{NewAccountID([]byte{171, 18, 52}), "[171 18 52 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]"},
+		{newTestAccountID(), "[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32]"},
 	})
 }
 
 func TestAccountID_Eq(t *testing.T) {
+	b := testAccountIDBytes[:31]
+	b = append(b, 11)
+
+	accID, err := NewAccountID(b)
+	assert.NoError(t, err)
+
 	assertEq(t, []eqAssert{
-		{NewAccountID([]byte{1, 0, 0}), NewAccountID([]byte{1, 0}), true},
-		{NewAccountID([]byte{0, 0, 1}), NewAccountID([]byte{0, 1}), false},
-		{NewAccountID([]byte{0, 0, 0}), NewAccountID([]byte{0, 0}), true},
-		{NewAccountID([]byte{12, 48, 255}), NewAccountID([]byte{12, 48, 255}), true},
-		{NewAccountID([]byte{0}), NewAccountID([]byte{0}), true},
-		{NewAccountID([]byte{1}), NewBool(true), false},
-		{NewAccountID([]byte{0}), NewBool(false), false},
+		{newTestAccountID(), newTestAccountID(), true},
+		{newTestAccountID(), accID, false},
 	})
+}
+
+func TestAccountID_ToBytes(t *testing.T) {
+	accID, err := NewAccountID(testAccountIDBytes)
+	assert.NoError(t, err)
+
+	assert.Equal(t, accID.ToBytes(), testAccountIDBytes)
+}
+
+func TestAccountID_ToHexString(t *testing.T) {
+	accID, err := NewAccountID(testAccountIDBytes)
+	assert.NoError(t, err)
+
+	hb, err := Hex(testAccountIDBytes)
+	assert.NoError(t, err)
+
+	assert.Equal(t, hb, accID.ToHexString())
+}
+
+func TestAccountID_JSONMarshalUnmarshal(t *testing.T) {
+	accID, err := NewAccountID(testAccountIDBytes)
+	assert.NoError(t, err)
+
+	b, err := json.Marshal(accID)
+	assert.NoError(t, err)
+
+	var res AccountID
+
+	err = json.Unmarshal(b, &res)
+	assert.NoError(t, err)
+
+	assert.True(t, accID.Equal(&res))
 }

@@ -27,8 +27,8 @@ import (
 
 var (
 	testInstanceDetails = InstanceDetails{
-		Owner:    NewAccountID([]byte("acc_id")),
-		Approved: NewOptionAccountID(NewAccountID([]byte("acc_id2"))),
+		Owner:    newTestAccountID(),
+		Approved: NewOptionAccountID(newTestAccountID()),
 		IsFrozen: true,
 		Deposit:  NewU128(*big.NewInt(123)),
 	}
@@ -56,7 +56,7 @@ func TestInstanceDetails_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
 		{
 			testInstanceDetails,
-			MustHexDecodeString("0x6163635f69640000000000000000000000000000000000000000000000000000016163635f69643200000000000000000000000000000000000000000000000000017b000000000000000000000000000000"),
+			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20010102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20017b000000000000000000000000000000"),
 		},
 	})
 }
@@ -64,7 +64,7 @@ func TestInstanceDetails_Encode(t *testing.T) {
 func TestInstanceDetails_Decode(t *testing.T) {
 	assertDecode(t, []decodingAssert{
 		{
-			MustHexDecodeString("0x6163635f69640000000000000000000000000000000000000000000000000000016163635f69643200000000000000000000000000000000000000000000000000017b000000000000000000000000000000"),
+			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20010102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20017b000000000000000000000000000000"),
 			testInstanceDetails,
 		},
 	})

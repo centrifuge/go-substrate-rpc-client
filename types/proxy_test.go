@@ -9,12 +9,12 @@ import (
 
 var (
 	proxyDefinition1 = ProxyDefinition{
-		Delegate:  NewAccountID([]byte("some-account")),
+		Delegate:  newTestAccountID(),
 		ProxyType: ProxyTypePrice,
 		Delay:     3,
 	}
 	proxyDefinition2 = ProxyDefinition{
-		Delegate:  NewAccountID([]byte("some-other-account")),
+		Delegate:  newTestAccountID(),
 		ProxyType: KeystoreManagement,
 		Delay:     0,
 	}
@@ -31,11 +31,11 @@ func TestProxyDefinition_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
 		{
 			proxyDefinition1,
-			MustHexDecodeString("0x736f6d652d6163636f756e740000000000000000000000000000000000000000060c"),
+			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20060c"),
 		},
 		{
 			proxyDefinition2,
-			MustHexDecodeString("0x736f6d652d6f746865722d6163636f756e7400000000000000000000000000000900"),
+			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f200900"),
 		},
 	})
 }
@@ -43,11 +43,11 @@ func TestProxyDefinition_Encode(t *testing.T) {
 func TestProxyDefinition_Decode(t *testing.T) {
 	assertDecode(t, []decodingAssert{
 		{
-			MustHexDecodeString("0x736f6d652d6163636f756e740000000000000000000000000000000000000000060c"),
+			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20060c"),
 			proxyDefinition1,
 		},
 		{
-			MustHexDecodeString("0x736f6d652d6f746865722d6163636f756e7400000000000000000000000000000900"),
+			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f200900"),
 			proxyDefinition2,
 		},
 	})
@@ -74,7 +74,7 @@ func TestProxyStorageEntry_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
 		{
 			proxyStorageEntry1,
-			MustHexDecodeString("0x08736f6d652d6163636f756e740000000000000000000000000000000000000000060c736f6d652d6f746865722d6163636f756e7400000000000000000000000000000900d2040000000000000000000000000000"),
+			MustHexDecodeString("0x080102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20060c0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f200900d2040000000000000000000000000000"),
 		},
 	})
 }
@@ -82,7 +82,7 @@ func TestProxyStorageEntry_Encode(t *testing.T) {
 func TestProxyStorageEntry_Decode(t *testing.T) {
 	assertDecode(t, []decodingAssert{
 		{
-			MustHexDecodeString("0x08736f6d652d6163636f756e740000000000000000000000000000000000000000060c736f6d652d6f746865722d6163636f756e7400000000000000000000000000000900d2040000000000000000000000000000"),
+			MustHexDecodeString("0x080102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20060c0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f200900d2040000000000000000000000000000"),
 			proxyStorageEntry1,
 		},
 	})

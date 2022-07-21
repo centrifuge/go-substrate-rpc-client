@@ -65,10 +65,12 @@ func TestExtrinsic_Signed_EncodeDecode(t *testing.T) {
 }
 
 func TestExtrinsic_Sign(t *testing.T) {
-	c, err := NewCall(ExamplaryMetadataV4,
-		"balances.transfer", NewAddressFromAccountID(MustHexDecodeString(
-			"0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")),
-		NewUCompactFromUInt(6969))
+	c, err := NewCall(
+		ExamplaryMetadataV4,
+		"balances.transfer",
+		newTestAddress(),
+		NewUCompactFromUInt(6969),
+	)
 	assert.NoError(t, err)
 
 	ext := NewExtrinsic(c)
@@ -184,10 +186,12 @@ func ExampleExtrinsic() {
 }
 
 func TestExtrinsic_JSONMarshalUnmarshal(t *testing.T) {
-	c, err := NewCall(ExamplaryMetadataV4,
-		"balances.transfer", NewAddressFromAccountID(MustHexDecodeString(
-			"0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48")),
-		NewUCompactFromUInt(6969))
+	c, err := NewCall(
+		ExamplaryMetadataV4,
+		"balances.transfer",
+		newTestAddress(),
+		NewUCompactFromUInt(6969),
+	)
 	assert.NoError(t, err)
 
 	ext := NewExtrinsic(c)

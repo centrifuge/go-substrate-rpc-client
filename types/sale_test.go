@@ -151,7 +151,7 @@ func TestPrice_Decode(t *testing.T) {
 
 var (
 	testSale = Sale{
-		Seller: NewAccountID([]byte("acc_id")),
+		Seller: newTestAccountID(),
 		Price:  testPrice,
 	}
 )
@@ -164,12 +164,18 @@ func TestSale_EncodeDecode(t *testing.T) {
 
 func TestSale_Encode(t *testing.T) {
 	assertEncode(t, []encodingAssert{
-		{testSale, MustHexDecodeString("0x6163635f69640000000000000000000000000000000000000000000000000000037b000000000000000000000000000000")},
+		{
+			testSale,
+			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20037b000000000000000000000000000000"),
+		},
 	})
 }
 
 func TestSale_Decode(t *testing.T) {
 	assertDecode(t, []decodingAssert{
-		{MustHexDecodeString("0x6163635f69640000000000000000000000000000000000000000000000000000037b000000000000000000000000000000"), testSale},
+		{
+			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20037b000000000000000000000000000000"),
+			testSale,
+		},
 	})
 }
