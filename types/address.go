@@ -32,11 +32,17 @@ type Address struct {
 }
 
 // NewAddressFromAccountID creates an Address from the given AccountID (public key)
-func NewAddressFromAccountID(b []byte) Address {
+func NewAddressFromAccountID(b []byte) (Address, error) {
+	accountID, err := NewAccountID(b)
+
+	if err != nil {
+		return Address{}, nil
+	}
+
 	return Address{
 		IsAccountID: true,
-		AsAccountID: NewAccountID(b),
-	}
+		AsAccountID: *accountID,
+	}, nil
 }
 
 // NewAddressFromHexAccountID creates an Address from the given hex string that contains an AccountID (public key)
@@ -45,7 +51,7 @@ func NewAddressFromHexAccountID(str string) (Address, error) {
 	if err != nil {
 		return Address{}, err
 	}
-	return NewAddressFromAccountID(b), nil
+	return NewAddressFromAccountID(b)
 }
 
 // NewAddressFromAccountIndex creates an Address from the given AccountIndex
@@ -68,7 +74,11 @@ func (a *Address) Decode(decoder scale.Decoder) error {
 		if err != nil {
 			return err
 		}
-		a.AsAccountID = NewAccountID(append([]byte{b}, sm[:]...)) // Push b back to the front
+		accountID, err := NewAccountID(append([]byte{b}, sm[:]...)) // Push b back to the front
+		if err != nil {
+			return err
+		}
+		a.AsAccountID = *accountID
 		a.IsAccountID = true
 		return nil
 	}

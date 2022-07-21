@@ -19,6 +19,8 @@ package types
 import (
 	"fmt"
 
+	"github.com/ethereum/go-ethereum/common/hexutil"
+
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 )
@@ -106,6 +108,8 @@ func (e ExtrinsicPayloadV4) Sign(signer signature.KeyringPair) (Signature, error
 	if err != nil {
 		return Signature{}, err
 	}
+
+	fmt.Println("Hex payload -", hexutil.Encode(b))
 
 	sig, err := signature.Sign(b, signer.URI)
 	return NewSignature(sig), err

@@ -34,11 +34,16 @@ type MultiAddress struct {
 }
 
 // NewMultiAddressFromAccountID creates an Address from the given AccountID (public key)
-func NewMultiAddressFromAccountID(b []byte) MultiAddress {
+func NewMultiAddressFromAccountID(b []byte) (MultiAddress, error) {
+	accountID, err := NewAccountID(b)
+	if err != nil {
+		return MultiAddress{}, err
+	}
+
 	return MultiAddress{
 		IsID: true,
-		AsID: NewAccountID(b),
-	}
+		AsID: *accountID,
+	}, nil
 }
 
 // NewMultiAddressFromHexAccountID creates an Address from the given hex string that contains an AccountID (public key)
@@ -47,7 +52,7 @@ func NewMultiAddressFromHexAccountID(str string) (MultiAddress, error) {
 	if err != nil {
 		return MultiAddress{}, err
 	}
-	return NewMultiAddressFromAccountID(b), nil
+	return NewMultiAddressFromAccountID(b)
 }
 
 func (m MultiAddress) Encode(encoder scale.Encoder) error {
