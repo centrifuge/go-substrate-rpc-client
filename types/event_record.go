@@ -378,6 +378,8 @@ type EventRecords struct {
 	TransactionStorage_Renewed      []EventTransactionStorageRenewed      `test-gen-skip:"true"`
 	TransactionStorage_ProofChecked []EventTransactionStorageProofChecked `test-gen-skip:"true"`
 
+	TransactionPayment_TransactionFeePaid []EventTransactionPaymentTransactionFeePaid `test-gen-blockchain:"westend"`
+
 	Treasury_Awarded  []EventTreasuryAwarded  `test-gen-blockchain:"altair"`
 	Treasury_Burnt    []EventTreasuryBurnt    `test-gen-blockchain:"altair"`
 	Treasury_Deposit  []EventTreasuryDeposit  `test-gen-blockchain:"altair"`
