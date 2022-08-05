@@ -6,6 +6,29 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 )
 
+type EventKeystoreKeyAdded struct {
+	Phase      Phase
+	Owner      AccountID
+	Key        Hash
+	KeyPurpose KeyPurpose
+	KeyType    KeyType
+	Topics     []Hash
+}
+
+type EventKeystoreKeyRevoked struct {
+	Phase       Phase
+	Owner       AccountID
+	Key         Hash
+	BlockNumber BlockNumber
+	Topics      []Hash
+}
+
+type EventKeystoreDepositSet struct {
+	Phase      Phase
+	NewDeposit U128
+	Topics     []Hash
+}
+
 type KeyPurpose uint
 
 const (
