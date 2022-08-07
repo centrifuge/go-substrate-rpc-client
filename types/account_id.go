@@ -72,12 +72,20 @@ const (
 type AccountID [AccountIDLen]byte
 
 func (a *AccountID) ToBytes() []byte {
+	if a == nil {
+		return nil
+	}
+
 	b := a[:]
 
 	return b
 }
 
 func (a *AccountID) ToHexString() string {
+	if a == nil {
+		return ""
+	}
+
 	return hexutil.Encode(a.ToBytes())
 }
 

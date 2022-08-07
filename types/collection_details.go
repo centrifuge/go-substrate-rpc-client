@@ -18,7 +18,7 @@ package types
 
 import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 
-type ClassDetails struct {
+type CollectionDetails struct {
 	Owner             AccountID
 	Issuer            AccountID
 	Admin             AccountID
@@ -31,7 +31,7 @@ type ClassDetails struct {
 	IsFrozen          bool
 }
 
-func (c *ClassDetails) Decode(decoder scale.Decoder) error {
+func (c *CollectionDetails) Decode(decoder scale.Decoder) error {
 	if err := decoder.Decode(&c.Owner); err != nil {
 		return err
 	}
@@ -64,7 +64,7 @@ func (c *ClassDetails) Decode(decoder scale.Decoder) error {
 	return decoder.Decode(&c.IsFrozen)
 }
 
-func (c ClassDetails) Encode(encoder scale.Encoder) error {
+func (c CollectionDetails) Encode(encoder scale.Encoder) error {
 	if err := encoder.Encode(c.Owner); err != nil {
 		return err
 	}

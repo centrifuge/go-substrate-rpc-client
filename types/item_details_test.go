@@ -26,7 +26,7 @@ import (
 )
 
 var (
-	testInstanceDetails = InstanceDetails{
+	testInstanceDetails = ItemDetails{
 		Owner:    newTestAccountID(),
 		Approved: NewOptionAccountID(newTestAccountID()),
 		IsFrozen: true,
@@ -36,7 +36,7 @@ var (
 	instanceDetailsFuzzOpts = combineFuzzOpts(
 		optionAccountIDFuzzOpts,
 		[]fuzzOpt{
-			withFuzzFuncs(func(i *InstanceDetails, c fuzz.Continue) {
+			withFuzzFuncs(func(i *ItemDetails, c fuzz.Continue) {
 				c.Fuzz(&i.Owner)
 				c.Fuzz(&i.Approved)
 				c.Fuzz(&i.IsFrozen)
@@ -47,9 +47,9 @@ var (
 )
 
 func TestInstanceDetails_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[InstanceDetails](t, 1000, instanceDetailsFuzzOpts...)
-	assertDecodeNilData[InstanceDetails](t)
-	assertEncodeEmptyObj[InstanceDetails](t, 50)
+	assertRoundTripFuzz[ItemDetails](t, 1000, instanceDetailsFuzzOpts...)
+	assertDecodeNilData[ItemDetails](t)
+	assertEncodeEmptyObj[ItemDetails](t, 50)
 }
 
 func TestInstanceDetails_Encode(t *testing.T) {

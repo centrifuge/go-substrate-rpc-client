@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	testClassDetails = ClassDetails{
+	testClassDetails = CollectionDetails{
 		Owner:             newTestAccountID(),
 		Issuer:            newTestAccountID(),
 		Admin:             newTestAccountID(),
@@ -39,9 +39,9 @@ var (
 )
 
 func TestClassDetails_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[ClassDetails](t, 1000)
-	assertDecodeNilData[ClassDetails](t)
-	assertEncodeEmptyObj[ClassDetails](t, 158)
+	assertRoundTripFuzz[CollectionDetails](t, 1000)
+	assertDecodeNilData[CollectionDetails](t)
+	assertEncodeEmptyObj[CollectionDetails](t, 158)
 }
 
 func TestClassDetails_Encode(t *testing.T) {

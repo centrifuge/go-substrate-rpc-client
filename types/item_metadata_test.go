@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	testInstanceMetadata = InstanceMetadata{
+	testInstanceMetadata = ItemMetadata{
 		Deposit:  NewU128(*big.NewInt(1234)),
 		Data:     Bytes("some_data"),
 		IsFrozen: true,
@@ -32,9 +32,9 @@ var (
 )
 
 func TestInstanceMetadata_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[InstanceMetadata](t, 1000)
-	assertDecodeNilData[InstanceMetadata](t)
-	assertEncodeEmptyObj[InstanceMetadata](t, 18)
+	assertRoundTripFuzz[ItemMetadata](t, 1000)
+	assertDecodeNilData[ItemMetadata](t)
+	assertEncodeEmptyObj[ItemMetadata](t, 18)
 }
 
 func TestInstanceMetadata_Encode(t *testing.T) {
