@@ -22,5 +22,5 @@ type PeerInfo struct {
 	Roles           Text
 	ProtocolVersion U32
 	BestHash        Hash
-	BestNumber      BlockNumber
+	BestNumber      U32
 }
