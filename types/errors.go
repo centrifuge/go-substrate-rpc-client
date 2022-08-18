@@ -20,11 +20,8 @@ import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 
 type ModuleError struct {
 	Index U8
-
-	// The 1 byte error is considered legacy however it seems that it's still used.
-	//
-	// Error [4]U8
-	Error U8
+	Error   U32
+	Message OptionBytes
 }
 
 func (m *ModuleError) Decode(decoder scale.Decoder) error {
