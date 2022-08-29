@@ -2409,10 +2409,8 @@ const (
 	Invest
 	ProxyManagement
 	KeystoreManagement
-	NFTMint
-	NFTTransfer
-	NFTManagement
-	AnchorManagement
+	PodOperation
+	PodAuth
 )
 
 var (
@@ -2427,10 +2425,8 @@ var (
 		Invest:             {},
 		ProxyManagement:    {},
 		KeystoreManagement: {},
-		NFTMint:            {},
-		NFTTransfer:        {},
-		NFTManagement:      {},
-		AnchorManagement:   {},
+		PodOperation:       {},
+		PodAuth:            {},
 	}
 
 	ProxyTypeName = map[ProxyType]string{
@@ -2444,10 +2440,8 @@ var (
 		Invest:             "invest",
 		ProxyManagement:    "proxy_management",
 		KeystoreManagement: "keystore_management",
-		NFTMint:            "nft_mint",
-		NFTTransfer:        "nft_transfer",
-		NFTManagement:      "nft_management",
-		AnchorManagement:   "anchor_management",
+		PodOperation:       "pod_operation",
+		PodAuth:            "pod_auth",
 	}
 
 	ProxyTypeValue = map[string]ProxyType{
@@ -2461,10 +2455,8 @@ var (
 		"invest":              Invest,
 		"proxy_management":    ProxyManagement,
 		"keystore_management": KeystoreManagement,
-		"nft_mint":            NFTMint,
-		"nft_transfer":        NFTTransfer,
-		"nft_management":      NFTManagement,
-		"anchor_management":   AnchorManagement,
+		"pod_operation":       PodOperation,
+		"pod_auth":            PodAuth,
 	}
 )
 

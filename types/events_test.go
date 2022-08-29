@@ -87,7 +87,7 @@ func TestDispatchResult_Decode(t *testing.T) {
 var (
 	proxyTypeFuzzOpts = []fuzzOpt{
 		withFuzzFuncs(func(p *ProxyType, c fuzz.Continue) {
-			*p = ProxyType(c.Intn(13))
+			*p = ProxyType(c.Intn(12))
 		}),
 	}
 )
