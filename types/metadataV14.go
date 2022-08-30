@@ -144,7 +144,7 @@ func (m *MetadataV14) FindStorageEntryMetadata(module string, fn string) (Storag
 	return nil, fmt.Errorf("module %v not found in metadata", module)
 }
 
-func (m *MetadataV14) FindError(moduleIndex U8, errorIndex U8) (*MetadataError, error) {
+func (m *MetadataV14) FindError(moduleIndex U8, errorIndex [4]U8) (*MetadataError, error) {
 	for _, mod := range m.Pallets {
 		if int(mod.Index) == int(moduleIndex) {
 			if mod.HasErrors {
@@ -160,12 +160,12 @@ func (m *MetadataV14) FindError(moduleIndex U8, errorIndex U8) (*MetadataError, 
 				}
 
 				for _, variant := range errType.Def.Variant.Variants {
-					if variant.Index == errorIndex {
+					if variant.Index == errorIndex[0] {
 						return NewMetadataError(variant), nil
 					}
 				}
 
-				return nil, fmt.Errorf("error at index %d not found", errorIndex)
+				return nil, fmt.Errorf("error at index 0x%x not found", errorIndex)
 			}
 
 			return nil, fmt.Errorf("module %d has no errors", moduleIndex)

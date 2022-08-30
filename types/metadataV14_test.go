@@ -298,17 +298,17 @@ func TestMetadataV14_FindError(t *testing.T) {
 	assert.NoError(t, err)
 
 	// System - SpecVersionNeedsToIncrease
-	metaErr, err := meta.FindError(0, 1)
+	metaErr, err := meta.FindError(0, [4]U8{1})
 	assert.NoError(t, err)
 	assert.NotNil(t, metaErr)
 
 	// System - no error at index
-	metaErr, err = meta.FindError(0, 6)
+	metaErr, err = meta.FindError(0, [4]U8{6})
 	assert.Error(t, err)
 	assert.Nil(t, metaErr)
 
 	// No module at index
-	metaErr, err = meta.FindError(200, 0)
+	metaErr, err = meta.FindError(200, [4]U8{0})
 	assert.Error(t, err)
 	assert.Nil(t, metaErr)
 }
