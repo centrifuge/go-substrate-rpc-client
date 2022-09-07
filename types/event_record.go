@@ -517,7 +517,7 @@ func (e EventRecordsRaw) DecodeEventRecords(m *Metadata, t interface{}) error { 
 			return fmt.Errorf("unable to find event with EventID %v in metadata for event #%v: %s", id, i, err)
 		}
 
-		//fmt.Printf("event #%v is in module %v with event name %v\n", i, moduleName, eventName)
+		// fmt.Printf("event #%v is in module %v with event name %v\n", i, moduleName, eventName)
 
 		log.Debug(fmt.Sprintf("event #%v is in module %v with event name %v", i, moduleName, eventName))
 

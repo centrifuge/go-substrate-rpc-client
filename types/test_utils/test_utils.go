@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package test_utils
+package testutils
 
 import (
 	"bytes"
@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
-	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	fuzz "github.com/google/gofuzz"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/blake2b"
@@ -122,7 +122,7 @@ func AssertRoundtrip(t *testing.T, value interface{}) {
 
 func AssertEncodedLength(t *testing.T, encodedLengthAsserts []EncodedLengthAssert) {
 	for _, test := range encodedLengthAsserts {
-		result, err := EncodedLength(test.Input)
+		result, err := codec.EncodedLength(test.Input)
 		if err != nil {
 			t.Errorf("Encoded length error for input %v: %v\n", test.Input, err)
 		}
@@ -139,7 +139,7 @@ type EncodingAssert struct {
 
 func AssertEncode(t *testing.T, encodingAsserts []EncodingAssert) {
 	for _, test := range encodingAsserts {
-		result, err := Encode(test.Input)
+		result, err := codec.Encode(test.Input)
 		if err != nil {
 			t.Errorf("Encoding error for input %v: %v\n", test.Input, err)
 		}
@@ -158,7 +158,7 @@ type DecodingAssert struct {
 func AssertDecode(t *testing.T, decodingAsserts []DecodingAssert) {
 	for _, test := range decodingAsserts {
 		target := reflect.New(reflect.TypeOf(test.Expected))
-		err := Decode(test.Input, target.Interface())
+		err := codec.Decode(test.Input, target.Interface())
 		if err != nil {
 			t.Errorf("Encoding error for input %v: %v\n", test.Input, err)
 		}
@@ -173,7 +173,7 @@ type HashAssert struct {
 
 func AssertHash(t *testing.T, hashAsserts []HashAssert) {
 	for _, test := range hashAsserts {
-		enc, err := Encode(test.Input)
+		enc, err := codec.Encode(test.Input)
 
 		if err != nil {
 			t.Errorf("Couldn't encode input %v: %s", test.Input, err)
@@ -194,7 +194,7 @@ type EncodeToHexAssert struct {
 
 func AssertEncodeToHex(t *testing.T, encodeToHexAsserts []EncodeToHexAssert) {
 	for _, test := range encodeToHexAsserts {
-		result, err := EncodeToHex(test.Input)
+		result, err := codec.EncodeToHex(test.Input)
 		if err != nil {
 			t.Errorf("Hex error for input %v: %v\n", test.Input, err)
 		}
@@ -226,7 +226,7 @@ type EqAssert struct {
 
 func AssertEq(t *testing.T, eqAsserts []EqAssert) {
 	for _, test := range eqAsserts {
-		result := Eq(test.Input, test.Other)
+		result := codec.Eq(test.Input, test.Other)
 		if result != test.Expected {
 			t.Errorf("Fail, input %v, other %v, expected %v, result %v\n", test.Input, test.Other, test.Expected, result)
 		}
