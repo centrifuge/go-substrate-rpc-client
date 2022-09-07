@@ -20,31 +20,33 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 func TestType_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, Type(""))
-	assertRoundtrip(t, Type("Custom Type"))
-	assertRoundTripFuzz[Type](t, 100)
-	assertEncodeEmptyObj[Type](t, 1)
+	AssertRoundtrip(t, Type(""))
+	AssertRoundtrip(t, Type("Custom Type"))
+	AssertRoundTripFuzz[Type](t, 100)
+	AssertEncodeEmptyObj[Type](t, 1)
 }
 
 func TestType_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{
+	AssertEncodedLength(t, []EncodedLengthAssert{
 		{Type(""), 1},
 		{Type("Custom Type"), 12},
 	})
 }
 
 func TestType_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{Type(""), MustHexDecodeString("0x00")},
 		{Type("Custom Type"), MustHexDecodeString("0x2c437573746f6d2054797065")},
 	})
 }
 
 func TestType_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{Type(""), MustHexDecodeString("0x03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314")},
 		{Type("Custom Type"), MustHexDecodeString(
 			"0x7c2996c160a91b8479eae96ade3ad8b287edc22997bf209b7bc0ca04d3bc0725")},
@@ -52,21 +54,21 @@ func TestType_Hash(t *testing.T) {
 }
 
 func TestType_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{Type(""), "0x00"},
 		{Type("Custom Type"), "0x2c437573746f6d2054797065"},
 	})
 }
 
 func TestType_Type(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{Type(""), ""},
 		{Type("Custom Type"), "Custom Type"},
 	})
 }
 
 func TestType_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{Type("Custom Type"), Type("Custom Type"), true},
 		{Type(""), Type("23"), false},
 		{Type("Custom Type"), NewU8(23), false},

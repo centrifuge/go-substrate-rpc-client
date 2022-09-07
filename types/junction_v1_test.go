@@ -20,9 +20,10 @@ import (
 	"math/big"
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 )
 
 var (
@@ -75,12 +76,12 @@ var (
 		},
 	}
 
-	junctionV1FuzzOpts = combineFuzzOpts(
+	junctionV1FuzzOpts = CombineFuzzOpts(
 		networkIDFuzzOpts,
 		bodyIDFuzzOpts,
 		bodyPartFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(j *JunctionV1, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(j *JunctionV1, c fuzz.Continue) {
 				switch c.Intn(9) {
 				case 0:
 					j.IsParachain = true
@@ -131,13 +132,13 @@ var (
 )
 
 func TestJunctionV1_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[JunctionV1](t, 1000, junctionV1FuzzOpts...)
-	assertDecodeNilData[JunctionV1](t)
-	assertEncodeEmptyObj[JunctionV1](t, 0)
+	AssertRoundTripFuzz[JunctionV1](t, 1000, junctionV1FuzzOpts...)
+	AssertDecodeNilData[JunctionV1](t)
+	AssertEncodeEmptyObj[JunctionV1](t, 0)
 }
 
 func TestJunctionV1_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testJunctionV1n1, MustHexDecodeString("0x002c")},
 		{testJunctionV1n2, MustHexDecodeString("0x01000c010203")},
 		{testJunctionV1n3, MustHexDecodeString("0x02001000000000000000")},
@@ -151,7 +152,7 @@ func TestJunctionV1_Encode(t *testing.T) {
 }
 
 func TestJunctionV1_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x002c"), testJunctionV1n1},
 		{MustHexDecodeString("0x01000c010203"), testJunctionV1n2},
 		{MustHexDecodeString("0x02001000000000000000"), testJunctionV1n3},
@@ -243,10 +244,10 @@ var (
 		},
 	}
 
-	junctionsV1FuzzOpts = combineFuzzOpts(
+	junctionsV1FuzzOpts = CombineFuzzOpts(
 		junctionV1FuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(j *JunctionsV1, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(j *JunctionsV1, c fuzz.Continue) {
 				switch c.Intn(9) {
 				case 0:
 					j.IsHere = true
@@ -289,13 +290,13 @@ var (
 )
 
 func TestJunctionsV1_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[JunctionsV1](t, 1000, junctionsV1FuzzOpts...)
-	assertDecodeNilData[JunctionsV1](t)
-	assertEncodeEmptyObj[JunctionsV1](t, 0)
+	AssertRoundTripFuzz[JunctionsV1](t, 1000, junctionsV1FuzzOpts...)
+	AssertDecodeNilData[JunctionsV1](t)
+	AssertEncodeEmptyObj[JunctionsV1](t, 0)
 }
 
 func TestJunctionsV1_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{
 			testJunctionsV1n1,
 			MustHexDecodeString("0x00"),
@@ -336,7 +337,7 @@ func TestJunctionsV1_Encode(t *testing.T) {
 }
 
 func TestJunctionsV1_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{
 			MustHexDecodeString("0x00"),
 			testJunctionsV1n1,

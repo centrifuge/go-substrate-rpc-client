@@ -19,9 +19,10 @@ package types_test
 import (
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 )
 
 var testMultiSig1 = MultiSignature{IsEd25519: true, AsEd25519: NewSignature(hash64)}
@@ -29,8 +30,8 @@ var testMultiSig2 = MultiSignature{IsSr25519: true, AsSr25519: NewSignature(hash
 var testMultiSig3 = MultiSignature{IsEcdsa: true, AsEcdsa: NewEcdsaSignature(hash65)}
 
 var (
-	multiSignatureFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(m *MultiSignature, c fuzz.Continue) {
+	multiSignatureFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(m *MultiSignature, c fuzz.Continue) {
 			switch c.Intn(3) {
 			case 0:
 				m.IsEd25519 = true
@@ -47,16 +48,16 @@ var (
 )
 
 func TestMultiSignature_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, testMultiSig1)
-	assertRoundtrip(t, testMultiSig2)
-	assertRoundtrip(t, testMultiSig3)
-	assertRoundTripFuzz[MultiSignature](t, 100, multiSignatureFuzzOpts...)
-	assertDecodeNilData[MultiSignature](t)
-	assertEncodeEmptyObj[MultiSignature](t, 0)
+	AssertRoundtrip(t, testMultiSig1)
+	AssertRoundtrip(t, testMultiSig2)
+	AssertRoundtrip(t, testMultiSig3)
+	AssertRoundTripFuzz[MultiSignature](t, 100, multiSignatureFuzzOpts...)
+	AssertDecodeNilData[MultiSignature](t)
+	AssertEncodeEmptyObj[MultiSignature](t, 0)
 }
 
 func TestMultiSignature_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testMultiSig1, MustHexDecodeString("0x0001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304")},   //nolint:lll
 		{testMultiSig2, MustHexDecodeString("0x0101020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304")},   //nolint:lll
 		{testMultiSig3, MustHexDecodeString("0x020102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405")}, //nolint:lll
@@ -64,7 +65,7 @@ func TestMultiSignature_Encode(t *testing.T) {
 }
 
 func TestMultiSignature_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x0001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304"), testMultiSig1},   //nolint:lll
 		{MustHexDecodeString("0x0101020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304"), testMultiSig2},   //nolint:lll
 		{MustHexDecodeString("0x020102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405"), testMultiSig3}, //nolint:lll

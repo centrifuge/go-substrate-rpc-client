@@ -4,7 +4,7 @@ import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 
 type ProxyDefinition struct {
 	Delegate  AccountID
-	ProxyType ProxyType
+	ProxyType U8
 	Delay     U32
 }
 

@@ -19,6 +19,7 @@ package state
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 // GetChildKeys retreives the keys with the given prefix of a specific child storage
@@ -42,7 +43,7 @@ func (s *state) getChildKeys(childStorageKey, prefix types.StorageKey, blockHash
 
 	keys := make([]types.StorageKey, len(res))
 	for i, r := range res {
-		err = types.DecodeFromHex(r, &keys[i])
+		err = codec.DecodeFromHex(r, &keys[i])
 		if err != nil {
 			return nil, err
 		}

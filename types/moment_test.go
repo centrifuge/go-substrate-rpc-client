@@ -22,16 +22,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMoment_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewMoment(time.Unix(1575470205, 874000000000)))
-	assertRoundtrip(t, NewMoment(time.Unix(0, 0)))
+	AssertRoundtrip(t, NewMoment(time.Unix(1575470205, 874000000000)))
+	AssertRoundtrip(t, NewMoment(time.Unix(0, 0)))
 
 	m := new(Moment)
 
@@ -47,36 +47,36 @@ func TestMoment_EncodeDecode(t *testing.T) {
 }
 
 func TestMoment_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{{NewMoment(time.Unix(12345, 0)), 8}})
+	AssertEncodedLength(t, []EncodedLengthAssert{{NewMoment(time.Unix(12345, 0)), 8}})
 }
 
 func TestMoment_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewMoment(time.Unix(12345, 0)), MustHexDecodeString("0xa85ebc0000000000")},
 	})
 }
 
 func TestMoment_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewMoment(time.Unix(12345, 0)), MustHexDecodeString(
 			"0x388c23ace057ec800ef437dcc68bfbcd2b1a22fe79aceb623d7d21f7bda56848")},
 	})
 }
 
 func TestMoment_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewMoment(time.Unix(12345, 0)), "0xa85ebc0000000000"},
 	})
 }
 
 func TestMoment_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewMoment(time.Unix(12345, 0).UTC()), "1970-01-01 03:25:45 +0000 UTC"},
 	})
 }
 
 func TestMoment_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewMoment(time.Unix(12345, 0)), NewMoment(time.Unix(12345, 0)), true},
 		{NewMoment(time.Unix(12345, 0)), NewBool(false), false},
 	})

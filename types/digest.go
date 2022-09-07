@@ -18,6 +18,8 @@ package types
 
 import (
 	"encoding/json"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 // Digest contains logs
@@ -33,7 +35,7 @@ func (d *Digest) UnmarshalJSON(bz []byte) error {
 	}
 	*d = make([]DigestItem, len(tmp.Logs))
 	for i, log := range tmp.Logs {
-		err := DecodeFromHex(log, &(*d)[i])
+		err := codec.DecodeFromHex(log, &(*d)[i])
 		if err != nil {
 			return err
 		}
@@ -46,7 +48,7 @@ func (d Digest) MarshalJSON() ([]byte, error) {
 	logs := make([]string, len(d))
 	var err error
 	for i, di := range d {
-		logs[i], err = EncodeToHex(di)
+		logs[i], err = codec.EncodeToHex(di)
 		if err != nil {
 			return nil, err
 		}

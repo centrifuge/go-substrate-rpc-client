@@ -20,9 +20,10 @@ import (
 	"math/big"
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 )
 
 var (
@@ -33,19 +34,19 @@ var (
 )
 
 func TestTranche_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[Tranche](t, 100)
-	assertDecodeNilData[Tranche](t)
-	assertEncodeEmptyObj[Tranche](t, 24)
+	AssertRoundTripFuzz[Tranche](t, 100)
+	AssertDecodeNilData[Tranche](t)
+	AssertEncodeEmptyObj[Tranche](t, 24)
 }
 
 func TestTranche_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testTranche, MustHexDecodeString("0x430100000000000004050603010302040000000000000000")},
 	})
 }
 
 func TestTranche_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x430100000000000004050603010302040000000000000000"), testTranche},
 	})
 }
@@ -72,8 +73,8 @@ var (
 		PermissionedCurrency: PermissionedCurrency{},
 	}
 
-	currencyIDFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(cID *CurrencyID, c fuzz.Continue) {
+	currencyIDFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(cID *CurrencyID, c fuzz.Continue) {
 			switch c.Intn(6) {
 			case 0:
 				cID.IsNative = true
@@ -97,13 +98,13 @@ var (
 )
 
 func TestCurrencyID_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[CurrencyID](t, 1000, currencyIDFuzzOpts...)
-	assertDecodeNilData[CurrencyID](t)
-	assertEncodeEmptyObj[CurrencyID](t, 0)
+	AssertRoundTripFuzz[CurrencyID](t, 1000, currencyIDFuzzOpts...)
+	AssertDecodeNilData[CurrencyID](t)
+	AssertEncodeEmptyObj[CurrencyID](t, 0)
 }
 
 func TestCurrencyID_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testCurrencyID1, MustHexDecodeString("0x00")},
 		{testCurrencyID2, MustHexDecodeString("0x01")},
 		{testCurrencyID3, MustHexDecodeString("0x02430100000000000004050603010302040000000000000000")},
@@ -114,7 +115,7 @@ func TestCurrencyID_Encode(t *testing.T) {
 }
 
 func TestCurrencyID_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), testCurrencyID1},
 		{MustHexDecodeString("0x01"), testCurrencyID2},
 		{MustHexDecodeString("0x02430100000000000004050603010302040000000000000000"), testCurrencyID3},
@@ -132,19 +133,19 @@ var (
 )
 
 func TestPrice_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[Price](t, 100, currencyIDFuzzOpts...)
-	assertDecodeNilData[Price](t)
-	assertEncodeEmptyObj[Price](t, 16)
+	AssertRoundTripFuzz[Price](t, 100, currencyIDFuzzOpts...)
+	AssertDecodeNilData[Price](t)
+	AssertEncodeEmptyObj[Price](t, 16)
 }
 
 func TestPrice_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testPrice, MustHexDecodeString("0x037b000000000000000000000000000000")},
 	})
 }
 
 func TestPrice_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x037b000000000000000000000000000000"), testPrice},
 	})
 }
@@ -157,13 +158,13 @@ var (
 )
 
 func TestSale_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[Sale](t, 100, currencyIDFuzzOpts...)
-	assertDecodeNilData[Sale](t)
-	assertEncodeEmptyObj[Sale](t, 48)
+	AssertRoundTripFuzz[Sale](t, 100, currencyIDFuzzOpts...)
+	AssertDecodeNilData[Sale](t)
+	AssertEncodeEmptyObj[Sale](t, 48)
 }
 
 func TestSale_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{
 			testSale,
 			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20037b000000000000000000000000000000"),
@@ -172,7 +173,7 @@ func TestSale_Encode(t *testing.T) {
 }
 
 func TestSale_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{
 			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20037b000000000000000000000000000000"),
 			testSale,

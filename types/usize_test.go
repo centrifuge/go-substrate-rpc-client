@@ -20,49 +20,51 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 func TestUSize_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, USize(0))
-	assertRoundtrip(t, USize(12))
+	AssertRoundtrip(t, USize(0))
+	AssertRoundtrip(t, USize(12))
 }
 
 func TestUsize_JSONMarshalUnmarshal(t *testing.T) {
 	u := USize(11)
 
-	assertJSONRoundTrip(t, &u)
+	AssertJSONRoundTrip(t, &u)
 }
 
 func TestUSize_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{{USize(13), 4}})
+	AssertEncodedLength(t, []EncodedLengthAssert{{USize(13), 4}})
 }
 
 func TestUSize_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{USize(29), MustHexDecodeString("0x1d000000")},
 	})
 }
 
 func TestUSize_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{USize(29), MustHexDecodeString("0x60ebb66f09bc7fdd21772ab1ed0efb1fd1208e3f5cd20d2d9a29a2a79b6f953f")},
 	})
 }
 
 func TestUSize_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{USize(29), "0x1d000000"},
 	})
 }
 
 func TestUSize_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{USize(29), "29"},
 	})
 }
 
 func TestUSize_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{USize(23), USize(23), true},
 		{USize(23), NewBool(false), false},
 	})

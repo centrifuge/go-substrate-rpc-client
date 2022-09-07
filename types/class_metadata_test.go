@@ -21,6 +21,8 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 var (
@@ -32,19 +34,19 @@ var (
 )
 
 func TestClassMetadata_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[ClassMetadata](t, 1000)
-	assertDecodeNilData[ClassMetadata](t)
-	assertEncodeEmptyObj[ClassMetadata](t, 18)
+	AssertRoundTripFuzz[ClassMetadata](t, 1000)
+	AssertDecodeNilData[ClassMetadata](t)
+	AssertEncodeEmptyObj[ClassMetadata](t, 18)
 }
 
 func TestClassMetadata_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testClassMetadata, MustHexDecodeString("0x7b000000000000000000000000000000106461746101")},
 	})
 }
 
 func TestClassMetadata_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x7b000000000000000000000000000000106461746101"), testClassMetadata},
 	})
 }

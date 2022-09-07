@@ -20,24 +20,25 @@ import (
 	"bytes"
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	electionComputeFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(e *ElectionCompute, c fuzz.Continue) {
+	electionComputeFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(e *ElectionCompute, c fuzz.Continue) {
 			*e = ElectionCompute(c.Intn(3))
 		}),
 	}
 
-	optionElectionComputeFuzzOpts = combineFuzzOpts(
+	optionElectionComputeFuzzOpts = CombineFuzzOpts(
 		electionComputeFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(o *OptionElectionCompute, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(o *OptionElectionCompute, c fuzz.Continue) {
 				if c.RandBool() {
 					*o = NewOptionElectionComputeEmpty()
 					return
@@ -54,12 +55,12 @@ var (
 )
 
 func TestOptionElectionCompute_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[OptionElectionCompute](t, 100, optionElectionComputeFuzzOpts...)
-	assertEncodeEmptyObj[ElectionCompute](t, 1)
+	AssertRoundTripFuzz[OptionElectionCompute](t, 100, optionElectionComputeFuzzOpts...)
+	AssertEncodeEmptyObj[ElectionCompute](t, 1)
 }
 
 func TestOptionElectionCompute_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewOptionElectionCompute(NewElectionCompute(byte(0))), MustHexDecodeString("0x0100")},
 		{NewOptionElectionCompute(NewElectionCompute(byte(1))), MustHexDecodeString("0x0101")},
 		{NewOptionElectionCompute(NewElectionCompute(byte(2))), MustHexDecodeString("0x0102")},
@@ -68,7 +69,7 @@ func TestOptionElectionCompute_Encode(t *testing.T) {
 }
 
 func TestOptionElectionCompute_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x0100"), NewOptionElectionCompute(NewElectionCompute(byte(0)))},
 		{MustHexDecodeString("0x0101"), NewOptionElectionCompute(NewElectionCompute(byte(1)))},
 		{MustHexDecodeString("0x0102"), NewOptionElectionCompute(NewElectionCompute(byte(2)))},
@@ -98,7 +99,7 @@ func TestElectionComputeEncodeDecode(t *testing.T) {
 	err := decoder.Decode(&ec0)
 	assert.Error(t, err)
 
-	assertRoundTripFuzz[ElectionCompute](t, 100, electionComputeFuzzOpts...)
-	assertDecodeNilData[ElectionCompute](t)
-	assertEncodeEmptyObj[ElectionCompute](t, 1)
+	AssertRoundTripFuzz[ElectionCompute](t, 100, electionComputeFuzzOpts...)
+	AssertDecodeNilData[ElectionCompute](t)
+	AssertEncodeEmptyObj[ElectionCompute](t, 1)
 }

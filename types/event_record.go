@@ -221,10 +221,6 @@ type EventRecords struct {
 	Indices_IndexFreed    []EventIndicesIndexFreed    `test-gen-blockchain:"polkadot"`
 	Indices_IndexFrozen   []EventIndicesIndexFrozen   `test-gen-blockchain:"polkadot"`
 
-	Keystore_KeyAdded   []EventKeystoreKeyAdded   `test-gen-blockchain:"centrifuge-parachain"`
-	Keystore_KeyRevoked []EventKeystoreKeyRevoked `test-gen-blockchain:"centrifuge-parachain"`
-	Keystore_DepositSet []EventKeystoreDepositSet `test-gen-blockchain:"centrifuge-parachain"`
-
 	Lottery_LotteryStarted []EventLotteryLotteryStarted `test-gen-skip:"true"`
 	Lottery_CallsUpdated   []EventLotteryCallsUpdated   `test-gen-skip:"true"`
 	Lottery_Winner         []EventLotteryWinner         `test-gen-skip:"true"`

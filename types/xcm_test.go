@@ -20,11 +20,10 @@ import (
 	"math/big"
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
-
-	_ "github.com/google/gofuzz"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 )
 
 var (
@@ -37,10 +36,10 @@ var (
 		AbstractKey: []U8{6, 7, 4},
 	}
 
-	assetIDFuzzOpts = combineFuzzOpts(
+	assetIDFuzzOpts = CombineFuzzOpts(
 		multiLocationV1FuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(a *AssetID, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(a *AssetID, c fuzz.Continue) {
 				if c.RandBool() {
 					a.IsConcrete = true
 					c.Fuzz(&a.MultiLocation)
@@ -55,20 +54,20 @@ var (
 )
 
 func TestAssetID_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[AssetID](t, 100, assetIDFuzzOpts...)
-	assertDecodeNilData[AssetID](t)
-	assertEncodeEmptyObj[AssetID](t, 0)
+	AssertRoundTripFuzz[AssetID](t, 100, assetIDFuzzOpts...)
+	AssertDecodeNilData[AssetID](t)
+	AssertEncodeEmptyObj[AssetID](t, 0)
 }
 
 func TestAssetID_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testAssetID1, MustHexDecodeString("0x000408002c01000c010203020010000000000000000303000404052a0000000000000000000000000000000608060807")},
 		{testAssetID2, MustHexDecodeString("0x010c060704")},
 	})
 }
 
 func TestAssetID_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x000408002c01000c010203020010000000000000000303000404052a0000000000000000000000000000000608060807"), testAssetID1},
 		{MustHexDecodeString("0x010c060704"), testAssetID2},
 	})
@@ -103,8 +102,8 @@ var (
 		Blob:   []U8{4, 5, 3, 2, 4, 5, 6, 2, 1},
 	}
 
-	assetInstanceFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(a *AssetInstance, c fuzz.Continue) {
+	assetInstanceFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(a *AssetInstance, c fuzz.Continue) {
 			switch c.Intn(7) {
 			case 0:
 				a.IsUndefined = true
@@ -138,13 +137,13 @@ var (
 )
 
 func TestAssetInstance_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[AssetInstance](t, 1000, assetInstanceFuzzOpts...)
-	assertDecodeNilData[AssetInstance](t)
-	assertEncodeEmptyObj[AssetInstance](t, 0)
+	AssertRoundTripFuzz[AssetInstance](t, 1000, assetInstanceFuzzOpts...)
+	AssertDecodeNilData[AssetInstance](t)
+	AssertEncodeEmptyObj[AssetInstance](t, 0)
 }
 
 func TestAssetInstance_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testAssetInstance1, MustHexDecodeString("0x00")},
 		{testAssetInstance2, MustHexDecodeString("0x017b000000000000000000000000000000")},
 		{testAssetInstance3, MustHexDecodeString("0x0201020304")},
@@ -156,7 +155,7 @@ func TestAssetInstance_Encode(t *testing.T) {
 }
 
 func TestAssetInstance_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), testAssetInstance1},
 		{MustHexDecodeString("0x017b000000000000000000000000000000"), testAssetInstance2},
 		{MustHexDecodeString("0x0201020304"), testAssetInstance3},
@@ -177,10 +176,10 @@ var (
 		AssetInstance: testAssetInstance3,
 	}
 
-	fungibilityFuzzOpts = combineFuzzOpts(
+	fungibilityFuzzOpts = CombineFuzzOpts(
 		assetInstanceFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(f *Fungibility, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(f *Fungibility, c fuzz.Continue) {
 				if c.RandBool() {
 					f.IsFungible = true
 					c.Fuzz(&f.Amount)
@@ -195,20 +194,20 @@ var (
 )
 
 func TestFungibility_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[Fungibility](t, 1000, fungibilityFuzzOpts...)
-	assertDecodeNilData[Fungibility](t)
-	assertEncodeEmptyObj[Fungibility](t, 0)
+	AssertRoundTripFuzz[Fungibility](t, 1000, fungibilityFuzzOpts...)
+	AssertDecodeNilData[Fungibility](t)
+	AssertEncodeEmptyObj[Fungibility](t, 0)
 }
 
 func TestFungibility_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testFungibility1, MustHexDecodeString("0x00ed01")},
 		{testFungibility2, MustHexDecodeString("0x010201020304")},
 	})
 }
 
 func TestFungibility_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00ed01"), testFungibility1},
 		{MustHexDecodeString("0x010201020304"), testFungibility2},
 	})
@@ -224,17 +223,17 @@ var (
 		Fungibility: testFungibility2,
 	}
 
-	multiAssetV1FuzzOpts = combineFuzzOpts(assetIDFuzzOpts, fungibilityFuzzOpts)
+	multiAssetV1FuzzOpts = CombineFuzzOpts(assetIDFuzzOpts, fungibilityFuzzOpts)
 )
 
 func TestMultiAssetV1_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[MultiAssetV1](t, 1000, multiAssetV1FuzzOpts...)
-	assertDecodeNilData[MultiAssetV1](t)
-	assertEncodeEmptyObj[MultiAssetV1](t, 0)
+	AssertRoundTripFuzz[MultiAssetV1](t, 1000, multiAssetV1FuzzOpts...)
+	AssertDecodeNilData[MultiAssetV1](t)
+	AssertEncodeEmptyObj[MultiAssetV1](t, 0)
 }
 
 func TestMultiAssetV1_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{
 			testMultiAssetV1,
 			MustHexDecodeString("0x010c06070400ed01"),
@@ -247,7 +246,7 @@ func TestMultiAssetV1_Encode(t *testing.T) {
 }
 
 func TestMultiAssetV1_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{
 			MustHexDecodeString("0x010c06070400ed01"),
 			testMultiAssetV1,
@@ -264,12 +263,12 @@ var (
 )
 
 func TestMultiAssetsV1_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[MultiAssetsV1](t, 100, multiAssetV1FuzzOpts...)
-	assertEncodeEmptyObj[MultiAssetsV1](t, 1)
+	AssertRoundTripFuzz[MultiAssetsV1](t, 100, multiAssetV1FuzzOpts...)
+	AssertEncodeEmptyObj[MultiAssetsV1](t, 1)
 }
 
 func TestMultiAssetsV1_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{
 			testMultiAssetsV1,
 			MustHexDecodeString("0x08010c06070400ed01000408002c01000c010203020010000000000000000303000404052a0000000000000000000000000000000608060807010201020304"),
@@ -278,7 +277,7 @@ func TestMultiAssetsV1_Encode(t *testing.T) {
 }
 
 func TestMultiAssetsV1_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{
 			MustHexDecodeString("0x08010c06070400ed01000408002c01000c010203020010000000000000000303000404052a0000000000000000000000000000000608060807010201020304"),
 			testMultiAssetsV1,
@@ -336,11 +335,11 @@ var (
 		ConcreteNonFungibleInstance: testAssetInstance3,
 	}
 
-	multiAssetV0FuzzOpts = combineFuzzOpts(
+	multiAssetV0FuzzOpts = CombineFuzzOpts(
 		multiLocationV1FuzzOpts,
 		assetInstanceFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(m *MultiAssetV0, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(m *MultiAssetV0, c fuzz.Continue) {
 				switch c.Intn(12) {
 				case 0:
 					m.IsNone = true
@@ -397,13 +396,13 @@ var (
 )
 
 func TestMultiAssetV0_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[MultiAssetV0](t, 1000, multiAssetV0FuzzOpts...)
-	assertDecodeNilData[MultiAssetV0](t)
-	assertEncodeEmptyObj[MultiAssetV0](t, 0)
+	AssertRoundTripFuzz[MultiAssetV0](t, 1000, multiAssetV0FuzzOpts...)
+	AssertDecodeNilData[MultiAssetV0](t)
+	AssertEncodeEmptyObj[MultiAssetV0](t, 0)
 }
 
 func TestMultiAssetV0_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testMultiAssetV0n1, MustHexDecodeString("0x00")},
 		{testMultiAssetV0n2, MustHexDecodeString("0x01")},
 		{testMultiAssetV0n3, MustHexDecodeString("0x02")},
@@ -420,7 +419,7 @@ func TestMultiAssetV0_Encode(t *testing.T) {
 }
 
 func TestMultiAssetV0_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), testMultiAssetV0n1},
 		{MustHexDecodeString("0x01"), testMultiAssetV0n2},
 		{MustHexDecodeString("0x02"), testMultiAssetV0n3},
@@ -450,11 +449,11 @@ var (
 		MultiAssetsV1: testMultiAssetsV1,
 	}
 
-	versionedMultiAssetsFuzzOpts = combineFuzzOpts(
+	versionedMultiAssetsFuzzOpts = CombineFuzzOpts(
 		multiAssetV0FuzzOpts,
 		multiAssetV1FuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(v *VersionedMultiAssets, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(v *VersionedMultiAssets, c fuzz.Continue) {
 				if c.RandBool() {
 					v.IsV0 = true
 					c.Fuzz(&v.MultiAssetsV0)
@@ -469,13 +468,13 @@ var (
 )
 
 func TestVersionedMultiAssets_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[VersionedMultiAssets](t, 1000, versionedMultiAssetsFuzzOpts...)
-	assertDecodeNilData[VersionedMultiAssets](t)
-	assertEncodeEmptyObj[VersionedMultiAssets](t, 0)
+	AssertRoundTripFuzz[VersionedMultiAssets](t, 1000, versionedMultiAssetsFuzzOpts...)
+	AssertDecodeNilData[VersionedMultiAssets](t)
+	AssertEncodeEmptyObj[VersionedMultiAssets](t, 0)
 }
 
 func TestVersionedMultiAssets_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{
 			testVersionedMultiAssets1,
 			MustHexDecodeString("0x000c00040c0405060a0408002c01000c010203020010000000000000000303000404052a00000000000000000000000000000006080608078e020000000000000000000000000000"),
@@ -488,7 +487,7 @@ func TestVersionedMultiAssets_Encode(t *testing.T) {
 }
 
 func TestVersionedMultiAssets_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{
 			MustHexDecodeString("0x000c00040c0405060a0408002c01000c010203020010000000000000000303000404052a00000000000000000000000000000006080608078e020000000000000000000000000000"),
 			testVersionedMultiAssets1,
@@ -517,11 +516,11 @@ var (
 		Version:   NewU32(431),
 	}
 
-	responseFuzzOpts = combineFuzzOpts(
+	responseFuzzOpts = CombineFuzzOpts(
 		multiAssetV1FuzzOpts,
 		executionResultFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(r *Response, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(r *Response, c fuzz.Continue) {
 				switch c.Intn(4) {
 				case 0:
 					r.IsNull = true
@@ -544,13 +543,13 @@ var (
 )
 
 func TestResponse_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[Response](t, 1000, responseFuzzOpts...)
-	assertDecodeNilData[Response](t)
-	assertEncodeEmptyObj[Response](t, 0)
+	AssertRoundTripFuzz[Response](t, 1000, responseFuzzOpts...)
+	AssertDecodeNilData[Response](t)
+	AssertEncodeEmptyObj[Response](t, 0)
 }
 
 func TestResponse_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testResponse1, MustHexDecodeString("0x00")},
 		{testResponse2, MustHexDecodeString("0x0108010c06070400ed01000408002c01000c010203020010000000000000000303000404052a0000000000000000000000000000000608060807010201020304")},
 		{testResponse3, MustHexDecodeString("0x020100000000")},
@@ -559,7 +558,7 @@ func TestResponse_Encode(t *testing.T) {
 }
 
 func TestResponse_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), testResponse1},
 		{MustHexDecodeString("0x0108010c06070400ed01000408002c01000c010203020010000000000000000303000404052a0000000000000000000000000000000608060807010201020304"), testResponse2},
 		{MustHexDecodeString("0x020100000000"), testResponse3},
@@ -581,8 +580,8 @@ var (
 		IsXcm: true,
 	}
 
-	originKindFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(o *OriginKind, c fuzz.Continue) {
+	originKindFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(o *OriginKind, c fuzz.Continue) {
 			switch c.Intn(4) {
 			case 0:
 				o.IsNative = true
@@ -598,13 +597,13 @@ var (
 )
 
 func TestOriginKind_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[OriginKind](t, 1000, originKindFuzzOpts...)
-	assertDecodeNilData[OriginKind](t)
-	assertEncodeEmptyObj[OriginKind](t, 0)
+	AssertRoundTripFuzz[OriginKind](t, 1000, originKindFuzzOpts...)
+	AssertDecodeNilData[OriginKind](t)
+	AssertEncodeEmptyObj[OriginKind](t, 0)
 }
 
 func TestOriginKind_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testOriginKind1, MustHexDecodeString("0x00")},
 		{testOriginKind2, MustHexDecodeString("0x01")},
 		{testOriginKind3, MustHexDecodeString("0x02")},
@@ -613,7 +612,7 @@ func TestOriginKind_Encode(t *testing.T) {
 }
 
 func TestOriginKind_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), testOriginKind1},
 		{MustHexDecodeString("0x01"), testOriginKind2},
 		{MustHexDecodeString("0x02"), testOriginKind3},
@@ -628,18 +627,18 @@ var (
 )
 
 func TestEncodedCall_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[EncodedCall](t, 100)
-	assertEncodeEmptyObj[EncodedCall](t, 1)
+	AssertRoundTripFuzz[EncodedCall](t, 100)
+	AssertEncodeEmptyObj[EncodedCall](t, 1)
 }
 
 func TestEncodedCall_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testEncodedCall, MustHexDecodeString("0x1005060709")},
 	})
 }
 
 func TestEncodedCall_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x1005060709"), testEncodedCall},
 	})
 }
@@ -648,8 +647,8 @@ var (
 	testWildFungibility1 = WildFungibility{IsFungible: true}
 	testWildFungibility2 = WildFungibility{IsNonFungible: true}
 
-	wildFungibilityFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(w *WildFungibility, c fuzz.Continue) {
+	wildFungibilityFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(w *WildFungibility, c fuzz.Continue) {
 			if c.RandBool() {
 				w.IsFungible = true
 				return
@@ -661,20 +660,20 @@ var (
 )
 
 func TestWildFungibility_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[WildFungibility](t, 100, wildFungibilityFuzzOpts...)
-	assertDecodeNilData[WildFungibility](t)
-	assertEncodeEmptyObj[WildFungibility](t, 0)
+	AssertRoundTripFuzz[WildFungibility](t, 100, wildFungibilityFuzzOpts...)
+	AssertDecodeNilData[WildFungibility](t)
+	AssertEncodeEmptyObj[WildFungibility](t, 0)
 }
 
 func TestWildFungibility_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testWildFungibility1, MustHexDecodeString("0x00")},
 		{testWildFungibility2, MustHexDecodeString("0x01")},
 	})
 }
 
 func TestWildFungibility_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), testWildFungibility1},
 		{MustHexDecodeString("0x01"), testWildFungibility2},
 	})
@@ -690,11 +689,11 @@ var (
 		Fun:     testWildFungibility1,
 	}
 
-	wildMultiAssetFuzzOpts = combineFuzzOpts(
+	wildMultiAssetFuzzOpts = CombineFuzzOpts(
 		assetIDFuzzOpts,
 		wildFungibilityFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(w *WildMultiAsset, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(w *WildMultiAsset, c fuzz.Continue) {
 				if c.RandBool() {
 					w.IsAll = true
 					return
@@ -709,20 +708,20 @@ var (
 )
 
 func TestWildMultiAsset_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[WildMultiAsset](t, 100, wildMultiAssetFuzzOpts...)
-	assertDecodeNilData[WildMultiAsset](t)
-	assertEncodeEmptyObj[WildMultiAsset](t, 0)
+	AssertRoundTripFuzz[WildMultiAsset](t, 100, wildMultiAssetFuzzOpts...)
+	AssertDecodeNilData[WildMultiAsset](t)
+	AssertEncodeEmptyObj[WildMultiAsset](t, 0)
 }
 
 func TestWildMultiAsset_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testWildMultiAsset1, MustHexDecodeString("0x00")},
 		{testWildMultiAsset2, MustHexDecodeString("0x01010c06070400")},
 	})
 }
 
 func TestWildMultiAsset_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), testWildMultiAsset1},
 		{MustHexDecodeString("0x01010c06070400"), testWildMultiAsset2},
 	})
@@ -737,11 +736,11 @@ var (
 		IsWild:         true,
 		WildMultiAsset: testWildMultiAsset1,
 	}
-	multiAssetFilterFuzzOpts = combineFuzzOpts(
+	multiAssetFilterFuzzOpts = CombineFuzzOpts(
 		multiAssetV1FuzzOpts,
 		wildMultiAssetFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(m *MultiAssetFilter, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(m *MultiAssetFilter, c fuzz.Continue) {
 				if c.RandBool() {
 					m.IsDefinite = true
 					c.Fuzz(&m.MultiAssets)
@@ -756,13 +755,13 @@ var (
 )
 
 func TestMultiAssetFilter_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[MultiAssetFilter](t, 100, multiAssetFilterFuzzOpts...)
-	assertDecodeNilData[MultiAssetFilter](t)
-	assertEncodeEmptyObj[MultiAssetFilter](t, 0)
+	AssertRoundTripFuzz[MultiAssetFilter](t, 100, multiAssetFilterFuzzOpts...)
+	AssertDecodeNilData[MultiAssetFilter](t)
+	AssertEncodeEmptyObj[MultiAssetFilter](t, 0)
 }
 
 func TestMultiAssetFilter_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{
 			testMultiAssetFilter1,
 			MustHexDecodeString("0x0008010c06070400ed01000408002c01000c010203020010000000000000000303000404052a0000000000000000000000000000000608060807010201020304"),
@@ -775,7 +774,7 @@ func TestMultiAssetFilter_Encode(t *testing.T) {
 }
 
 func TestMultiAssetFilter_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{
 			MustHexDecodeString("0x0008010c06070400ed01000408002c01000c010203020010000000000000000303000404052a0000000000000000000000000000000608060807010201020304"),
 			testMultiAssetFilter1,
@@ -795,8 +794,8 @@ var (
 		IsLimited: true,
 		Limit:     54,
 	}
-	weightLimitFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(w *WeightLimit, c fuzz.Continue) {
+	weightLimitFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(w *WeightLimit, c fuzz.Continue) {
 			if c.RandBool() {
 				w.IsUnlimited = true
 				return
@@ -809,36 +808,36 @@ var (
 )
 
 func TestWeightLimit_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[WeightLimit](t, 100, weightLimitFuzzOpts...)
-	assertDecodeNilData[WeightLimit](t)
-	assertEncodeEmptyObj[WeightLimit](t, 0)
+	AssertRoundTripFuzz[WeightLimit](t, 100, weightLimitFuzzOpts...)
+	AssertDecodeNilData[WeightLimit](t)
+	AssertEncodeEmptyObj[WeightLimit](t, 0)
 }
 
 func TestWeightLimit_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testWeightLimit1, MustHexDecodeString("0x00")},
 		{testWeightLimit2, MustHexDecodeString("0x013600000000000000")},
 	})
 }
 
 func TestWeightLimit_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), testWeightLimit1},
 		{MustHexDecodeString("0x013600000000000000"), testWeightLimit2},
 	})
 }
 
 var (
-	instructionFuzzOpts = combineFuzzOpts(
+	instructionFuzzOpts = CombineFuzzOpts(
 		multiAssetV1FuzzOpts,
 		responseFuzzOpts,
 		multiLocationV1FuzzOpts,
 		originKindFuzzOpts,
 		multiAssetFilterFuzzOpts,
 		weightLimitFuzzOpts,
-		[]fuzzOpt{
-			withNumElements(1, 3),
-			withFuzzFuncs(func(i *Instruction, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithNumElements(1, 3),
+			WithFuzzFuncs(func(i *Instruction, c fuzz.Continue) {
 				switch c.Intn(28) {
 				case 0:
 					i.IsWithdrawAsset = true
@@ -1009,7 +1008,7 @@ var (
 )
 
 func TestInstruction_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[Instruction](t, 1000, instructionFuzzOpts...)
-	assertDecodeNilData[Instruction](t)
-	assertEncodeEmptyObj[Instruction](t, 0)
+	AssertRoundTripFuzz[Instruction](t, 1000, instructionFuzzOpts...)
+	AssertDecodeNilData[Instruction](t)
+	AssertEncodeEmptyObj[Instruction](t, 0)
 }

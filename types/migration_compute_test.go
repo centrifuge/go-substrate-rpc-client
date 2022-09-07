@@ -19,9 +19,10 @@ package types_test
 import (
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 )
 
 var (
@@ -32,8 +33,8 @@ var (
 		IsAuto: true,
 	}
 
-	migrationComputeFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(m *MigrationCompute, c fuzz.Continue) {
+	migrationComputeFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(m *MigrationCompute, c fuzz.Continue) {
 			r := c.RandBool()
 			m.IsSigned = r
 			m.IsAuto = !r
@@ -42,20 +43,20 @@ var (
 )
 
 func TestMigrationCompute_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[MigrationCompute](t, 100, migrationComputeFuzzOpts...)
-	assertDecodeNilData[MigrationCompute](t)
-	assertEncodeEmptyObj[MigrationCompute](t, 0)
+	AssertRoundTripFuzz[MigrationCompute](t, 100, migrationComputeFuzzOpts...)
+	AssertDecodeNilData[MigrationCompute](t)
+	AssertEncodeEmptyObj[MigrationCompute](t, 0)
 }
 
 func TestMigrationCompute_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testMigrationCompute1, MustHexDecodeString("0x00")},
 		{testMigrationCompute2, MustHexDecodeString("0x01")},
 	})
 }
 
 func TestMigrationCompute_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), testMigrationCompute1},
 		{MustHexDecodeString("0x01"), testMigrationCompute2},
 	})

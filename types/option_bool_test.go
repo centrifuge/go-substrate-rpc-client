@@ -19,19 +19,20 @@ package types_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestOptionBool_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewOptionBool(NewBool(true)))
-	assertRoundtrip(t, NewOptionBool(NewBool(false)))
-	assertRoundtrip(t, NewOptionBoolEmpty())
+	AssertRoundtrip(t, NewOptionBool(NewBool(true)))
+	AssertRoundtrip(t, NewOptionBool(NewBool(false)))
+	AssertRoundtrip(t, NewOptionBoolEmpty())
 }
 
 func TestOptionBool_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{
+	AssertEncodedLength(t, []EncodedLengthAssert{
 		{NewOptionBool(NewBool(false)), 1},
 		{NewOptionBool(NewBool(true)), 1},
 		{NewOptionBoolEmpty(), 1},
@@ -39,7 +40,7 @@ func TestOptionBool_EncodedLength(t *testing.T) {
 }
 
 func TestOptionBool_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewOptionBool(NewBool(false)), MustHexDecodeString("0x02")},
 		{NewOptionBool(NewBool(true)), MustHexDecodeString("0x01")},
 		{NewOptionBoolEmpty(), MustHexDecodeString("0x00")},
@@ -47,7 +48,7 @@ func TestOptionBool_Encode(t *testing.T) {
 }
 
 func TestOptionBool_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewOptionBool(NewBool(true)), MustHexDecodeString(
 			"0xee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25")},
 		{NewOptionBool(NewBool(false)), MustHexDecodeString(
@@ -58,7 +59,7 @@ func TestOptionBool_Hash(t *testing.T) {
 }
 
 func TestOptionBool_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewOptionBool(NewBool(true)), NewBool(true), false},
 		{NewOptionBool(NewBool(false)), NewOptionBool(NewBool(false)), true},
 		{NewOptionBoolEmpty(), NewOptionBoolEmpty(), true},

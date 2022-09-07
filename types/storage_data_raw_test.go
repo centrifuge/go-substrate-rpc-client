@@ -20,11 +20,13 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestStorageDataRaw_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{
+	AssertEncodedLength(t, []EncodedLengthAssert{
 		{NewStorageDataRaw([]byte{12, 251, 42}), 3},
 		{NewStorageDataRaw([]byte{}), 0},
 	})
@@ -47,7 +49,7 @@ func TestStorageDataRaw_Decode(t *testing.T) {
 }
 
 func TestStorageDataRaw_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewStorageDataRaw([]byte{0, 42, 254}), MustHexDecodeString(
 			"0x537db36f5b5970b679a28a3df8d219317d658014fb9c3d409c0c799d8ecf149d")},
 		{NewStorageDataRaw([]byte{}), MustHexDecodeString(
@@ -56,7 +58,7 @@ func TestStorageDataRaw_Hash(t *testing.T) {
 }
 
 func TestStorageDataRaw_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewStorageDataRaw([]byte{0, 0, 0}), "0x000000"},
 		{NewStorageDataRaw([]byte{171, 18, 52}), "0xab1234"},
 		{NewStorageDataRaw([]byte{0, 1}), "0x0001"},
@@ -65,7 +67,7 @@ func TestStorageDataRaw_Hex(t *testing.T) {
 }
 
 func TestStorageDataRaw_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewStorageDataRaw([]byte{0, 0, 0}), "[0 0 0]"},
 		{NewStorageDataRaw([]byte{171, 18, 52}), "[171 18 52]"},
 		{NewStorageDataRaw([]byte{0, 1}), "[0 1]"},
@@ -74,7 +76,7 @@ func TestStorageDataRaw_String(t *testing.T) {
 }
 
 func TestStorageDataRaw_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewStorageDataRaw([]byte{1, 0, 0}), NewStorageDataRaw([]byte{1, 0}), false},
 		{NewStorageDataRaw([]byte{0, 0, 1}), NewStorageDataRaw([]byte{0, 1}), false},
 		{NewStorageDataRaw([]byte{0, 0, 0}), NewStorageDataRaw([]byte{0, 0}), false},

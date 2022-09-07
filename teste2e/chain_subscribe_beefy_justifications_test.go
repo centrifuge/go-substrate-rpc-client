@@ -25,6 +25,7 @@ import (
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/config"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -54,7 +55,7 @@ func TestChain_SubscribeBeefyJustifications(t *testing.T) {
 			fmt.Printf("encoded msg: %#v\n", msg)
 
 			s := &types.SignedCommitment{}
-			err := types.DecodeFromHex(msg.(string), s)
+			err := codec.DecodeFromHex(msg.(string), s)
 			if err != nil {
 				panic(err)
 			}

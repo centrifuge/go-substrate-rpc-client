@@ -19,6 +19,7 @@ package state
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 // GetChildStorage retreives the child storage for a key and decodes them into the provided interface. Ok is true if the
@@ -32,7 +33,7 @@ func (s *state) GetChildStorage(childStorageKey, key types.StorageKey, target in
 	if len(*raw) == 0 {
 		return false, nil
 	}
-	return true, types.Decode(*raw, target)
+	return true, codec.Decode(*raw, target)
 }
 
 // GetChildStorageLatest retreives the child storage for a key for the latest block height and decodes them into the
@@ -45,7 +46,7 @@ func (s *state) GetChildStorageLatest(childStorageKey, key types.StorageKey, tar
 	if len(*raw) == 0 {
 		return false, nil
 	}
-	return true, types.Decode(*raw, target)
+	return true, codec.Decode(*raw, target)
 }
 
 // GetChildStorageRaw retreives the child storage for a key as raw bytes, without decoding them
@@ -69,7 +70,7 @@ func (s *state) getChildStorageRaw(childStorageKey, key types.StorageKey, blockH
 		return nil, err
 	}
 
-	bz, err := types.HexDecodeString(res)
+	bz, err := codec.HexDecodeString(res)
 	if err != nil {
 		return nil, err
 	}

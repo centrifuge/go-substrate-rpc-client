@@ -19,9 +19,9 @@ package types_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	"github.com/stretchr/testify/assert"
 )
 
 var exampleMetadataV7 = Metadata{
@@ -113,7 +113,7 @@ var exampleModuleConstantMetadataV6 = ModuleConstantMetadataV6{
 }
 
 func TestMetadataV7_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleMetadataV7)
+	AssertRoundtrip(t, exampleMetadataV7)
 }
 
 func TestFindEventNamesForEventIDV7(t *testing.T) {

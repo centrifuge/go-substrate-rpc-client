@@ -22,13 +22,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
-
-	fuzz "github.com/google/gofuzz"
-
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/hash"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -47,8 +47,8 @@ func TestChecksum(t *testing.T) {
 }
 
 var (
-	addressFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(a *Address, c fuzz.Continue) {
+	addressFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(a *Address, c fuzz.Continue) {
 			if c.RandBool() {
 				a.IsAccountID = true
 				c.Fuzz(&a.AsAccountID)
@@ -73,13 +73,13 @@ func newTestAddress() Address {
 }
 
 func TestAddress_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[Address](t, 100, addressFuzzOpts...)
-	assertDecodeNilData[Address](t)
-	assertEncodeEmptyObj[Address](t, 1)
+	AssertRoundTripFuzz[Address](t, 100, addressFuzzOpts...)
+	AssertDecodeNilData[Address](t)
+	AssertEncodeEmptyObj[Address](t, 1)
 }
 
 func TestAddress_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{newTestAddress(),
 			MustHexDecodeString("0xff0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f0b"),
 		},
@@ -100,7 +100,7 @@ func TestAddress_Encode(t *testing.T) {
 func TestAddress_EncodeWithOptions(t *testing.T) {
 	SetSerDeOptions(SerDeOptions{NoPalletIndices: true})
 	defer SetSerDeOptions(SerDeOptions{NoPalletIndices: false})
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{newTestAddress(),
 			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f0b"),
 		},
@@ -113,7 +113,7 @@ func TestAddress_EncodeWithOptions(t *testing.T) {
 }
 
 func TestAddress_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0xff0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f0b"),
 			newTestAddress(),
 		},
@@ -141,7 +141,7 @@ func TestAddress_Decode(t *testing.T) {
 func TestAddress_DecodeWithOptions(t *testing.T) {
 	SetSerDeOptions(SerDeOptions{NoPalletIndices: true})
 	defer SetSerDeOptions(SerDeOptions{NoPalletIndices: false})
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f0b"),
 			newTestAddress(),
 		},

@@ -17,12 +17,13 @@
 package types_test
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
+	"github.com/stretchr/testify/assert"
 )
 
 var exampleHeader = Header{
@@ -40,13 +41,13 @@ var exampleHeader = Header{
 }
 
 func TestBlockNumber_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[BlockNumber](t, 100)
-	assertEncodeEmptyObj[BlockNumber](t, 1)
+	AssertRoundTripFuzz[BlockNumber](t, 100)
+	AssertEncodeEmptyObj[BlockNumber](t, 1)
 }
 
 func TestBlockNumber_JSONMarshalUnmarshal(t *testing.T) {
 	b := BlockNumber(1)
-	assertJSONRoundTrip(t, &b)
+	AssertJSONRoundTrip(t, &b)
 }
 
 var (
@@ -54,30 +55,30 @@ var (
 )
 
 func TestHeader_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleHeader)
-	assertRoundTripFuzz[Header](t, 100, headerFuzzOpts...)
-	assertDecodeNilData[Header](t)
-	assertEncodeEmptyObj[Header](t, 98)
+	AssertRoundtrip(t, exampleHeader)
+	AssertRoundTripFuzz[Header](t, 100, headerFuzzOpts...)
+	AssertDecodeNilData[Header](t)
+	AssertEncodeEmptyObj[Header](t, 98)
 }
 
 func TestHeader_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{{exampleHeader, 162}})
+	AssertEncodedLength(t, []EncodedLengthAssert{{exampleHeader, 162}})
 }
 
 func TestHeader_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{exampleHeader, MustHexDecodeString("0x0102030405000000000000000000000000000000000000000000000000000000a802030405060000000000000000000000000000000000000000000000000000000304050607000000000000000000000000000000000000000000000000000000140008040502060700000000000000000000000000000000000000000000000000000000000004090000000c0a0b0c050b0000000c0c0d0e060d0000000c0e0f10")}, //nolint:lll
 	})
 }
 
 func TestHeader_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{exampleHeader, "0x0102030405000000000000000000000000000000000000000000000000000000a802030405060000000000000000000000000000000000000000000000000000000304050607000000000000000000000000000000000000000000000000000000140008040502060700000000000000000000000000000000000000000000000000000000000004090000000c0a0b0c050b0000000c0c0d0e060d0000000c0e0f10"}, //nolint:lll
 	})
 }
 
 func TestHeader_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{exampleHeader, exampleHeader, true},
 		{exampleHeader, NewBytes(hash64), false},
 		{exampleHeader, NewBool(false), false},
@@ -85,8 +86,8 @@ func TestHeader_Eq(t *testing.T) {
 }
 
 var (
-	optionBlockNumberFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(o *OptionBlockNumber, c fuzz.Continue) {
+	optionBlockNumberFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(o *OptionBlockNumber, c fuzz.Continue) {
 			if c.RandBool() {
 				*o = NewOptionBlockNumberEmpty()
 				return
@@ -100,19 +101,19 @@ var (
 )
 
 func TestOptionBlockNumber_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[OptionBlockNumber](t, 100, optionBlockNumberFuzzOpts...)
-	assertEncodeEmptyObj[OptionBlockNumber](t, 1)
+	AssertRoundTripFuzz[OptionBlockNumber](t, 100, optionBlockNumberFuzzOpts...)
+	AssertEncodeEmptyObj[OptionBlockNumber](t, 1)
 }
 
 func TestOptionBlockNumber_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewOptionBlockNumber(BlockNumber(1)), MustHexDecodeString("0x0104")},
 		{NewOptionBlockNumberEmpty(), MustHexDecodeString("0x00")},
 	})
 }
 
 func TestOptionBlockNumber_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x0104"), NewOptionBlockNumber(BlockNumber(1))},
 		{MustHexDecodeString("0x00"), NewOptionBlockNumberEmpty()},
 	})

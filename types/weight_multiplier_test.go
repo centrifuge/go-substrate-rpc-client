@@ -20,44 +20,46 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 func TestWeightMultiplier_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewWeightMultiplier(0))
-	assertRoundtrip(t, NewWeightMultiplier(12))
-	assertRoundtrip(t, NewWeightMultiplier(-12))
+	AssertRoundtrip(t, NewWeightMultiplier(0))
+	AssertRoundtrip(t, NewWeightMultiplier(12))
+	AssertRoundtrip(t, NewWeightMultiplier(-12))
 }
 
 func TestWeightMultiplier_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{{NewWeightMultiplier(-13), 8}})
+	AssertEncodedLength(t, []EncodedLengthAssert{{NewWeightMultiplier(-13), 8}})
 }
 
 func TestWeightMultiplier_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewWeightMultiplier(-29), MustHexDecodeString("0xe3ffffffffffffff")},
 	})
 }
 
 func TestWeightMultiplier_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewWeightMultiplier(-29), MustHexDecodeString("0x4d42db2aa4a23bde81a3ad3705220affaa457c56a0135080c71db7783fec8f44")},
 	})
 }
 
 func TestWeightMultiplier_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewWeightMultiplier(-29), "0xe3ffffffffffffff"},
 	})
 }
 
 func TestWeightMultiplier_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewWeightMultiplier(-29), "-29"},
 	})
 }
 
 func TestWeightMultiplier_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewWeightMultiplier(23), NewWeightMultiplier(23), true},
 		{NewWeightMultiplier(-23), NewWeightMultiplier(23), false},
 		{NewWeightMultiplier(23), NewU64(23), false},

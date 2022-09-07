@@ -20,33 +20,35 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 func TestDigestOf_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, DigestOf{testDigestItem1, testDigestItem2})
-	assertRoundTripFuzz[DigestOf](t, 100, digestItemFuzzOpts...)
+	AssertRoundtrip(t, DigestOf{testDigestItem1, testDigestItem2})
+	AssertRoundTripFuzz[DigestOf](t, 100, digestItemFuzzOpts...)
 }
 
 func TestDigestOf_JSONMarshalUnmarshal(t *testing.T) {
 	d := DigestOf{testDigestItem1, testDigestItem2}
-	assertJSONRoundTrip(t, &d)
+	AssertJSONRoundTrip(t, &d)
 }
 
 func TestDigestOf_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{
-			input: DigestOf{testDigestItem1, testDigestItem2},
-			expected: MustHexDecodeString(
+			Input: DigestOf{testDigestItem1, testDigestItem2},
+			Expected: MustHexDecodeString(
 				"0x080004ab020102030000000000000000000000000000000000000000000000000000000000"),
 		}, //nolint:lll
 	})
 }
 
 func TestDigestOf_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{
-			input: MustHexDecodeString(
+			Input: MustHexDecodeString(
 				"0x080004ab020102030000000000000000000000000000000000000000000000000000000000"), //nolint:lll
-			expected: DigestOf{testDigestItem1, testDigestItem2}},
+			Expected: DigestOf{testDigestItem1, testDigestItem2}},
 	})
 }

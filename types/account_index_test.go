@@ -20,47 +20,49 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 func TestAccountIndex_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[AccountIndex](t, 100)
-	assertDecodeNilData[AccountID](t)
-	assertEncodeEmptyObj[AccountID](t, 32)
+	AssertRoundTripFuzz[AccountIndex](t, 100)
+	AssertDecodeNilData[AccountID](t)
+	AssertEncodeEmptyObj[AccountID](t, 32)
 }
 
 func TestAccountIndex_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{
+	AssertEncodedLength(t, []EncodedLengthAssert{
 		{NewAccountIndex(336794129), 4},
 	})
 }
 
 func TestAccountIndex_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewAccountIndex(336794129), MustHexDecodeString("0x11121314")},
 	})
 }
 
 func TestAccountIndex_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewAccountIndex(336794129), MustHexDecodeString(
 			"0xa6730c0d3a95e0ff2068fa9a6ecf82c42c494c8c2cdd65379c898a4b88dd7138")},
 	})
 }
 
 func TestAccountIndex_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewAccountIndex(336794129), "0x11121314"},
 	})
 }
 
 func TestAccountIndex_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewAccountIndex(336794129), "336794129"},
 	})
 }
 
 func TestAccountIndex_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewAccountIndex(336794129), NewAccountIndex(336794129), true},
 		{NewAccountIndex(336794129), NewAccountIndex(12), false},
 		{NewAccountIndex(336794129), NewBool(false), false},

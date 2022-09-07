@@ -2,6 +2,8 @@ package types
 
 import (
 	"encoding/json"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 // GenerateMMRProofResponse contains the generate proof rpc response
@@ -21,20 +23,20 @@ func (d *GenerateMMRProofResponse) UnmarshalJSON(bz []byte) error {
 	if err := json.Unmarshal(bz, &tmp); err != nil {
 		return err
 	}
-	err := DecodeFromHex(tmp.BlockHash, &d.BlockHash)
+	err := codec.DecodeFromHex(tmp.BlockHash, &d.BlockHash)
 	if err != nil {
 		return err
 	}
 	var encodedLeaf MMREncodableOpaqueLeaf
-	err = DecodeFromHex(tmp.Leaf, &encodedLeaf)
+	err = codec.DecodeFromHex(tmp.Leaf, &encodedLeaf)
 	if err != nil {
 		return err
 	}
-	err = Decode(encodedLeaf, &d.Leaf)
+	err = codec.Decode(encodedLeaf, &d.Leaf)
 	if err != nil {
 		return err
 	}
-	err = DecodeFromHex(tmp.Proof, &d.Proof)
+	err = codec.DecodeFromHex(tmp.Proof, &d.Proof)
 	if err != nil {
 		return err
 	}

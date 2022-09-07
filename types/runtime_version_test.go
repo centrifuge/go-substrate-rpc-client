@@ -20,6 +20,8 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -61,5 +63,5 @@ func TestRuntimeVersionAPI_Encode_Decode(t *testing.T) {
 
 func TestRuntimeVersionAPI_JSONMarshalUnmarshal(t *testing.T) {
 	r := exampleRuntimeVersionAPI
-	assertJSONRoundTrip(t, &r)
+	AssertJSONRoundTrip(t, &r)
 }

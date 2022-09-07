@@ -2396,92 +2396,6 @@ type EventPreimageRequested struct {
 	Topics []Hash
 }
 
-type ProxyType uint8
-
-const (
-	Any ProxyType = iota
-	NonTransfer
-	Governance
-	Staking
-	NonProxy
-	Borrow
-	ProxyTypePrice
-	Invest
-	ProxyManagement
-	KeystoreManagement
-	PodOperation
-	PodAuth
-)
-
-var (
-	proxyTypeMap = map[ProxyType]struct{}{
-		Any:                {},
-		NonTransfer:        {},
-		Governance:         {},
-		Staking:            {},
-		NonProxy:           {},
-		Borrow:             {},
-		ProxyTypePrice:     {},
-		Invest:             {},
-		ProxyManagement:    {},
-		KeystoreManagement: {},
-		PodOperation:       {},
-		PodAuth:            {},
-	}
-
-	ProxyTypeName = map[ProxyType]string{
-		Any:                "any",
-		NonTransfer:        "non_transfer",
-		Governance:         "governance",
-		Staking:            "staking",
-		NonProxy:           "non_proxy",
-		Borrow:             "borrow",
-		ProxyTypePrice:     "price",
-		Invest:             "invest",
-		ProxyManagement:    "proxy_management",
-		KeystoreManagement: "keystore_management",
-		PodOperation:       "pod_operation",
-		PodAuth:            "pod_auth",
-	}
-
-	ProxyTypeValue = map[string]ProxyType{
-		"any":                 Any,
-		"non_transfer":        NonTransfer,
-		"governance":          Governance,
-		"staking":             Staking,
-		"non_proxy":           NonProxy,
-		"borrow":              Borrow,
-		"price":               ProxyTypePrice,
-		"invest":              Invest,
-		"proxy_management":    ProxyManagement,
-		"keystore_management": KeystoreManagement,
-		"pod_operation":       PodOperation,
-		"pod_auth":            PodAuth,
-	}
-)
-
-func (pt *ProxyType) Decode(decoder scale.Decoder) error {
-	b, err := decoder.ReadOneByte()
-
-	if err != nil {
-		return err
-	}
-
-	pb := ProxyType(b)
-
-	if _, ok := proxyTypeMap[pb]; !ok {
-		return fmt.Errorf("unknown ProxyType enum: %v", pb)
-	}
-
-	*pt = pb
-
-	return nil
-}
-
-func (pt ProxyType) Encode(encoder scale.Encoder) error {
-	return encoder.PushByte(byte(pt))
-}
-
 // EventProxyProxyExecuted is emitted when a proxy was executed correctly, with the given [result]
 type EventProxyProxyExecuted struct {
 	Phase  Phase
@@ -2495,7 +2409,7 @@ type EventProxyAnonymousCreated struct {
 	Phase               Phase
 	Anonymous           AccountID
 	Who                 AccountID
-	ProxyType           ProxyType
+	ProxyType           U8
 	DisambiguationIndex U16
 	Topics              []Hash
 }
@@ -2505,7 +2419,7 @@ type EventProxyProxyAdded struct {
 	Phase     Phase
 	Delegator AccountID
 	Delegatee AccountID
-	ProxyType ProxyType
+	ProxyType U8
 	Delay     U32
 	Topics    []Hash
 }
@@ -2515,7 +2429,7 @@ type EventProxyProxyRemoved struct {
 	Phase       Phase
 	Delegator   AccountID
 	Delegatee   AccountID
-	ProxyType   ProxyType
+	ProxyType   U8
 	BlockNumber U32
 	Topics      []Hash
 }

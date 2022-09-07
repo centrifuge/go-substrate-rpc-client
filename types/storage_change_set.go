@@ -19,6 +19,8 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 // StorageChangeSet contains changes from storage subscriptions
@@ -43,14 +45,14 @@ func (r *KeyValueOption) UnmarshalJSON(b []byte) error {
 		return fmt.Errorf("expected at least one entry for KeyValueOption")
 	case 2:
 		r.HasStorageData = true
-		data, err := HexDecodeString(tmp[1])
+		data, err := codec.HexDecodeString(tmp[1])
 		if err != nil {
 			return err
 		}
 		r.StorageData = data
 		fallthrough
 	case 1:
-		key, err := HexDecodeString(tmp[0])
+		key, err := codec.HexDecodeString(tmp[0])
 		if err != nil {
 			return err
 		}

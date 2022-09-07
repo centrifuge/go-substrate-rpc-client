@@ -20,9 +20,10 @@ import (
 	"encoding/json"
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -38,8 +39,8 @@ var testExtrinsicStatus8 = ExtrinsicStatus{IsDropped: true}
 var testExtrinsicStatus9 = ExtrinsicStatus{IsInvalid: true}
 
 var (
-	extrinsicStatusFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(e *ExtrinsicStatus, c fuzz.Continue) {
+	extrinsicStatusFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(e *ExtrinsicStatus, c fuzz.Continue) {
 			switch c.Intn(10) {
 			case 0:
 				e.IsFuture = true
@@ -73,23 +74,23 @@ var (
 )
 
 func TestExtrinsicStatus_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, testExtrinsicStatus0)
-	assertRoundtrip(t, testExtrinsicStatus1)
-	assertRoundtrip(t, testExtrinsicStatus2)
-	assertRoundtrip(t, testExtrinsicStatus3)
-	assertRoundtrip(t, testExtrinsicStatus4)
-	assertRoundtrip(t, testExtrinsicStatus5)
-	assertRoundtrip(t, testExtrinsicStatus6)
-	assertRoundtrip(t, testExtrinsicStatus7)
-	assertRoundtrip(t, testExtrinsicStatus8)
-	assertRoundtrip(t, testExtrinsicStatus9)
-	assertRoundTripFuzz[ExtrinsicStatus](t, 1000, extrinsicStatusFuzzOpts...)
-	assertDecodeNilData[ExtrinsicStatus](t)
-	assertEncodeEmptyObj[ExtrinsicStatus](t, 0)
+	AssertRoundtrip(t, testExtrinsicStatus0)
+	AssertRoundtrip(t, testExtrinsicStatus1)
+	AssertRoundtrip(t, testExtrinsicStatus2)
+	AssertRoundtrip(t, testExtrinsicStatus3)
+	AssertRoundtrip(t, testExtrinsicStatus4)
+	AssertRoundtrip(t, testExtrinsicStatus5)
+	AssertRoundtrip(t, testExtrinsicStatus6)
+	AssertRoundtrip(t, testExtrinsicStatus7)
+	AssertRoundtrip(t, testExtrinsicStatus8)
+	AssertRoundtrip(t, testExtrinsicStatus9)
+	AssertRoundTripFuzz[ExtrinsicStatus](t, 1000, extrinsicStatusFuzzOpts...)
+	AssertDecodeNilData[ExtrinsicStatus](t)
+	AssertEncodeEmptyObj[ExtrinsicStatus](t, 0)
 }
 
 func TestExtrinsicStatus_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testExtrinsicStatus0, []byte{0x00}},
 		{testExtrinsicStatus1, []byte{0x01}},
 		{testExtrinsicStatus2, MustHexDecodeString("0x020c10546869730869732462726f616463617374")},
@@ -104,7 +105,7 @@ func TestExtrinsicStatus_Encode(t *testing.T) {
 }
 
 func TestExtrinsicStatus_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{[]byte{0x00}, testExtrinsicStatus0},
 		{[]byte{0x01}, testExtrinsicStatus1},
 		{MustHexDecodeString("0x020c10546869730869732462726f616463617374"), testExtrinsicStatus2},

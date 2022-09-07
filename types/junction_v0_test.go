@@ -20,9 +20,10 @@ import (
 	"math/big"
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 )
 
 var (
@@ -78,12 +79,12 @@ var (
 		},
 	}
 
-	junctionV0FuzzOpts = combineFuzzOpts(
+	junctionV0FuzzOpts = CombineFuzzOpts(
 		networkIDFuzzOpts,
 		bodyIDFuzzOpts,
 		bodyPartFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(j *JunctionV0, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(j *JunctionV0, c fuzz.Continue) {
 				switch c.Intn(10) {
 				case 0:
 					j.IsParent = true
@@ -136,13 +137,13 @@ var (
 )
 
 func TestJunctionV0_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[JunctionV0](t, 1000, junctionV0FuzzOpts...)
-	assertDecodeNilData[JunctionV0](t)
-	assertEncodeEmptyObj[JunctionV0](t, 0)
+	AssertRoundTripFuzz[JunctionV0](t, 1000, junctionV0FuzzOpts...)
+	AssertDecodeNilData[JunctionV0](t)
+	AssertEncodeEmptyObj[JunctionV0](t, 0)
 }
 
 func TestJunctionV0_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testJunction1, MustHexDecodeString("0x00")},
 		{testJunction2, MustHexDecodeString("0x010b000000")},
 		{testJunction3, MustHexDecodeString("0x02000c010203")},
@@ -157,7 +158,7 @@ func TestJunctionV0_Encode(t *testing.T) {
 }
 
 func TestJunctionV0_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), testJunction1},
 		{MustHexDecodeString("0x010b000000"), testJunction2},
 		{MustHexDecodeString("0x02000c010203"), testJunction3},

@@ -20,17 +20,19 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 func TestString_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewText(""))
-	assertRoundtrip(t, NewText("My nice string"))
-	assertRoundTripFuzz[Text](t, 100)
-	assertEncodeEmptyObj[Text](t, 1)
+	AssertRoundtrip(t, NewText(""))
+	AssertRoundtrip(t, NewText("My nice string"))
+	AssertRoundTripFuzz[Text](t, 100)
+	AssertEncodeEmptyObj[Text](t, 1)
 }
 
 func TestString_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{
+	AssertEncodedLength(t, []EncodedLengthAssert{
 		{NewText(""), 1},
 		{NewText("My nice string"), 15},
 		{NewText("ښ"), 3},
@@ -38,7 +40,7 @@ func TestString_EncodedLength(t *testing.T) {
 }
 
 func TestString_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewText(""), MustHexDecodeString("0x00")},
 		{NewText("My nice string"), MustHexDecodeString("0x384d79206e69636520737472696e67")},
 		{NewText("ښ"), MustHexDecodeString("0x08da9a")},
@@ -46,7 +48,7 @@ func TestString_Encode(t *testing.T) {
 }
 
 func TestString_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewText(""), MustHexDecodeString("0x03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314")},
 		{NewText("My nice string"), MustHexDecodeString(
 			"0x30f31ff5f82596c990e5afd2b656db0ca30e1a5a9cc7eb5f83ee18731eecd453")},
@@ -54,7 +56,7 @@ func TestString_Hash(t *testing.T) {
 }
 
 func TestString_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewText(""), "0x00"},
 		{NewText("My nice string"), "0x384d79206e69636520737472696e67"},
 		{NewText("ښ"), "0x08da9a"},
@@ -62,7 +64,7 @@ func TestString_Hex(t *testing.T) {
 }
 
 func TestString_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewText(""), ""},
 		{NewText("My nice string"), "My nice string"},
 		{NewText("ښ"), "ښ"},
@@ -70,7 +72,7 @@ func TestString_String(t *testing.T) {
 }
 
 func TestString_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewText("My nice string"), NewText("My nice string"), true},
 		{NewText(""), NewText("23"), false},
 		{NewText("My nice string"), NewU8(23), false},

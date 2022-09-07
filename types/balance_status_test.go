@@ -20,16 +20,16 @@ import (
 	"bytes"
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	balanceStatusFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(b *BalanceStatus, c fuzz.Continue) {
+	balanceStatusFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(b *BalanceStatus, c fuzz.Continue) {
 			*b = BalanceStatus(c.Intn(2))
 		}),
 	}
@@ -42,7 +42,7 @@ func TestBalanceStatusEncodeDecode(t *testing.T) {
 	err := decoder.Decode(&bs0)
 	assert.Error(t, err)
 
-	assertRoundTripFuzz[BalanceStatus](t, 100, balanceStatusFuzzOpts...)
-	assertDecodeNilData[BalanceStatus](t)
-	assertEncodeEmptyObj[BalanceStatus](t, 1)
+	AssertRoundTripFuzz[BalanceStatus](t, 100, balanceStatusFuzzOpts...)
+	AssertDecodeNilData[BalanceStatus](t)
+	AssertEncodeEmptyObj[BalanceStatus](t, 1)
 }

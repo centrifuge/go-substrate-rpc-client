@@ -20,16 +20,17 @@ import (
 	"fmt"
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	multiAddressFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(m *MultiAddress, c fuzz.Continue) {
+	multiAddressFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(m *MultiAddress, c fuzz.Continue) {
 			switch c.Intn(5) {
 			case 0:
 				m.IsID = true
@@ -62,32 +63,32 @@ func newTestMultiAddress() MultiAddress {
 }
 
 func TestMultiAddress_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[MultiAddress](t, 100, multiAddressFuzzOpts...)
-	assertDecodeNilData[MultiAddress](t)
+	AssertRoundTripFuzz[MultiAddress](t, 100, multiAddressFuzzOpts...)
+	AssertDecodeNilData[MultiAddress](t)
 }
 
 func TestNewMultiAddressFromAccountID(t *testing.T) {
-	assertRoundtrip(t, newTestMultiAddress())
+	AssertRoundtrip(t, newTestMultiAddress())
 
 	_, err := NewMultiAddressFromHexAccountID("123!")
 	assert.Error(t, err)
 
 	addr, err := NewMultiAddressFromHexAccountID(HexEncodeToString(signature.TestKeyringPairAlice.PublicKey))
 	assert.NoError(t, err)
-	assertRoundtrip(t, addr)
-	assertRoundtrip(t, MultiAddress{
+	AssertRoundtrip(t, addr)
+	AssertRoundtrip(t, MultiAddress{
 		IsIndex: true,
 		AsIndex: 100,
 	})
-	assertRoundtrip(t, MultiAddress{
+	AssertRoundtrip(t, MultiAddress{
 		IsRaw: true,
 		AsRaw: []byte{1, 2, 3},
 	})
-	assertRoundtrip(t, MultiAddress{
+	AssertRoundtrip(t, MultiAddress{
 		IsAddress32: true,
 		AsAddress32: [32]byte{},
 	})
-	assertRoundtrip(t, MultiAddress{
+	AssertRoundtrip(t, MultiAddress{
 		IsAddress20: true,
 		AsAddress20: [20]byte{},
 	})

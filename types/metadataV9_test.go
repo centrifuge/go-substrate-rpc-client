@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,7 +35,7 @@ var exampleRuntimeMetadataV9 = MetadataV9{
 }
 
 func TestMetadataV9_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleMetadataV9)
+	AssertRoundtrip(t, exampleMetadataV9)
 }
 
 func TestFindEventNamesForEventIDV9(t *testing.T) {

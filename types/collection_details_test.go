@@ -21,6 +21,8 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 var (
@@ -39,13 +41,13 @@ var (
 )
 
 func TestClassDetails_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[CollectionDetails](t, 1000)
-	assertDecodeNilData[CollectionDetails](t)
-	assertEncodeEmptyObj[CollectionDetails](t, 158)
+	AssertRoundTripFuzz[CollectionDetails](t, 1000)
+	AssertDecodeNilData[CollectionDetails](t)
+	AssertEncodeEmptyObj[CollectionDetails](t, 158)
 }
 
 func TestClassDetails_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{
 			testClassDetails,
 			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f200102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f200102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f200102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f207b0000000000000000000000000000000104000000050000000600000001"),
@@ -54,7 +56,7 @@ func TestClassDetails_Encode(t *testing.T) {
 }
 
 func TestClassDetails_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{
 			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f200102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f200102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f200102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f207b0000000000000000000000000000000104000000050000000600000001"),
 			testClassDetails,

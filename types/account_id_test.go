@@ -21,16 +21,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
-	optionAccountIDFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(o *OptionAccountID, c fuzz.Continue) {
+	optionAccountIDFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(o *OptionAccountID, c fuzz.Continue) {
 			if c.RandBool() {
 				*o = NewOptionAccountIDEmpty()
 				return
@@ -54,21 +54,21 @@ func newTestAccountID() AccountID {
 }
 
 func TestOptionAccountID_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[OptionAccountID](t, 100, optionAccountIDFuzzOpts...)
-	assertEncodeEmptyObj[OptionAccountID](t, 1)
+	AssertRoundTripFuzz[OptionAccountID](t, 100, optionAccountIDFuzzOpts...)
+	AssertEncodeEmptyObj[OptionAccountID](t, 1)
 }
 
 var testAccountIDBytes = []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32}
 
 func TestOptionAccountID_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewOptionAccountID(newTestAccountID()), MustHexDecodeString("0x010102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20")},
 		{NewOptionAccountIDEmpty(), MustHexDecodeString("0x00")},
 	})
 }
 
 func TestOptionAccountID_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x010102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20"), NewOptionAccountID(newTestAccountID())},
 		{MustHexDecodeString("0x00"), NewOptionAccountIDEmpty()},
 	})
@@ -93,25 +93,25 @@ func TestOptionAccountID_OptionMethods(t *testing.T) {
 }
 
 func TestAccountID_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[AccountID](t, 100, withNilChance(0.01))
-	assertDecodeNilData[AccountID](t)
-	assertEncodeEmptyObj[AccountID](t, 32)
+	AssertRoundTripFuzz[AccountID](t, 100, WithNilChance(0.01))
+	AssertDecodeNilData[AccountID](t)
+	AssertEncodeEmptyObj[AccountID](t, 32)
 }
 
 func TestAccountID_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{
+	AssertEncodedLength(t, []EncodedLengthAssert{
 		{newTestAccountID(), 32},
 	})
 }
 
 func TestAccountID_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{newTestAccountID(), MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20")}, //nolint:lll
 	})
 }
 
 func TestAccountID_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{
 			newTestAccountID(),
 			MustHexDecodeString("0x441edc56cebc8e285d02267aa650819f15add7b06ef9b41b2690128dce655924"),
@@ -120,13 +120,13 @@ func TestAccountID_Hash(t *testing.T) {
 }
 
 func TestAccountID_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{newTestAccountID(), "0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20"},
 	})
 }
 
 func TestAccountID_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{newTestAccountID(), "[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32]"},
 	})
 }
@@ -138,7 +138,7 @@ func TestAccountID_Eq(t *testing.T) {
 	accID, err := NewAccountID(b)
 	assert.NoError(t, err)
 
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{newTestAccountID(), newTestAccountID(), true},
 		{newTestAccountID(), accID, false},
 	})

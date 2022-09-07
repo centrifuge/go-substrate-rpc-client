@@ -22,21 +22,22 @@ import (
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 	fuzz "github.com/google/gofuzz"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	dispatchInfoFuzzOpts = combineFuzzOpts(
+	dispatchInfoFuzzOpts = CombineFuzzOpts(
 		dispatchClassFuzzOpts,
 		paysFuzzOpts,
 	)
 )
 
 func TestDispatchInfo_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[DispatchInfo](t, 100, dispatchInfoFuzzOpts...)
-	assertDecodeNilData[DispatchInfo](t)
-	assertEncodeEmptyObj[DispatchInfo](t, 8)
+	AssertRoundTripFuzz[DispatchInfo](t, 100, dispatchInfoFuzzOpts...)
+	AssertDecodeNilData[DispatchInfo](t)
+	AssertEncodeEmptyObj[DispatchInfo](t, 8)
 }
 
 func TestVoteThreshold_Decoder(t *testing.T) {
@@ -63,10 +64,10 @@ func TestVoteThreshold_Encode(t *testing.T) {
 }
 
 var (
-	dispatchResultFuzzOpts = combineFuzzOpts(
+	dispatchResultFuzzOpts = CombineFuzzOpts(
 		dispatchErrorFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(d *DispatchResult, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(d *DispatchResult, c fuzz.Continue) {
 				if c.RandBool() {
 					d.Ok = true
 					return
@@ -79,28 +80,14 @@ var (
 )
 
 func TestDispatchResult_Decode(t *testing.T) {
-	assertRoundTripFuzz[DispatchResult](t, 100, dispatchResultFuzzOpts...)
-	assertDecodeNilData[DispatchResult](t)
-	assertEncodeEmptyObj[DispatchResult](t, 1)
+	AssertRoundTripFuzz[DispatchResult](t, 100, dispatchResultFuzzOpts...)
+	AssertDecodeNilData[DispatchResult](t)
+	AssertEncodeEmptyObj[DispatchResult](t, 1)
 }
 
 var (
-	proxyTypeFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(p *ProxyType, c fuzz.Continue) {
-			*p = ProxyType(c.Intn(12))
-		}),
-	}
-)
-
-func TestProxyTypeEncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[ProxyType](t, 1000, proxyTypeFuzzOpts...)
-	assertDecodeNilData[ProxyType](t)
-	assertEncodeEmptyObj[ProxyType](t, 1)
-}
-
-var (
-	paysFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(p *Pays, c fuzz.Continue) {
+	paysFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(p *Pays, c fuzz.Continue) {
 			r := c.RandBool()
 			p.IsYes = r
 			p.IsNo = !r
@@ -109,14 +96,14 @@ var (
 )
 
 func TestPaysEncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[Pays](t, 1000, paysFuzzOpts...)
-	assertDecodeNilData[Pays](t)
-	assertEncodeEmptyObj[Pays](t, 0)
+	AssertRoundTripFuzz[Pays](t, 1000, paysFuzzOpts...)
+	AssertDecodeNilData[Pays](t)
+	AssertEncodeEmptyObj[Pays](t, 0)
 }
 
 var (
-	dispatchClassFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(d *DispatchClass, c fuzz.Continue) {
+	dispatchClassFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(d *DispatchClass, c fuzz.Continue) {
 			switch c.Intn(3) {
 			case 0:
 				d.IsNormal = true
@@ -130,30 +117,30 @@ var (
 )
 
 func TestDispatchClassEncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[DispatchClass](t, 100, dispatchClassFuzzOpts...)
-	assertDecodeNilData[DispatchClass](t)
-	assertEncodeEmptyObj[DispatchClass](t, 0)
+	AssertRoundTripFuzz[DispatchClass](t, 100, dispatchClassFuzzOpts...)
+	AssertDecodeNilData[DispatchClass](t)
+	AssertEncodeEmptyObj[DispatchClass](t, 0)
 }
 
 var (
-	democracyConvictionFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(d *DemocracyConviction, c fuzz.Continue) {
+	democracyConvictionFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(d *DemocracyConviction, c fuzz.Continue) {
 			*d = DemocracyConviction(c.Intn(7))
 		}),
 	}
 )
 
 func TestDemocracyConviction_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[DemocracyConviction](t, 100, democracyConvictionFuzzOpts...)
-	assertDecodeNilData[DemocracyConviction](t)
-	assertEncodeEmptyObj[DemocracyConviction](t, 1)
+	AssertRoundTripFuzz[DemocracyConviction](t, 100, democracyConvictionFuzzOpts...)
+	AssertDecodeNilData[DemocracyConviction](t)
+	AssertEncodeEmptyObj[DemocracyConviction](t, 1)
 }
 
 var (
-	voteAccountVoteFuzzOpts = combineFuzzOpts(
+	voteAccountVoteFuzzOpts = CombineFuzzOpts(
 		democracyConvictionFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(v *VoteAccountVote, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(v *VoteAccountVote, c fuzz.Continue) {
 				if c.RandBool() {
 					v.IsStandard = true
 					c.Fuzz(&v.AsStandard)
@@ -168,21 +155,21 @@ var (
 )
 
 func TestVoteAccountVote_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[VoteAccountVote](t, 100, voteAccountVoteFuzzOpts...)
-	assertDecodeNilData[VoteAccountVote](t)
-	assertEncodeEmptyObj[VoteAccountVote](t, 0)
+	AssertRoundTripFuzz[VoteAccountVote](t, 100, voteAccountVoteFuzzOpts...)
+	AssertDecodeNilData[VoteAccountVote](t)
+	AssertEncodeEmptyObj[VoteAccountVote](t, 0)
 }
 
 var (
-	schedulerLookupErrorFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(e *SchedulerLookupError, c fuzz.Continue) {
+	schedulerLookupErrorFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(e *SchedulerLookupError, c fuzz.Continue) {
 			*e = SchedulerLookupError(c.Intn(2))
 		}),
 	}
 )
 
 func TestSchedulerLookupError_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[SchedulerLookupError](t, 100, schedulerLookupErrorFuzzOpts...)
-	assertDecodeNilData[SchedulerLookupError](t)
-	assertEncodeEmptyObj[SchedulerLookupError](t, 1)
+	AssertRoundTripFuzz[SchedulerLookupError](t, 100, schedulerLookupErrorFuzzOpts...)
+	AssertDecodeNilData[SchedulerLookupError](t)
+	AssertEncodeEmptyObj[SchedulerLookupError](t, 1)
 }

@@ -19,11 +19,11 @@ package types_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -36,10 +36,10 @@ var (
 
 	executionResultFuzzOpts = xcmErrorFuzzOpts
 
-	optionExecutionResultFuzzOpts = combineFuzzOpts(
+	optionExecutionResultFuzzOpts = CombineFuzzOpts(
 		executionResultFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(o *OptionExecutionResult, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(o *OptionExecutionResult, c fuzz.Continue) {
 				if c.RandBool() {
 					*o = NewOptionExecutionResultEmpty()
 					return
@@ -56,18 +56,18 @@ var (
 )
 
 func TestOptionExecutionResult_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[OptionExecutionResult](t, 1000, optionExecutionResultFuzzOpts...)
+	AssertRoundTripFuzz[OptionExecutionResult](t, 1000, optionExecutionResultFuzzOpts...)
 }
 
 func TestOptionExecutionResult_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewOptionExecutionResult(testExecutionResult), MustHexDecodeString("0x010100000000")},
 		{NewOptionExecutionResultEmpty(), MustHexDecodeString("0x00")},
 	})
 }
 
 func TestOptionExecutionResult_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x010100000000"), NewOptionExecutionResult(testExecutionResult)},
 		{MustHexDecodeString("0x00"), NewOptionBytesEmpty()},
 	})
@@ -89,19 +89,19 @@ func TestOptionExecutionResult_OptionMethods(t *testing.T) {
 }
 
 func TestExecutionResult_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[ExecutionResult](t, 1000, executionResultFuzzOpts...)
-	assertDecodeNilData[ExecutionResult](t)
-	assertEncodeEmptyObj[ExecutionResult](t, 4)
+	AssertRoundTripFuzz[ExecutionResult](t, 1000, executionResultFuzzOpts...)
+	AssertDecodeNilData[ExecutionResult](t)
+	AssertEncodeEmptyObj[ExecutionResult](t, 4)
 }
 
 func TestExecutionResult_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testExecutionResult, MustHexDecodeString("0x0100000000")},
 	})
 }
 
 func TestExecutionResult_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x0100000000"), testExecutionResult},
 	})
 }

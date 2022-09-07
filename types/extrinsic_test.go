@@ -22,6 +22,8 @@ import (
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -196,7 +198,7 @@ func TestExtrinsic_JSONMarshalUnmarshal(t *testing.T) {
 
 	ext := NewExtrinsic(c)
 
-	assertJSONRoundTrip(t, &ext)
+	AssertJSONRoundTrip(t, &ext)
 }
 
 func TestCall(t *testing.T) {

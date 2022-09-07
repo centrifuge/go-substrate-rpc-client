@@ -19,9 +19,10 @@ package types_test
 import (
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 )
 
 var (
@@ -49,8 +50,8 @@ var (
 		IsJudicial: true,
 	}
 
-	bodyIDFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(b *BodyID, c fuzz.Continue) {
+	bodyIDFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(b *BodyID, c fuzz.Continue) {
 			switch c.Intn(7) {
 			case 0:
 				b.IsUnit = true
@@ -74,13 +75,13 @@ var (
 )
 
 func TestBodyID_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[BodyID](t, 1000, bodyIDFuzzOpts...)
-	assertDecodeNilData[BodyID](t)
-	assertEncodeEmptyObj[BodyID](t, 0)
+	AssertRoundTripFuzz[BodyID](t, 1000, bodyIDFuzzOpts...)
+	AssertDecodeNilData[BodyID](t)
+	AssertEncodeEmptyObj[BodyID](t, 0)
 }
 
 func TestBodyID_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{bodyID1, MustHexDecodeString("0x00")},
 		{bodyID2, MustHexDecodeString("0x010404")},
 		{bodyID3, MustHexDecodeString("0x0206000000")},
@@ -92,7 +93,7 @@ func TestBodyID_Encode(t *testing.T) {
 }
 
 func TestBodyID_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), bodyID1},
 		{MustHexDecodeString("0x010404"), bodyID2},
 		{MustHexDecodeString("0x0206000000"), bodyID3},
@@ -127,8 +128,8 @@ var (
 		MoreThanProportionDenom: 7,
 	}
 
-	bodyPartFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(b *BodyPart, c fuzz.Continue) {
+	bodyPartFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(b *BodyPart, c fuzz.Continue) {
 			switch c.Intn(5) {
 			case 0:
 				b.IsVoice = true
@@ -153,13 +154,13 @@ var (
 )
 
 func TestBodyPart_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[BodyPart](t, 1000, bodyPartFuzzOpts...)
-	assertDecodeNilData[BodyPart](t)
-	assertEncodeEmptyObj[BodyPart](t, 0)
+	AssertRoundTripFuzz[BodyPart](t, 1000, bodyPartFuzzOpts...)
+	AssertDecodeNilData[BodyPart](t)
+	AssertEncodeEmptyObj[BodyPart](t, 0)
 }
 
 func TestBodyPart_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{bodyPart1, MustHexDecodeString("0x00")},
 		{bodyPart2, MustHexDecodeString("0x0103000000")},
 		{bodyPart3, MustHexDecodeString("0x020100000002000000")},
@@ -169,7 +170,7 @@ func TestBodyPart_Encode(t *testing.T) {
 }
 
 func TestBodyPart_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), bodyPart1},
 		{MustHexDecodeString("0x0103000000"), bodyPart2},
 		{MustHexDecodeString("0x020100000002000000"), bodyPart3},

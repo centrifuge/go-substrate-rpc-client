@@ -19,6 +19,7 @@ package types
 
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 // PayloadItem ...
@@ -193,7 +194,7 @@ func makeChunks(slice []byte, chunkSize int) [][]byte {
 // UnmarshalText deserializes hex string into a SignedCommitment.
 // Used for decoding JSON-RPC subscription messages (beefy_subscribeJustifications)
 func (s *SignedCommitment) UnmarshalText(text []byte) error {
-	return DecodeFromHex(string(text), s)
+	return codec.DecodeFromHex(string(text), s)
 }
 
 func (o OptionalSignedCommitment) Encode(encoder scale.Encoder) error {

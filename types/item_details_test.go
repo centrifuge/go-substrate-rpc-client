@@ -20,9 +20,10 @@ import (
 	"math/big"
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 )
 
 var (
@@ -33,10 +34,10 @@ var (
 		Deposit:  NewU128(*big.NewInt(123)),
 	}
 
-	instanceDetailsFuzzOpts = combineFuzzOpts(
+	instanceDetailsFuzzOpts = CombineFuzzOpts(
 		optionAccountIDFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(i *ItemDetails, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(i *ItemDetails, c fuzz.Continue) {
 				c.Fuzz(&i.Owner)
 				c.Fuzz(&i.Approved)
 				c.Fuzz(&i.IsFrozen)
@@ -47,13 +48,13 @@ var (
 )
 
 func TestInstanceDetails_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[ItemDetails](t, 1000, instanceDetailsFuzzOpts...)
-	assertDecodeNilData[ItemDetails](t)
-	assertEncodeEmptyObj[ItemDetails](t, 50)
+	AssertRoundTripFuzz[ItemDetails](t, 1000, instanceDetailsFuzzOpts...)
+	AssertDecodeNilData[ItemDetails](t)
+	AssertEncodeEmptyObj[ItemDetails](t, 50)
 }
 
 func TestInstanceDetails_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{
 			testInstanceDetails,
 			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20010102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20017b000000000000000000000000000000"),
@@ -62,7 +63,7 @@ func TestInstanceDetails_Encode(t *testing.T) {
 }
 
 func TestInstanceDetails_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{
 			MustHexDecodeString("0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20010102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20017b000000000000000000000000000000"),
 			testInstanceDetails,

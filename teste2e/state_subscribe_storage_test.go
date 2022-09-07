@@ -24,6 +24,7 @@ import (
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/config"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -90,7 +91,7 @@ func TestState_SubscribeStorage_Events(t *testing.T) {
 		case set := <-sub.Chan():
 			fmt.Printf("%#v\n", set)
 			for _, chng := range set.Changes {
-				if !types.Eq(chng.StorageKey, key) || !chng.HasStorageData {
+				if !codec.Eq(chng.StorageKey, key) || !chng.HasStorageData {
 					// skip, we are only interested in events with content
 					continue
 				}

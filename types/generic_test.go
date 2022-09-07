@@ -3,15 +3,16 @@ package types_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 	fuzz "github.com/google/gofuzz"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
-	optionFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(o *Option[U64], c fuzz.Continue) {
+	optionFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(o *Option[U64], c fuzz.Continue) {
 			if c.RandBool() {
 				*o = NewEmptyOption[U64]()
 				return
@@ -27,14 +28,14 @@ var (
 )
 
 func TestOption_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[Option[U64]](t, 100, optionFuzzOpts...)
-	assertEncodeEmptyObj[Option[U64]](t, 1)
+	AssertRoundTripFuzz[Option[U64]](t, 100, optionFuzzOpts...)
+	AssertEncodeEmptyObj[Option[U64]](t, 1)
 
 	testOptionEncodeLen[U64](11, t)
 
 	accountID := newTestAccountID()
 	testOptionEncodeLen[AccountID](accountID, t)
-	
+
 	testOptionEncodeLen[ItemDetails](testInstanceDetails, t)
 }
 

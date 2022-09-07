@@ -20,17 +20,18 @@ import (
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestState_GetChildStorageHashLatest(t *testing.T) {
 	hash, err := testState.GetChildStorageHashLatest(childStorageKey, key)
 	assert.NoError(t, err)
-	assert.Equal(t, types.NewHash(types.MustHexDecodeString(mockSrv.childStorageTrieHashHex)), hash)
+	assert.Equal(t, types.NewHash(codec.MustHexDecodeString(mockSrv.childStorageTrieHashHex)), hash)
 }
 
 func TestState_GetChildStorageHash(t *testing.T) {
 	hash, err := testState.GetChildStorageHash(childStorageKey, key, mockSrv.blockHashLatest)
 	assert.NoError(t, err)
-	assert.Equal(t, types.NewHash(types.MustHexDecodeString(mockSrv.childStorageTrieHashHex)), hash)
+	assert.Equal(t, types.NewHash(codec.MustHexDecodeString(mockSrv.childStorageTrieHashHex)), hash)
 }

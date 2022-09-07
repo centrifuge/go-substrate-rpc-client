@@ -19,9 +19,10 @@ package types_test
 import (
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 )
 
 var (
@@ -42,8 +43,8 @@ var (
 )
 
 var (
-	disputeLocationFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(d *DisputeLocation, c fuzz.Continue) {
+	disputeLocationFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(d *DisputeLocation, c fuzz.Continue) {
 			if c.RandBool() {
 				d.IsLocal = true
 				return
@@ -55,30 +56,30 @@ var (
 )
 
 func TestDisputeLocation_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, testDisputeLocation1)
-	assertRoundtrip(t, testDisputeLocation2)
-	assertRoundTripFuzz[DisputeLocation](t, 100, disputeLocationFuzzOpts...)
-	assertDecodeNilData[DisputeLocation](t)
-	assertEncodeEmptyObj[DisputeLocation](t, 0)
+	AssertRoundtrip(t, testDisputeLocation1)
+	AssertRoundtrip(t, testDisputeLocation2)
+	AssertRoundTripFuzz[DisputeLocation](t, 100, disputeLocationFuzzOpts...)
+	AssertDecodeNilData[DisputeLocation](t)
+	AssertEncodeEmptyObj[DisputeLocation](t, 0)
 }
 
 func TestDisputeLocation_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testDisputeLocation1, MustHexDecodeString("0x00")},
 		{testDisputeLocation2, MustHexDecodeString("0x01")},
 	})
 }
 
 func TestDisputeLocation_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), testDisputeLocation1},
 		{MustHexDecodeString("0x01"), testDisputeLocation2},
 	})
 }
 
 var (
-	disputeResultFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(d *DisputeResult, c fuzz.Continue) {
+	disputeResultFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(d *DisputeResult, c fuzz.Continue) {
 			if c.RandBool() {
 				d.IsValid = true
 				return
@@ -91,22 +92,22 @@ var (
 )
 
 func TestDisputeResult_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, testDisputeResult1)
-	assertRoundtrip(t, testDisputeResult2)
-	assertRoundTripFuzz[DisputeResult](t, 100, disputeResultFuzzOpts...)
-	assertDecodeNilData[DisputeResult](t)
-	assertEncodeEmptyObj[DisputeResult](t, 0)
+	AssertRoundtrip(t, testDisputeResult1)
+	AssertRoundtrip(t, testDisputeResult2)
+	AssertRoundTripFuzz[DisputeResult](t, 100, disputeResultFuzzOpts...)
+	AssertDecodeNilData[DisputeResult](t)
+	AssertEncodeEmptyObj[DisputeResult](t, 0)
 }
 
 func TestDisputeResult_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testDisputeResult1, MustHexDecodeString("0x00")},
 		{testDisputeResult2, MustHexDecodeString("0x01")},
 	})
 }
 
 func TestDisputeResult_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), testDisputeResult1},
 		{MustHexDecodeString("0x01"), testDisputeResult2},
 	})

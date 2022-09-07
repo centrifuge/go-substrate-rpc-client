@@ -23,9 +23,10 @@ import (
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/hash"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/xxhash"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/xxhash"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -367,7 +368,7 @@ func TestCreateStorageKeyDoubleMapV9(t *testing.T) {
 }
 
 func TestStorageKey_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{
+	AssertEncodedLength(t, []EncodedLengthAssert{
 		{NewStorageKey(MustHexDecodeString("0x00")), 1},
 		{NewStorageKey(MustHexDecodeString("0xab1234")), 3},
 		{NewStorageKey(MustHexDecodeString("0x0001")), 2},
@@ -375,7 +376,7 @@ func TestStorageKey_EncodedLength(t *testing.T) {
 }
 
 func TestStorageKey_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewStorageKey([]byte{171, 18, 52}), MustHexDecodeString("0xab1234")},
 		{NewStorageKey([]byte{}), MustHexDecodeString("0x")},
 	})
@@ -390,7 +391,7 @@ func TestStorageKey_Decode(t *testing.T) {
 }
 
 func TestStorageKey_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewStorageKey([]byte{0, 42, 254}), MustHexDecodeString(
 			"0x537db36f5b5970b679a28a3df8d219317d658014fb9c3d409c0c799d8ecf149d")},
 		{NewStorageKey([]byte{0, 0}), MustHexDecodeString(
@@ -399,7 +400,7 @@ func TestStorageKey_Hash(t *testing.T) {
 }
 
 func TestStorageKey_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewStorageKey([]byte{0, 0, 0}), "0x000000"},
 		{NewStorageKey([]byte{171, 18, 52}), "0xab1234"},
 		{NewStorageKey([]byte{0, 1}), "0x0001"},
@@ -408,7 +409,7 @@ func TestStorageKey_Hex(t *testing.T) {
 }
 
 func TestStorageKey_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewStorageKey([]byte{0, 0, 0}), "[0 0 0]"},
 		{NewStorageKey([]byte{171, 18, 52}), "[171 18 52]"},
 		{NewStorageKey([]byte{0, 1}), "[0 1]"},
@@ -417,7 +418,7 @@ func TestStorageKey_String(t *testing.T) {
 }
 
 func TestStorageKey_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewStorageKey([]byte{1, 0, 0}), NewStorageKey([]byte{1, 0}), false},
 		{NewStorageKey([]byte{0, 0, 1}), NewStorageKey([]byte{0, 1}), false},
 		{NewStorageKey([]byte{0, 0, 0}), NewStorageKey([]byte{0, 0}), false},

@@ -21,6 +21,7 @@ import (
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 // ExtrinsicPayloadV3 is a signing payload for an Extrinsic. For the final encoding, it is variable length based on
@@ -40,7 +41,7 @@ type ExtrinsicPayloadV3 struct {
 
 // Sign the extrinsic payload with the given derivation path
 func (e ExtrinsicPayloadV3) Sign(signer signature.KeyringPair) (Signature, error) {
-	b, err := Encode(e)
+	b, err := codec.Encode(e)
 	if err != nil {
 		return Signature{}, err
 	}
@@ -102,7 +103,7 @@ type ExtrinsicPayloadV4 struct {
 
 // Sign the extrinsic payload with the given derivation path
 func (e ExtrinsicPayloadV4) Sign(signer signature.KeyringPair) (Signature, error) {
-	b, err := Encode(e)
+	b, err := codec.Encode(e)
 	if err != nil {
 		return Signature{}, err
 	}

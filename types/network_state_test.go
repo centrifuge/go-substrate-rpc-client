@@ -20,22 +20,24 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 func TestNetworkState_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NetworkState{NewText("ab123")})
-	assertRoundTripFuzz[NetworkState](t, 100)
-	assertEncodeEmptyObj[NetworkState](t, 1)
+	AssertRoundtrip(t, NetworkState{NewText("ab123")})
+	AssertRoundTripFuzz[NetworkState](t, 100)
+	AssertEncodeEmptyObj[NetworkState](t, 1)
 }
 
 func TestNetworkState_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NetworkState{NewText("ab123")}, MustHexDecodeString("0x146162313233")},
 	})
 }
 
 func TestNetworkState_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x146162313233"), NetworkState{NewText("ab123")}},
 	})
 }

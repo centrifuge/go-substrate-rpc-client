@@ -20,58 +20,60 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 func TestBool_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[Bool](t, 100)
-	assertDecodeNilData[Bool](t)
-	assertEncodeEmptyObj[Bool](t, 1)
+	AssertRoundTripFuzz[Bool](t, 100)
+	AssertDecodeNilData[Bool](t)
+	AssertEncodeEmptyObj[Bool](t, 1)
 }
 
 func TestBool_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{
+	AssertEncodedLength(t, []EncodedLengthAssert{
 		{NewBool(true), 1},
 		{NewBool(false), 1},
 	})
 }
 
 func TestBool_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewBool(true), []byte{0x01}},
 		{NewBool(false), []byte{0x00}},
 	})
 }
 
 func TestBool_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{[]byte{0x01}, NewBool(true)},
 		{[]byte{0x00}, NewBool(false)},
 	})
 }
 
 func TestBool_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewBool(true), MustHexDecodeString("0xee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25")},
 		{NewBool(false), MustHexDecodeString("0x03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314")},
 	})
 }
 
 func TestBool_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewBool(true), "0x01"},
 		{NewBool(false), "0x00"},
 	})
 }
 
 func TestBool_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewBool(true), "true"},
 		{NewBool(false), "false"},
 	})
 }
 
 func TestBool_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewBool(true), NewBool(true), true},
 		{NewBool(false), NewBool(true), false},
 		{NewBool(false), NewBool(false), true},

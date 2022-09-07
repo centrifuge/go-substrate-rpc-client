@@ -24,6 +24,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/config"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -84,7 +85,7 @@ func TestAuthor_SubmitExtrinsic(t *testing.T) {
 			continue
 		}
 
-		hex, err := types.Hex(res)
+		hex, err := codec.Hex(res)
 		assert.NoError(t, err)
 		assert.NotEmpty(t, hex)
 		break

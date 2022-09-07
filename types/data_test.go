@@ -20,16 +20,18 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestData_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[Data](t, 100)
-	assertEncodeEmptyObj[Data](t, 0)
+	AssertRoundTripFuzz[Data](t, 100)
+	AssertEncodeEmptyObj[Data](t, 0)
 }
 
 func TestData_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{
+	AssertEncodedLength(t, []EncodedLengthAssert{
 		{Data([]byte{12, 251, 42}), 3},
 		{Data([]byte{}), 0},
 	})
@@ -52,7 +54,7 @@ func TestData_Decode(t *testing.T) {
 }
 
 func TestData_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{Data([]byte{0, 42, 254}), MustHexDecodeString(
 			"0x537db36f5b5970b679a28a3df8d219317d658014fb9c3d409c0c799d8ecf149d")},
 		{Data([]byte{}), MustHexDecodeString(
@@ -61,19 +63,19 @@ func TestData_Hash(t *testing.T) {
 }
 
 func TestData_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{Data([]byte{0, 0, 0}), "0x000000"},
 		{Data([]byte{171, 18, 52}), "0xab1234"},
 		{Data([]byte{0, 1}), "0x0001"},
 		{Data([]byte{18, 52, 86}), "0x123456"},
 	})
 
-	assertEqual(t, NewData([]byte{0, 0, 0}).Hex(), "0x000000")
-	assertEqual(t, NewData([]byte{171, 18, 52}).Hex(), "0xab1234")
+	AssertEqual(t, NewData([]byte{0, 0, 0}).Hex(), "0x000000")
+	AssertEqual(t, NewData([]byte{171, 18, 52}).Hex(), "0xab1234")
 }
 
 func TestData_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{Data([]byte{0, 0, 0}), "[0 0 0]"},
 		{Data([]byte{171, 18, 52}), "[171 18 52]"},
 		{Data([]byte{0, 1}), "[0 1]"},
@@ -82,7 +84,7 @@ func TestData_String(t *testing.T) {
 }
 
 func TestData_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{Data([]byte{1, 0, 0}), Data([]byte{1, 0}), false},
 		{Data([]byte{0, 0, 1}), Data([]byte{0, 1}), false},
 		{Data([]byte{0, 0, 0}), Data([]byte{0, 0}), false},

@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 // Address is a wrapper around an AccountId or an AccountIndex. It is encoded with a prefix in case of an AccountID.
@@ -47,7 +48,7 @@ func NewAddressFromAccountID(b []byte) (Address, error) {
 
 // NewAddressFromHexAccountID creates an Address from the given hex string that contains an AccountID (public key)
 func NewAddressFromHexAccountID(str string) (Address, error) {
-	b, err := HexDecodeString(str)
+	b, err := codec.HexDecodeString(str)
 	if err != nil {
 		return Address{}, err
 	}

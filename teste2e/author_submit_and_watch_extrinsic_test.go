@@ -24,6 +24,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/author"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -101,7 +102,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 			fmt.Printf("%#v\n", status)
 
 			if status.IsInBlock {
-				assert.False(t, types.Eq(status.AsInBlock, types.ExtrinsicStatus{}.AsInBlock),
+				assert.False(t, codec.Eq(status.AsInBlock, types.ExtrinsicStatus{}.AsInBlock),
 					"expected AsFinalized not to be empty")
 				return
 			}

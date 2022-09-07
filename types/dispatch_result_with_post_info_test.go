@@ -19,9 +19,10 @@ package types_test
 import (
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 )
 
 var (
@@ -49,12 +50,12 @@ var (
 		},
 	}
 
-	dispatchResultWithPostInfoFuzzOpts = combineFuzzOpts(
+	dispatchResultWithPostInfoFuzzOpts = CombineFuzzOpts(
 		optionWeightFuzzOpts,
 		paysFuzzOpts,
 		dispatchErrorFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(d *DispatchResultWithPostInfo, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(d *DispatchResultWithPostInfo, c fuzz.Continue) {
 				if c.RandBool() {
 					d.IsOk = true
 					c.Fuzz(&d.Ok)
@@ -69,20 +70,20 @@ var (
 )
 
 func TestDispatchResultWithPostInfo_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[DispatchResultWithPostInfo](t, 1000, dispatchResultWithPostInfoFuzzOpts...)
-	assertDecodeNilData[DispatchResultWithPostInfo](t)
-	assertEncodeEmptyObj[DispatchResultWithPostInfo](t, 0)
+	AssertRoundTripFuzz[DispatchResultWithPostInfo](t, 1000, dispatchResultWithPostInfoFuzzOpts...)
+	AssertDecodeNilData[DispatchResultWithPostInfo](t)
+	AssertEncodeEmptyObj[DispatchResultWithPostInfo](t, 0)
 }
 
 func TestDispatchResultWithPostInfo_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testDispatchResultWithPostInfo1, MustHexDecodeString("0x00017b0000000000000000")},
 		{testDispatchResultWithPostInfo2, MustHexDecodeString("0x0101c8010000000000000100")},
 	})
 }
 
 func TestDispatchResultWithPostInfo_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00017b0000000000000000"), testDispatchResultWithPostInfo1},
 		{MustHexDecodeString("0x0101c8010000000000000100"), testDispatchResultWithPostInfo2},
 	})
