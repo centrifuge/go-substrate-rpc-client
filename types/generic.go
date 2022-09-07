@@ -42,3 +42,7 @@ func (o *Option[T]) SetNone() {
 func (o *Option[T]) Unwrap() (ok bool, value T) {
 	return o.hasValue, o.value
 }
+
+func (o *Option[T]) HasValue() bool {
+	return o.hasValue
+}
