@@ -427,6 +427,9 @@ type EventRecords struct {
 	Vesting_VestingCompleted []EventVestingVestingCompleted `test-gen-blockchain:"centrifuge-parachain"`
 	Vesting_VestingUpdated   []EventVestingVestingUpdated   `test-gen-blockchain:"centrifuge-parachain"`
 
+	VoterList_Rebagged     []EventVoterListRebagged     `test-gen-blockchain:"polkadot"`
+	VoterList_ScoreUpdated []EventVoterListScoreUpdated `test-gen-blockchain:"polkadot"`
+
 	Whitelist_CallWhitelisted           []EventWhitelistCallWhitelisted        `test-gen-skip:"true"`
 	Whitelist_WhitelistedCallRemoved    []EventWhitelistWhitelistedCallRemoved `test-gen-skip:"true"`
 	Whitelist_WhitelistedCallDispatched []EventWhitelistWhitelistedCallRemoved `test-gen-skip:"true"`
