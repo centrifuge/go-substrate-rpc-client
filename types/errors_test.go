@@ -38,7 +38,7 @@ var (
 		IsModule: true,
 		ModuleError: ModuleError{
 			Index: 4,
-			Error: 5,
+			Error: [4]U8{5, 0, 0, 0},
 		},
 	}
 	testDispatchError5 = DispatchError{
@@ -163,7 +163,7 @@ func TestDispatchError_Encode(t *testing.T) {
 		{testDispatchError1, MustHexDecodeString("0x00")},
 		{testDispatchError2, MustHexDecodeString("0x01")},
 		{testDispatchError3, MustHexDecodeString("0x02")},
-		{testDispatchError4, MustHexDecodeString("0x030405")},
+		{testDispatchError4, MustHexDecodeString("0x030405000000")},
 		{testDispatchError5, MustHexDecodeString("0x04")},
 		{testDispatchError6, MustHexDecodeString("0x05")},
 		{testDispatchError7, MustHexDecodeString("0x06")},
@@ -178,7 +178,7 @@ func TestDispatchError_Decode(t *testing.T) {
 		{MustHexDecodeString("0x00"), testDispatchError1},
 		{MustHexDecodeString("0x01"), testDispatchError2},
 		{MustHexDecodeString("0x02"), testDispatchError3},
-		{MustHexDecodeString("0x030405"), testDispatchError4},
+		{MustHexDecodeString("0x030405000000"), testDispatchError4},
 		{MustHexDecodeString("0x04"), testDispatchError5},
 		{MustHexDecodeString("0x05"), testDispatchError6},
 		{MustHexDecodeString("0x06"), testDispatchError7},

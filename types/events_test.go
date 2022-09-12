@@ -79,28 +79,6 @@ var (
 )
 
 func TestDispatchResult_Decode(t *testing.T) {
-	// ok
-	decoder := scale.NewDecoder(bytes.NewReader([]byte{0}))
-	var res DispatchResult
-	err := decoder.Decode(&res)
-	assert.NoError(t, err)
-	assert.True(t, res.Ok)
-
-	// Dispatch Error
-	decoder = scale.NewDecoder(bytes.NewReader([]byte{1, 3, 1, 1}))
-	res = DispatchResult{}
-	assert.NoError(t, decoder.Decode(&res))
-
-	assert.False(t, res.Ok)
-	assert.True(t, res.Error.IsModule)
-	assert.Equal(t, res.Error.ModuleError.Index, U8(1))
-	assert.Equal(t, res.Error.ModuleError.Error, U8(1))
-
-	// decoder error
-	decoder = scale.NewDecoder(bytes.NewReader([]byte{1, 3, 1}))
-	res = DispatchResult{}
-	assert.Error(t, decoder.Decode(&res))
-
 	assertRoundTripFuzz[DispatchResult](t, 100, dispatchResultFuzzOpts...)
 	assertDecodeNilData[DispatchResult](t)
 	assertEncodeEmptyObj[DispatchResult](t, 1)

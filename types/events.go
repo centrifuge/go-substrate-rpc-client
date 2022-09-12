@@ -2109,6 +2109,23 @@ type EventVestingVestingUpdated struct {
 	Topics   []Hash
 }
 
+// EventVoterListRebagged is emitted when an account is moved from one bag to another.
+type EventVoterListRebagged struct {
+	Phase  Phase
+	Who    AccountID
+	From   U64
+	To     U64
+	Topics []Hash
+}
+
+// EventVoterListScoreUpdated is emitted when the score of an account is updated to the given amount.
+type EventVoterListScoreUpdated struct {
+	Phase    Phase
+	Who      AccountID
+	NewScore U64
+	Topics   []Hash
+}
+
 // EventWhitelistCallWhitelisted is emitted when a call has been whitelisted.
 type EventWhitelistCallWhitelisted struct {
 	Phase    Phase
