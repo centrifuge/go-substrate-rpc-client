@@ -480,17 +480,33 @@ func (c *Client) send(ctx context.Context, op *requestOp, msg interface{}) error
 }
 
 func (c *Client) write(ctx context.Context, msg interface{}) error {
+	if err := c.checkWriteConn(ctx); err != nil {
+		return err
+	}
+
+	if err := c.writeConn.Write(ctx, msg); err != nil {
+		c.writeConn = nil
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) checkWriteConn(ctx context.Context) error {
 	// The previous write failed. Try to establish a new connection.
 	if c.writeConn == nil {
-		if err := c.reconnect(ctx); err != nil {
-			return err
-		}
+		return c.reconnect(ctx)
 	}
-	err := c.writeConn.Write(ctx, msg)
-	if err != nil {
-		c.writeConn = nil
+
+	// Extra check to ensure that connection is not closed.
+	select {
+	case <-c.writeConn.Closed():
+		return c.reconnect(ctx)
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+		return nil
 	}
-	return err
 }
 
 func (c *Client) reconnect(ctx context.Context) error {
