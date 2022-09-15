@@ -22,8 +22,6 @@ import (
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
-	fuzz "github.com/google/gofuzz"
-	"github.com/stretchr/testify/assert"
 )
 
 var exampleHeader = Header{
@@ -83,53 +81,4 @@ func TestHeader_Eq(t *testing.T) {
 		{exampleHeader, NewBytes(hash64), false},
 		{exampleHeader, NewBool(false), false},
 	})
-}
-
-var (
-	optionBlockNumberFuzzOpts = []FuzzOpt{
-		WithFuzzFuncs(func(o *OptionBlockNumber, c fuzz.Continue) {
-			if c.RandBool() {
-				*o = NewOptionBlockNumberEmpty()
-				return
-			}
-			var blockNumber BlockNumber
-			c.Fuzz(&blockNumber)
-
-			*o = NewOptionBlockNumber(blockNumber)
-		}),
-	}
-)
-
-func TestOptionBlockNumber_EncodeDecode(t *testing.T) {
-	AssertRoundTripFuzz[OptionBlockNumber](t, 100, optionBlockNumberFuzzOpts...)
-	AssertEncodeEmptyObj[OptionBlockNumber](t, 1)
-}
-
-func TestOptionBlockNumber_Encode(t *testing.T) {
-	AssertEncode(t, []EncodingAssert{
-		{NewOptionBlockNumber(BlockNumber(1)), MustHexDecodeString("0x0104")},
-		{NewOptionBlockNumberEmpty(), MustHexDecodeString("0x00")},
-	})
-}
-
-func TestOptionBlockNumber_Decode(t *testing.T) {
-	AssertDecode(t, []DecodingAssert{
-		{MustHexDecodeString("0x0104"), NewOptionBlockNumber(BlockNumber(1))},
-		{MustHexDecodeString("0x00"), NewOptionBlockNumberEmpty()},
-	})
-}
-
-func TestOptionBlockNumber_OptionMethods(t *testing.T) {
-	o := NewOptionBlockNumberEmpty()
-	o.SetSome(BlockNumber(1))
-
-	ok, v := o.Unwrap()
-	assert.True(t, ok)
-	assert.NotNil(t, v)
-
-	o.SetNone()
-
-	ok, v = o.Unwrap()
-	assert.False(t, ok)
-	assert.Equal(t, BlockNumber(0), v)
 }
