@@ -208,7 +208,7 @@ func NewMetadataError(variant Si1Variant) *MetadataError {
 	}
 }
 
-func (m *Metadata) FindError(moduleIndex U8, errorIndex U8) (*MetadataError, error) {
+func (m *Metadata) FindError(moduleIndex U8, errorIndex [4]U8) (*MetadataError, error) {
 	if m.Version != 14 {
 		return nil, fmt.Errorf("invalid metadata version %d", m.Version)
 	}

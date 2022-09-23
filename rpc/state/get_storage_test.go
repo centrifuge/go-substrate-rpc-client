@@ -20,12 +20,13 @@ import (
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestState_GetStorageLatest(t *testing.T) {
 	var decoded types.U64
-	ok, err := testState.GetStorageLatest(types.MustHexDecodeString(mockSrv.storageKeyHex), &decoded)
+	ok, err := testState.GetStorageLatest(codec.MustHexDecodeString(mockSrv.storageKeyHex), &decoded)
 	assert.NoError(t, err)
 	assert.True(t, ok)
 	assert.Equal(t, types.U64(0x5d892db8), decoded)
@@ -33,7 +34,7 @@ func TestState_GetStorageLatest(t *testing.T) {
 
 func TestState_GetStorage(t *testing.T) {
 	var decoded types.U64
-	ok, err := testState.GetStorage(types.MustHexDecodeString(mockSrv.storageKeyHex), &decoded, mockSrv.blockHashLatest)
+	ok, err := testState.GetStorage(codec.MustHexDecodeString(mockSrv.storageKeyHex), &decoded, mockSrv.blockHashLatest)
 	assert.NoError(t, err)
 	assert.True(t, ok)
 	assert.Equal(t, types.U64(0x5d892db8), decoded)
@@ -47,13 +48,13 @@ func TestState_GetStorageEmpty(t *testing.T) {
 }
 
 func TestState_GetStorageRawLatest(t *testing.T) {
-	data, err := testState.GetStorageRawLatest(types.MustHexDecodeString(mockSrv.storageKeyHex))
+	data, err := testState.GetStorageRawLatest(codec.MustHexDecodeString(mockSrv.storageKeyHex))
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.storageDataHex, data.Hex())
 }
 
 func TestState_GetStorageRaw(t *testing.T) {
-	data, err := testState.GetStorageRaw(types.MustHexDecodeString(mockSrv.storageKeyHex), mockSrv.blockHashLatest)
+	data, err := testState.GetStorageRaw(codec.MustHexDecodeString(mockSrv.storageKeyHex), mockSrv.blockHashLatest)
 	assert.NoError(t, err)
 	assert.Equal(t, mockSrv.storageDataHex, data.Hex())
 }

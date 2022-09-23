@@ -19,9 +19,10 @@ package types_test
 import (
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 )
 
 var (
@@ -102,10 +103,10 @@ var (
 			testJunction8,
 		},
 	}
-	multiLocationV0FuzzOpts = combineFuzzOpts(
+	multiLocationV0FuzzOpts = CombineFuzzOpts(
 		junctionV0FuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(m *MultiLocationV0, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(m *MultiLocationV0, c fuzz.Continue) {
 				switch c.Intn(9) {
 				case 0:
 					m.IsNull = true
@@ -148,13 +149,13 @@ var (
 )
 
 func TestMultiLocationV0_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[MultiLocationV0](t, 1000, multiLocationV0FuzzOpts...)
-	assertDecodeNilData[MultiLocationV0](t)
-	assertEncodeEmptyObj[MultiLocationV0](t, 0)
+	AssertRoundTripFuzz[MultiLocationV0](t, 1000, multiLocationV0FuzzOpts...)
+	AssertDecodeNilData[MultiLocationV0](t)
+	AssertEncodeEmptyObj[MultiLocationV0](t, 0)
 }
 
 func TestMultiLocationV0_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{
 			testMultiLocationV0n1,
 			MustHexDecodeString("0x00"),
@@ -195,7 +196,7 @@ func TestMultiLocationV0_Encode(t *testing.T) {
 }
 
 func TestMultiLocationV0_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{
 			MustHexDecodeString("0x00"),
 			testMultiLocationV0n1,

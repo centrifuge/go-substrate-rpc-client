@@ -19,6 +19,7 @@ package state
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 // GetKeys retreives the keys with the given prefix
@@ -40,7 +41,7 @@ func (s *state) getKeys(prefix types.StorageKey, blockHash *types.Hash) ([]types
 
 	keys := make([]types.StorageKey, len(res))
 	for i, r := range res {
-		err = types.DecodeFromHex(r, &keys[i])
+		err = codec.DecodeFromHex(r, &keys[i])
 		if err != nil {
 			return nil, err
 		}

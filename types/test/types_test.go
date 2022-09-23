@@ -23,6 +23,8 @@ import (
 	"path"
 	"testing"
 
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
@@ -67,7 +69,7 @@ func TestTypesDecode(t *testing.T) {
 
 			switch subdirEntry.Name() {
 			case "meta_bytes":
-				if err := types.Decode(b, &metadata); err != nil {
+				if err := codec.Decode(b, &metadata); err != nil {
 					t.Errorf("Couldn't decode Metadata - %s", err)
 				}
 			case "storage_bytes":

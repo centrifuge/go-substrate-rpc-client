@@ -20,11 +20,12 @@ import (
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"github.com/stretchr/testify/assert"
 )
 
-var childStorageKey = types.NewStorageKey(types.MustHexDecodeString(mockSrv.childStorageKeyHex))
-var key = types.NewStorageKey(types.MustHexDecodeString(mockSrv.childStorageTrieKeyHex))
+var childStorageKey = types.NewStorageKey(codec.MustHexDecodeString(mockSrv.childStorageKeyHex))
+var key = types.NewStorageKey(codec.MustHexDecodeString(mockSrv.childStorageTrieKeyHex))
 
 func TestState_GetChildStorageLatest(t *testing.T) {
 	var decoded ChildStorageTrieTestVal

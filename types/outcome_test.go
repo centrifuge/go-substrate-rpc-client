@@ -19,9 +19,10 @@ package types_test
 import (
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 )
 
 var (
@@ -43,10 +44,10 @@ var (
 		},
 	}
 
-	outcomeFuzzOpts = combineFuzzOpts(
+	outcomeFuzzOpts = CombineFuzzOpts(
 		xcmErrorFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(o *Outcome, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(o *Outcome, c fuzz.Continue) {
 				switch c.Intn(3) {
 				case 0:
 					o.IsComplete = true
@@ -69,13 +70,13 @@ var (
 )
 
 func TestOutcome_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[Outcome](t, 100, outcomeFuzzOpts...)
-	assertDecodeNilData[Outcome](t)
-	assertEncodeEmptyObj[Outcome](t, 0)
+	AssertRoundTripFuzz[Outcome](t, 100, outcomeFuzzOpts...)
+	AssertDecodeNilData[Outcome](t)
+	AssertEncodeEmptyObj[Outcome](t, 0)
 }
 
 func TestOutcome_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testOutcome1, MustHexDecodeString("0x007b00000000000000")},
 		{testOutcome2, MustHexDecodeString("0x01360000000000000000")},
 		{testOutcome3, MustHexDecodeString("0x0201")},
@@ -83,7 +84,7 @@ func TestOutcome_Encode(t *testing.T) {
 }
 
 func TestOutcome_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x007b00000000000000"), testOutcome1},
 		{MustHexDecodeString("0x01360000000000000000"), testOutcome2},
 		{MustHexDecodeString("0x0201"), testOutcome3},

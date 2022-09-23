@@ -20,19 +20,21 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 func TestHealth_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, Health{3, false, true})
-	assertRoundtrip(t, Health{1, true, true})
-	assertRoundtrip(t, Health{0, true, false})
-	assertRoundTripFuzz[Health](t, 100)
-	assertDecodeNilData[Health](t)
-	assertEncodeEmptyObj[Health](t, 10)
+	AssertRoundtrip(t, Health{3, false, true})
+	AssertRoundtrip(t, Health{1, true, true})
+	AssertRoundtrip(t, Health{0, true, false})
+	AssertRoundTripFuzz[Health](t, 100)
+	AssertDecodeNilData[Health](t)
+	AssertEncodeEmptyObj[Health](t, 10)
 }
 
 func TestHealth_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{Health{3, false, true}, MustHexDecodeString("0x03000000000000000001")},
 		{Health{1, true, true}, MustHexDecodeString("0x01000000000000000101")},
 		{Health{0, true, false}, MustHexDecodeString("0x00000000000000000100")},
@@ -40,7 +42,7 @@ func TestHealth_Encode(t *testing.T) {
 }
 
 func TestHealth_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x03000000000000000001"), Health{3, false, true}},
 		{MustHexDecodeString("0x01000000000000000101"), Health{1, true, true}},
 		{MustHexDecodeString("0x00000000000000000100"), Health{0, true, false}},

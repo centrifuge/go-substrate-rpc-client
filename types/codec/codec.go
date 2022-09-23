@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package types
+package codec
 
 import (
 	"bytes"
@@ -24,7 +24,6 @@ import (
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
-	"golang.org/x/crypto/blake2b"
 )
 
 // Hexer interface is implemented by any type that has a Hex() function returning a string
@@ -74,15 +73,6 @@ func EncodedLength(value interface{}) (int, error) {
 		return 0, err
 	}
 	return buffer.Len(), nil
-}
-
-// GetHash returns a hash of the value
-func GetHash(value interface{}) (Hash, error) {
-	enc, err := Encode(value)
-	if err != nil {
-		return Hash{}, err
-	}
-	return blake2b.Sum256(enc), err
 }
 
 // Eq compares the value of the input to see if there is a match

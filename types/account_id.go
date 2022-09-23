@@ -16,7 +16,15 @@
 
 package types
 
-import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"strings"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+)
 
 type OptionAccountID struct {
 	option
@@ -56,12 +64,74 @@ func (o *OptionAccountID) Unwrap() (ok bool, value AccountID) {
 	return o.hasValue, o.value
 }
 
+const (
+	AccountIDLen = 32
+)
+
 // AccountID represents a public key (an 32 byte array)
-type AccountID [32]byte
+type AccountID [AccountIDLen]byte
+
+func (a *AccountID) ToBytes() []byte {
+	if a == nil {
+		return nil
+	}
+
+	b := a[:]
+
+	return b
+}
+
+func (a *AccountID) ToHexString() string {
+	if a == nil {
+		return ""
+	}
+
+	return hexutil.Encode(a.ToBytes())
+}
+
+func (a *AccountID) Equal(accountID *AccountID) bool {
+	return bytes.Equal(a.ToBytes(), accountID.ToBytes())
+}
+
+func (a AccountID) MarshalJSON() ([]byte, error) {
+	return json.Marshal(a.ToHexString())
+}
+
+func (a *AccountID) UnmarshalJSON(data []byte) error {
+	accID, err := NewAccountIDFromHexString(strings.Trim(string(data), "\""))
+
+	if err != nil {
+		return err
+	}
+
+	*a = *accID
+
+	return nil
+}
+
+var (
+	ErrInvalidAccountIDBytes = errors.New("invalid account ID bytes")
+)
 
 // NewAccountID creates a new AccountID type
-func NewAccountID(b []byte) AccountID {
+func NewAccountID(b []byte) (*AccountID, error) {
+	if len(b) != AccountIDLen {
+		return nil, ErrInvalidAccountIDBytes
+	}
+
 	a := AccountID{}
+
 	copy(a[:], b)
-	return a
+
+	return &a, nil
+}
+
+func NewAccountIDFromHexString(accountIDHex string) (*AccountID, error) {
+	b, err := hexutil.Decode(accountIDHex)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return NewAccountID(b)
 }

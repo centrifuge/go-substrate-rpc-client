@@ -14,8 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:generate mockery --name Client
-
 package client
 
 import (
@@ -25,7 +23,10 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/config"
 	gethrpc "github.com/centrifuge/go-substrate-rpc-client/v4/gethrpc"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
+
+//go:generate mockery --name Client
 
 type Client interface {
 	// Call makes the call to RPC method with the provided args
@@ -73,7 +74,7 @@ func CallWithBlockHash(c Client, target interface{}, method string, blockHash *t
 		}
 		return nil
 	}
-	hexHash, err := types.Hex(*blockHash)
+	hexHash, err := codec.Hex(*blockHash)
 	if err != nil {
 		return err
 	}

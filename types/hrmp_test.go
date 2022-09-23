@@ -20,6 +20,8 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 var (
@@ -30,19 +32,19 @@ var (
 )
 
 func TestHRMPChannelID_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[HRMPChannelID](t, 1000)
-	assertDecodeNilData[HRMPChannelID](t)
-	assertEncodeEmptyObj[HRMPChannelID](t, 8)
+	AssertRoundTripFuzz[HRMPChannelID](t, 1000)
+	AssertDecodeNilData[HRMPChannelID](t)
+	AssertEncodeEmptyObj[HRMPChannelID](t, 8)
 }
 
 func TestHRMPChannelID_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testHRMPChannelID, MustHexDecodeString("0x0b0000002d000000")},
 	})
 }
 
 func TestHRMPChannelID_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x0b0000002d000000"), testHRMPChannelID},
 	})
 }

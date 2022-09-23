@@ -19,9 +19,10 @@ package types_test
 import (
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -42,8 +43,8 @@ func TestExtrinsicEra_Mortal(t *testing.T) {
 }
 
 var (
-	extrinsicEraFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(e *ExtrinsicEra, c fuzz.Continue) {
+	extrinsicEraFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(e *ExtrinsicEra, c fuzz.Continue) {
 			if c.RandBool() {
 				e.IsImmortalEra = true
 				return
@@ -62,7 +63,7 @@ func TestExtrinsicEra_EncodeDecode(t *testing.T) {
 	var e ExtrinsicEra
 	err := DecodeFromHex("0x4e9c", &e)
 	assert.NoError(t, err)
-	assertRoundtrip(t, e)
+	AssertRoundtrip(t, e)
 
-	assertRoundTripFuzz[ExtrinsicEra](t, 1000, extrinsicEraFuzzOpts...)
+	AssertRoundTripFuzz[ExtrinsicEra](t, 1000, extrinsicEraFuzzOpts...)
 }

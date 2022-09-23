@@ -18,6 +18,7 @@ package types
 
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 type MultiAddress struct {
@@ -34,20 +35,25 @@ type MultiAddress struct {
 }
 
 // NewMultiAddressFromAccountID creates an Address from the given AccountID (public key)
-func NewMultiAddressFromAccountID(b []byte) MultiAddress {
+func NewMultiAddressFromAccountID(b []byte) (MultiAddress, error) {
+	accountID, err := NewAccountID(b)
+	if err != nil {
+		return MultiAddress{}, err
+	}
+
 	return MultiAddress{
 		IsID: true,
-		AsID: NewAccountID(b),
-	}
+		AsID: *accountID,
+	}, nil
 }
 
 // NewMultiAddressFromHexAccountID creates an Address from the given hex string that contains an AccountID (public key)
 func NewMultiAddressFromHexAccountID(str string) (MultiAddress, error) {
-	b, err := HexDecodeString(str)
+	b, err := codec.HexDecodeString(str)
 	if err != nil {
 		return MultiAddress{}, err
 	}
-	return NewMultiAddressFromAccountID(b), nil
+	return NewMultiAddressFromAccountID(b)
 }
 
 func (m MultiAddress) Encode(encoder scale.Encoder) error {

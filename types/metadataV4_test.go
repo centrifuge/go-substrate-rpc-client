@@ -20,7 +20,8 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
-
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -135,47 +136,47 @@ func TestMetadataV4_Decode(t *testing.T) {
 }
 
 func TestMetadataV4_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleMetadataV4)
+	AssertRoundtrip(t, exampleMetadataV4)
 }
 
 func TestCallIndex_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleCallIndex)
+	AssertRoundtrip(t, exampleCallIndex)
 }
 
 func TestModuleMetadataV4_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleModuleMetadataV42)
+	AssertRoundtrip(t, exampleModuleMetadataV42)
 }
 
 func TestStorageFunctionMetadataV4Type_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleStorageFunctionMetadataV4Type)
+	AssertRoundtrip(t, exampleStorageFunctionMetadataV4Type)
 }
 
 func TestStorageFunctionMetadataV4Map_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleStorageFunctionMetadataV4Map)
+	AssertRoundtrip(t, exampleStorageFunctionMetadataV4Map)
 }
 
 func TestStorageFunctionMetadataV4DoubleMap_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleStorageFunctionMetadataV4DoubleMap)
+	AssertRoundtrip(t, exampleStorageFunctionMetadataV4DoubleMap)
 }
 
 func TestFunctionMetadataV4_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleFunctionMetadataV4)
+	AssertRoundtrip(t, exampleFunctionMetadataV4)
 }
 
 func TestEventMetadataV4_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleEventMetadataV4)
+	AssertRoundtrip(t, exampleEventMetadataV4)
 }
 
 func TestMapTypeV4_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleMapTypeV4)
+	AssertRoundtrip(t, exampleMapTypeV4)
 }
 
 func TestDoubleMapTypeV4_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleDoubleMapTypeV4)
+	AssertRoundtrip(t, exampleDoubleMapTypeV4)
 }
 
 func TestFunctionArgumentMetadata_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleFunctionArgumentMetadata)
+	AssertRoundtrip(t, exampleFunctionArgumentMetadata)
 }
 
 func TestFindEventNamesForEventIDV4(t *testing.T) {

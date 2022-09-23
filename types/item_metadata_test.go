@@ -21,10 +21,12 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 var (
-	testInstanceMetadata = InstanceMetadata{
+	testInstanceMetadata = ItemMetadata{
 		Deposit:  NewU128(*big.NewInt(1234)),
 		Data:     Bytes("some_data"),
 		IsFrozen: true,
@@ -32,19 +34,19 @@ var (
 )
 
 func TestInstanceMetadata_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[InstanceMetadata](t, 1000)
-	assertDecodeNilData[InstanceMetadata](t)
-	assertEncodeEmptyObj[InstanceMetadata](t, 18)
+	AssertRoundTripFuzz[ItemMetadata](t, 1000)
+	AssertDecodeNilData[ItemMetadata](t)
+	AssertEncodeEmptyObj[ItemMetadata](t, 18)
 }
 
 func TestInstanceMetadata_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testInstanceMetadata, MustHexDecodeString("0xd204000000000000000000000000000024736f6d655f6461746101")},
 	})
 }
 
 func TestInstanceMetadata_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0xd204000000000000000000000000000024736f6d655f6461746101"), testInstanceMetadata},
 	})
 }

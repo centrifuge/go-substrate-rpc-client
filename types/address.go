@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 // Address is a wrapper around an AccountId or an AccountIndex. It is encoded with a prefix in case of an AccountID.
@@ -32,20 +33,26 @@ type Address struct {
 }
 
 // NewAddressFromAccountID creates an Address from the given AccountID (public key)
-func NewAddressFromAccountID(b []byte) Address {
+func NewAddressFromAccountID(b []byte) (Address, error) {
+	accountID, err := NewAccountID(b)
+
+	if err != nil {
+		return Address{}, nil
+	}
+
 	return Address{
 		IsAccountID: true,
-		AsAccountID: NewAccountID(b),
-	}
+		AsAccountID: *accountID,
+	}, nil
 }
 
 // NewAddressFromHexAccountID creates an Address from the given hex string that contains an AccountID (public key)
 func NewAddressFromHexAccountID(str string) (Address, error) {
-	b, err := HexDecodeString(str)
+	b, err := codec.HexDecodeString(str)
 	if err != nil {
 		return Address{}, err
 	}
-	return NewAddressFromAccountID(b), nil
+	return NewAddressFromAccountID(b)
 }
 
 // NewAddressFromAccountIndex creates an Address from the given AccountIndex
@@ -68,7 +75,11 @@ func (a *Address) Decode(decoder scale.Decoder) error {
 		if err != nil {
 			return err
 		}
-		a.AsAccountID = NewAccountID(append([]byte{b}, sm[:]...)) // Push b back to the front
+		accountID, err := NewAccountID(append([]byte{b}, sm[:]...)) // Push b back to the front
+		if err != nil {
+			return err
+		}
+		a.AsAccountID = *accountID
 		a.IsAccountID = true
 		return nil
 	}

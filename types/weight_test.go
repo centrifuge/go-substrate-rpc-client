@@ -19,16 +19,16 @@ package types_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
-	optionWeightFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(o *OptionWeight, c fuzz.Continue) {
+	optionWeightFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(o *OptionWeight, c fuzz.Continue) {
 			if c.RandBool() {
 				*o = NewOptionWeightEmpty()
 				return
@@ -44,12 +44,12 @@ var (
 )
 
 func TestOptionWeight_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[OptionWeight](t, 100, optionWeightFuzzOpts...)
-	assertEncodeEmptyObj[OptionWeight](t, 1)
+	AssertRoundTripFuzz[OptionWeight](t, 100, optionWeightFuzzOpts...)
+	AssertEncodeEmptyObj[OptionWeight](t, 1)
 }
 
 func TestOptionWeight_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewOptionWeight(NewWeight(0)), MustHexDecodeString("0x010000000000000000")},
 		{NewOptionWeight(NewWeight(1)), MustHexDecodeString("0x010100000000000000")},
 		{NewOptionWeight(NewWeight(2)), MustHexDecodeString("0x010200000000000000")},
@@ -58,7 +58,7 @@ func TestOptionWeight_Encode(t *testing.T) {
 }
 
 func TestOptionWeight_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x010000000000000000"), NewOptionWeight(NewWeight(0))},
 		{MustHexDecodeString("0x010100000000000000"), NewOptionWeight(NewWeight(1))},
 		{MustHexDecodeString("0x010200000000000000"), NewOptionWeight(NewWeight(2))},
@@ -82,41 +82,41 @@ func TestOptionWeight_OptionMethods(t *testing.T) {
 }
 
 func TestWeight_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[Weight](t, 100)
-	assertDecodeNilData[Weight](t)
-	assertEncodeEmptyObj[Weight](t, 8)
+	AssertRoundTripFuzz[Weight](t, 100)
+	AssertDecodeNilData[Weight](t)
+	AssertEncodeEmptyObj[Weight](t, 8)
 }
 
 func TestWeight_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{{NewWeight(13), 8}})
+	AssertEncodedLength(t, []EncodedLengthAssert{{NewWeight(13), 8}})
 }
 
 func TestWeight_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewWeight(29), MustHexDecodeString("0x1d00000000000000")},
 	})
 }
 
 func TestWeight_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewWeight(29), MustHexDecodeString("0x83e168a13a013e6d47b0778f046aaa05d6c01d6857d044d9e9b658a6d85eb865")},
 	})
 }
 
 func TestWeight_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewWeight(29), "0x1d00000000000000"},
 	})
 }
 
 func TestWeight_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewWeight(29), "29"},
 	})
 }
 
 func TestWeight_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewWeight(23), NewWeight(23), true},
 		{NewWeight(23), NewBool(false), false},
 	})

@@ -20,45 +20,47 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 func TestNull_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewNull())
+	AssertRoundtrip(t, NewNull())
 }
 
 func TestNull_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{
+	AssertEncodedLength(t, []EncodedLengthAssert{
 		{NewNull(), 0},
 	})
 }
 
 func TestNull_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewNull(), MustHexDecodeString("0x")},
 	})
 }
 
 func TestNull_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewNull(), MustHexDecodeString(
 			"0x0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8")},
 	})
 }
 
 func TestNull_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewNull(), ""},
 	})
 }
 
 func TestNull_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewNull(), ""},
 	})
 }
 
 func TestNull_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewNull(), NewNull(), true},
 		{NewNull(), NewBytes([]byte{}), false},
 		{NewNull(), NewBool(true), false},

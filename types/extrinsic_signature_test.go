@@ -21,13 +21,14 @@ import (
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	extrinsicSignatureV3FuzzOpts = combineFuzzOpts(
+	extrinsicSignatureV3FuzzOpts = CombineFuzzOpts(
 		addressFuzzOpts,
 		extrinsicEraFuzzOpts,
 	)
@@ -45,13 +46,13 @@ func TestExtrinsicSignatureV3_EncodeDecode(t *testing.T) {
 
 	assert.Equal(t, sig, sigDec)
 
-	assertRoundTripFuzz[ExtrinsicSignatureV3](t, 1000, extrinsicSignatureV3FuzzOpts...)
-	assertDecodeNilData[ExtrinsicSignatureV3](t)
-	assertEncodeEmptyObj[ExtrinsicSignatureV3](t, 69)
+	AssertRoundTripFuzz[ExtrinsicSignatureV3](t, 1000, extrinsicSignatureV3FuzzOpts...)
+	AssertDecodeNilData[ExtrinsicSignatureV3](t)
+	AssertEncodeEmptyObj[ExtrinsicSignatureV3](t, 69)
 }
 
 var (
-	extrinsicSignatureV4FuzzOpts = combineFuzzOpts(
+	extrinsicSignatureV4FuzzOpts = CombineFuzzOpts(
 		multiAddressFuzzOpts,
 		multiSignatureFuzzOpts,
 		extrinsicEraFuzzOpts,
@@ -71,8 +72,8 @@ func TestExtrinsicSignatureV4_EncodeDecode(t *testing.T) {
 
 	assert.Equal(t, sig, sigDec)
 
-	assertRoundTripFuzz[ExtrinsicSignatureV4](t, 1000, extrinsicSignatureV4FuzzOpts...)
-	assertDecodeNilData[ExtrinsicSignatureV4](t)
+	AssertRoundTripFuzz[ExtrinsicSignatureV4](t, 1000, extrinsicSignatureV4FuzzOpts...)
+	AssertDecodeNilData[ExtrinsicSignatureV4](t)
 
 	var (
 		ext ExtrinsicSignatureV4

@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 // StorageKind ...
@@ -45,7 +46,7 @@ func (c *offchain) LocalStorageGet(kind StorageKind, key []byte) (*types.Storage
 		return nil, nil
 	}
 
-	b, err := types.HexDecodeString(res)
+	b, err := codec.HexDecodeString(res)
 	if err != nil {
 		return nil, err
 	}

@@ -20,19 +20,20 @@ import (
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"github.com/stretchr/testify/assert"
 )
 
-var prefix = types.NewStorageKey(types.MustHexDecodeString(mockSrv.childStorageTrieKeyHex))[:8]
+var prefix = types.NewStorageKey(codec.MustHexDecodeString(mockSrv.childStorageTrieKeyHex))[:8]
 
 func TestState_GetChildKeysLatest(t *testing.T) {
 	keys, err := testState.GetChildKeysLatest(childStorageKey, prefix)
 	assert.NoError(t, err)
-	assert.Equal(t, []types.StorageKey{types.MustHexDecodeString(mockSrv.childStorageTrieKeyHex)}, keys)
+	assert.Equal(t, []types.StorageKey{codec.MustHexDecodeString(mockSrv.childStorageTrieKeyHex)}, keys)
 }
 
 func TestState_GetChildKeys(t *testing.T) {
 	keys, err := testState.GetChildKeys(childStorageKey, prefix, mockSrv.blockHashLatest)
 	assert.NoError(t, err)
-	assert.Equal(t, []types.StorageKey{types.MustHexDecodeString(mockSrv.childStorageTrieKeyHex)}, keys)
+	assert.Equal(t, []types.StorageKey{codec.MustHexDecodeString(mockSrv.childStorageTrieKeyHex)}, keys)
 }

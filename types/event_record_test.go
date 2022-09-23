@@ -23,10 +23,10 @@ import (
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
-
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -58,16 +58,16 @@ var exampleEventFinEnc = []byte{0x1, 0x10, 0x27, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0
 	0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} //nolint:lll
 
 var (
-	eventSystemExtrinsicSuccessFuzzOpts = combineFuzzOpts(
+	eventSystemExtrinsicSuccessFuzzOpts = CombineFuzzOpts(
 		phaseFuzzOpts,
 		dispatchInfoFuzzOpts,
 	)
 )
 
 func TestEventSystemExtrinsicSuccess_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[EventSystemExtrinsicSuccess](t, 100, eventSystemExtrinsicSuccessFuzzOpts...)
-	assertDecodeNilData[EventSystemExtrinsicSuccess](t)
-	assertEncodeEmptyObj[EventSystemExtrinsicSuccess](t, 9)
+	AssertRoundTripFuzz[EventSystemExtrinsicSuccess](t, 100, eventSystemExtrinsicSuccessFuzzOpts...)
+	AssertDecodeNilData[EventSystemExtrinsicSuccess](t)
+	AssertEncodeEmptyObj[EventSystemExtrinsicSuccess](t, 9)
 }
 
 func TestEventSystemExtrinsicSuccess_Encode(t *testing.T) {
@@ -318,14 +318,14 @@ func TestEventRecordsRaw_Decode(t *testing.T) {
 }
 
 func TestDispatchError(t *testing.T) {
-	assertRoundTripFuzz[DispatchError](t, 1000, dispatchErrorFuzzOpts...)
-	assertDecodeNilData[DispatchError](t)
-	assertEncodeEmptyObj[DispatchError](t, 0)
+	AssertRoundTripFuzz[DispatchError](t, 1000, dispatchErrorFuzzOpts...)
+	AssertDecodeNilData[DispatchError](t)
+	AssertEncodeEmptyObj[DispatchError](t, 0)
 }
 
 var (
-	phaseFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(p *Phase, c fuzz.Continue) {
+	phaseFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(p *Phase, c fuzz.Continue) {
 			switch c.Intn(3) {
 			case 0:
 				p.IsApplyExtrinsic = true
@@ -340,7 +340,7 @@ var (
 )
 
 func TestPhase(t *testing.T) {
-	assertRoundTripFuzz[Phase](t, 100, phaseFuzzOpts...)
-	assertDecodeNilData[Phase](t)
-	assertEncodeEmptyObj[Phase](t, 0)
+	AssertRoundTripFuzz[Phase](t, 100, phaseFuzzOpts...)
+	AssertDecodeNilData[Phase](t)
+	AssertEncodeEmptyObj[Phase](t, 0)
 }

@@ -19,11 +19,11 @@ package types_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -34,10 +34,10 @@ var (
 		},
 	}
 
-	optionMultiLocationV1FuzzOpts = combineFuzzOpts(
+	optionMultiLocationV1FuzzOpts = CombineFuzzOpts(
 		junctionsV1FuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(o *OptionMultiLocationV1, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(o *OptionMultiLocationV1, c fuzz.Continue) {
 				if c.RandBool() {
 					*o = NewOptionMultiLocationV1Empty()
 					return
@@ -54,19 +54,19 @@ var (
 )
 
 func TestOptionMultiLocation_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[OptionMultiLocationV1](t, 1000, optionMultiLocationV1FuzzOpts...)
-	assertEncodeEmptyObj[OptionMultiLocationV1](t, 1)
+	AssertRoundTripFuzz[OptionMultiLocationV1](t, 1000, optionMultiLocationV1FuzzOpts...)
+	AssertEncodeEmptyObj[OptionMultiLocationV1](t, 1)
 }
 
 func TestOptionMultiLocation_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewOptionMultiLocationV1(testMultiLocation), MustHexDecodeString("0x010100")},
 		{NewOptionMultiLocationV1Empty(), MustHexDecodeString("0x00")},
 	})
 }
 
 func TestOptionMultiLocation_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x010100"), NewOptionMultiLocationV1(testMultiLocation)},
 		{MustHexDecodeString("0x00"), NewOptionMultiLocationV1Empty()},
 	})
@@ -99,19 +99,19 @@ var (
 )
 
 func TestMultiLocationV1_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[MultiLocationV1](t, 100, multiLocationV1FuzzOpts...)
-	assertDecodeNilData[MultiLocationV1](t)
-	assertEncodeEmptyObj[MultiLocationV1](t, 1)
+	AssertRoundTripFuzz[MultiLocationV1](t, 100, multiLocationV1FuzzOpts...)
+	AssertDecodeNilData[MultiLocationV1](t)
+	AssertEncodeEmptyObj[MultiLocationV1](t, 1)
 }
 
 func TestMultiLocationV1_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testMultiLocationV1n1, MustHexDecodeString("0x0408002c01000c010203020010000000000000000303000404052a0000000000000000000000000000000608060807")},
 	})
 }
 
 func TestMultiLocationV1_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x0408002c01000c010203020010000000000000000303000404052a0000000000000000000000000000000608060807"), testMultiLocationV1n1},
 	})
 }
@@ -126,11 +126,11 @@ var (
 		MultiLocationV1: testMultiLocationV1n1,
 	}
 
-	versionedMultiLocationFuzzOpts = combineFuzzOpts(
+	versionedMultiLocationFuzzOpts = CombineFuzzOpts(
 		multiLocationV0FuzzOpts,
 		multiLocationV1FuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(v *VersionedMultiLocation, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(v *VersionedMultiLocation, c fuzz.Continue) {
 				if c.RandBool() {
 					v.IsV0 = true
 					c.Fuzz(&v.MultiLocationV0)
@@ -146,20 +146,20 @@ var (
 )
 
 func TestVersionedMultiLocation_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[VersionedMultiLocation](t, 1000, versionedMultiLocationFuzzOpts...)
-	assertDecodeNilData[VersionedMultiLocation](t)
-	assertEncodeEmptyObj[VersionedMultiLocation](t, 0)
+	AssertRoundTripFuzz[VersionedMultiLocation](t, 1000, versionedMultiLocationFuzzOpts...)
+	AssertDecodeNilData[VersionedMultiLocation](t)
+	AssertEncodeEmptyObj[VersionedMultiLocation](t, 0)
 }
 
 func TestVersionedMultiLocation_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testVersionMultiLocation1, MustHexDecodeString("0x000800010b00000002000c010203030010000000000000000403000504062a00000000000000000000000000000007080608")},
 		{testVersionMultiLocation2, MustHexDecodeString("0x010408002c01000c010203020010000000000000000303000404052a0000000000000000000000000000000608060807")},
 	})
 }
 
 func TestVersionedMultiLocation_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x000800010b00000002000c010203030010000000000000000403000504062a00000000000000000000000000000007080608"), testVersionMultiLocation1},
 		{MustHexDecodeString("0x010408002c01000c010203020010000000000000000303000404052a0000000000000000000000000000000608060807"), testVersionMultiLocation2},
 	})

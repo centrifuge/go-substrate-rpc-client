@@ -21,7 +21,7 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/signature"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -39,7 +39,7 @@ func TestKeyRingPairFromSecretPhrase_SubstrateAddress(t *testing.T) {
 	assert.Equal(t, KeyringPair{
 		URI:       testSecretPhrase,
 		Address:   testAddressSS58,
-		PublicKey: types.MustHexDecodeString(testPubKey),
+		PublicKey: codec.MustHexDecodeString(testPubKey),
 	}, p)
 }
 
@@ -50,7 +50,7 @@ func TestKeyRingPairFromSecretPhrase_PolkadotAddress(t *testing.T) {
 	assert.Equal(t, KeyringPair{
 		URI:       testSecretPhrase,
 		Address:   testPolkadotAddressSS58,
-		PublicKey: types.MustHexDecodeString(testPubKey),
+		PublicKey: codec.MustHexDecodeString(testPubKey),
 	}, p)
 }
 
@@ -61,7 +61,7 @@ func TestKeyRingPairFromSecretPhrase_KusamaAddress(t *testing.T) {
 	assert.Equal(t, KeyringPair{
 		URI:       testSecretPhrase,
 		Address:   testKusamaAddressSS58,
-		PublicKey: types.MustHexDecodeString(testPubKey),
+		PublicKey: codec.MustHexDecodeString(testPubKey),
 	}, p)
 }
 
@@ -77,7 +77,7 @@ func TestKeyringPairFromSecretSeed(t *testing.T) {
 	assert.Equal(t, KeyringPair{
 		URI:       testSecretSeed,
 		Address:   testAddressSS58,
-		PublicKey: types.MustHexDecodeString(testPubKey),
+		PublicKey: codec.MustHexDecodeString(testPubKey),
 	}, p)
 }
 
@@ -88,7 +88,7 @@ func TestKeyringPairFromSecretSeedAndNetwork(t *testing.T) {
 	assert.Equal(t, KeyringPair{
 		URI:       testSecretSeed,
 		Address:   testAddressSS58,
-		PublicKey: types.MustHexDecodeString(testPubKey),
+		PublicKey: codec.MustHexDecodeString(testPubKey),
 	}, p)
 }
 

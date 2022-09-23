@@ -20,6 +20,8 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -115,7 +117,7 @@ var exampleDoubleMapTypeV10 = DoubleMapTypeV10{
 }
 
 func TestMetadataV10_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, exampleMetadataV10)
+	AssertRoundtrip(t, exampleMetadataV10)
 }
 
 func TestFindEventNamesForEventIDV10(t *testing.T) {

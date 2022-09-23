@@ -20,6 +20,8 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 // newOrigin creates a new Origin type. This function is not exported by purpose – Origin should be ignored and not be
@@ -29,43 +31,43 @@ func newOrigin() Origin {
 }
 
 func TestOrigin_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, newOrigin())
-	assertEncodeEmptyObj[Origin](t, 0)
+	AssertRoundtrip(t, newOrigin())
+	AssertEncodeEmptyObj[Origin](t, 0)
 }
 
 func TestOrigin_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{
+	AssertEncodedLength(t, []EncodedLengthAssert{
 		{newOrigin(), 0},
 	})
 }
 
 func TestOrigin_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{newOrigin(), MustHexDecodeString("0x")},
 	})
 }
 
 func TestOrigin_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{newOrigin(), MustHexDecodeString(
 			"0x0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8")},
 	})
 }
 
 func TestOrigin_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{newOrigin(), ""},
 	})
 }
 
 func TestOrigin_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{newOrigin(), ""},
 	})
 }
 
 func TestOrigin_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{newOrigin(), newOrigin(), true},
 		{newOrigin(), NewBytes([]byte{}), false},
 		{newOrigin(), NewBool(true), false},

@@ -20,6 +20,8 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 var (
@@ -30,19 +32,19 @@ var (
 )
 
 func TestLotteryCallIndex_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[LotteryCallIndex](t, 100)
-	assertDecodeNilData[LotteryCallIndex](t)
-	assertEncodeEmptyObj[LotteryCallIndex](t, 2)
+	AssertRoundTripFuzz[LotteryCallIndex](t, 100)
+	AssertDecodeNilData[LotteryCallIndex](t)
+	AssertEncodeEmptyObj[LotteryCallIndex](t, 2)
 }
 
 func TestLotteryCallIndex_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testLotteryCallIndex, MustHexDecodeString("0x3420")},
 	})
 }
 
 func TestLotteryCallIndex_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x3420"), testLotteryCallIndex},
 	})
 }

@@ -22,46 +22,47 @@ import (
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestU8_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewU8(0))
-	assertRoundtrip(t, NewU8(12))
+	AssertRoundtrip(t, NewU8(0))
+	AssertRoundtrip(t, NewU8(12))
 }
 
 func TestU8_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{{NewU8(13), 1}})
+	AssertEncodedLength(t, []EncodedLengthAssert{{NewU8(13), 1}})
 }
 
 func TestU8_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewU8(29), MustHexDecodeString("0x1d")},
 	})
 }
 
 func TestU8_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewU8(29), MustHexDecodeString("0x6a9843ae0195ae1e6f95c7fbd34a42414c77e243aa18a959b5912a1f0f391b54")},
 	})
 }
 
 func TestU8_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewU8(29), "0x1d"},
 	})
 }
 
 func TestU8_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewU8(29), "29"},
 	})
 }
 
 func TestU8_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewU8(23), NewU8(23), true},
 		{NewU8(23), NewBool(false), false},
 	})
@@ -70,44 +71,44 @@ func TestU8_Eq(t *testing.T) {
 func TestU8_MarshalUnmarshal(t *testing.T) {
 	u := NewU8(3)
 
-	assertJSONRoundTrip(t, &u)
+	AssertJSONRoundTrip(t, &u)
 }
 
 func TestU16_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewU16(0))
-	assertRoundtrip(t, NewU16(12))
+	AssertRoundtrip(t, NewU16(0))
+	AssertRoundtrip(t, NewU16(12))
 }
 
 func TestU16_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{{NewU16(13), 2}})
+	AssertEncodedLength(t, []EncodedLengthAssert{{NewU16(13), 2}})
 }
 
 func TestU16_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewU16(29), MustHexDecodeString("0x1d00")},
 	})
 }
 
 func TestU16_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewU16(29), MustHexDecodeString("0x4e59f743a8e19ecb3022652bdef4343e62793d1f7378a688a82741b5d029d3d5")},
 	})
 }
 
 func TestU16_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewU16(29), "0x1d00"},
 	})
 }
 
 func TestU16_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewU16(29), "29"},
 	})
 }
 
 func TestU16_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewU16(23), NewU16(23), true},
 		{NewU16(23), NewBool(false), false},
 	})
@@ -116,44 +117,44 @@ func TestU16_Eq(t *testing.T) {
 func TestU16_MarshalUnmarshal(t *testing.T) {
 	u := NewU16(3)
 
-	assertJSONRoundTrip(t, &u)
+	AssertJSONRoundTrip(t, &u)
 }
 
 func TestU32_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewU32(0))
-	assertRoundtrip(t, NewU32(12))
+	AssertRoundtrip(t, NewU32(0))
+	AssertRoundtrip(t, NewU32(12))
 }
 
 func TestU32_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{{NewU32(13), 4}})
+	AssertEncodedLength(t, []EncodedLengthAssert{{NewU32(13), 4}})
 }
 
 func TestU32_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewU32(29), MustHexDecodeString("0x1d000000")},
 	})
 }
 
 func TestU32_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewU32(29), MustHexDecodeString("0x60ebb66f09bc7fdd21772ab1ed0efb1fd1208e3f5cd20d2d9a29a2a79b6f953f")},
 	})
 }
 
 func TestU32_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewU32(29), "0x1d000000"},
 	})
 }
 
 func TestU32_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewU32(29), "29"},
 	})
 }
 
 func TestU32_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewU32(23), NewU32(23), true},
 		{NewU32(23), NewBool(false), false},
 	})
@@ -162,44 +163,44 @@ func TestU32_Eq(t *testing.T) {
 func TestU32_MarshalUnmarshal(t *testing.T) {
 	u := NewU32(3)
 
-	assertJSONRoundTrip(t, &u)
+	AssertJSONRoundTrip(t, &u)
 }
 
 func TestU64_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewU64(0))
-	assertRoundtrip(t, NewU64(12))
+	AssertRoundtrip(t, NewU64(0))
+	AssertRoundtrip(t, NewU64(12))
 }
 
 func TestU64_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{{NewU64(13), 8}})
+	AssertEncodedLength(t, []EncodedLengthAssert{{NewU64(13), 8}})
 }
 
 func TestU64_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewU64(29), MustHexDecodeString("0x1d00000000000000")},
 	})
 }
 
 func TestU64_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewU64(29), MustHexDecodeString("0x83e168a13a013e6d47b0778f046aaa05d6c01d6857d044d9e9b658a6d85eb865")},
 	})
 }
 
 func TestU64_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewU64(29), "0x1d00000000000000"},
 	})
 }
 
 func TestU64_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewU64(29), "29"},
 	})
 }
 
 func TestU64_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewU64(23), NewU64(23), true},
 		{NewU64(23), NewBool(false), false},
 	})
@@ -208,7 +209,7 @@ func TestU64_Eq(t *testing.T) {
 func TestU64_MarshalUnmarshal(t *testing.T) {
 	u := NewU64(3)
 
-	assertJSONRoundTrip(t, &u)
+	AssertJSONRoundTrip(t, &u)
 }
 
 func TestUCompact_EncodeDecode(t *testing.T) {
@@ -285,18 +286,18 @@ func TestUCompact_EncodeNegative(t *testing.T) {
 }
 
 func TestU128_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewU128(*big.NewInt(0)))
-	assertRoundtrip(t, NewU128(*big.NewInt(12)))
+	AssertRoundtrip(t, NewU128(*big.NewInt(0)))
+	AssertRoundtrip(t, NewU128(*big.NewInt(12)))
 
 	bigPos := big.NewInt(0)
 	bigPos.SetBytes([]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16})
-	assertRoundtrip(t, NewU128(*bigPos))
+	AssertRoundtrip(t, NewU128(*bigPos))
 
-	assertDecodeNilData[U128](t)
+	AssertDecodeNilData[U128](t)
 }
 
 func TestU128_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{{NewU128(*big.NewInt(13)), 16}})
+	AssertEncodedLength(t, []EncodedLengthAssert{{NewU128(*big.NewInt(13)), 16}})
 }
 
 func TestU128_Encode(t *testing.T) {
@@ -304,7 +305,7 @@ func TestU128_Encode(t *testing.T) {
 	b := big.NewInt(0).SetBytes([]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16})
 	c := big.NewInt(0).SetBytes([]byte{255, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16})
 
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewU128(*big.NewInt(0)), MustHexDecodeString("0x00000000000000000000000000000000")},
 		{NewU128(*big.NewInt(29)), MustHexDecodeString("0x1d000000000000000000000000000000")},
 		{NewU128(*a), MustHexDecodeString("0x34120000000000000000000000000000")},
@@ -318,7 +319,7 @@ func TestU128_Decode(t *testing.T) {
 	b := big.NewInt(0).SetBytes([]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16})
 	c := big.NewInt(0).SetBytes([]byte{255, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16})
 
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00000000000000000000000000000000"), NewU128(*big.NewInt(0))},
 		{MustHexDecodeString("0x1d000000000000000000000000000000"), NewU128(*big.NewInt(29))},
 		{MustHexDecodeString("0x34120000000000000000000000000000"), NewU128(*a)},
@@ -328,26 +329,26 @@ func TestU128_Decode(t *testing.T) {
 }
 
 func TestU128_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewU128(*big.NewInt(29)), MustHexDecodeString(
 			"0x139bd9153bbc4913d4161f7a5dd39912b5d22b57a8b557f0a24078a11f943174")},
 	})
 }
 
 func TestU128_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewU128(*big.NewInt(29)), "0x1d000000000000000000000000000000"},
 	})
 }
 
 func TestU128_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewU128(*big.NewInt(29)), "29"},
 	})
 }
 
 func TestU128_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewU128(*big.NewInt(23)), NewU128(*big.NewInt(23)), true},
 		{NewU128(*big.NewInt(23)), NewU64(23), false},
 		{NewU128(*big.NewInt(23)), NewBool(false), false},
@@ -364,23 +365,23 @@ func TestU128_GobEncodeDecode(t *testing.T) {
 	err = target.GobDecode(b)
 	assert.NoError(t, err)
 
-	assertEqual(t, u, *target)
+	AssertEqual(t, u, *target)
 }
 
 func TestU256_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewU256(*big.NewInt(0)))
-	assertRoundtrip(t, NewU256(*big.NewInt(12)))
+	AssertRoundtrip(t, NewU256(*big.NewInt(0)))
+	AssertRoundtrip(t, NewU256(*big.NewInt(12)))
 
 	bigPos := big.NewInt(0)
 	bigPos.SetBytes([]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 		17, 18, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32})
-	assertRoundtrip(t, NewU256(*bigPos))
+	AssertRoundtrip(t, NewU256(*bigPos))
 
-	assertDecodeNilData[U256](t)
+	AssertDecodeNilData[U256](t)
 }
 
 func TestU256_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{{NewU256(*big.NewInt(13)), 32}})
+	AssertEncodedLength(t, []EncodedLengthAssert{{NewU256(*big.NewInt(13)), 32}})
 }
 
 func TestU256_Encode(t *testing.T) {
@@ -389,7 +390,7 @@ func TestU256_Encode(t *testing.T) {
 	b := big.NewInt(0).SetBytes([]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 		17, 18, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32})
 
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewU256(*big.NewInt(0)), MustHexDecodeString(
 			"0x0000000000000000000000000000000000000000000000000000000000000000")},
 		{NewU256(*big.NewInt(29)), MustHexDecodeString(
@@ -405,7 +406,7 @@ func TestU256_Decode(t *testing.T) {
 	b := big.NewInt(0).SetBytes([]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 		17, 18, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32})
 
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x0000000000000000000000000000000000000000000000000000000000000000"),
 			NewU256(*big.NewInt(0))},
 		{MustHexDecodeString("0x1d00000000000000000000000000000000000000000000000000000000000000"),
@@ -416,26 +417,26 @@ func TestU256_Decode(t *testing.T) {
 }
 
 func TestU256_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewU256(*big.NewInt(29)), MustHexDecodeString(
 			"0x92d6618c3e5941a74d1e805e1a8485469229f9a9c58145761bd9209bc2f4360d")},
 	})
 }
 
 func TestU256_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewU256(*big.NewInt(29)), "0x1d00000000000000000000000000000000000000000000000000000000000000"},
 	})
 }
 
 func TestU256_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewU256(*big.NewInt(29)), "29"},
 	})
 }
 
 func TestU256_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewU256(*big.NewInt(23)), NewU256(*big.NewInt(23)), true},
 		{NewU256(*big.NewInt(23)), NewU128(*big.NewInt(23)), false},
 		{NewU256(*big.NewInt(23)), NewI256(*big.NewInt(23)), false},

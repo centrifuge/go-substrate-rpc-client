@@ -19,6 +19,8 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 // H160 is a hash containing 160 bits (20 bytes), typically used in blocks, extrinsics and as a sane default
@@ -78,7 +80,7 @@ func NewHash(b []byte) Hash {
 
 // NewHashFromHexString creates a new Hash type from a hex string
 func NewHashFromHexString(s string) (Hash, error) {
-	bz, err := HexDecodeString(s)
+	bz, err := codec.HexDecodeString(s)
 	if err != nil {
 		return Hash{}, err
 	}

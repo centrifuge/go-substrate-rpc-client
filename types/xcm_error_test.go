@@ -19,14 +19,14 @@ package types_test
 import (
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 )
 
 var (
-	xcmErrorFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(x *XCMError, c fuzz.Continue) {
+	xcmErrorFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(x *XCMError, c fuzz.Continue) {
 			switch c.Intn(26) {
 			case 0:
 				x.IsOverflow = true
@@ -94,7 +94,7 @@ var (
 )
 
 func TestXCMError_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[XCMError](t, 1000, xcmErrorFuzzOpts...)
-	assertDecodeNilData[XCMError](t)
-	assertEncodeEmptyObj[XCMError](t, 0)
+	AssertRoundTripFuzz[XCMError](t, 1000, xcmErrorFuzzOpts...)
+	AssertDecodeNilData[XCMError](t)
+	AssertEncodeEmptyObj[XCMError](t, 0)
 }

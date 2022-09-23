@@ -20,16 +20,15 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
-	optionU128FuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(o *OptionU128, c fuzz.Continue) {
+	optionU128FuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(o *OptionU128, c fuzz.Continue) {
 			if c.RandBool() {
 				*o = NewOptionU128Empty()
 				return
@@ -45,8 +44,8 @@ var (
 )
 
 func TestOptionU8_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[OptionU128](t, 100, optionU128FuzzOpts...)
-	assertEncodeEmptyObj[OptionU128](t, 1)
+	AssertRoundTripFuzz[OptionU128](t, 100, optionU128FuzzOpts...)
+	AssertEncodeEmptyObj[OptionU128](t, 1)
 }
 
 func TestOptionU8_OptionMethods(t *testing.T) {
@@ -125,25 +124,25 @@ func TestOptionU128_OptionMethods(t *testing.T) {
 }
 
 func TestOptionU16_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewOptionU16(NewU16(14)))
-	assertRoundtrip(t, NewOptionU16(NewU16(0)))
-	assertRoundtrip(t, NewOptionU16Empty())
+	AssertRoundtrip(t, NewOptionU16(NewU16(14)))
+	AssertRoundtrip(t, NewOptionU16(NewU16(0)))
+	AssertRoundtrip(t, NewOptionU16Empty())
 }
 
 func TestOptionU32_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewOptionU32(NewU32(21)))
-	assertRoundtrip(t, NewOptionU32(NewU32(0)))
-	assertRoundtrip(t, NewOptionU32Empty())
+	AssertRoundtrip(t, NewOptionU32(NewU32(21)))
+	AssertRoundtrip(t, NewOptionU32(NewU32(0)))
+	AssertRoundtrip(t, NewOptionU32Empty())
 }
 
 func TestOptionU64_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewOptionU64(NewU64(28)))
-	assertRoundtrip(t, NewOptionU64(NewU64(0)))
-	assertRoundtrip(t, NewOptionU64Empty())
+	AssertRoundtrip(t, NewOptionU64(NewU64(28)))
+	AssertRoundtrip(t, NewOptionU64(NewU64(0)))
+	AssertRoundtrip(t, NewOptionU64Empty())
 }
 
 func TestOptionU128_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, NewOptionU128(NewU128(*big.NewInt(123))))
-	assertRoundtrip(t, NewOptionU128(NewU128(*big.NewInt(0))))
-	assertRoundtrip(t, NewOptionU128Empty())
+	AssertRoundtrip(t, NewOptionU128(NewU128(*big.NewInt(123))))
+	AssertRoundtrip(t, NewOptionU128(NewU128(*big.NewInt(0))))
+	AssertRoundtrip(t, NewOptionU128Empty())
 }

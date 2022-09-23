@@ -20,47 +20,49 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 func TestAccountInfoV4_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[AccountInfoV4](t, 100)
-	assertDecodeNilData[AccountInfoV4](t)
-	assertEncodeEmptyObj[AccountInfoV4](t, 9)
+	AssertRoundTripFuzz[AccountInfoV4](t, 100)
+	AssertDecodeNilData[AccountInfoV4](t)
+	AssertEncodeEmptyObj[AccountInfoV4](t, 9)
 }
 
 func TestAccountInfoV4_EncodedLength(t *testing.T) {
-	assertEncodedLength(t, []encodedLengthAssert{
+	AssertEncodedLength(t, []EncodedLengthAssert{
 		{NewAccountInfoV4([]byte{1, 2, 3}, 13), 12},
 	})
 }
 
 func TestAccountInfoV4_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{NewAccountInfoV4([]byte{1, 2, 3}, 13), MustHexDecodeString("0x0c0102030d00000000000000")},
 	})
 }
 
 func TestAccountInfoV4_Hash(t *testing.T) {
-	assertHash(t, []hashAssert{
+	AssertHash(t, []HashAssert{
 		{NewAccountInfoV4([]byte{1, 2, 3}, 13), MustHexDecodeString(
 			"0x4fac0dfeb9b4efd2518c762e7d097fafaffaf8d56a2e784f9fc9919c22277804")},
 	})
 }
 
 func TestAccountInfoV4_Hex(t *testing.T) {
-	assertEncodeToHex(t, []encodeToHexAssert{
+	AssertEncodeToHex(t, []EncodeToHexAssert{
 		{NewAccountInfoV4([]byte{1, 2, 3}, 13), "0x0c0102030d00000000000000"},
 	})
 }
 
 func TestAccountInfoV4_String(t *testing.T) {
-	assertString(t, []stringAssert{
+	AssertString(t, []StringAssert{
 		{NewAccountInfoV4([]byte{1, 2, 3}, 13), "{[1 2 3] 13}"},
 	})
 }
 
 func TestAccountInfoV4_Eq(t *testing.T) {
-	assertEq(t, []eqAssert{
+	AssertEq(t, []EqAssert{
 		{NewAccountInfoV4([]byte{1, 2, 3}, 13), NewAccountInfoV4([]byte{1, 2, 3}, 13), true},
 		{NewAccountInfoV4([]byte{1, 2, 3}, 13), NewAccountInfoV4([]byte{1, 2, 2}, 13), false},
 		{NewAccountInfoV4([]byte{1, 2, 3}, 13), NewBool(false), false},

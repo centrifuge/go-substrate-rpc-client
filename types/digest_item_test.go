@@ -21,16 +21,15 @@ import (
 	"testing"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
-	"github.com/stretchr/testify/assert"
-
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
-	changesTrieSignalFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(c *ChangesTrieSignal, fc fuzz.Continue) {
+	changesTrieSignalFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(c *ChangesTrieSignal, fc fuzz.Continue) {
 			c.IsNewConfiguration = true
 			fc.Fuzz(&c.AsNewConfiguration)
 
@@ -40,8 +39,8 @@ var (
 )
 
 func TestChangesTrieSignal_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[ChangesTrieSignal](t, 100, changesTrieSignalFuzzOpts...)
-	assertDecodeNilData[ChangesTrieSignal](t)
+	AssertRoundTripFuzz[ChangesTrieSignal](t, 100, changesTrieSignalFuzzOpts...)
+	AssertDecodeNilData[ChangesTrieSignal](t)
 
 	var c ChangesTrieSignal
 
@@ -58,10 +57,10 @@ var testDigestItem1 = DigestItem{IsOther: true, AsOther: NewBytes([]byte{0xab})}
 var testDigestItem2 = DigestItem{IsChangesTrieRoot: true, AsChangesTrieRoot: NewHash([]byte{0x01, 0x02, 0x03})}
 
 var (
-	digestItemFuzzOpts = combineFuzzOpts(
+	digestItemFuzzOpts = CombineFuzzOpts(
 		changesTrieSignalFuzzOpts,
-		[]fuzzOpt{
-			withFuzzFuncs(func(d *DigestItem, c fuzz.Continue) {
+		[]FuzzOpt{
+			WithFuzzFuncs(func(d *DigestItem, c fuzz.Continue) {
 				vals := []int{0, 2, 4, 5, 6, 7}
 				r := c.Intn(len(vals))
 
@@ -91,26 +90,26 @@ var (
 )
 
 func TestDigestItem_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, testDigestItem1)
-	assertRoundtrip(t, testDigestItem2)
-	assertRoundtrip(t, DigestItem{
+	AssertRoundtrip(t, testDigestItem1)
+	AssertRoundtrip(t, testDigestItem2)
+	AssertRoundtrip(t, DigestItem{
 		IsPreRuntime: true,
 		AsPreRuntime: PreRuntime{},
 	})
-	assertRoundtrip(t, DigestItem{
+	AssertRoundtrip(t, DigestItem{
 		IsConsensus: true,
 		AsConsensus: Consensus{},
 	})
-	assertRoundtrip(t, DigestItem{
+	AssertRoundtrip(t, DigestItem{
 		IsSeal: true,
 		AsSeal: Seal{},
 	})
-	assertRoundtrip(t, DigestItem{
+	AssertRoundtrip(t, DigestItem{
 		IsChangesTrieSignal: true,
 		AsChangesTrieSignal: ChangesTrieSignal{IsNewConfiguration: true, AsNewConfiguration: NewBytes([]byte{1, 2, 3})},
 	})
 
-	assertRoundTripFuzz[DigestItem](t, 100, digestItemFuzzOpts...)
-	assertDecodeNilData[DigestItem](t)
-	assertEncodeEmptyObj[DigestItem](t, 0)
+	AssertRoundTripFuzz[DigestItem](t, 100, digestItemFuzzOpts...)
+	AssertDecodeNilData[DigestItem](t)
+	AssertEncodeEmptyObj[DigestItem](t, 0)
 }

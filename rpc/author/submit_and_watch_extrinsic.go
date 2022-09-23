@@ -23,6 +23,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/config"
 	gethrpc "github.com/centrifuge/go-substrate-rpc-client/v4/gethrpc"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 // ExtrinsicStatusSubscription is a subscription established through one of the Client's subscribe methods.
@@ -68,7 +69,7 @@ func (a *author) SubmitAndWatchExtrinsic(xt types.Extrinsic) (*ExtrinsicStatusSu
 
 	c := make(chan types.ExtrinsicStatus)
 
-	enc, err := types.EncodeToHex(xt)
+	enc, err := codec.EncodeToHex(xt)
 	if err != nil {
 		return nil, err
 	}

@@ -19,9 +19,10 @@ package types_test
 import (
 	"testing"
 
-	fuzz "github.com/google/gofuzz"
-
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
+	fuzz "github.com/google/gofuzz"
 )
 
 var (
@@ -39,8 +40,8 @@ var (
 		IsKusama: true,
 	}
 
-	networkIDFuzzOpts = []fuzzOpt{
-		withFuzzFuncs(func(n *NetworkID, c fuzz.Continue) {
+	networkIDFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(n *NetworkID, c fuzz.Continue) {
 			switch c.Intn(4) {
 			case 0:
 				n.IsAny = true
@@ -58,13 +59,13 @@ var (
 )
 
 func TestNetworkID_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[NetworkID](t, 100, networkIDFuzzOpts...)
-	assertDecodeNilData[NetworkID](t)
-	assertEncodeEmptyObj[NetworkID](t, 0)
+	AssertRoundTripFuzz[NetworkID](t, 100, networkIDFuzzOpts...)
+	AssertDecodeNilData[NetworkID](t)
+	AssertEncodeEmptyObj[NetworkID](t, 0)
 }
 
 func TestNetworkID_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testNetworkID1, MustHexDecodeString("0x00")},
 		{testNetworkID2, MustHexDecodeString("0x011001020304")},
 		{testNetworkID3, MustHexDecodeString("0x02")},
@@ -73,7 +74,7 @@ func TestNetworkID_Encode(t *testing.T) {
 }
 
 func TestNetworkID_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), testNetworkID1},
 		{MustHexDecodeString("0x011001020304"), testNetworkID2},
 		{MustHexDecodeString("0x02"), testNetworkID3},

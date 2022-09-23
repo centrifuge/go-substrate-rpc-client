@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 var testChainProperties1 = ChainProperties{}
@@ -30,19 +31,19 @@ var testChainProperties2 = ChainProperties{
 }
 
 func TestChainProperties_EncodeDecode(t *testing.T) {
-	assertRoundtrip(t, testChainProperties1)
-	assertRoundtrip(t, testChainProperties2)
+	AssertRoundtrip(t, testChainProperties1)
+	AssertRoundtrip(t, testChainProperties2)
 }
 
 func TestChainProperties_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testChainProperties1, []byte{0x0, 0x0, 0x0}},
 		{testChainProperties2, []byte{0x01, 0x01, 0x01, 0x12, 0x00, 0x00, 0x00, 0x01, 0x0c, 0x46, 0x4f, 0x4f}},
 	})
 }
 
 func TestChainProperties_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{[]byte{0x0, 0x0, 0x0}, testChainProperties1},
 		{[]byte{0x01, 0x01, 0x01, 0x12, 0x00, 0x00, 0x00, 0x01, 0x0c, 0x46, 0x4f, 0x4f}, testChainProperties2},
 	})

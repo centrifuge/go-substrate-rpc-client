@@ -18,32 +18,37 @@ package types
 
 import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 
-type InstanceMetadata struct {
-	Deposit  U128
-	Data     Bytes
+type ItemDetails struct {
+	Owner    AccountID
+	Approved OptionAccountID
 	IsFrozen bool
+	Deposit  U128
 }
 
-func (i *InstanceMetadata) Decode(decoder scale.Decoder) error {
-	if err := decoder.Decode(&i.Deposit); err != nil {
+func (i *ItemDetails) Decode(decoder scale.Decoder) error {
+	if err := decoder.Decode(&i.Owner); err != nil {
+		return err
+	}
+	if err := decoder.Decode(&i.Approved); err != nil {
+		return err
+	}
+	if err := decoder.Decode(&i.IsFrozen); err != nil {
 		return err
 	}
 
-	if err := decoder.Decode(&i.Data); err != nil {
-		return err
-	}
-
-	return decoder.Decode(&i.IsFrozen)
+	return decoder.Decode(&i.Deposit)
 }
 
-func (i InstanceMetadata) Encode(encoder scale.Encoder) error {
-	if err := encoder.Encode(i.Deposit); err != nil {
+func (i ItemDetails) Encode(encoder scale.Encoder) error {
+	if err := encoder.Encode(i.Owner); err != nil {
+		return err
+	}
+	if err := encoder.Encode(i.Approved); err != nil {
+		return err
+	}
+	if err := encoder.Encode(i.IsFrozen); err != nil {
 		return err
 	}
 
-	if err := encoder.Encode(i.Data); err != nil {
-		return err
-	}
-
-	return encoder.Encode(i.IsFrozen)
+	return encoder.Encode(i.Deposit)
 }

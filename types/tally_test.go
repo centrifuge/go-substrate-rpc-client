@@ -21,6 +21,8 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 )
 
 var (
@@ -31,19 +33,19 @@ var (
 )
 
 func TestTally_EncodeDecode(t *testing.T) {
-	assertRoundTripFuzz[Tally](t, 100)
-	assertDecodeNilData[Tally](t)
-	assertEncodeEmptyObj[Tally](t, 32)
+	AssertRoundTripFuzz[Tally](t, 100)
+	AssertDecodeNilData[Tally](t)
+	AssertEncodeEmptyObj[Tally](t, 32)
 }
 
 func TestTally_Encode(t *testing.T) {
-	assertEncode(t, []encodingAssert{
+	AssertEncode(t, []EncodingAssert{
 		{testTally, MustHexDecodeString("0x7b000000000000000000000000000000c8010000000000000000000000000000")},
 	})
 }
 
 func TestTally_Decode(t *testing.T) {
-	assertDecode(t, []decodingAssert{
+	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x7b000000000000000000000000000000c8010000000000000000000000000000"), testTally},
 	})
 }
