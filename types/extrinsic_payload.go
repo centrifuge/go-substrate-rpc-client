@@ -98,6 +98,7 @@ func (e *ExtrinsicPayloadV3) Decode(decoder scale.Decoder) error {
 
 type ExtrinsicPayloadV4 struct {
 	ExtrinsicPayloadV3
+	AssetID            Option[U32]
 	TransactionVersion U32
 }
 
@@ -129,6 +130,11 @@ func (e ExtrinsicPayloadV4) Encode(encoder scale.Encoder) error {
 	}
 
 	err = encoder.Encode(e.Tip)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.AssetID)
 	if err != nil {
 		return err
 	}

@@ -30,6 +30,7 @@ type ExtrinsicSignatureV4 struct {
 	Era       ExtrinsicEra // extra via system::CheckEra
 	Nonce     UCompact     // extra via system::CheckNonce (Compact<Index> where Index is u32))
 	Tip       UCompact     // extra via balances::TakeFees (Compact<Balance> where Balance is u128))
+	AssetID   Option[U32]
 }
 
 type SignatureOptions struct {
