@@ -3051,6 +3051,13 @@ type EventUtilityBatchInterrupted struct {
 	Topics        []Hash
 }
 
+// EventUtilityItemFailed is emitted when an item fail.
+type EventUtilityItemFailed struct {
+	Phase         Phase
+	DispatchError DispatchError
+	Topics        []Hash
+}
+
 // EventUtilityBatchCompleted is emitted when a batch of dispatches completed fully with no error.
 type EventUtilityBatchCompleted struct {
 	Phase  Phase
@@ -3060,7 +3067,6 @@ type EventUtilityBatchCompleted struct {
 // EventUtilityDispatchedAs is emitted when a call was dispatched
 type EventUtilityDispatchedAs struct {
 	Phase  Phase
-	Index  U32
 	Result DispatchResult
 	Topics []Hash
 }

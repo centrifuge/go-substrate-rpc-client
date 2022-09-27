@@ -419,10 +419,12 @@ type EventRecords struct {
 	Ump_OverweightEnqueued     []EventUMPOverweightEnqueued     `test-gen-blockchain:"polkadot"`
 	Ump_OverweightServiced     []EventUMPOverweightServiced     `test-gen-blockchain:"polkadot"`
 
-	Utility_BatchCompleted   []EventUtilityBatchCompleted   `test-gen-blockchain:"centrifuge-parachain"`
-	Utility_BatchInterrupted []EventUtilityBatchInterrupted `test-gen-blockchain:"centrifuge-parachain"`
-	Utility_DispatchedAs     []EventUtilityBatchInterrupted `test-gen-blockchain:"centrifuge-parachain"`
-	Utility_ItemCompleted    []EventUtilityItemCompleted    `test-gen-blockchain:"centrifuge-parachain"`
+	Utility_BatchCompleted           []EventUtilityBatchCompleted   `test-gen-blockchain:"centrifuge-parachain"`
+	Utility_BatchCompletedWithErrors []EventUtilityBatchCompleted   `test-gen-blockchain:"centrifuge-parachain"`
+	Utility_BatchInterrupted         []EventUtilityBatchInterrupted `test-gen-blockchain:"centrifuge-parachain"`
+	Utility_DispatchedAs             []EventUtilityDispatchedAs     `test-gen-blockchain:"centrifuge-parachain"`
+	Utility_ItemCompleted            []EventUtilityItemCompleted    `test-gen-blockchain:"centrifuge-parachain"`
+	Utility_ItemFailed               []EventUtilityItemFailed       `test-gen-blockchain:"centrifuge-parachain"`
 
 	Vesting_VestingCompleted []EventVestingVestingCompleted `test-gen-blockchain:"centrifuge-parachain"`
 	Vesting_VestingUpdated   []EventVestingVestingUpdated   `test-gen-blockchain:"centrifuge-parachain"`
