@@ -38,7 +38,6 @@ type XCMError struct {
 	IsAssetNotFound bool
 
 	IsFailedToTransactAsset bool
-	FailedToTransactAsset   string
 
 	IsNotWithdrawable bool
 
@@ -103,8 +102,6 @@ func (x *XCMError) Decode(decoder scale.Decoder) error { //nolint: funlen
 		x.IsAssetNotFound = true
 	case 9:
 		x.IsFailedToTransactAsset = true
-
-		return decoder.Decode(&x.FailedToTransactAsset)
 	case 10:
 		x.IsNotWithdrawable = true
 	case 11:
@@ -169,11 +166,7 @@ func (x XCMError) Encode(encoder scale.Encoder) error { //nolint:gocyclo,funlen
 	case x.IsAssetNotFound:
 		return encoder.PushByte(8)
 	case x.IsFailedToTransactAsset:
-		if err := encoder.PushByte(9); err != nil {
-			return err
-		}
-
-		return encoder.Encode(x.FailedToTransactAsset)
+		return encoder.PushByte(9)
 	case x.IsNotWithdrawable:
 		return encoder.PushByte(10)
 	case x.IsLocationCannotHold:

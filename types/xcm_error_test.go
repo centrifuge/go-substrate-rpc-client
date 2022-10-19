@@ -48,8 +48,6 @@ var (
 				x.IsAssetNotFound = true
 			case 9:
 				x.IsFailedToTransactAsset = true
-
-				c.Fuzz(&x.FailedToTransactAsset)
 			case 10:
 				x.IsNotWithdrawable = true
 			case 11:
