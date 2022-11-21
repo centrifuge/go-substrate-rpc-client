@@ -31,6 +31,11 @@ func (_m *Client) Call(result interface{}, method string, args ...interface{}) e
 	return r0
 }
 
+// Close provides a mock function with given fields:
+func (_m *Client) Close() {
+	_m.Called()
+}
+
 // Subscribe provides a mock function with given fields: ctx, namespace, subscribeMethodSuffix, unsubscribeMethodSuffix, notificationMethodSuffix, channel, args
 func (_m *Client) Subscribe(ctx context.Context, namespace string, subscribeMethodSuffix string, unsubscribeMethodSuffix string, notificationMethodSuffix string, channel interface{}, args ...interface{}) (*rpc.ClientSubscription, error) {
 	var _ca []interface{}
