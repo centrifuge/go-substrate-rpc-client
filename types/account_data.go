@@ -22,7 +22,7 @@ type AccountInfo struct {
 	Consumers   U32
 	Providers   U32
 	Sufficients U32
-	Data      struct {
+	Data        struct {
 		Free       U128
 		Reserved   U128
 		MiscFrozen U128
