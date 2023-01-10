@@ -29,7 +29,7 @@ var (
 	testDispatchResultWithPostInfo1 = DispatchResultWithPostInfo{
 		IsOk: true,
 		Ok: PostDispatchInfo{
-			ActualWeight: NewOptionWeight(123),
+			ActualWeight: NewOption(testWeight),
 			PaysFee: Pays{
 				IsYes: true,
 			},
@@ -39,7 +39,7 @@ var (
 		IsError: true,
 		Error: DispatchErrorWithPostInfo{
 			PostInfo: PostDispatchInfo{
-				ActualWeight: NewOptionWeight(456),
+				ActualWeight: NewOption(testWeight),
 				PaysFee: Pays{
 					IsNo: true,
 				},
@@ -51,7 +51,7 @@ var (
 	}
 
 	dispatchResultWithPostInfoFuzzOpts = CombineFuzzOpts(
-		optionWeightFuzzOpts,
+		optionFuzzOpts,
 		paysFuzzOpts,
 		dispatchErrorFuzzOpts,
 		[]FuzzOpt{
@@ -77,14 +77,14 @@ func TestDispatchResultWithPostInfo_EncodeDecode(t *testing.T) {
 
 func TestDispatchResultWithPostInfo_Encode(t *testing.T) {
 	AssertEncode(t, []EncodingAssert{
-		{testDispatchResultWithPostInfo1, MustHexDecodeString("0x00017b0000000000000000")},
-		{testDispatchResultWithPostInfo2, MustHexDecodeString("0x0101c8010000000000000100")},
+		{testDispatchResultWithPostInfo1, MustHexDecodeString("0x00012ce90900")},
+		{testDispatchResultWithPostInfo2, MustHexDecodeString("0x01012ce9090100")},
 	})
 }
 
 func TestDispatchResultWithPostInfo_Decode(t *testing.T) {
 	AssertDecode(t, []DecodingAssert{
-		{MustHexDecodeString("0x00017b0000000000000000"), testDispatchResultWithPostInfo1},
-		{MustHexDecodeString("0x0101c8010000000000000100"), testDispatchResultWithPostInfo2},
+		{MustHexDecodeString("0x00012ce90900"), testDispatchResultWithPostInfo1},
+		{MustHexDecodeString("0x01012ce9090100"), testDispatchResultWithPostInfo2},
 	})
 }

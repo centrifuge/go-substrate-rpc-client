@@ -37,7 +37,7 @@ var (
 func TestDispatchInfo_EncodeDecode(t *testing.T) {
 	AssertRoundTripFuzz[DispatchInfo](t, 100, dispatchInfoFuzzOpts...)
 	AssertDecodeNilData[DispatchInfo](t)
-	AssertEncodeEmptyObj[DispatchInfo](t, 8)
+	AssertEncodeEmptyObj[DispatchInfo](t, 2)
 }
 
 func TestVoteThreshold_Decoder(t *testing.T) {

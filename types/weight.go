@@ -16,59 +16,18 @@
 
 package types
 
-import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
-
-type OptionWeight struct {
-	option
-	value Weight
-}
-
 // Weight is a numeric range of a transaction weight
-type Weight uint64
+type Weight struct {
+	// The weight of computational time used based on some reference hardware.
+	RefTime UCompact
+	// The weight of storage space used by proof of validity.
+	ProofSize UCompact
+}
 
 // NewWeight creates a new Weight type
-func NewWeight(u uint64) Weight {
-	return Weight(u)
-}
-
-func NewOptionWeight(value Weight) OptionWeight {
-	return OptionWeight{
-		option: option{
-			hasValue: true,
-		},
-		value: value,
+func NewWeight(refTime UCompact, proofSize UCompact) Weight {
+	return Weight{
+		RefTime:   refTime,
+		ProofSize: proofSize,
 	}
-}
-
-func NewOptionWeightEmpty() OptionWeight {
-	return OptionWeight{
-		option: option{
-			hasValue: false,
-		},
-	}
-}
-
-func (o OptionWeight) Encode(encoder scale.Encoder) error {
-	return encoder.EncodeOption(o.hasValue, o.value)
-}
-
-func (o *OptionWeight) Decode(decoder scale.Decoder) error {
-	return decoder.DecodeOption(&o.hasValue, &o.value)
-}
-
-// SetSome sets a value
-func (o *OptionWeight) SetSome(value Weight) {
-	o.hasValue = true
-	o.value = value
-}
-
-// SetNone removes a value and marks it as missing
-func (o *OptionWeight) SetNone() {
-	o.hasValue = false
-	o.value = Weight(0)
-}
-
-// Unwrap returns a flag that indicates whether a value is present and the stored value
-func (o *OptionWeight) Unwrap() (ok bool, value Weight) {
-	return o.hasValue, o.value
 }
