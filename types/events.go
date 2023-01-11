@@ -2403,11 +2403,11 @@ type EventProxyProxyExecuted struct {
 	Topics []Hash
 }
 
-// EventProxyAnonymousCreated is emitted when an anonymous account has been created by new proxy with given,
+// EventProxyPureCreated is emitted when an anonymous account has been created by new proxy with given,
 // disambiguation index and proxy type.
-type EventProxyAnonymousCreated struct {
+type EventProxyPureCreated struct {
 	Phase               Phase
-	Anonymous           AccountID
+	Pure                AccountID
 	Who                 AccountID
 	ProxyType           U8
 	DisambiguationIndex U16
