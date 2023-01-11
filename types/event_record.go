@@ -266,11 +266,11 @@ type EventRecords struct {
 	Preimage_Noted     []EventPreimageNoted     `test-gen-skip:"true"`
 	Preimage_Requested []EventPreimageRequested `test-gen-skip:"true"`
 
-	Proxy_Announced        []EventProxyAnnounced        `test-gen-blockchain:"centrifuge-parachain"`
-	Proxy_AnonymousCreated []EventProxyAnonymousCreated `test-gen-blockchain:"centrifuge-parachain"`
-	Proxy_ProxyAdded       []EventProxyProxyAdded       `test-gen-blockchain:"centrifuge-parachain"`
-	Proxy_ProxyExecuted    []EventProxyProxyExecuted    `test-gen-blockchain:"centrifuge-parachain"`
-	Proxy_ProxyRemoved     []EventProxyProxyRemoved     `test-gen-blockchain:"centrifuge-parachain"`
+	Proxy_Announced     []EventProxyAnnounced     `test-gen-blockchain:"centrifuge-parachain"`
+	Proxy_PureCreated   []EventProxyPureCreated   `test-gen-blockchain:"centrifuge-parachain"`
+	Proxy_ProxyAdded    []EventProxyProxyAdded    `test-gen-blockchain:"centrifuge-parachain"`
+	Proxy_ProxyExecuted []EventProxyProxyExecuted `test-gen-blockchain:"centrifuge-parachain"`
+	Proxy_ProxyRemoved  []EventProxyProxyRemoved  `test-gen-blockchain:"centrifuge-parachain"`
 
 	Recovery_AccountRecovered  []EventRecoveryAccountRecovered `test-gen-skip:"true"`
 	Recovery_RecoveryClosed    []EventRecoveryClosed           `test-gen-skip:"true"`
