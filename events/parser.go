@@ -13,7 +13,19 @@ import (
 type Event struct {
 	Name   string
 	Fields map[string]any
+	Phase  *types.Phase
+	Topics []types.Hash
 }
+
+type OverrideDecodeFn func(decoder *scale.Decoder) (any, error)
+
+var (
+	overrideDecodeFnMap = map[string]OverrideDecodeFn{
+		//"ref_time": func(decoder *scale.Decoder) (any, error) {
+		//	return decode[types.UCompact](decoder)
+		//},
+	}
+)
 
 func ParseEvents(meta *types.Metadata, sd *types.StorageDataRaw) ([]*Event, error) {
 	decoder := scale.NewDecoder(bytes.NewReader(*sd))
@@ -46,6 +58,15 @@ func ParseEvents(meta *types.Metadata, sd *types.StorageDataRaw) ([]*Event, erro
 		if err != nil {
 			return nil, fmt.Errorf("unable to find event with EventID %v in metadata for event #%v: %s", eventID, i, err)
 		}
+
+		var topics []types.Hash
+
+		if err := decoder.Decode(&topics); err != nil {
+			return nil, fmt.Errorf("unable to decode topics for event #%v: %v", i, err)
+		}
+
+		event.Phase = &phase
+		event.Topics = topics
 
 		events = append(events, event)
 	}
@@ -84,10 +105,10 @@ func parseEvent(meta *types.Metadata, decoder *scale.Decoder, eventID types.Even
 
 			eventName := fmt.Sprintf("%s.%s", mod.Name, variant.Name)
 
-			fmt.Println("Parsing event %s", eventName)
+			fmt.Println("Parsing event", eventName)
 
 			if len(variant.Fields) == 0 {
-				return &Event{eventName, nil}, nil
+				return &Event{eventName, nil, nil, nil}, nil
 			}
 
 			eventFields, err := parseFields(meta, decoder, variant.Fields)
@@ -96,7 +117,7 @@ func parseEvent(meta *types.Metadata, decoder *scale.Decoder, eventID types.Even
 				return nil, fmt.Errorf("couldn't parse event fields: %w", err)
 			}
 
-			return &Event{eventName, eventFields}, nil
+			return &Event{eventName, eventFields, nil, nil}, nil
 		}
 
 		return nil, fmt.Errorf("event with index %d not found", eventID[1])
@@ -117,6 +138,20 @@ func parseFields(meta *types.Metadata, decoder *scale.Decoder, fields []types.Si
 
 		fieldName := string(field.Name)
 
+		if overrideDecodeFn, ok := overrideDecodeFnMap[fieldName]; ok {
+			fieldValue, err := overrideDecodeFn(decoder)
+
+			if err != nil {
+				return nil, fmt.Errorf("couldn't decode '%s' using override func: %w", fieldName, err)
+			}
+
+			eventFields[fieldName] = fieldValue
+
+			jsonPrint(fieldName, fieldValue)
+
+			continue
+		}
+
 		fieldTypeDef := fieldType.Def
 
 		switch {
@@ -124,7 +159,7 @@ func parseFields(meta *types.Metadata, decoder *scale.Decoder, fields []types.Si
 			compositeFields, err := parseFields(meta, decoder, fieldTypeDef.Composite.Fields)
 
 			if err != nil {
-				return nil, fmt.Errorf("couldn't parse composite fields for %s", fieldName)
+				return nil, fmt.Errorf("couldn't parse composite fields for %s: %w", fieldName, err)
 			}
 
 			eventFields[fieldName] = compositeFields
@@ -134,7 +169,7 @@ func parseFields(meta *types.Metadata, decoder *scale.Decoder, fields []types.Si
 			variantByte, err := decoder.ReadOneByte()
 
 			if err != nil {
-				return nil, fmt.Errorf("couldn't read variant byte: %w", err)
+				return nil, fmt.Errorf("couldn't read variant byte for %s: %w", fieldName, err)
 			}
 
 			variantFound := false
@@ -157,7 +192,7 @@ func parseFields(meta *types.Metadata, decoder *scale.Decoder, fields []types.Si
 				variantFields, err := parseFields(meta, decoder, variant.Fields)
 
 				if err != nil {
-					return nil, fmt.Errorf("couldn't parse variant fields for %s", fieldName)
+					return nil, fmt.Errorf("couldn't parse variant fields for %s: %w", fieldName, err)
 				}
 
 				eventFields[fieldName] = variantFields
@@ -166,7 +201,7 @@ func parseFields(meta *types.Metadata, decoder *scale.Decoder, fields []types.Si
 			}
 
 			if !variantFound {
-				return nil, fmt.Errorf("variant %d not found", variantByte)
+				return nil, fmt.Errorf("variant %d not found for %s", variantByte, fieldName)
 			}
 		case fieldTypeDef.IsCompact:
 			compactFieldType, ok := meta.AsMetadataV14.EfficientLookup[fieldTypeDef.Compact.Type.Int64()]
@@ -177,18 +212,51 @@ func parseFields(meta *types.Metadata, decoder *scale.Decoder, fields []types.Si
 
 			switch {
 			case compactFieldType.Def.IsPrimitive:
-				fieldValue, err := decodeType[types.UCompact](decoder)
+				fieldValue, err := decode[types.UCompact](decoder)
 
 				if err != nil {
-					return nil, fmt.Errorf("couldn't decode primitive type: %w", err)
+					return nil, fmt.Errorf("couldn't decode primitive type for %s: %w", fieldName, err)
 				}
 
 				eventFields[fieldName] = fieldValue
 
 				jsonPrint(fieldName, fieldValue)
+			default:
+				return nil, fmt.Errorf("unsupported compact field type for %s", fieldName)
+			}
+		case fieldTypeDef.IsPrimitive:
+			primitiveValue, err := decodePrimitive(decoder, fieldTypeDef.Primitive.Si0TypeDefPrimitive)
+
+			if err != nil {
+				return nil, fmt.Errorf("couldn't decode primitive type for %s: %w", fieldName, err)
+			}
+
+			eventFields[fieldName] = primitiveValue
+
+			jsonPrint(fieldName, primitiveValue)
+		case fieldTypeDef.IsArray:
+			arrayFieldType, ok := meta.AsMetadataV14.EfficientLookup[fieldTypeDef.Array.Type.Int64()]
+
+			if !ok {
+				return nil, fmt.Errorf("type not found for array field '%s'", fieldName)
+			}
+
+			switch {
+			case arrayFieldType.Def.IsPrimitive:
+				arrayValue, err := decodePrimitiveArrayOfLength(uint32(fieldTypeDef.Array.Len), decoder, arrayFieldType.Def.Primitive.Si0TypeDefPrimitive)
+
+				if err != nil {
+					return nil, fmt.Errorf("couldn't get primitive slice for array field '%s': %w", fieldName, err)
+				}
+
+				eventFields[fieldName] = arrayValue
+
+				jsonPrint(fieldName, arrayValue)
+			default:
+				return nil, errors.New("unspupported array field type definition")
 			}
 		default:
-			return nil, errors.New("unsupported field type def")
+			return nil, errors.New("unsupported field type definition")
 		}
 	}
 
@@ -201,44 +269,97 @@ func jsonPrint(fieldName string, obj any) {
 	fmt.Printf("Field name - '%s': %s\n", fieldName, string(b))
 }
 
-func decodePrimitiveType(decoder *scale.Decoder, primitiveTypeDef types.Si0TypeDefPrimitive) (any, error) {
+func decodePrimitiveArrayOfLength(length uint32, decoder *scale.Decoder, primitiveTypeDef types.Si0TypeDefPrimitive) (any, error) {
 	switch primitiveTypeDef {
 	case types.IsBool:
-		return decodeType[bool](decoder)
+		return decodeArrayOfLength[bool](decoder, length)
 	case types.IsChar:
-		return decodeType[byte](decoder)
+		return decodeArrayOfLength[byte](decoder, length)
 	case types.IsStr:
-		return decodeType[string](decoder)
+		return decodeArrayOfLength[string](decoder, length)
 	case types.IsU8:
-		return decodeType[types.U8](decoder)
+		return decodeArrayOfLength[types.U8](decoder, length)
 	case types.IsU16:
-		return decodeType[types.U16](decoder)
+		return decodeArrayOfLength[types.U16](decoder, length)
 	case types.IsU32:
-		return decodeType[types.U32](decoder)
+		return decodeArrayOfLength[types.U32](decoder, length)
 	case types.IsU64:
-		return decodeType[types.U64](decoder)
+		return decodeArrayOfLength[types.U64](decoder, length)
 	case types.IsU128:
-		return decodeType[types.U128](decoder)
+		return decodeArrayOfLength[types.U128](decoder, length)
 	case types.IsU256:
-		return decodeType[types.U256](decoder)
+		return decodeArrayOfLength[types.U256](decoder, length)
 	case types.IsI8:
-		return decodeType[types.I8](decoder)
+		return decodeArrayOfLength[types.I8](decoder, length)
 	case types.IsI16:
-		return decodeType[types.I16](decoder)
+		return decodeArrayOfLength[types.I16](decoder, length)
 	case types.IsI32:
-		return decodeType[types.I32](decoder)
+		return decodeArrayOfLength[types.I32](decoder, length)
 	case types.IsI64:
-		return decodeType[types.I64](decoder)
+		return decodeArrayOfLength[types.I64](decoder, length)
 	case types.IsI128:
-		return decodeType[types.I128](decoder)
+		return decodeArrayOfLength[types.I128](decoder, length)
 	case types.IsI256:
-		return decodeType[types.I256](decoder)
+		return decodeArrayOfLength[types.I256](decoder, length)
 	}
 
 	return nil, fmt.Errorf("unsupported primitive type %v", primitiveTypeDef)
 }
 
-func decodeType[T any](decoder *scale.Decoder) (T, error) {
+func decodeArrayOfLength[T any](decoder *scale.Decoder, length uint32) ([]T, error) {
+	slice := make([]T, 0, length)
+
+	for i := uint32(0); i < length; i++ {
+		var t T
+
+		if err := decoder.Decode(&t); err != nil {
+			return nil, err
+		}
+
+		slice = append(slice, t)
+	}
+
+	return slice, nil
+}
+
+func decodePrimitive(decoder *scale.Decoder, primitiveTypeDef types.Si0TypeDefPrimitive) (any, error) {
+	switch primitiveTypeDef {
+	case types.IsBool:
+		return decode[bool](decoder)
+	case types.IsChar:
+		return decode[byte](decoder)
+	case types.IsStr:
+		return decode[string](decoder)
+	case types.IsU8:
+		return decode[types.U8](decoder)
+	case types.IsU16:
+		return decode[types.U16](decoder)
+	case types.IsU32:
+		return decode[types.U32](decoder)
+	case types.IsU64:
+		return decode[types.U64](decoder)
+	case types.IsU128:
+		return decode[types.U128](decoder)
+	case types.IsU256:
+		return decode[types.U256](decoder)
+	case types.IsI8:
+		return decode[types.I8](decoder)
+	case types.IsI16:
+		return decode[types.I16](decoder)
+	case types.IsI32:
+		return decode[types.I32](decoder)
+	case types.IsI64:
+		return decode[types.I64](decoder)
+	case types.IsI128:
+		return decode[types.I128](decoder)
+	case types.IsI256:
+		return decode[types.I256](decoder)
+	}
+
+	return nil, fmt.Errorf("unsupported primitive type %v", primitiveTypeDef)
+}
+
+func decode[T any](decoder *scale.Decoder) (T, error) {
 	var t T
 
 	if err := decoder.Decode(&t); err != nil {
