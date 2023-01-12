@@ -17,6 +17,7 @@
 package types
 
 import (
+	"encoding/json"
 	"math/big"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
@@ -53,4 +54,8 @@ func (u UCompact) Encode(encoder scale.Encoder) error {
 		return err
 	}
 	return nil
+}
+
+func (u UCompact) MarshalJSON() ([]byte, error) {
+	return json.Marshal(u.Int64())
 }
