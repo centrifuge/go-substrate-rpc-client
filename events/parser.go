@@ -32,26 +32,26 @@ func ParseEvents(meta *types.Metadata, sd *types.StorageDataRaw) ([]*Event, erro
 		var phase types.Phase
 
 		if err := decoder.Decode(&phase); err != nil {
-			return nil, fmt.Errorf("unable to decode Phase for event #%v: %v", i, err)
+			return nil, fmt.Errorf("couldn't decode Phase for event #%v: %w", i, err)
 		}
 
 		// decode EventID
 		var eventID types.EventID
 
 		if err := decoder.Decode(&eventID); err != nil {
-			return nil, fmt.Errorf("unable to decode EventID for event #%v: %v", i, err)
+			return nil, fmt.Errorf("couldn't decode EventID for event #%v: %w", i, err)
 		}
 
 		// ask metadata for method & event name for event
 		event, err := parseEvent(meta, decoder, eventID)
 		if err != nil {
-			return nil, fmt.Errorf("unable to find event with EventID %v in metadata for event #%v: %s", eventID, i, err)
+			return nil, fmt.Errorf("couldn't parse event #%v with EventID %v: %w", i, eventID, err)
 		}
 
 		var topics []types.Hash
 
 		if err := decoder.Decode(&topics); err != nil {
-			return nil, fmt.Errorf("unable to decode topics for event #%v: %v", i, err)
+			return nil, fmt.Errorf("unable to decode topics for event #%v: %w", i, err)
 		}
 
 		event.Phase = &phase
@@ -94,8 +94,6 @@ func parseEvent(meta *types.Metadata, decoder *scale.Decoder, eventID types.Even
 
 			eventName := fmt.Sprintf("%s.%s", mod.Name, variant.Name)
 
-			fmt.Println("Parsing event", eventName)
-
 			if len(variant.Fields) == 0 {
 				return &Event{eventName, nil, nil, nil}, nil
 			}
@@ -103,7 +101,7 @@ func parseEvent(meta *types.Metadata, decoder *scale.Decoder, eventID types.Even
 			eventFields, err := parseFields(meta, decoder, variant.Fields)
 
 			if err != nil {
-				return nil, fmt.Errorf("couldn't parse event fields: %w", err)
+				return nil, fmt.Errorf("couldn't parse fields for event '%s': %w", eventName, err)
 			}
 
 			return &Event{eventName, eventFields, nil, nil}, nil
