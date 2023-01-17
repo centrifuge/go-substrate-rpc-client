@@ -123,7 +123,7 @@ func parseFields(meta *types.Metadata, decoder *scale.Decoder, fields []types.Si
 			return nil, fmt.Errorf("type not found for field %s", field.Name)
 		}
 
-		fieldName := string(field.Name)
+		fieldName := getFieldName(field)
 
 		fieldTypeDef := fieldType.Def
 
@@ -158,37 +158,7 @@ func decodeTypeDef(meta *types.Metadata, decoder *scale.Decoder, typeDef types.S
 
 		return compositeFields, nil
 	case typeDef.IsVariant:
-		variantByte, err := decoder.ReadOneByte()
-
-		if err != nil {
-			return nil, fmt.Errorf("couldn't read variant byte: %w", err)
-		}
-
-		variantFound := false
-
-		for _, variant := range typeDef.Variant.Variants {
-			if byte(variant.Index) != variantByte {
-				continue
-			}
-
-			variantFound = true
-
-			if len(variant.Fields) == 0 {
-				return string(variant.Name), nil
-			}
-
-			variantFields, err := parseFields(meta, decoder, variant.Fields)
-
-			if err != nil {
-				return nil, fmt.Errorf("couldn't parse variant fields: %w", err)
-			}
-
-			return variantFields, nil
-		}
-
-		if !variantFound {
-			return nil, fmt.Errorf("variant %d not found", variantByte)
-		}
+		return decodeVariant(meta, decoder, typeDef)
 	case typeDef.IsPrimitive:
 		primitiveValue, err := decodePrimitive(decoder, typeDef.Primitive.Si0TypeDefPrimitive)
 
@@ -278,6 +248,26 @@ func decodeTypeDef(meta *types.Metadata, decoder *scale.Decoder, typeDef types.S
 			}
 
 			return compositeVector, nil
+		case vectorFieldType.Def.IsVariant:
+			vectorLen, err := decoder.DecodeUintCompact()
+
+			if err != nil {
+				return nil, fmt.Errorf("couldn't decode vector length: %w", err)
+			}
+
+			var variantVector []any
+
+			for i := uint64(0); i < vectorLen.Uint64(); i++ {
+				variant, err := decodeVariant(meta, decoder, vectorFieldType.Def)
+
+				if err != nil {
+					return nil, fmt.Errorf("couldn't parse composite vector fields: %w", err)
+				}
+
+				variantVector = append(variantVector, variant)
+			}
+
+			return variantVector, nil
 		default:
 			return nil, errors.New("unsupported vector field type definition")
 		}
@@ -296,8 +286,38 @@ func decodeTypeDef(meta *types.Metadata, decoder *scale.Decoder, typeDef types.S
 	default:
 		return nil, errors.New("unsupported field type definition")
 	}
+}
 
-	return nil, fmt.Errorf("unsupported type definition %v", typeDef)
+func decodeVariant(meta *types.Metadata, decoder *scale.Decoder, typeDef types.Si1TypeDef) (any, error) {
+	variantByte, err := decoder.ReadOneByte()
+
+	if err != nil {
+		return nil, fmt.Errorf("couldn't read variant byte: %w", err)
+	}
+
+	for _, variant := range typeDef.Variant.Variants {
+		if byte(variant.Index) != variantByte {
+			continue
+		}
+
+		if len(variant.Fields) == 0 {
+			return string(variant.Name), nil
+		}
+
+		fieldMap := make(map[string]any)
+
+		variantFields, err := parseFields(meta, decoder, variant.Fields)
+
+		if err != nil {
+			return nil, fmt.Errorf("couldn't parse variant fields: %w", err)
+		}
+
+		fieldMap[string(variant.Name)] = variantFields
+
+		return fieldMap, nil
+	}
+
+	return nil, fmt.Errorf("variant %d not found", variantByte)
 }
 
 func decodeCompact(meta *types.Metadata, decoder *scale.Decoder, typeDef types.Si1TypeDef) (any, error) {
@@ -507,4 +527,15 @@ func decode[T any](decoder *scale.Decoder) (T, error) {
 	}
 
 	return t, nil
+}
+
+func getFieldName(field types.Si1Field) string {
+	switch {
+	case field.HasName:
+		return string(field.Name)
+	case field.HasTypeName:
+		return string(field.TypeName)
+	default:
+		return "unknown_field_name"
+	}
 }
