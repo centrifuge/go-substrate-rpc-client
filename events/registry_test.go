@@ -11,41 +11,68 @@ import (
 )
 
 func TestCreateEventRegistry(t *testing.T) {
-	var meta types.Metadata
+	var tests = []struct {
+		Chain       string
+		MetadataHex string
+	}{
+		{
+			Chain:       "centrifuge",
+			MetadataHex: test.CentrifugeMetadataHex,
+		},
+		{
+			Chain:       "polkadot",
+			MetadataHex: test.PolkadotMetadataHex,
+		},
+		{
+			Chain:       "acala",
+			MetadataHex: test.AcalaMetaHex,
+		},
+		{
+			Chain:       "statemint",
+			MetadataHex: test.StatemintMetaHex,
+		},
+		{
+			Chain:       "moonbeam",
+			MetadataHex: test.MoonbeamMetaHex,
+		},
+	}
 
-	err := codec.DecodeFromHex(test.MetadataHex, &meta)
-	assert.NoError(t, err)
+	for _, test := range tests {
+		t.Run(test.Chain, func(t *testing.T) {
+			var meta types.Metadata
 
-	t.Log("Metadata was decoded successfully")
-
-	reg, err := CreateEventRegistry(&meta)
-	assert.NoError(t, err)
-
-	t.Log("Event registry was created successfully")
-
-	for _, pallet := range meta.AsMetadataV14.Pallets {
-		if !pallet.HasEvents {
-			continue
-		}
-
-		eventsType, ok := meta.AsMetadataV14.EfficientLookup[pallet.Events.Type.Int64()]
-		assert.True(t, ok, fmt.Sprintf("Events type %d not found", pallet.Events.Type.Int64()))
-
-		assert.True(t, eventsType.Def.IsVariant, fmt.Sprintf("Events type %d not a variant", pallet.Events.Type.Int64()))
-
-		for _, eventVariant := range eventsType.Def.Variant.Variants {
-			eventID := types.EventID{byte(pallet.Index), byte(eventVariant.Index)}
-
-			eventType, ok := reg[eventID]
-			assert.True(t, ok, fmt.Sprintf("Event with ID %v not found in registry", eventID))
-
-			assertRegistryEventContainsAllTypes(t, meta, eventType.Fields, eventVariant.Fields)
-
-			eventStr, err := eventType.String()
+			err := codec.DecodeFromHex(test.MetadataHex, &meta)
 			assert.NoError(t, err)
 
-			t.Logf("String representation for event with ID %v:\n%s", eventID, eventStr)
-		}
+			t.Log("Metadata was decoded successfully")
+
+			factory := NewRegistryFactory()
+
+			reg, err := factory.CreateEventRegistry(&meta)
+			assert.NoError(t, err)
+
+			t.Log("Event registry was created successfully")
+
+			for _, pallet := range meta.AsMetadataV14.Pallets {
+				if !pallet.HasEvents {
+					continue
+				}
+
+				eventsType, ok := meta.AsMetadataV14.EfficientLookup[pallet.Events.Type.Int64()]
+				assert.True(t, ok, fmt.Sprintf("Events type %d not found", pallet.Events.Type.Int64()))
+
+				assert.True(t, eventsType.Def.IsVariant, fmt.Sprintf("Events type %d not a variant", pallet.Events.Type.Int64()))
+
+				for _, eventVariant := range eventsType.Def.Variant.Variants {
+					eventID := types.EventID{byte(pallet.Index), byte(eventVariant.Index)}
+
+					eventType, ok := reg[eventID]
+					assert.True(t, ok, fmt.Sprintf("Event with ID %v not found in registry", eventID))
+
+					assertRegistryEventContainsAllTypes(t, meta, eventType.Fields, eventVariant.Fields)
+				}
+			}
+		})
 	}
 }
 
@@ -80,7 +107,12 @@ func assertRegistryEventFieldIsCorrect(t *testing.T, meta types.Metadata, regist
 		assertRegistryEventContainsAllTypes(t, meta, compositeRegistryFieldType.Fields, metaEventFieldTypeDef.Composite.Fields)
 	case metaEventFieldTypeDef.IsVariant:
 		variantRegistryFieldType, ok := registryEventFieldType.(*VariantFieldType)
-		assert.True(t, ok, "expected variant field type in registry")
+
+		if !ok {
+			_, isRecursive := registryEventFieldType.(*RecursiveFieldType)
+			assert.True(t, isRecursive, "expected variant or recursive event field")
+			return
+		}
 
 		for _, variant := range metaEventFieldTypeDef.Variant.Variants {
 			registryVariant, ok := variantRegistryFieldType.FieldTypeMap[byte(variant.Index)]
