@@ -1,44 +1,36 @@
 package events
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
 
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
+
+type EventRegistry map[types.EventID]*EventDecoder
 
 type RegistryFactory interface {
 	CreateEventRegistry(meta *types.Metadata) (EventRegistry, error)
 }
 
-type EventRegistry map[types.EventID]*EventType
-
-func (e EventRegistry) MarshalJSON() ([]byte, error) {
-	eventRegistryMap := make(map[string]*EventType)
-
-	for _, eventType := range e {
-		eventRegistryMap[eventType.Name] = eventType
-	}
-
-	return json.Marshal(eventRegistryMap)
-}
-
 type registryFactory struct {
-	fieldStorage          map[int64]EventFieldType
-	recursiveFieldStorage map[int64]*RecursiveFieldType
+	fieldStorage          map[int64]FieldDecoder
+	recursiveFieldStorage map[int64]*RecursiveDecoder
 }
 
 func NewRegistryFactory() RegistryFactory {
 	return &registryFactory{
-		fieldStorage:          make(map[int64]EventFieldType),
-		recursiveFieldStorage: make(map[int64]*RecursiveFieldType),
+		fieldStorage:          make(map[int64]FieldDecoder),
+		recursiveFieldStorage: make(map[int64]*RecursiveDecoder),
 	}
 }
 
 func (r *registryFactory) CreateEventRegistry(meta *types.Metadata) (EventRegistry, error) {
-	eventRegistry := make(map[types.EventID]*EventType)
+	defer r.resetStorages()
+
+	eventRegistry := make(map[types.EventID]*EventDecoder)
 
 	for _, mod := range meta.AsMetadataV14.Pallets {
 		if !mod.HasEvents {
@@ -66,7 +58,7 @@ func (r *registryFactory) CreateEventRegistry(meta *types.Metadata) (EventRegist
 				return nil, fmt.Errorf("couldn't get fields for event '%s': %w", eventName, err)
 			}
 
-			eventRegistry[eventID] = &EventType{
+			eventRegistry[eventID] = &EventDecoder{
 				Name:   eventName,
 				Fields: eventFields,
 			}
@@ -80,19 +72,24 @@ func (r *registryFactory) CreateEventRegistry(meta *types.Metadata) (EventRegist
 	return eventRegistry, nil
 }
 
+func (r *registryFactory) resetStorages() {
+	r.fieldStorage = make(map[int64]FieldDecoder)
+	r.recursiveFieldStorage = make(map[int64]*RecursiveDecoder)
+}
+
 func (r *registryFactory) resolveRecursiveTypes() error {
-	for recursiveFieldLookupIndex, recursiveFieldType := range r.recursiveFieldStorage {
-		fieldType, ok := r.fieldStorage[recursiveFieldLookupIndex]
+	for recursiveFieldDecoderLookupIndex, recursiveDecoder := range r.recursiveFieldStorage {
+		fieldDecoder, ok := r.fieldStorage[recursiveFieldDecoderLookupIndex]
 
 		if !ok {
-			return fmt.Errorf("couldn't get field type for recursive type %d", recursiveFieldLookupIndex)
+			return fmt.Errorf("couldn't get field decoder for recursive type %d", recursiveFieldDecoderLookupIndex)
 		}
 
-		if _, ok := fieldType.(*RecursiveFieldType); ok {
-			return fmt.Errorf("recursive field type %d cannot be resolved with a non-recursive field type", recursiveFieldLookupIndex)
+		if _, ok := fieldDecoder.(*RecursiveDecoder); ok {
+			return fmt.Errorf("recursive field type %d cannot be resolved with a non-recursive field decoder", recursiveFieldDecoderLookupIndex)
 		}
 
-		recursiveFieldType.ResolvedItemType = fieldType
+		recursiveDecoder.FieldDecoder = fieldDecoder
 	}
 
 	return nil
@@ -110,36 +107,34 @@ func (r *registryFactory) getEventFields(meta *types.Metadata, fields []types.Si
 
 		fieldName := getFieldName(field, fieldType)
 
-		if eventFieldType, ok := r.getStoredEventFieldType(fieldName, field.Type.Int64()); ok {
+		if fieldDecoder, ok := r.getStoredFieldDecoder(fieldName, field.Type.Int64()); ok {
 			eventFields = append(eventFields, &Field{
-				Name:        fieldName,
-				FieldType:   eventFieldType,
-				LookupIndex: field.Type.Int64(),
+				Name:         fieldName,
+				FieldDecoder: fieldDecoder,
 			})
 			continue
 		}
 
 		fieldTypeDef := fieldType.Def
 
-		eventFieldType, err := r.getEventFieldType(meta, fieldName, fieldTypeDef)
+		fieldDecoder, err := r.getFieldDecoder(meta, fieldName, fieldTypeDef)
 
 		if err != nil {
-			return nil, fmt.Errorf("couldn't get event field type for '%s': %w", fieldName, err)
+			return nil, fmt.Errorf("couldn't get field decoder for field '%s': %w", fieldName, err)
 		}
 
-		r.storeEventFieldType(field.Type.Int64(), eventFieldType)
+		r.storeFieldDecoder(field.Type.Int64(), fieldDecoder)
 
 		eventFields = append(eventFields, &Field{
-			Name:        fieldName,
-			FieldType:   eventFieldType,
-			LookupIndex: field.Type.Int64(),
+			Name:         fieldName,
+			FieldDecoder: fieldDecoder,
 		})
 	}
 
 	return eventFields, nil
 }
 
-func (r *registryFactory) getEventFieldType(meta *types.Metadata, fieldName string, typeDef types.Si1TypeDef) (EventFieldType, error) {
+func (r *registryFactory) getFieldDecoder(meta *types.Metadata, fieldName string, typeDef types.Si1TypeDef) (FieldDecoder, error) {
 	switch {
 	case typeDef.IsCompact:
 		compactFieldType, ok := meta.AsMetadataV14.EfficientLookup[typeDef.Compact.Type.Int64()]
@@ -148,23 +143,23 @@ func (r *registryFactory) getEventFieldType(meta *types.Metadata, fieldName stri
 			return nil, errors.New("type not found for compact field")
 		}
 
-		return r.getCompactFieldType(meta, fieldName, compactFieldType.Def)
+		return r.getCompactFieldDecoder(meta, fieldName, compactFieldType.Def)
 	case typeDef.IsComposite:
-		compositeFieldType := &CompositeFieldType{}
+		compositeDecoder := &CompositeDecoder{}
 
-		fields, err := r.getEventFields(meta, typeDef.Composite.Fields)
+		compositeFieldDecoders, err := r.getEventFields(meta, typeDef.Composite.Fields)
 
 		if err != nil {
 			return nil, fmt.Errorf("couldn't get composite fields: %w", err)
 		}
 
-		compositeFieldType.Fields = fields
+		compositeDecoder.Fields = compositeFieldDecoders
 
-		return compositeFieldType, nil
+		return compositeDecoder, nil
 	case typeDef.IsVariant:
-		return r.getVariantFieldType(meta, typeDef)
+		return r.getVariantFieldDecoder(meta, typeDef)
 	case typeDef.IsPrimitive:
-		return getPrimitiveType(typeDef.Primitive.Si0TypeDefPrimitive)
+		return getPrimitiveDecoder(typeDef.Primitive.Si0TypeDefPrimitive)
 	case typeDef.IsArray:
 		arrayFieldType, ok := meta.AsMetadataV14.EfficientLookup[typeDef.Array.Type.Int64()]
 
@@ -172,63 +167,65 @@ func (r *registryFactory) getEventFieldType(meta *types.Metadata, fieldName stri
 			return nil, fmt.Errorf("type not found for array field")
 		}
 
-		return r.getArrayFieldType(uint(typeDef.Array.Len), meta, fieldName, arrayFieldType.Def)
+		return r.getArrayFieldDecoder(uint(typeDef.Array.Len), arrayFieldType.Def)
 	case typeDef.IsSequence:
 		vectorFieldType, ok := meta.AsMetadataV14.EfficientLookup[typeDef.Sequence.Type.Int64()]
 
 		if !ok {
-			return nil, errors.New("type not found for vector field")
+			return nil, errors.New("type not found for slice field")
 		}
 
-		return r.getSliceFieldType(meta, fieldName, vectorFieldType.Def)
+		return r.getSliceFieldDecoder(meta, fieldName, vectorFieldType.Def)
 	case typeDef.IsTuple:
 		if typeDef.Tuple == nil {
-			return &FieldType[[]any]{}, nil
+			return &NoopDecoder{}, nil
 		}
 
-		return r.getTupleType(meta, fieldName, typeDef.Tuple)
+		return r.getTupleDecoder(meta, fieldName, typeDef.Tuple)
 	default:
 		return nil, errors.New("unsupported field type definition")
 	}
 }
 
-func (r *registryFactory) getVariantFieldType(meta *types.Metadata, typeDef types.Si1TypeDef) (EventFieldType, error) {
-	variantFieldType := &VariantFieldType{}
+func (r *registryFactory) getVariantFieldDecoder(meta *types.Metadata, typeDef types.Si1TypeDef) (FieldDecoder, error) {
+	variantDecoder := &VariantDecoder{}
 
-	fieldTypeMap := make(map[byte]EventFieldType)
+	fieldDecoderMap := make(map[byte]FieldDecoder)
 
 	for _, variant := range typeDef.Variant.Variants {
 		if len(variant.Fields) == 0 {
-			fieldTypeMap[byte(variant.Index)] = &FieldType[byte]{}
+			fieldDecoderMap[byte(variant.Index)] = &NoopDecoder{}
 			continue
 		}
 
-		compositeFieldType := &CompositeFieldType{}
+		compositeDecoder := &CompositeDecoder{}
 
-		fields, err := r.getEventFields(meta, variant.Fields)
+		fieldDecoders, err := r.getEventFields(meta, variant.Fields)
 
 		if err != nil {
-			return nil, fmt.Errorf("couldn't get field types for variant '%d': %w", variant.Index, err)
+			return nil, fmt.Errorf("couldn't get field decoders for variant '%d': %w", variant.Index, err)
 		}
 
-		compositeFieldType.Fields = fields
+		compositeDecoder.Fields = fieldDecoders
 
-		fieldTypeMap[byte(variant.Index)] = compositeFieldType
+		fieldDecoderMap[byte(variant.Index)] = compositeDecoder
 	}
 
-	variantFieldType.FieldTypeMap = fieldTypeMap
+	variantDecoder.FieldDecoderMap = fieldDecoderMap
 
-	return variantFieldType, nil
+	return variantDecoder, nil
 }
 
-func (r *registryFactory) getCompactFieldType(meta *types.Metadata, fieldName string, typeDef types.Si1TypeDef) (EventFieldType, error) {
+func (r *registryFactory) getCompactFieldDecoder(meta *types.Metadata, fieldName string, typeDef types.Si1TypeDef) (FieldDecoder, error) {
+	// TODO(cdamian): Cover all types.
 	switch {
 	case typeDef.IsPrimitive:
-		return &FieldType[types.UCompact]{}, nil
+		// TODO(cdamian): Confirm that this covers all primitive types.
+		return &ValueDecoder[types.UCompact]{}, nil
 	case typeDef.IsComposite:
 		compactCompositeFields := typeDef.Composite.Fields
 
-		compositeFieldType := &CompositeFieldType{}
+		compositeDecoder := &CompositeDecoder{}
 
 		for _, compactCompositeField := range compactCompositeFields {
 			compactCompositeFieldType, ok := meta.AsMetadataV14.EfficientLookup[compactCompositeField.Type.Int64()]
@@ -239,51 +236,59 @@ func (r *registryFactory) getCompactFieldType(meta *types.Metadata, fieldName st
 
 			compactFieldName := getFieldName(compactCompositeField, compactCompositeFieldType)
 
-			compactCompositeType, err := r.getCompactFieldType(meta, compactFieldName, compactCompositeFieldType.Def)
+			compactCompositeFieldDecoder, err := r.getCompactFieldDecoder(meta, compactFieldName, compactCompositeFieldType.Def)
 
 			if err != nil {
-				return nil, fmt.Errorf("couldn't decode compact composite type: %w", err)
+				return nil, fmt.Errorf("couldn't get compact field decoder: %w", err)
 			}
 
-			compositeFieldType.Fields = append(compositeFieldType.Fields, &Field{
-				Name:        fieldName,
-				FieldType:   compactCompositeType,
-				LookupIndex: compactCompositeField.Type.Int64(),
-			})
+			compositeDecoder.Fields = append(compositeDecoder.Fields, &Field{Name: fieldName, FieldDecoder: compactCompositeFieldDecoder})
 		}
 
-		return compositeFieldType, nil
+		return compositeDecoder, nil
 	default:
 		return nil, errors.New("unsupported compact field type")
 	}
 }
 
-func (r *registryFactory) getArrayFieldType(arrayLen uint, meta *types.Metadata, fieldName string, typeDef types.Si1TypeDef) (EventFieldType, error) {
-	itemFieldType, err := r.getEventFieldType(meta, fieldName, typeDef)
-
-	if err != nil {
-		return nil, fmt.Errorf("couldn't get array item field type: %w", err)
+func (r *registryFactory) getArrayFieldDecoder(arrayLen uint, typeDef types.Si1TypeDef) (FieldDecoder, error) {
+	arrayDecoder := &ArrayDecoder{
+		Length: arrayLen,
 	}
 
-	arrayFieldType := &ArrayFieldType{Length: arrayLen, ItemType: itemFieldType}
+	// TODO(cdamian): Cover all types.
+	switch {
+	case typeDef.IsPrimitive:
+		primitiveDecoder, err := getPrimitiveDecoder(typeDef.Primitive.Si0TypeDefPrimitive)
 
-	return arrayFieldType, nil
+		if err != nil {
+			return nil, fmt.Errorf("couldn't get primitive decoder for array: %w", err)
+		}
+
+		arrayDecoder.ItemDecoder = primitiveDecoder
+
+		return arrayDecoder, nil
+	default:
+		return nil, errors.New("unsupported array field type definition")
+	}
 }
 
-func (r *registryFactory) getSliceFieldType(meta *types.Metadata, fieldName string, typeDef types.Si1TypeDef) (EventFieldType, error) {
-	itemFieldType, err := r.getEventFieldType(meta, fieldName, typeDef)
+func (r *registryFactory) getSliceFieldDecoder(meta *types.Metadata, fieldName string, typeDef types.Si1TypeDef) (FieldDecoder, error) {
+	sliceDecoder := &SliceDecoder{}
+
+	itemDecoder, err := r.getFieldDecoder(meta, fieldName, typeDef)
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't get slice item field type: %w", err)
+		return nil, fmt.Errorf("couldn't get item decoder for slice: %w", err)
 	}
 
-	sliceFieldType := &SliceFieldType{itemFieldType}
+	sliceDecoder.ItemDecoder = itemDecoder
 
-	return sliceFieldType, nil
+	return sliceDecoder, nil
 }
 
-func (r *registryFactory) getTupleType(meta *types.Metadata, fieldName string, tuple types.Si1TypeDefTuple) (EventFieldType, error) {
-	compositeFieldType := &CompositeFieldType{}
+func (r *registryFactory) getTupleDecoder(meta *types.Metadata, fieldName string, tuple types.Si1TypeDefTuple) (FieldDecoder, error) {
+	compositeDecoder := &CompositeDecoder{}
 
 	for _, item := range tuple {
 		itemTypeDef, ok := meta.AsMetadataV14.EfficientLookup[item.Int64()]
@@ -292,62 +297,58 @@ func (r *registryFactory) getTupleType(meta *types.Metadata, fieldName string, t
 			return nil, fmt.Errorf("type definition for tuple item %d not found", item.Int64())
 		}
 
-		itemFieldType, err := r.getEventFieldType(meta, fieldName, itemTypeDef.Def)
+		fieldDecoder, err := r.getFieldDecoder(meta, fieldName, itemTypeDef.Def)
 
 		if err != nil {
-			return nil, fmt.Errorf("couldn't get tuple field type: %w", err)
+			return nil, fmt.Errorf("couldn't get tuple field decoder: %w", err)
 		}
 
-		compositeFieldType.Fields = append(compositeFieldType.Fields, &Field{
-			Name:        fieldName,
-			FieldType:   itemFieldType,
-			LookupIndex: item.Int64(),
-		})
+		compositeDecoder.Fields = append(compositeDecoder.Fields, &Field{Name: fieldName, FieldDecoder: fieldDecoder})
 	}
 
-	return compositeFieldType, nil
+	return compositeDecoder, nil
 }
 
-func getPrimitiveType(primitiveTypeDef types.Si0TypeDefPrimitive) (EventFieldType, error) {
+func getPrimitiveDecoder(primitiveTypeDef types.Si0TypeDefPrimitive) (FieldDecoder, error) {
 	switch primitiveTypeDef {
 	case types.IsBool:
-		return &FieldType[bool]{}, nil
+		return &ValueDecoder[bool]{}, nil
 	case types.IsChar:
-		return &FieldType[byte]{}, nil
+		return &ValueDecoder[byte]{}, nil
 	case types.IsStr:
-		return &FieldType[string]{}, nil
+		return &ValueDecoder[string]{}, nil
 	case types.IsU8:
-		return &FieldType[types.U8]{}, nil
+		return &ValueDecoder[types.U8]{}, nil
 	case types.IsU16:
-		return &FieldType[types.U16]{}, nil
+		return &ValueDecoder[types.U16]{}, nil
 	case types.IsU32:
-		return &FieldType[types.U32]{}, nil
+		return &ValueDecoder[types.U32]{}, nil
 	case types.IsU64:
-		return &FieldType[types.U64]{}, nil
+		return &ValueDecoder[types.U64]{}, nil
 	case types.IsU128:
-		return &FieldType[types.U128]{}, nil
+		return &ValueDecoder[types.U128]{}, nil
 	case types.IsU256:
-		return &FieldType[types.U256]{}, nil
+		return &ValueDecoder[types.U256]{}, nil
 	case types.IsI8:
-		return &FieldType[types.I8]{}, nil
+		return &ValueDecoder[types.I8]{}, nil
 	case types.IsI16:
-		return &FieldType[types.I16]{}, nil
+		return &ValueDecoder[types.I16]{}, nil
 	case types.IsI32:
-		return &FieldType[types.I32]{}, nil
+		return &ValueDecoder[types.I32]{}, nil
 	case types.IsI64:
-		return &FieldType[types.I64]{}, nil
+		return &ValueDecoder[types.I64]{}, nil
 	case types.IsI128:
-		return &FieldType[types.I128]{}, nil
+		return &ValueDecoder[types.I128]{}, nil
 	case types.IsI256:
-		return &FieldType[types.I256]{}, nil
+		return &ValueDecoder[types.I256]{}, nil
 	default:
 		return nil, fmt.Errorf("unsupported primitive type %v", primitiveTypeDef)
 	}
 }
 
-func (r *registryFactory) getStoredEventFieldType(fieldName string, fieldType int64) (EventFieldType, bool) {
+func (r *registryFactory) getStoredFieldDecoder(fieldName string, fieldType int64) (FieldDecoder, bool) {
 	if ft, ok := r.fieldStorage[fieldType]; ok {
-		if rt, ok := ft.(*RecursiveFieldType); ok {
+		if rt, ok := ft.(*RecursiveDecoder); ok {
 			r.recursiveFieldStorage[fieldType] = rt
 		}
 
@@ -355,21 +356,15 @@ func (r *registryFactory) getStoredEventFieldType(fieldName string, fieldType in
 	}
 
 	// Ensure that a recursive type such as Xcm::TransferReserveAsset does not cause an infinite loop
-	// by adding the RecursiveFieldType the first time the field is encountered.
-	r.fieldStorage[fieldType] = &RecursiveFieldType{
-		FieldName: fieldName,
-	}
+	// by adding the RecursiveDecoder the first time a field is encountered.
+	r.fieldStorage[fieldType] = &RecursiveDecoder{}
 
 	return nil, false
 }
 
-func (r *registryFactory) storeEventFieldType(fieldType int64, eventFieldType EventFieldType) {
-	r.fieldStorage[fieldType] = eventFieldType
+func (r *registryFactory) storeFieldDecoder(fieldType int64, fieldDecoder FieldDecoder) {
+	r.fieldStorage[fieldType] = fieldDecoder
 }
-
-const (
-	UnknownFieldName = "unknown_field_name"
-)
 
 func getFieldPath(fieldType *types.Si1Type) string {
 	var nameParts []string
@@ -392,134 +387,165 @@ func getFieldName(field types.Si1Field, fieldType *types.Si1Type) string {
 	case field.HasTypeName:
 		return string(field.TypeName)
 	default:
-		return UnknownFieldName
+		return fmt.Sprintf("lookup_index_%d", field.Type.Int64())
 	}
 }
 
-type EventType struct {
+type FieldDecoder interface {
+	Decode(decoder *scale.Decoder) (any, error)
+}
+
+type Field struct {
+	Name         string
+	FieldDecoder FieldDecoder
+}
+
+type EventDecoder struct {
 	Name   string
 	Fields []*Field
 }
 
-func (e *EventType) String() (string, error) {
-	eventTypeMap := map[string][]*Field{
-		e.Name: e.Fields,
-	}
+func (e *EventDecoder) Decode(decoder *scale.Decoder) (map[string]any, error) {
+	fieldMap := make(map[string]any)
 
-	res, err := json.Marshal(eventTypeMap)
+	for _, field := range e.Fields {
+		value, err := field.FieldDecoder.Decode(decoder)
 
-	if err != nil {
-		return "", err
-	}
+		if err != nil {
+			return nil, err
+		}
 
-	return string(res), nil
-}
-
-type Field struct {
-	Name        string
-	FieldType   EventFieldType
-	LookupIndex int64
-}
-
-func (f *Field) GetFieldMap() (map[string]any, error) {
-	fieldType, err := f.FieldType.GetFieldType()
-
-	if err != nil {
-		return nil, fmt.Errorf("couldn't get field type: %w", err)
-	}
-
-	fieldMap := map[string]any{
-		"field_name":   f.Name,
-		"field_type":   fieldType,
-		"lookup_index": f.LookupIndex,
+		fieldMap[field.Name] = value
 	}
 
 	return fieldMap, nil
 }
 
-func (f *Field) MarshalJSON() ([]byte, error) {
-	fieldMap, err := f.GetFieldMap()
+type ValueDecoder[T any] struct{}
 
-	if err != nil {
+func (v *ValueDecoder[T]) Decode(decoder *scale.Decoder) (any, error) {
+	var t T
+
+	if err := decoder.Decode(&t); err != nil {
 		return nil, err
 	}
 
-	return json.Marshal(fieldMap)
+	return t, nil
 }
 
-type EventFieldType interface {
-	GetFieldType() (string, error)
-}
-
-type VariantFieldType struct {
-	FieldTypeMap map[byte]EventFieldType
-}
-
-func (v *VariantFieldType) GetFieldType() (string, error) {
-	return "enum", nil
-}
-
-type ArrayFieldType struct {
-	Length   uint
-	ItemType EventFieldType
-}
-
-func (a *ArrayFieldType) GetFieldType() (string, error) {
-	arrayItemTypeString, err := a.ItemType.GetFieldType()
-
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("[%d]%s", a.Length, arrayItemTypeString), nil
-}
-
-type SliceFieldType struct {
-	ItemType EventFieldType
-}
-
-func (s *SliceFieldType) GetFieldType() (string, error) {
-	sliceItemTypeString, err := s.ItemType.GetFieldType()
-
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("[]%s", sliceItemTypeString), nil
-}
-
-type CompositeFieldType struct {
+type CompositeDecoder struct {
 	Fields []*Field
 }
 
-func (c *CompositeFieldType) GetFieldType() (string, error) {
-	return "struct", nil
-}
+func (e *CompositeDecoder) Decode(decoder *scale.Decoder) (any, error) {
+	fieldMap := make(map[string]any)
 
-type FieldType[T any] struct{}
+	for _, field := range e.Fields {
+		value, err := field.FieldDecoder.Decode(decoder)
 
-func (f *FieldType[T]) GetFieldType() (string, error) {
-	var t T
-	return fmt.Sprintf("%T", t), nil
-}
+		if err != nil {
+			return nil, err
+		}
 
-type RecursiveFieldType struct {
-	depth int
-
-	FieldName        string
-	ResolvedItemType EventFieldType
-}
-
-func (r *RecursiveFieldType) GetFieldType() (string, error) {
-	if r.ResolvedItemType == nil {
-		return "", fmt.Errorf("recursive type not resolved")
+		fieldMap[field.Name] = value
 	}
 
-	if r.depth > 0 {
-		return "recursive", nil
+	return fieldMap, nil
+}
+
+type VariantDecoder struct {
+	FieldDecoderMap map[byte]FieldDecoder
+}
+
+func (v *VariantDecoder) Decode(decoder *scale.Decoder) (any, error) {
+	variantByte, err := decoder.ReadOneByte()
+
+	if err != nil {
+		return nil, fmt.Errorf("couldn't read variant byte: %w", err)
 	}
 
-	r.depth++
+	variantDecoder, ok := v.FieldDecoderMap[variantByte]
 
-	return r.ResolvedItemType.GetFieldType()
+	if !ok {
+		return nil, fmt.Errorf("variant decoder for variant %d not found", variantByte)
+	}
+
+	if _, ok := variantDecoder.(*NoopDecoder); ok {
+		return variantByte, nil
+	}
+
+	return variantDecoder.Decode(decoder)
+}
+
+type NoopDecoder struct{}
+
+func (n *NoopDecoder) Decode(_ *scale.Decoder) (any, error) {
+	return nil, nil
+}
+
+type ArrayDecoder struct {
+	Length      uint
+	ItemDecoder FieldDecoder
+}
+
+func (a *ArrayDecoder) Decode(decoder *scale.Decoder) (any, error) {
+	if a.ItemDecoder == nil {
+		return nil, errors.New("array item decoder not found")
+	}
+
+	slice := make([]any, 0, a.Length)
+
+	for i := uint(0); i < a.Length; i++ {
+		item, err := a.ItemDecoder.Decode(decoder)
+
+		if err != nil {
+			return nil, err
+		}
+
+		slice = append(slice, item)
+	}
+
+	return slice, nil
+}
+
+type SliceDecoder struct {
+	ItemDecoder FieldDecoder
+}
+
+func (s *SliceDecoder) Decode(decoder *scale.Decoder) (any, error) {
+	if s.ItemDecoder == nil {
+		return nil, errors.New("slice item decoder not found")
+	}
+
+	sliceLen, err := decoder.DecodeUintCompact()
+
+	if err != nil {
+		return nil, fmt.Errorf("couldn't decode slice length: %w", err)
+	}
+
+	slice := make([]any, 0, sliceLen.Uint64())
+
+	for i := uint64(0); i < sliceLen.Uint64(); i++ {
+		item, err := s.ItemDecoder.Decode(decoder)
+
+		if err != nil {
+			return nil, err
+		}
+
+		slice = append(slice, item)
+	}
+
+	return slice, nil
+}
+
+type RecursiveDecoder struct {
+	FieldDecoder FieldDecoder
+}
+
+func (r *RecursiveDecoder) Decode(decoder *scale.Decoder) (any, error) {
+	if r.FieldDecoder == nil {
+		return nil, errors.New("recursive field decoder not found")
+	}
+
+	return r.FieldDecoder.Decode(decoder)
 }
