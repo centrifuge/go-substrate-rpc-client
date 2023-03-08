@@ -39,6 +39,7 @@ func NewFactory() Factory {
 }
 
 // CreateErrorRegistry creates the registry that contains the types for errors.
+// nolint:dupl
 func (r *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, error) {
 	errorRegistry := make(map[string]*Type)
 
@@ -50,11 +51,11 @@ func (r *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, erro
 		errorsType, ok := meta.AsMetadataV14.EfficientLookup[mod.Errors.Type.Int64()]
 
 		if !ok {
-			return nil, fmt.Errorf("errors type %d not found for module '%s'", mod.Events.Type.Int64(), mod.Name)
+			return nil, fmt.Errorf("errors type %d not found for module '%s'", mod.Errors.Type.Int64(), mod.Name)
 		}
 
 		if !errorsType.Def.IsVariant {
-			return nil, fmt.Errorf("errors type %d for module '%s' is not a variant", mod.Events.Type.Int64(), mod.Name)
+			return nil, fmt.Errorf("errors type %d for module '%s' is not a variant", mod.Errors.Type.Int64(), mod.Name)
 		}
 
 		for _, errorVariant := range errorsType.Def.Variant.Variants {
@@ -81,6 +82,7 @@ func (r *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, erro
 }
 
 // CreateCallRegistry creates the registry that contains the types for calls.
+// nolint:dupl
 func (r *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error) {
 	callRegistry := make(map[string]*Type)
 
@@ -92,11 +94,11 @@ func (r *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error)
 		callsType, ok := meta.AsMetadataV14.EfficientLookup[mod.Calls.Type.Int64()]
 
 		if !ok {
-			return nil, fmt.Errorf("calls type %d not found for module '%s'", mod.Events.Type.Int64(), mod.Name)
+			return nil, fmt.Errorf("calls type %d not found for module '%s'", mod.Calls.Type.Int64(), mod.Name)
 		}
 
 		if !callsType.Def.IsVariant {
-			return nil, fmt.Errorf("calls type %d for module '%s' is not a variant", mod.Events.Type.Int64(), mod.Name)
+			return nil, fmt.Errorf("calls type %d for module '%s' is not a variant", mod.Calls.Type.Int64(), mod.Name)
 		}
 
 		for _, callVariant := range callsType.Def.Variant.Variants {
@@ -167,6 +169,7 @@ func (r *factory) CreateEventRegistry(meta *types.Metadata) (EventRegistry, erro
 }
 
 // resolveRecursiveTypes resolves all recursive types with their according field type.
+// nolint:lll
 func (r *factory) resolveRecursiveTypes() error {
 	for recursiveFieldLookupIndex, recursiveFieldType := range r.recursiveFieldStorage {
 		fieldType, ok := r.fieldStorage[recursiveFieldLookupIndex]
@@ -228,6 +231,7 @@ func (r *factory) getTypeFields(meta *types.Metadata, fields []types.Si1Field) (
 }
 
 // getFieldType returns the FieldType based on the provided type definition.
+// nolint:funlen
 func (r *factory) getFieldType(meta *types.Metadata, fieldName string, typeDef types.Si1TypeDef) (FieldType, error) {
 	switch {
 	case typeDef.IsCompact:
@@ -239,7 +243,9 @@ func (r *factory) getFieldType(meta *types.Metadata, fieldName string, typeDef t
 
 		return r.getCompactFieldType(meta, fieldName, compactFieldType.Def)
 	case typeDef.IsComposite:
-		compositeFieldType := &CompositeFieldType{}
+		compositeFieldType := &CompositeFieldType{
+			FieldName: fieldName,
+		}
 
 		fields, err := r.getTypeFields(meta, typeDef.Composite.Fields)
 
@@ -310,19 +316,27 @@ func (r *factory) getFieldType(meta *types.Metadata, fieldName string, typeDef t
 	}
 }
 
+const (
+	variantItemFieldNameFormat = "variant_item_%d"
+)
+
 // getVariantFieldType parses a variant type definition and returns a VariantFieldType.
 func (r *factory) getVariantFieldType(meta *types.Metadata, typeDef types.Si1TypeDef) (FieldType, error) {
 	variantFieldType := &VariantFieldType{}
 
 	fieldTypeMap := make(map[byte]FieldType)
 
-	for _, variant := range typeDef.Variant.Variants {
+	for i, variant := range typeDef.Variant.Variants {
 		if len(variant.Fields) == 0 {
 			fieldTypeMap[byte(variant.Index)] = &PrimitiveFieldType[byte]{}
 			continue
 		}
 
-		compositeFieldType := &CompositeFieldType{}
+		variantFieldName := fmt.Sprintf(variantItemFieldNameFormat, i)
+
+		compositeFieldType := &CompositeFieldType{
+			FieldName: variantFieldName,
+		}
 
 		fields, err := r.getTypeFields(meta, variant.Fields)
 
@@ -345,6 +359,7 @@ const (
 )
 
 // getCompactFieldType parses a compact type definition and returns the according field type.
+// nolint:funlen,lll
 func (r *factory) getCompactFieldType(meta *types.Metadata, fieldName string, typeDef types.Si1TypeDef) (FieldType, error) {
 	switch {
 	case typeDef.IsPrimitive:
@@ -354,7 +369,9 @@ func (r *factory) getCompactFieldType(meta *types.Metadata, fieldName string, ty
 			return &PrimitiveFieldType[any]{}, nil
 		}
 
-		compositeFieldType := &CompositeFieldType{}
+		compositeFieldType := &CompositeFieldType{
+			FieldName: fieldName,
+		}
 
 		for i, item := range typeDef.Tuple {
 			itemTypeDef, ok := meta.AsMetadataV14.EfficientLookup[item.Int64()]
@@ -382,7 +399,9 @@ func (r *factory) getCompactFieldType(meta *types.Metadata, fieldName string, ty
 	case typeDef.IsComposite:
 		compactCompositeFields := typeDef.Composite.Fields
 
-		compositeFieldType := &CompositeFieldType{}
+		compositeFieldType := &CompositeFieldType{
+			FieldName: fieldName,
+		}
 
 		for _, compactCompositeField := range compactCompositeFields {
 			compactCompositeFieldType, ok := meta.AsMetadataV14.EfficientLookup[compactCompositeField.Type.Int64()]
@@ -400,7 +419,7 @@ func (r *factory) getCompactFieldType(meta *types.Metadata, fieldName string, ty
 			}
 
 			compositeFieldType.Fields = append(compositeFieldType.Fields, &Field{
-				Name:        fieldName,
+				Name:        compactFieldName,
 				FieldType:   compactCompositeType,
 				LookupIndex: compactCompositeField.Type.Int64(),
 			})
@@ -413,6 +432,7 @@ func (r *factory) getCompactFieldType(meta *types.Metadata, fieldName string, ty
 }
 
 // getArrayFieldType parses an array type definition and returns an ArrayFieldType.
+// nolint:lll
 func (r *factory) getArrayFieldType(arrayLen uint, meta *types.Metadata, fieldName string, typeDef types.Si1TypeDef) (FieldType, error) {
 	itemFieldType, err := r.getFieldType(meta, fieldName, typeDef)
 
@@ -426,6 +446,7 @@ func (r *factory) getArrayFieldType(arrayLen uint, meta *types.Metadata, fieldNa
 }
 
 // getSliceFieldType parses a slice type definition and returns an SliceFieldType.
+// nolint:lll
 func (r *factory) getSliceFieldType(meta *types.Metadata, fieldName string, typeDef types.Si1TypeDef) (FieldType, error) {
 	itemFieldType, err := r.getFieldType(meta, fieldName, typeDef)
 
@@ -440,23 +461,27 @@ func (r *factory) getSliceFieldType(meta *types.Metadata, fieldName string, type
 
 // getTupleType parses a tuple type definition and returns a CompositeFieldType.
 func (r *factory) getTupleType(meta *types.Metadata, fieldName string, tuple types.Si1TypeDefTuple) (FieldType, error) {
-	compositeFieldType := &CompositeFieldType{}
+	compositeFieldType := &CompositeFieldType{
+		FieldName: fieldName,
+	}
 
-	for _, item := range tuple {
+	for i, item := range tuple {
 		itemTypeDef, ok := meta.AsMetadataV14.EfficientLookup[item.Int64()]
 
 		if !ok {
-			return nil, fmt.Errorf("type definition for tuple item %d not found", item.Int64())
+			return nil, fmt.Errorf("type definition for tuple item %d not found", i)
 		}
 
-		itemFieldType, err := r.getFieldType(meta, fieldName, itemTypeDef.Def)
+		tupleFieldName := fmt.Sprintf(tupleItemFieldNameFormat, i)
+
+		itemFieldType, err := r.getFieldType(meta, tupleFieldName, itemTypeDef.Def)
 
 		if err != nil {
 			return nil, fmt.Errorf("couldn't get tuple field type: %w", err)
 		}
 
 		compositeFieldType.Fields = append(compositeFieldType.Fields, &Field{
-			Name:        fieldName,
+			Name:        tupleFieldName,
 			FieldType:   itemFieldType,
 			LookupIndex: item.Int64(),
 		})
@@ -563,20 +588,6 @@ type Type struct {
 	Fields []*Field
 }
 
-func (t *Type) String() (string, error) {
-	typeMap := map[string][]*Field{
-		t.Name: t.Fields,
-	}
-
-	res, err := json.Marshal(typeMap)
-
-	if err != nil {
-		return "", err
-	}
-
-	return string(res), nil
-}
-
 // Field represents one field of a Type.
 type Field struct {
 	Name        string
@@ -657,7 +668,8 @@ func (s *SliceFieldType) GetFieldTypeString() (string, error) {
 
 // CompositeFieldType represents a struct.
 type CompositeFieldType struct {
-	Fields []*Field
+	FieldName string
+	Fields    []*Field
 }
 
 func (c *CompositeFieldType) GetFieldTypeString() (string, error) {
