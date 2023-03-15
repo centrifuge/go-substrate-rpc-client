@@ -1,4 +1,4 @@
-package events
+package registry
 
 import (
 	"bytes"
@@ -23,13 +23,13 @@ type Parser interface {
 
 type parser struct {
 	stateProvider   StateProvider ``
-	registryFactory RegistryFactory
+	registryFactory Factory
 
 	eventRegistry EventRegistry
 	meta          *types.Metadata
 }
 
-func NewParser(stateProvider StateProvider, registryFactory RegistryFactory) (Parser, error) {
+func NewParser(stateProvider StateProvider, registryFactory Factory) (Parser, error) {
 	parser := &parser{
 		stateProvider:   stateProvider,
 		registryFactory: registryFactory,
