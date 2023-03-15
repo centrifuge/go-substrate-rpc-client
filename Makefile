@@ -46,6 +46,10 @@ test-types-decode:      ## run tests for types decode
 generate-mocks:      ## generate mocks
 	@docker run -v `pwd`:/app -w /app --entrypoint /bin/sh vektra/mockery:v2.13.0-beta.1 -c 'go generate ./...'
 
+test-milestone1:
+	@docker build -t gsrpc-m1 -f Dockerfile_milestone1 .
+	@docker run --rm gsrpc-m1
+
 help: 				## shows this help
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
 
