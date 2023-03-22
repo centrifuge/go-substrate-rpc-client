@@ -337,7 +337,7 @@ func (f *factory) getVariantFieldDecoder(meta *types.Metadata, typeDef types.Si1
 
 	for i, variant := range typeDef.Variant.Variants {
 		if len(variant.Fields) == 0 {
-			fieldDecoderMap[byte(variant.Index)] = &ValueDecoder[byte]{}
+			fieldDecoderMap[byte(variant.Index)] = &NoopDecoder{}
 			continue
 		}
 

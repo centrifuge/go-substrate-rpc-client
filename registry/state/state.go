@@ -1,4 +1,4 @@
-package registry
+package state
 
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/state"
