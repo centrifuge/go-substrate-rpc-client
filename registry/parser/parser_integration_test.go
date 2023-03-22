@@ -1,3 +1,5 @@
+//go:build integration
+
 package parser
 
 import (
@@ -39,7 +41,7 @@ func TestParser_GetEvents(t *testing.T) {
 				return
 			}
 
-			parser, err := NewDefaultParser(state.NewStateProvider(api.RPC.State), registry.NewFactory())
+			parser, err := NewDefaultEventParser(state.NewProvider(api.RPC.State), registry.NewFactory())
 
 			if err != nil {
 				log.Printf("Couldn't create eventParser: %s", err)
@@ -55,11 +57,13 @@ func TestParser_GetEvents(t *testing.T) {
 
 			var previousBlock *types.SignedBlock
 
+			processedBlockCount := 0
+
 			for {
 				block, err := api.RPC.Chain.GetBlock(blockHash)
 
 				if err != nil {
-					log.Printf("Skipping block for '%s': %s\n", testURL, err)
+					log.Printf("Skipping block %d for '%s' due to a block retrieval error\n", previousBlock.Block.Header.Number-1, testURL)
 
 					if blockHash, err = api.RPC.Chain.GetBlockHash(uint64(previousBlock.Block.Header.Number - 2)); err != nil {
 						log.Printf("Couldn't get block hash for block %d: %s", previousBlock.Block.Header.Number-2, err)
@@ -79,6 +83,12 @@ func TestParser_GetEvents(t *testing.T) {
 				if err != nil {
 					log.Printf("Couldn't parse events for '%s', block number %d: %s\n", testURL, block.Block.Header.Number, err)
 					return
+				}
+
+				processedBlockCount++
+
+				if processedBlockCount%500 == 0 {
+					log.Printf("Parsed events for %d blocks for '%s' so far, last block number %d\n", processedBlockCount, testURL, block.Block.Header.Number)
 				}
 			}
 		}()

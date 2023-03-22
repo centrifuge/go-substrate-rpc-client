@@ -26,7 +26,7 @@ type EventParser interface {
 }
 
 type eventParser struct {
-	stateProvider   state.StateProvider
+	stateProvider   state.Provider
 	registryFactory registry.Factory
 
 	eventStorageExecutor exec.RetryableExecutor[*types.StorageDataRaw]
@@ -36,8 +36,8 @@ type eventParser struct {
 	meta          *types.Metadata
 }
 
-func NewParser(
-	stateProvider state.StateProvider,
+func NewEventParser(
+	stateProvider state.Provider,
 	registryFactory registry.Factory,
 	eventStorageExecutor exec.RetryableExecutor[*types.StorageDataRaw],
 	eventParsingExecutor exec.RetryableExecutor[[]*Event],
@@ -56,11 +56,11 @@ func NewParser(
 	return parser, nil
 }
 
-func NewDefaultParser(stateProvider state.StateProvider, registryFactory registry.Factory) (EventParser, error) {
+func NewDefaultEventParser(stateProvider state.Provider, registryFactory registry.Factory) (EventParser, error) {
 	eventStorageExecutor := exec.NewRetryableExecutor[*types.StorageDataRaw](exec.WithErrTimeout(1 * time.Second))
-	eventParsingExecutor := exec.NewRetryableExecutor[[]*Event](exec.WithMaxCount(1))
+	eventParsingExecutor := exec.NewRetryableExecutor[[]*Event](exec.WithMaxRetryCount(1))
 
-	return NewParser(stateProvider, registryFactory, eventStorageExecutor, eventParsingExecutor)
+	return NewEventParser(stateProvider, registryFactory, eventStorageExecutor, eventParsingExecutor)
 }
 
 func (p *eventParser) GetEvents(blockHash types.Hash) ([]*Event, error) {

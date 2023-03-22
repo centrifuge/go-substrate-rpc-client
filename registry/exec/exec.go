@@ -29,16 +29,18 @@ func NewRetryableExecutor[T any](opts ...OptsFn) RetryableExecutor[T] {
 
 func (r *retryableExecutor[T]) ExecWithFallback(execFn func() (T, error), fallbackFn func() error) (res T, err error) {
 	if execFn == nil {
-		return res, errors.New("no exec function provided")
+		return res, ErrMissingExecFn
 	}
 
 	if fallbackFn == nil {
-		return res, errors.New("no fallback function provided")
+		return res, ErrMissingFallbackFn
 	}
 
 	execErr := &Error{}
 
-	for i := uint(0); i < r.opts.maxCount; i++ {
+	retryCount := uint(0)
+
+	for {
 		res, err = execFn()
 
 		if err == nil {
@@ -47,33 +49,42 @@ func (r *retryableExecutor[T]) ExecWithFallback(execFn func() (T, error), fallba
 
 		execErr.AddErr(fmt.Errorf("exec function error: %w", err))
 
+		if retryCount == r.opts.maxRetryCount {
+			return res, execErr
+		}
+
 		if err = fallbackFn(); err != nil && !r.opts.retryOnFallbackError {
 			execErr.AddErr(fmt.Errorf("fallback function error: %w", err))
 
 			return res, execErr
 		}
 
+		retryCount++
+
 		time.Sleep(r.opts.errTimeout)
 	}
-
-	return res, execErr
 }
 
+var (
+	ErrMissingExecFn     = errors.New("no exec function provided")
+	ErrMissingFallbackFn = errors.New("no fallback function provided")
+)
+
 const (
-	defaultExecMaxCount         = 3
+	defaultMaxRetryCount        = 3
 	defaultErrTimeout           = 0 * time.Second
 	defaultRetryOnFallbackError = true
 )
 
 type Opts struct {
-	maxCount             uint
+	maxRetryCount        uint
 	errTimeout           time.Duration
 	retryOnFallbackError bool
 }
 
 func NewDefaultExecOpts() *Opts {
 	return &Opts{
-		maxCount:             defaultExecMaxCount,
+		maxRetryCount:        defaultMaxRetryCount,
 		errTimeout:           defaultErrTimeout,
 		retryOnFallbackError: defaultRetryOnFallbackError,
 	}
@@ -81,9 +92,13 @@ func NewDefaultExecOpts() *Opts {
 
 type OptsFn func(opts *Opts)
 
-func WithMaxCount(maxCount uint) OptsFn {
+func WithMaxRetryCount(maxCount uint) OptsFn {
 	return func(opts *Opts) {
-		opts.maxCount = maxCount
+		if maxCount == 0 {
+			maxCount = defaultMaxRetryCount
+		}
+
+		opts.maxRetryCount = maxCount
 	}
 }
 

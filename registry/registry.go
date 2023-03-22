@@ -9,6 +9,8 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+//go:generate mockery --name Factory --structname FactoryMock --filename factory_mock.go --inpackage
+
 // Factory is the interface responsible for generating the according registries from the metadata.
 type Factory interface {
 	CreateCallRegistry(meta *types.Metadata) (CallRegistry, error)
