@@ -18,7 +18,7 @@ package types
 
 import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 
-type NetworkID struct {
+type NetworkIDV0 struct {
 	IsAny bool
 
 	IsNamed      bool
@@ -29,7 +29,7 @@ type NetworkID struct {
 	IsKusama bool
 }
 
-func (n *NetworkID) Decode(decoder scale.Decoder) error {
+func (n *NetworkIDV0) Decode(decoder scale.Decoder) error {
 	b, err := decoder.ReadOneByte()
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func (n *NetworkID) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
-func (n NetworkID) Encode(encoder scale.Encoder) error {
+func (n NetworkIDV0) Encode(encoder scale.Encoder) error {
 	switch {
 	case n.IsAny:
 		return encoder.PushByte(0)

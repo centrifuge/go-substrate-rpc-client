@@ -25,15 +25,15 @@ type JunctionV0 struct {
 	ParachainID U32
 
 	IsAccountID32        bool
-	AccountID32NetworkID NetworkID
+	AccountID32NetworkID NetworkIDV0
 	AccountID            []U8
 
 	IsAccountIndex64        bool
-	AccountIndex64NetworkID NetworkID
+	AccountIndex64NetworkID NetworkIDV0
 	AccountIndex            U64
 
 	IsAccountKey20        bool
-	AccountKey20NetworkID NetworkID
+	AccountKey20NetworkID NetworkIDV0
 	AccountKey            []U8
 
 	IsPalletInstance bool

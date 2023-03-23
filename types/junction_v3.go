@@ -20,20 +20,20 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 )
 
-type JunctionV1 struct {
+type JunctionV3 struct {
 	IsParachain bool
 	ParachainID UCompact
 
 	IsAccountID32        bool
-	AccountID32NetworkID NetworkIDV1
+	AccountID32NetworkID NetworkIDV3
 	AccountID            []U8
 
 	IsAccountIndex64        bool
-	AccountIndex64NetworkID NetworkIDV1
+	AccountIndex64NetworkID NetworkIDV3
 	AccountIndex            U64
 
 	IsAccountKey20        bool
-	AccountKey20NetworkID NetworkIDV1
+	AccountKey20NetworkID NetworkIDV3
 	AccountKey            []U8
 
 	IsPalletInstance bool
@@ -42,17 +42,21 @@ type JunctionV1 struct {
 	IsGeneralIndex bool
 	GeneralIndex   U128
 
-	IsGeneralKey bool
-	GeneralKey   []U8
+	IsGeneralKey     bool
+	GeneralKeyLength U8
+	GeneralKey       [32]U8
 
 	IsOnlyChild bool
 
 	IsPlurality bool
 	BodyID      BodyID
 	BodyPart    BodyPart
+
+	IsGlobalConsensus bool
+	GlobalConsensus NetworkIDV3
 }
 
-func (j *JunctionV1) Decode(decoder scale.Decoder) error {
+func (j *JunctionV3) Decode(decoder scale.Decoder) error {
 	b, err := decoder.ReadOneByte()
 	if err != nil {
 		return err
@@ -98,6 +102,10 @@ func (j *JunctionV1) Decode(decoder scale.Decoder) error {
 	case 6:
 		j.IsGeneralKey = true
 
+		if err := decoder.Decode(&j.GeneralKeyLength); err != nil {
+			return nil
+		}
+
 		return decoder.Decode(&j.GeneralKey)
 	case 7:
 		j.IsOnlyChild = true
@@ -109,12 +117,15 @@ func (j *JunctionV1) Decode(decoder scale.Decoder) error {
 		}
 
 		return decoder.Decode(&j.BodyPart)
+	case 9:
+		j.IsGlobalConsensus = true
+		return decoder.Decode(&j.GlobalConsensus)
 	}
 
 	return nil
 }
 
-func (j JunctionV1) Encode(encoder scale.Encoder) error { //nolint:funlen
+func (j JunctionV3) Encode(encoder scale.Encoder) error { //nolint:funlen
 	switch {
 	case j.IsParachain:
 		if err := encoder.PushByte(0); err != nil {
@@ -169,6 +180,10 @@ func (j JunctionV1) Encode(encoder scale.Encoder) error { //nolint:funlen
 			return err
 		}
 
+		if err := encoder.Encode(j.GeneralKeyLength); err != nil {
+			return err
+		}
+
 		return encoder.Encode(j.GeneralKey)
 	case j.IsOnlyChild:
 		return encoder.PushByte(7)
@@ -182,12 +197,19 @@ func (j JunctionV1) Encode(encoder scale.Encoder) error { //nolint:funlen
 		}
 
 		return encoder.Encode(j.BodyPart)
+
+	case j.IsGlobalConsensus:
+		if err := encoder.PushByte(9); err != nil {
+			return err
+		}
+
+		return encoder.Encode(j.GlobalConsensus)
 	}
 
 	return nil
 }
 
-type JunctionsV1 struct {
+type JunctionsV3 struct {
 	IsHere bool
 
 	IsX1 bool
@@ -215,7 +237,7 @@ type JunctionsV1 struct {
 	X8   [8]JunctionV1
 }
 
-func (j *JunctionsV1) Decode(decoder scale.Decoder) error { //nolint:dupl
+func (j *JunctionsV3) Decode(decoder scale.Decoder) error { //nolint:dupl
 	b, err := decoder.ReadOneByte()
 	if err != nil {
 		return err
@@ -261,7 +283,7 @@ func (j *JunctionsV1) Decode(decoder scale.Decoder) error { //nolint:dupl
 	return nil
 }
 
-func (j JunctionsV1) Encode(encoder scale.Encoder) error {
+func (j JunctionsV3) Encode(encoder scale.Encoder) error {
 	switch {
 	case j.IsHere:
 		return encoder.PushByte(0)

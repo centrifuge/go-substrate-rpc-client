@@ -26,22 +26,22 @@ import (
 )
 
 var (
-	testNetworkID1 = NetworkID{
+	testNetworkID1 = NetworkIDV0{
 		IsAny: true,
 	}
-	testNetworkID2 = NetworkID{
+	testNetworkID2 = NetworkIDV0{
 		IsNamed:      true,
 		NamedNetwork: []U8{1, 2, 3, 4},
 	}
-	testNetworkID3 = NetworkID{
+	testNetworkID3 = NetworkIDV0{
 		IsPolkadot: true,
 	}
-	testNetworkID4 = NetworkID{
+	testNetworkID4 = NetworkIDV0{
 		IsKusama: true,
 	}
 
 	networkIDFuzzOpts = []FuzzOpt{
-		WithFuzzFuncs(func(n *NetworkID, c fuzz.Continue) {
+		WithFuzzFuncs(func(n *NetworkIDV0, c fuzz.Continue) {
 			switch c.Intn(4) {
 			case 0:
 				n.IsAny = true
@@ -59,9 +59,9 @@ var (
 )
 
 func TestNetworkID_EncodeDecode(t *testing.T) {
-	AssertRoundTripFuzz[NetworkID](t, 100, networkIDFuzzOpts...)
-	AssertDecodeNilData[NetworkID](t)
-	AssertEncodeEmptyObj[NetworkID](t, 0)
+	AssertRoundTripFuzz[NetworkIDV0](t, 100, networkIDFuzzOpts...)
+	AssertDecodeNilData[NetworkIDV0](t)
+	AssertEncodeEmptyObj[NetworkIDV0](t, 0)
 }
 
 func TestNetworkID_Encode(t *testing.T) {
