@@ -80,7 +80,7 @@ func TestRetryableExecutor_ExecWithFallback_ExecFnError(t *testing.T) {
 
 	exec := NewRetryableExecutor[int](
 		WithMaxRetryCount(retryCount),
-		WithErrTimeout(100*time.Millisecond),
+		WithRetryTimeout(100*time.Millisecond),
 	)
 
 	execFnCallCount := uint(0)

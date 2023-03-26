@@ -1,6 +1,6 @@
-//go:build integration
+//go:build live
 
-package parser
+package retriever
 
 import (
 	"log"
@@ -8,22 +8,21 @@ import (
 	"testing"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/state"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
 var (
 	testURLs = []string{
-		"wss://fullnode.parachain.centrifuge.io",
+		//"wss://fullnode.parachain.centrifuge.io",
 		"wss://rpc.polkadot.io",
-		"wss://statemint-rpc.polkadot.io",
-		"wss://acala-rpc-0.aca-api.network",
-		"wss://wss.api.moonbeam.network",
+		//"wss://statemint-rpc.polkadot.io",
+		//"wss://acala-rpc-0.aca-api.network",
+		//"wss://wss.api.moonbeam.network",
 	}
 )
 
-func TestParser_GetEvents(t *testing.T) {
+func TestEventRetriever_GetEvents(t *testing.T) {
 	var wg sync.WaitGroup
 
 	for _, testURL := range testURLs {
@@ -41,10 +40,10 @@ func TestParser_GetEvents(t *testing.T) {
 				return
 			}
 
-			parser, err := NewDefaultEventParser(state.NewProvider(api.RPC.State), registry.NewFactory())
+			retriever, err := NewDefaultEventRetriever(state.NewProvider(api.RPC.State))
 
 			if err != nil {
-				log.Printf("Couldn't create eventParser: %s", err)
+				log.Printf("Couldn't create event retriever: %s", err)
 				return
 			}
 
@@ -74,21 +73,21 @@ func TestParser_GetEvents(t *testing.T) {
 					continue
 				}
 
+				_, err = retriever.GetEvents(blockHash)
+
+				if err != nil {
+					log.Printf("Couldn't retrieve events for '%s', block number %d: %s\n", testURL, block.Block.Header.Number, err)
+					return
+				}
+
 				previousBlock = block
 
 				blockHash = block.Block.Header.ParentHash
 
-				_, err = parser.GetEvents(blockHash)
-
-				if err != nil {
-					log.Printf("Couldn't parse events for '%s', block number %d: %s\n", testURL, block.Block.Header.Number, err)
-					return
-				}
-
 				processedBlockCount++
 
 				if processedBlockCount%500 == 0 {
-					log.Printf("Parsed events for %d blocks for '%s' so far, last block number %d\n", processedBlockCount, testURL, block.Block.Header.Number)
+					log.Printf("Retrieved events for %d blocks for '%s' so far, last block number %d\n", processedBlockCount, testURL, block.Block.Header.Number)
 				}
 			}
 		}()

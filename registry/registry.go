@@ -19,7 +19,7 @@ type Factory interface {
 }
 
 // CallRegistry maps a call name to its Type.
-type CallRegistry map[string]*Type
+type CallRegistry map[types.CallIndex]*Type
 
 // ErrorRegistry maps an error name to its Type.
 type ErrorRegistry map[string]*Type
@@ -87,7 +87,7 @@ func (f *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, erro
 func (f *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error) {
 	f.initStorages()
 
-	callRegistry := make(map[string]*Type)
+	callRegistry := make(map[types.CallIndex]*Type)
 
 	for _, mod := range meta.AsMetadataV14.Pallets {
 		if !mod.HasCalls {
@@ -105,6 +105,11 @@ func (f *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error)
 		}
 
 		for _, callVariant := range callsType.Def.Variant.Variants {
+			callIndex := types.CallIndex{
+				SectionIndex: uint8(mod.Index),
+				MethodIndex:  uint8(callVariant.Index),
+			}
+
 			callName := fmt.Sprintf("%s.%s", mod.Name, callVariant.Name)
 
 			callFields, err := f.getTypeFields(meta, callVariant.Fields)
@@ -113,7 +118,7 @@ func (f *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error)
 				return nil, fmt.Errorf("couldn't get fields for call '%s': %w", callName, err)
 			}
 
-			callRegistry[callName] = &Type{
+			callRegistry[callIndex] = &Type{
 				Name:   callName,
 				Fields: callFields,
 			}
@@ -294,34 +299,7 @@ func (f *factory) getFieldDecoder(meta *types.Metadata, fieldName string, typeDe
 
 		return f.getTupleFieldDecoder(meta, fieldName, typeDef.Tuple)
 	case typeDef.IsBitSequence:
-		bitStoreType, ok := meta.AsMetadataV14.EfficientLookup[typeDef.BitSequence.BitStoreType.Int64()]
-
-		if !ok {
-			return nil, errors.New("bit store type not found")
-		}
-
-		bitStoreFieldDecoder, err := f.getFieldDecoder(meta, bitStoreKey, bitStoreType.Def)
-
-		if err != nil {
-			return nil, fmt.Errorf("couldn't get bit store field type: %w", err)
-		}
-
-		bitOrderType, ok := meta.AsMetadataV14.EfficientLookup[typeDef.BitSequence.BitOrderType.Int64()]
-
-		if !ok {
-			return nil, errors.New("bit order type not found")
-		}
-
-		bitOrderFieldDecoder, err := f.getFieldDecoder(meta, bitOrderKey, bitOrderType.Def)
-
-		if err != nil {
-			return nil, fmt.Errorf("couldn't get bit order field decoder: %w", err)
-		}
-
-		return &BitSequenceDecoder{
-			BitStoreFieldDecoder: bitStoreFieldDecoder,
-			BitOrderFieldDecoder: bitOrderFieldDecoder,
-		}, nil
+		return f.getBitSequenceDecoder(meta, fieldName, typeDef.BitSequence)
 	default:
 		return nil, errors.New("unsupported field type definition")
 	}
@@ -495,6 +473,47 @@ func (f *factory) getTupleFieldDecoder(meta *types.Metadata, fieldName string, t
 	}
 
 	return compositeDecoder, nil
+}
+
+func (f *factory) getBitSequenceDecoder(meta *types.Metadata, fieldName string, bitSequenceTypeDef types.Si1TypeDefBitSequence) (FieldDecoder, error) {
+	bitStoreType, ok := meta.AsMetadataV14.EfficientLookup[bitSequenceTypeDef.BitStoreType.Int64()]
+
+	if !ok {
+		return nil, errors.New("bit store type not found")
+	}
+
+	if bitStoreType.Def.Primitive.Si0TypeDefPrimitive != types.IsU8 {
+		return nil, errors.New("bit store type not supported")
+	}
+
+	bitOrderType, ok := meta.AsMetadataV14.EfficientLookup[bitSequenceTypeDef.BitOrderType.Int64()]
+
+	if !ok {
+		return nil, errors.New("bit order type not found")
+	}
+
+	bitOrder, err := types.NewBitOrderFromString(getBitOrderString(bitOrderType.Path))
+
+	if err != nil {
+		return nil, err
+	}
+
+	bitSequenceDecoder := &BitSequenceDecoder{
+		FieldName: fieldName,
+		BitOrder:  bitOrder,
+	}
+
+	return bitSequenceDecoder, nil
+}
+
+func getBitOrderString(path types.Si1Path) string {
+	pathLen := len(path)
+
+	if pathLen == 0 {
+		return ""
+	}
+
+	return string(path[pathLen-1])
 }
 
 // getPrimitiveDecoder parses a primitive type definition and returns a ValueDecoder.
@@ -756,38 +775,18 @@ func (r *RecursiveDecoder) Decode(decoder *scale.Decoder) (any, error) {
 
 // BitSequenceDecoder holds the decoders for the bit store and the bit order or a bit sequence.
 type BitSequenceDecoder struct {
-	BitStoreFieldDecoder FieldDecoder
-	BitOrderFieldDecoder FieldDecoder
+	FieldName string
+	BitOrder  types.BitOrder
 }
 
-const (
-	bitStoreKey = "bit_store"
-	bitOrderKey = "bit_order"
-)
-
 func (b *BitSequenceDecoder) Decode(decoder *scale.Decoder) (any, error) {
-	if b.BitStoreFieldDecoder == nil {
-		return nil, errors.New("bit store field decoder not found")
+	bitVec := types.NewBitVec(b.BitOrder)
+
+	if err := bitVec.Decode(*decoder); err != nil {
+		return nil, err
 	}
 
-	if b.BitOrderFieldDecoder == nil {
-		return nil, errors.New("bit order field decoder not found")
-	}
-
-	bitStore, err := b.BitStoreFieldDecoder.Decode(decoder)
-
-	if err != nil {
-		return nil, fmt.Errorf("couldn't decode bit store: %w", err)
-	}
-
-	bitOrder, err := b.BitOrderFieldDecoder.Decode(decoder)
-
-	if err != nil {
-		return nil, fmt.Errorf("couldn't decode bit order: %w", err)
-	}
-
-	return map[string]any{
-		bitStoreKey: bitStore,
-		bitOrderKey: bitOrder,
+	return map[string]string{
+		b.FieldName: bitVec.String(),
 	}, nil
 }

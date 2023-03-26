@@ -61,7 +61,7 @@ func (r *retryableExecutor[T]) ExecWithFallback(execFn func() (T, error), fallba
 
 		retryCount++
 
-		time.Sleep(r.opts.errTimeout)
+		time.Sleep(r.opts.retryTimeout)
 	}
 }
 
@@ -78,14 +78,14 @@ const (
 
 type Opts struct {
 	maxRetryCount        uint
-	errTimeout           time.Duration
+	retryTimeout         time.Duration
 	retryOnFallbackError bool
 }
 
 func NewDefaultExecOpts() *Opts {
 	return &Opts{
 		maxRetryCount:        defaultMaxRetryCount,
-		errTimeout:           defaultErrTimeout,
+		retryTimeout:         defaultErrTimeout,
 		retryOnFallbackError: defaultRetryOnFallbackError,
 	}
 }
@@ -102,9 +102,9 @@ func WithMaxRetryCount(maxCount uint) OptsFn {
 	}
 }
 
-func WithErrTimeout(errTimeout time.Duration) OptsFn {
+func WithRetryTimeout(retryTimeout time.Duration) OptsFn {
 	return func(opts *Opts) {
-		opts.errTimeout = errTimeout
+		opts.retryTimeout = retryTimeout
 	}
 }
 
