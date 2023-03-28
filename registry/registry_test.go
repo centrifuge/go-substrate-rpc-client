@@ -267,9 +267,14 @@ func TestFactory_CreateCallRegistryWithLiveMetadata(t *testing.T) {
 				assert.True(t, callsType.Def.IsVariant, fmt.Sprintf("Calls type %d not a variant", pallet.Events.Type.Int64()))
 
 				for _, callVariant := range callsType.Def.Variant.Variants {
+					callIndex := types.CallIndex{
+						SectionIndex: uint8(pallet.Index),
+						MethodIndex:  uint8(callVariant.Index),
+					}
+
 					callName := fmt.Sprintf("%s.%s", pallet.Name, callVariant.Name)
 
-					registryCallType, ok := reg[callName]
+					registryCallType, ok := reg[callIndex]
 					assert.True(t, ok, fmt.Sprintf("Call '%s' not found in registry", callName))
 
 					testAsserter.assertRegistryItemContainsAllTypes(t, meta, registryCallType.Fields, callVariant.Fields)
@@ -1020,7 +1025,7 @@ func TestFactory_getFieldType_Variant(t *testing.T) {
 	assert.True(t, ok)
 	assert.Len(t, variantFieldType.FieldDecoderMap, 2)
 
-	assert.Equal(t, &ValueDecoder[byte]{}, variantFieldType.FieldDecoderMap[0])
+	assert.Equal(t, &NoopDecoder{}, variantFieldType.FieldDecoderMap[0])
 
 	compositeVariant, ok := variantFieldType.FieldDecoderMap[1].(*CompositeDecoder)
 	assert.True(t, ok)
@@ -1300,14 +1305,13 @@ func TestFactory_getFieldType_BitSequence(t *testing.T) {
 	bitStoreTypeDef := types.Si1TypeDef{
 		IsPrimitive: true,
 		Primitive: types.Si1TypeDefPrimitive{
-			Si0TypeDefPrimitive: types.Si0TypeDefPrimitive(types.IsI64),
+			Si0TypeDefPrimitive: types.Si0TypeDefPrimitive(types.IsU8),
 		},
 	}
 
-	bitOrderTypeDef := types.Si1TypeDef{
-		IsPrimitive: true,
-		Primitive: types.Si1TypeDefPrimitive{
-			Si0TypeDefPrimitive: types.Si0TypeDefPrimitive(types.IsI256),
+	bitOrderType := &types.Si1Type{
+		Path: []types.Text{
+			types.Text(types.BitOrderName[types.BitOrderLsb0]),
 		},
 	}
 
@@ -1317,9 +1321,7 @@ func TestFactory_getFieldType_BitSequence(t *testing.T) {
 				int64(bitStoreLookupID): {
 					Def: bitStoreTypeDef,
 				},
-				int64(bitOrderLookupID): {
-					Def: bitOrderTypeDef,
-				},
+				int64(bitOrderLookupID): bitOrderType,
 			},
 		},
 	}
@@ -1329,11 +1331,11 @@ func TestFactory_getFieldType_BitSequence(t *testing.T) {
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
 	assert.NoError(t, err)
 
-	bitSequenceType, ok := res.(*BitSequenceDecoder)
+	bitSequenceDecoder, ok := res.(*BitSequenceDecoder)
 	assert.True(t, ok)
 
-	assert.Equal(t, &ValueDecoder[types.I64]{}, bitSequenceType.BitStoreFieldDecoder)
-	assert.Equal(t, &ValueDecoder[types.I256]{}, bitSequenceType.BitOrderFieldDecoder)
+	assert.Equal(t, testFieldName, bitSequenceDecoder.FieldName)
+	assert.Equal(t, types.BitOrderLsb0, bitSequenceDecoder.BitOrder)
 }
 
 func TestFactory_getFieldType_BitSequence_BitStoreTypeNotFound(t *testing.T) {
@@ -1397,17 +1399,9 @@ func TestFactory_getFieldType_BitSequence_BitStoreFieldTypeError(t *testing.T) {
 	}
 
 	bitStoreTypeDef := types.Si1TypeDef{
-		IsComposite: true,
-		Composite: types.Si1TypeDefComposite{
-			Fields: []types.Si1Field{
-				{
-					Name: "BitStoreCompositeField1",
-					Type: types.Si1LookupTypeID{
-						// This type is not present in the efficient lookup map and should cause an error.
-						UCompact: types.NewUCompactFromUInt(uint64(123456)),
-					},
-				},
-			},
+		IsPrimitive: true,
+		Primitive: types.Si1TypeDefPrimitive{
+			Si0TypeDefPrimitive: types.Si0TypeDefPrimitive(types.IsU16),
 		},
 	}
 
@@ -1434,7 +1428,7 @@ func TestFactory_getFieldType_BitSequence_BitStoreFieldTypeError(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
-	assert.Equal(t, "couldn't get bit store field type: couldn't get fields for composite type with name 'bit_store': type not found for field 'BitStoreCompositeField1'", err.Error())
+	assert.Equal(t, "bit store type not supported", err.Error())
 	assert.Nil(t, res)
 }
 
@@ -1459,7 +1453,7 @@ func TestFactory_getFieldType_BitSequence_BitOrderTypeNotFound(t *testing.T) {
 	bitStoreTypeDef := types.Si1TypeDef{
 		IsPrimitive: true,
 		Primitive: types.Si1TypeDefPrimitive{
-			Si0TypeDefPrimitive: types.Si0TypeDefPrimitive(types.IsI64),
+			Si0TypeDefPrimitive: types.Si0TypeDefPrimitive(types.IsU8),
 		},
 	}
 
@@ -1501,22 +1495,15 @@ func TestFactory_getFieldType_BitSequence_BitOrderFieldTypeError(t *testing.T) {
 	bitStoreTypeDef := types.Si1TypeDef{
 		IsPrimitive: true,
 		Primitive: types.Si1TypeDefPrimitive{
-			Si0TypeDefPrimitive: types.Si0TypeDefPrimitive(types.IsI64),
+			Si0TypeDefPrimitive: types.Si0TypeDefPrimitive(types.IsU8),
 		},
 	}
 
-	bitOrderTypeDef := types.Si1TypeDef{
-		IsComposite: true,
-		Composite: types.Si1TypeDefComposite{
-			Fields: []types.Si1Field{
-				{
-					Name: "BitOrderCompositeField1",
-					Type: types.Si1LookupTypeID{
-						// This type is not present in the efficient lookup map and should cause an error.
-						UCompact: types.NewUCompactFromUInt(uint64(123456)),
-					},
-				},
-			},
+	bitOrder := "unknown-order"
+
+	bitOrderType := &types.Si1Type{
+		Path: []types.Text{
+			types.Text("unknown-order"),
 		},
 	}
 
@@ -1526,9 +1513,7 @@ func TestFactory_getFieldType_BitSequence_BitOrderFieldTypeError(t *testing.T) {
 				int64(bitStoreLookupID): {
 					Def: bitStoreTypeDef,
 				},
-				int64(bitOrderLookupID): {
-					Def: bitOrderTypeDef,
-				},
+				int64(bitOrderLookupID): bitOrderType,
 			},
 		},
 	}
@@ -1536,7 +1521,7 @@ func TestFactory_getFieldType_BitSequence_BitOrderFieldTypeError(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
-	assert.Equal(t, "couldn't get bit order field decoder: couldn't get fields for composite type with name 'bit_order': type not found for field 'BitOrderCompositeField1'", err.Error())
+	assert.Equal(t, fmt.Sprintf("bit order '%s' not supported", bitOrder), err.Error())
 	assert.Nil(t, res)
 }
 
@@ -2076,8 +2061,8 @@ func (a *testAsserter) assertRegistryItemFieldIsCorrect(t *testing.T, meta types
 			assert.True(t, ok, "expected registry variant")
 
 			if len(variant.Fields) == 0 {
-				_, ok = registryVariant.(*ValueDecoder[byte])
-				assert.True(t, ok, "expected byte field type")
+				_, ok = registryVariant.(*NoopDecoder)
+				assert.True(t, ok, "expected noop decoder")
 				continue
 			}
 
@@ -2170,18 +2155,13 @@ func (a *testAsserter) assertRegistryItemFieldIsCorrect(t *testing.T, meta types
 			t.Fatalf("unsupported compact field type")
 		}
 	case metaFieldTypeDef.IsBitSequence:
-		bitSequenceType, ok := registryItemFieldType.(*BitSequenceDecoder)
+		bitSequenceDecoder, ok := registryItemFieldType.(*BitSequenceDecoder)
 		assert.True(t, ok, "expected bit sequence field type in registry")
 
-		bitStoreType, ok := meta.AsMetadataV14.EfficientLookup[metaFieldTypeDef.BitSequence.BitStoreType.Int64()]
-		assert.True(t, ok, "couldn't get bit store field type")
-
-		a.assertRegistryItemFieldIsCorrect(t, meta, bitSequenceType.BitStoreFieldDecoder, bitStoreType)
-
 		bitOrderType, ok := meta.AsMetadataV14.EfficientLookup[metaFieldTypeDef.BitSequence.BitOrderType.Int64()]
-		assert.True(t, ok, "couldn't get bit order field type")
+		assert.True(t, ok, "expected bit order type")
 
-		a.assertRegistryItemFieldIsCorrect(t, meta, bitSequenceType.BitOrderFieldDecoder, bitOrderType)
+		assert.Equal(t, types.BitOrderValue[getBitOrderString(bitOrderType.Path)], bitSequenceDecoder.BitOrder)
 	case metaFieldTypeDef.IsHistoricMetaCompat:
 		t.Fatalf("historic meta compat type not covered")
 	}

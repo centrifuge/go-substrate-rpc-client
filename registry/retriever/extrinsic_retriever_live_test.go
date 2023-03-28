@@ -11,7 +11,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
-func TestExtrinsicRetriever_GetExtrinsics(t *testing.T) {
+func TestLive_ExtrinsicRetriever_GetExtrinsics(t *testing.T) {
 	var wg sync.WaitGroup
 
 	for _, testURL := range testURLs {
@@ -36,19 +36,22 @@ func TestExtrinsicRetriever_GetExtrinsics(t *testing.T) {
 				return
 			}
 
-			blockHash, err := api.RPC.Chain.GetBlockHashLatest()
-
-			if err != nil {
-				log.Printf("Couldn't get latest block hash for '%s': %s\n", testURL, err)
-				return
-			}
-
-			//blockHash, err := api.RPC.Chain.GetBlockHash(14785602)
+			//blockHash, err := api.RPC.Chain.GetBlockHashLatest()
 			//
 			//if err != nil {
 			//	log.Printf("Couldn't get latest block hash for '%s': %s\n", testURL, err)
 			//	return
 			//}
+
+			//statemint = 3505698
+			//acala = 3238492
+
+			blockHash, err := api.RPC.Chain.GetBlockHash(3505698)
+
+			if err != nil {
+				log.Printf("Couldn't get latest block hash for '%s': %s\n", testURL, err)
+				return
+			}
 
 			var previousBlock *types.SignedBlock
 
@@ -82,7 +85,7 @@ func TestExtrinsicRetriever_GetExtrinsics(t *testing.T) {
 
 				processedBlockCount++
 
-				if processedBlockCount%5 == 0 {
+				if processedBlockCount%500 == 0 {
 					log.Printf("Retrieved calls for %d blocks for '%s' so far, last block number %d\n", processedBlockCount, testURL, block.Block.Header.Number)
 				}
 			}

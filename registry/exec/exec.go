@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+//go:generate mockery --name RetryableExecutor --structname RetryableExecutorMock --filename exec_mock.go --inpackage
+
 type RetryableExecutor[T any] interface {
 	ExecWithFallback(execFn func() (T, error), fallbackFn func() error) (T, error)
 }

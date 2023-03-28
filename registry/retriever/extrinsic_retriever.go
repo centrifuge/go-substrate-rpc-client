@@ -12,6 +12,8 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+//go:generate mockery --name ExtrinsicRetriever --structname ExtrinsicRetrieverMock --filename extrinsic_retriever_mock.go --inpackage
+
 type ExtrinsicRetriever interface {
 	GetExtrinsics(blockHash types.Hash) ([]*parser.Extrinsic, error)
 }
@@ -32,20 +34,20 @@ type extrinsicRetriever struct {
 }
 
 func NewExtrinsicRetriever(
-	callParser parser.ExtrinsicParser,
+	extrinsicParser parser.ExtrinsicParser,
 	chainRPC chain.Chain,
 	stateRPC state.State,
 	registryFactory registry.Factory,
 	chainExecutor exec.RetryableExecutor[*types.SignedBlock],
-	callParsingExecutor exec.RetryableExecutor[[]*parser.Extrinsic],
+	extrinsicParsingExecutor exec.RetryableExecutor[[]*parser.Extrinsic],
 ) (ExtrinsicRetriever, error) {
 	retriever := &extrinsicRetriever{
-		extrinsicParser:          callParser,
+		extrinsicParser:          extrinsicParser,
 		chainRPC:                 chainRPC,
 		stateRPC:                 stateRPC,
 		registryFactory:          registryFactory,
 		chainExecutor:            chainExecutor,
-		extrinsicParsingExecutor: callParsingExecutor,
+		extrinsicParsingExecutor: extrinsicParsingExecutor,
 	}
 
 	if err := retriever.updateInternalState(nil); err != nil {
@@ -63,9 +65,9 @@ func NewDefaultExtrinsicRetriever(
 	registryFactory := registry.NewFactory()
 
 	chainExecutor := exec.NewRetryableExecutor[*types.SignedBlock](exec.WithRetryTimeout(1 * time.Second))
-	callParsingExecutor := exec.NewRetryableExecutor[[]*parser.Extrinsic](exec.WithMaxRetryCount(1))
+	extrinsicParsingExecutor := exec.NewRetryableExecutor[[]*parser.Extrinsic](exec.WithMaxRetryCount(1))
 
-	return NewExtrinsicRetriever(callParser, chainRPC, stateRPC, registryFactory, chainExecutor, callParsingExecutor)
+	return NewExtrinsicRetriever(callParser, chainRPC, stateRPC, registryFactory, chainExecutor, extrinsicParsingExecutor)
 }
 
 func (e *extrinsicRetriever) GetExtrinsics(blockHash types.Hash) ([]*parser.Extrinsic, error) {
@@ -92,7 +94,7 @@ func (e *extrinsicRetriever) GetExtrinsics(blockHash types.Hash) ([]*parser.Extr
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't parse calls: %w", err)
+		return nil, fmt.Errorf("couldn't parse extrinsic calls: %w", err)
 	}
 
 	return calls, nil

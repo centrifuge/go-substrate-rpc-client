@@ -17,6 +17,8 @@ type Extrinsic struct {
 	Signature  types.ExtrinsicSignatureV4
 }
 
+//go:generate mockery --name ExtrinsicParser --structname ExtrinsicParserMock --filename extrinsic_parser_mock.go --inpackage
+
 type ExtrinsicParser interface {
 	ParseExtrinsics(callRegistry registry.CallRegistry, block *types.SignedBlock) ([]*Extrinsic, error)
 }

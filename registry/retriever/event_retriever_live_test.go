@@ -15,14 +15,14 @@ import (
 var (
 	testURLs = []string{
 		//"wss://fullnode.parachain.centrifuge.io",
-		"wss://rpc.polkadot.io",
-		//"wss://statemint-rpc.polkadot.io",
+		//"wss://rpc.polkadot.io",
+		"wss://statemint-rpc.polkadot.io",
 		//"wss://acala-rpc-0.aca-api.network",
 		//"wss://wss.api.moonbeam.network",
 	}
 )
 
-func TestEventRetriever_GetEvents(t *testing.T) {
+func TestLive_EventRetriever_GetEvents(t *testing.T) {
 	var wg sync.WaitGroup
 
 	for _, testURL := range testURLs {
@@ -86,7 +86,7 @@ func TestEventRetriever_GetEvents(t *testing.T) {
 
 				processedBlockCount++
 
-				if processedBlockCount%500 == 0 {
+				if processedBlockCount%1000 == 0 {
 					log.Printf("Retrieved events for %d blocks for '%s' so far, last block number %d\n", processedBlockCount, testURL, block.Block.Header.Number)
 				}
 			}
