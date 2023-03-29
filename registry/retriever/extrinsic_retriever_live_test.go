@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
 func TestLive_ExtrinsicRetriever_GetExtrinsics(t *testing.T) {
@@ -36,57 +35,41 @@ func TestLive_ExtrinsicRetriever_GetExtrinsics(t *testing.T) {
 				return
 			}
 
-			//blockHash, err := api.RPC.Chain.GetBlockHashLatest()
-			//
-			//if err != nil {
-			//	log.Printf("Couldn't get latest block hash for '%s': %s\n", testURL, err)
-			//	return
-			//}
-
-			//statemint = 3505698
-			//acala = 3238492
-
-			blockHash, err := api.RPC.Chain.GetBlockHash(3505698)
+			header, err := api.RPC.Chain.GetHeaderLatest()
 
 			if err != nil {
-				log.Printf("Couldn't get latest block hash for '%s': %s\n", testURL, err)
+				log.Printf("Couldn't get latest header for '%s': %s\n", testURL, err)
 				return
 			}
-
-			var previousBlock *types.SignedBlock
 
 			processedBlockCount := 0
 
 			for {
-				block, err := api.RPC.Chain.GetBlock(blockHash)
+				blockHash, err := api.RPC.Chain.GetBlockHash(uint64(header.Number))
 
 				if err != nil {
-					log.Printf("Skipping block %d for '%s' due to a block retrieval error\n", previousBlock.Block.Header.Number-1, testURL)
-
-					if blockHash, err = api.RPC.Chain.GetBlockHash(uint64(previousBlock.Block.Header.Number - 2)); err != nil {
-						log.Printf("Couldn't get block hash for block %d: %s", previousBlock.Block.Header.Number-2, err)
-
-						return
-					}
-
-					continue
+					log.Printf("Couldn't retrieve blockHash for '%s', block number %d: %s\n", testURL, header.Number, err)
+					return
 				}
 
 				_, err = extrinsicRetriever.GetExtrinsics(blockHash)
 
 				if err != nil {
-					log.Printf("Couldn't retrieve extrinsics for '%s', block number %d: %s\n", testURL, block.Block.Header.Number, err)
-					return
+					log.Printf("Couldn't retrieve extrinsics for '%s', block number %d: %s\n", testURL, header.Number, err)
 				}
 
-				previousBlock = block
+				header, err = api.RPC.Chain.GetHeader(header.ParentHash)
 
-				blockHash = block.Block.Header.ParentHash
+				if err != nil {
+					log.Printf("Couldn't retrieve header for block number '%d' for '%s': %s\n", header.Number, testURL, err)
+
+					return
+				}
 
 				processedBlockCount++
 
 				if processedBlockCount%500 == 0 {
-					log.Printf("Retrieved calls for %d blocks for '%s' so far, last block number %d\n", processedBlockCount, testURL, block.Block.Header.Number)
+					log.Printf("Retrieved calls for %d blocks for '%s' so far, last block number %d\n", processedBlockCount, testURL, header.Number)
 				}
 			}
 		}()

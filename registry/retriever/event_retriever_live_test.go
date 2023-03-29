@@ -9,16 +9,15 @@ import (
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/state"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
 var (
 	testURLs = []string{
-		//"wss://fullnode.parachain.centrifuge.io",
-		//"wss://rpc.polkadot.io",
+		"wss://fullnode.parachain.centrifuge.io",
+		"wss://rpc.polkadot.io",
 		"wss://statemint-rpc.polkadot.io",
-		//"wss://acala-rpc-0.aca-api.network",
-		//"wss://wss.api.moonbeam.network",
+		"wss://acala-rpc-0.aca-api.network",
+		"wss://wss.api.moonbeam.network",
 	}
 )
 
@@ -47,47 +46,42 @@ func TestLive_EventRetriever_GetEvents(t *testing.T) {
 				return
 			}
 
-			blockHash, err := api.RPC.Chain.GetBlockHashLatest()
+			header, err := api.RPC.Chain.GetHeaderLatest()
 
 			if err != nil {
-				log.Printf("Couldn't get latest block hash for '%s': %s\n", testURL, err)
+				log.Printf("Couldn't get latest header for '%s': %s\n", testURL, err)
 				return
 			}
-
-			var previousBlock *types.SignedBlock
 
 			processedBlockCount := 0
 
 			for {
-				block, err := api.RPC.Chain.GetBlock(blockHash)
+				blockHash, err := api.RPC.Chain.GetBlockHash(uint64(header.Number))
 
 				if err != nil {
-					log.Printf("Skipping block %d for '%s' due to a block retrieval error\n", previousBlock.Block.Header.Number-1, testURL)
-
-					if blockHash, err = api.RPC.Chain.GetBlockHash(uint64(previousBlock.Block.Header.Number - 2)); err != nil {
-						log.Printf("Couldn't get block hash for block %d: %s", previousBlock.Block.Header.Number-2, err)
-
-						return
-					}
-
-					continue
+					log.Printf("Couldn't retrieve blockHash for '%s', block number %d: %s\n", testURL, header.Number, err)
+					return
 				}
 
 				_, err = retriever.GetEvents(blockHash)
 
 				if err != nil {
-					log.Printf("Couldn't retrieve events for '%s', block number %d: %s\n", testURL, block.Block.Header.Number, err)
+					log.Printf("Couldn't retrieve events for '%s', block number %d: %s\n", testURL, header.Number, err)
 					return
 				}
 
-				previousBlock = block
+				header, err = api.RPC.Chain.GetHeader(header.ParentHash)
 
-				blockHash = block.Block.Header.ParentHash
+				if err != nil {
+					log.Printf("Couldn't retrieve header for block number '%d' for '%s': %s\n", header.Number, testURL, err)
+
+					return
+				}
 
 				processedBlockCount++
 
 				if processedBlockCount%1000 == 0 {
-					log.Printf("Retrieved events for %d blocks for '%s' so far, last block number %d\n", processedBlockCount, testURL, block.Block.Header.Number)
+					log.Printf("Retrieved events for %d blocks for '%s' so far, last block number %d\n", processedBlockCount, testURL, header.Number)
 				}
 			}
 		}()
