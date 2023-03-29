@@ -215,7 +215,7 @@ func (f *factory) getTypeFields(meta *types.Metadata, fields []types.Si1Field) (
 			return nil, fmt.Errorf("type not found for field '%s'", field.Name)
 		}
 
-		fieldName := getFieldName(field, fieldType)
+		fieldName := getFullFieldName(field, fieldType)
 
 		if storedFieldDecoder, ok := f.getStoredFieldDecoder(field.Type.Int64()); ok {
 			typeFields = append(typeFields, &Field{
@@ -399,7 +399,7 @@ func (f *factory) getCompactFieldDecoder(meta *types.Metadata, fieldName string,
 				return nil, errors.New("compact composite field type not found")
 			}
 
-			compactFieldName := getFieldName(compactCompositeField, compactCompositeFieldType)
+			compactFieldName := getFullFieldName(compactCompositeField, compactCompositeFieldType)
 
 			compactCompositeDecoder, err := f.getCompactFieldDecoder(meta, compactFieldName, compactCompositeFieldType.Def)
 
@@ -572,8 +572,8 @@ func (f *factory) getStoredFieldDecoder(fieldLookupIndex int64) (FieldDecoder, b
 }
 
 const (
-	fieldPathSeparator = "_"
-	lookupIndexFormat  = "lookup_index_%d"
+	fieldSeparator    = "_"
+	lookupIndexFormat = "lookup_index_%d"
 )
 
 func getFieldPath(fieldType *types.Si1Type) string {
@@ -583,14 +583,20 @@ func getFieldPath(fieldType *types.Si1Type) string {
 		nameParts = append(nameParts, string(pathEntry))
 	}
 
-	return strings.Join(nameParts, fieldPathSeparator)
+	return strings.Join(nameParts, fieldSeparator)
 }
 
-func getFieldName(field types.Si1Field, fieldType *types.Si1Type) string {
+func getFullFieldName(field types.Si1Field, fieldType *types.Si1Type) string {
+	fieldName := getFieldName(field)
+
 	if fieldPath := getFieldPath(fieldType); fieldPath != "" {
-		return fieldPath
+		return fmt.Sprintf("%s%s%s", fieldPath, fieldSeparator, fieldName)
 	}
 
+	return getFieldName(field)
+}
+
+func getFieldName(field types.Si1Field) string {
 	switch {
 	case field.HasName:
 		return string(field.Name)
