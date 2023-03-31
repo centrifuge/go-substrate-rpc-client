@@ -6,6 +6,8 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/chain/generic"
+
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
@@ -13,7 +15,11 @@ import (
 )
 
 func TestExtrinsicParserFn_ParseExtrinsics(t *testing.T) {
-	testExtrinsics := []testExtrinsic{
+	testExtrinsics := []testExtrinsic[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]{
 		{
 			Name: "extrinsic_1",
 			CallIndex: types.CallIndex{
@@ -34,8 +40,12 @@ func TestExtrinsicParserFn_ParseExtrinsics(t *testing.T) {
 					Value: "test",
 				},
 			},
-			Version:   1,
-			Signature: types.ExtrinsicSignatureV4{},
+			Version: 1,
+			Signature: &generic.ExtrinsicSignature[
+				types.MultiAddress,
+				types.MultiSignature,
+				generic.DefaultPaymentFields,
+			]{},
 		},
 		{
 			Name: "extrinsic_2",
@@ -69,8 +79,12 @@ func TestExtrinsicParserFn_ParseExtrinsics(t *testing.T) {
 					Value: types.NewU256(*big.NewInt(5674)),
 				},
 			},
-			Version:   2,
-			Signature: types.ExtrinsicSignatureV4{},
+			Version: 2,
+			Signature: &generic.ExtrinsicSignature[
+				types.MultiAddress,
+				types.MultiSignature,
+				generic.DefaultPaymentFields,
+			]{},
 		},
 		{
 			Name: "extrinsic_3",
@@ -104,15 +118,27 @@ func TestExtrinsicParserFn_ParseExtrinsics(t *testing.T) {
 					Value: types.NewI256(*big.NewInt(45356747)),
 				},
 			},
-			Version:   2,
-			Signature: types.ExtrinsicSignatureV4{},
+			Version: 2,
+			Signature: &generic.ExtrinsicSignature[
+				types.MultiAddress,
+				types.MultiSignature,
+				generic.DefaultPaymentFields,
+			]{},
 		},
 	}
 
-	block, reg, err := getExtrinsicParsingTestData(testExtrinsics)
+	block, reg, err := getExtrinsicParsingTestData[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	](testExtrinsics)
 	assert.NoError(t, err)
 
-	extrinsicParser := NewExtrinsicParser()
+	extrinsicParser := NewExtrinsicParser[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]()
 
 	res, err := extrinsicParser.ParseExtrinsics(reg, block)
 	assert.NoError(t, err)
@@ -128,7 +154,11 @@ func TestExtrinsicParserFn_ParseExtrinsics(t *testing.T) {
 }
 
 func TestExtrinsicParserFn_ParseExtrinsics_MissingCallDecoder(t *testing.T) {
-	testExtrinsics := []testExtrinsic{
+	testExtrinsics := []testExtrinsic[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]{
 		{
 			Name: "extrinsic_1",
 			CallIndex: types.CallIndex{
@@ -149,24 +179,40 @@ func TestExtrinsicParserFn_ParseExtrinsics_MissingCallDecoder(t *testing.T) {
 					Value: "test",
 				},
 			},
-			Version:   1,
-			Signature: types.ExtrinsicSignatureV4{},
+			Version: 1,
+			Signature: &generic.ExtrinsicSignature[
+				types.MultiAddress,
+				types.MultiSignature,
+				generic.DefaultPaymentFields,
+			]{},
 		},
 	}
 
-	block, _, err := getExtrinsicParsingTestData(testExtrinsics)
+	block, _, err := getExtrinsicParsingTestData[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	](testExtrinsics)
 	assert.NoError(t, err)
 
-	extrinsicParser := NewExtrinsicParser()
+	extrinsicParser := NewExtrinsicParser[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]()
 
 	// Empty registry, decoding should fail.
 	res, err := extrinsicParser.ParseExtrinsics(registry.CallRegistry{}, block)
-	assert.Error(t, err)
+	assert.ErrorIs(t, err, ErrCallDecoderNotFound)
 	assert.Nil(t, res)
 }
 
 func TestExtrinsicParserFn_ParseExtrinsics_DecodeError(t *testing.T) {
-	testExtrinsics := []testExtrinsic{
+	testExtrinsics := []testExtrinsic[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]{
 		{
 			Name: "extrinsic_1",
 			CallIndex: types.CallIndex{
@@ -187,39 +233,51 @@ func TestExtrinsicParserFn_ParseExtrinsics_DecodeError(t *testing.T) {
 					Value: "test",
 				},
 			},
-			Version:   1,
-			Signature: types.ExtrinsicSignatureV4{},
+			Version: 1,
+			Signature: &generic.ExtrinsicSignature[
+				types.MultiAddress,
+				types.MultiSignature,
+				generic.DefaultPaymentFields,
+			]{},
 		},
 	}
 
-	block, reg, err := getExtrinsicParsingTestData(testExtrinsics)
+	block, reg, err := getExtrinsicParsingTestData[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	](testExtrinsics)
 	assert.NoError(t, err)
 
-	extrinsicParser := NewExtrinsicParser()
+	extrinsicParser := NewExtrinsicParser[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]()
 
 	// No args for extrinsics should trigger an error.
 	block.Block.Extrinsics[0].Method.Args = []byte{}
 
 	res, err := extrinsicParser.ParseExtrinsics(reg, block)
-	assert.Error(t, err)
+	assert.ErrorIs(t, err, ErrCallFieldsDecoding)
 	assert.Nil(t, res)
 }
 
-func assertExtrinsicFieldInformationIsCorrect(t *testing.T, testFields []testField, extrinsic *Extrinsic) {
+func assertExtrinsicFieldInformationIsCorrect[A, S, P any](t *testing.T, testFields []testField, extrinsic *Extrinsic[A, S, P]) {
 	for _, testField := range testFields {
 		assert.Equal(t, testField.Value, extrinsic.CallFields[testField.Name])
 	}
 }
 
-func getExtrinsicParsingTestData(testExtrinsics []testExtrinsic) (*types.SignedBlock, registry.CallRegistry, error) {
+func getExtrinsicParsingTestData[A, S, P any](testExtrinsics []testExtrinsic[A, S, P]) (*generic.SignedBlock[A, S, P], registry.CallRegistry, error) {
 	callRegistry, err := getRegistryForTestExtrinsic(testExtrinsics)
 
 	if err != nil {
 		return nil, nil, err
 	}
 
-	block := &types.SignedBlock{
-		Block: types.Block{},
+	block := &generic.SignedBlock[A, S, P]{
+		Block: &generic.Block[A, S, P]{},
 	}
 
 	for _, testExtrinsic := range testExtrinsics {
@@ -229,7 +287,7 @@ func getExtrinsicParsingTestData(testExtrinsics []testExtrinsic) (*types.SignedB
 			return nil, nil, err
 		}
 
-		block.Block.Extrinsics = append(block.Block.Extrinsics, types.Extrinsic{
+		block.Block.Extrinsics = append(block.Block.Extrinsics, &generic.Extrinsic[A, S, P]{
 			Version:   testExtrinsic.Version,
 			Signature: testExtrinsic.Signature,
 			Method: types.Call{
@@ -242,7 +300,7 @@ func getExtrinsicParsingTestData(testExtrinsics []testExtrinsic) (*types.SignedB
 	return block, callRegistry, nil
 }
 
-func getRegistryForTestExtrinsic(testExtrinsics []testExtrinsic) (registry.CallRegistry, error) {
+func getRegistryForTestExtrinsic[A, S, P any](testExtrinsics []testExtrinsic[A, S, P]) (registry.CallRegistry, error) {
 	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.Type{})
 
 	for _, testExtrinsic := range testExtrinsics {
@@ -261,15 +319,15 @@ func getRegistryForTestExtrinsic(testExtrinsics []testExtrinsic) (registry.CallR
 	return callRegistry, nil
 }
 
-type testExtrinsic struct {
+type testExtrinsic[A, S, P any] struct {
 	Name       string
 	CallIndex  types.CallIndex
 	CallFields []testField
 	Version    byte
-	Signature  types.ExtrinsicSignatureV4
+	Signature  *generic.ExtrinsicSignature[A, S, P]
 }
 
-func (t testExtrinsic) Encode() ([]byte, error) {
+func (t testExtrinsic[A, S, P]) Encode() ([]byte, error) {
 	var b []byte
 
 	buf := bytes.NewBuffer(b)

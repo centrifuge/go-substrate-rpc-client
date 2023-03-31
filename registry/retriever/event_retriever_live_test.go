@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	testURLs = []string{
+	eventTestURLs = []string{
 		"wss://fullnode.parachain.centrifuge.io",
 		"wss://rpc.polkadot.io",
 		"wss://statemint-rpc.polkadot.io",
@@ -22,9 +22,11 @@ var (
 )
 
 func TestLive_EventRetriever_GetEvents(t *testing.T) {
+	t.Parallel()
+
 	var wg sync.WaitGroup
 
-	for _, testURL := range testURLs {
+	for _, testURL := range eventTestURLs {
 		testURL := testURL
 
 		wg.Add(1)
@@ -39,7 +41,7 @@ func TestLive_EventRetriever_GetEvents(t *testing.T) {
 				return
 			}
 
-			retriever, err := NewDefaultEventRetriever(state.NewProvider(api.RPC.State))
+			retriever, err := NewDefaultEventRetriever(state.NewEventProvider(api.RPC.State), api.RPC.State)
 
 			if err != nil {
 				log.Printf("Couldn't create event retriever: %s", err)

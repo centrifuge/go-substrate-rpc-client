@@ -16,7 +16,9 @@
 
 package types
 
-import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+import (
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+)
 
 // PostDispatchInfo is used in DispatchResultWithPostInfo.
 // Weight information that is only available post dispatch.

@@ -8,6 +8,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/exec"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/parser"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/state"
+	stateMocks "github.com/centrifuge/go-substrate-rpc-client/v4/rpc/state/mocks"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -15,14 +16,15 @@ import (
 
 func TestEventRetriever_New(t *testing.T) {
 	eventParserMock := parser.NewEventParserMock(t)
-	stateProviderMock := state.NewProviderMock(t)
+	eventProviderMock := state.NewEventProviderMock(t)
+	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
 	storageExecMock := exec.NewRetryableExecutorMock[*types.StorageDataRaw](t)
 	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Event](t)
 
 	latestMeta := &types.Metadata{}
 
-	stateProviderMock.On("GetLatestMetadata").
+	stateRPCMock.On("GetMetadataLatest").
 		Return(latestMeta, nil).
 		Once()
 
@@ -34,7 +36,8 @@ func TestEventRetriever_New(t *testing.T) {
 
 	res, err := NewEventRetriever(
 		eventParserMock,
-		stateProviderMock,
+		eventProviderMock,
+		stateRPCMock,
 		registryFactoryMock,
 		storageExecMock,
 		parsingExecMock,
@@ -45,30 +48,32 @@ func TestEventRetriever_New(t *testing.T) {
 
 func TestEventRetriever_New_InternalStateUpdateError(t *testing.T) {
 	eventParserMock := parser.NewEventParserMock(t)
-	stateProviderMock := state.NewProviderMock(t)
+	eventProviderMock := state.NewEventProviderMock(t)
+	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
 	storageExecMock := exec.NewRetryableExecutorMock[*types.StorageDataRaw](t)
 	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Event](t)
 
 	metadataRetrievalError := errors.New("error")
 
-	stateProviderMock.On("GetLatestMetadata").
+	stateRPCMock.On("GetMetadataLatest").
 		Return(nil, metadataRetrievalError).
 		Once()
 
 	res, err := NewEventRetriever(
 		eventParserMock,
-		stateProviderMock,
+		eventProviderMock,
+		stateRPCMock,
 		registryFactoryMock,
 		storageExecMock,
 		parsingExecMock,
 	)
-	assert.ErrorIs(t, err, metadataRetrievalError)
+	assert.ErrorIs(t, err, ErrInternalStateUpdate)
 	assert.Nil(t, res)
 
 	latestMeta := &types.Metadata{}
 
-	stateProviderMock.On("GetLatestMetadata").
+	stateRPCMock.On("GetMetadataLatest").
 		Return(latestMeta, nil).
 		Once()
 
@@ -80,25 +85,27 @@ func TestEventRetriever_New_InternalStateUpdateError(t *testing.T) {
 
 	res, err = NewEventRetriever(
 		eventParserMock,
-		stateProviderMock,
+		eventProviderMock,
+		stateRPCMock,
 		registryFactoryMock,
 		storageExecMock,
 		parsingExecMock,
 	)
-	assert.ErrorIs(t, err, registryFactoryError)
+	assert.ErrorIs(t, err, ErrInternalStateUpdate)
 	assert.Nil(t, res)
 }
 
 func TestEventRetriever_NewDefault(t *testing.T) {
-	stateProviderMock := state.NewProviderMock(t)
+	eventProviderMock := state.NewEventProviderMock(t)
+	stateRPCMock := stateMocks.NewState(t)
 
 	latestMeta := &types.Metadata{}
 
-	stateProviderMock.On("GetLatestMetadata").
+	stateRPCMock.On("GetMetadataLatest").
 		Return(latestMeta, nil).
 		Once()
 
-	res, err := NewDefaultEventRetriever(stateProviderMock)
+	res, err := NewDefaultEventRetriever(eventProviderMock, stateRPCMock)
 	assert.NoError(t, err)
 	assert.IsType(t, &eventRetriever{}, res)
 
@@ -111,30 +118,18 @@ func TestEventRetriever_NewDefault(t *testing.T) {
 	assert.NotNil(t, retriever.eventRegistry)
 }
 
-func TestEventRetriever_NewDefault_MetadataRetrievalError(t *testing.T) {
-	stateProviderMock := state.NewProviderMock(t)
-
-	metadataRetrievalError := errors.New("error")
-
-	stateProviderMock.On("GetLatestMetadata").
-		Return(nil, metadataRetrievalError).
-		Once()
-
-	res, err := NewDefaultEventRetriever(stateProviderMock)
-	assert.ErrorIs(t, err, metadataRetrievalError)
-	assert.Nil(t, res)
-}
-
 func TestEventRetriever_GetEvents(t *testing.T) {
 	eventParserMock := parser.NewEventParserMock(t)
-	stateProviderMock := state.NewProviderMock(t)
+	eventProviderMock := state.NewEventProviderMock(t)
+	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
 	storageExecMock := exec.NewRetryableExecutorMock[*types.StorageDataRaw](t)
 	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Event](t)
 
 	eventRetriever := &eventRetriever{
 		eventParser:          eventParserMock,
-		stateProvider:        stateProviderMock,
+		eventProvider:        eventProviderMock,
+		stateRPC:             stateRPCMock,
 		registryFactory:      registryFactoryMock,
 		eventStorageExecutor: storageExecMock,
 		eventParsingExecutor: parsingExecMock,
@@ -152,7 +147,7 @@ func TestEventRetriever_GetEvents(t *testing.T) {
 
 	storageEvents := &types.StorageDataRaw{}
 
-	stateProviderMock.On("GetStorageEvents", testMeta, blockHash).
+	eventProviderMock.On("GetStorageEvents", testMeta, blockHash).
 		Return(storageEvents, nil).
 		Once()
 
@@ -193,14 +188,16 @@ func TestEventRetriever_GetEvents(t *testing.T) {
 
 func TestEventRetriever_GetEvents_StorageRetrievalError(t *testing.T) {
 	eventParserMock := parser.NewEventParserMock(t)
-	stateProviderMock := state.NewProviderMock(t)
+	eventProviderMock := state.NewEventProviderMock(t)
+	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
 	storageExecMock := exec.NewRetryableExecutorMock[*types.StorageDataRaw](t)
 	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Event](t)
 
 	eventRetriever := &eventRetriever{
 		eventParser:          eventParserMock,
-		stateProvider:        stateProviderMock,
+		eventProvider:        eventProviderMock,
+		stateRPC:             stateRPCMock,
 		registryFactory:      registryFactoryMock,
 		eventStorageExecutor: storageExecMock,
 		eventParsingExecutor: parsingExecMock,
@@ -218,11 +215,11 @@ func TestEventRetriever_GetEvents_StorageRetrievalError(t *testing.T) {
 
 	storageRetrievalError := errors.New("error")
 
-	stateProviderMock.On("GetStorageEvents", testMeta, blockHash).
+	eventProviderMock.On("GetStorageEvents", testMeta, blockHash).
 		Return(nil, storageRetrievalError).
 		Once()
 
-	stateProviderMock.On("GetMetadata", blockHash).
+	stateRPCMock.On("GetMetadata", blockHash).
 		Return(testMeta, nil).
 		Once()
 
@@ -249,20 +246,22 @@ func TestEventRetriever_GetEvents_StorageRetrievalError(t *testing.T) {
 		).Return(&types.StorageDataRaw{}, storageRetrievalError)
 
 	res, err := eventRetriever.GetEvents(blockHash)
-	assert.ErrorIs(t, err, storageRetrievalError)
+	assert.ErrorIs(t, err, ErrStorageEventRetrieval)
 	assert.Nil(t, res)
 }
 
 func TestEventRetriever_GetEvents_EventParsingError(t *testing.T) {
 	eventParserMock := parser.NewEventParserMock(t)
-	stateProviderMock := state.NewProviderMock(t)
+	eventProviderMock := state.NewEventProviderMock(t)
+	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
 	storageExecMock := exec.NewRetryableExecutorMock[*types.StorageDataRaw](t)
 	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Event](t)
 
 	eventRetriever := &eventRetriever{
 		eventParser:          eventParserMock,
-		stateProvider:        stateProviderMock,
+		eventProvider:        eventProviderMock,
+		stateRPC:             stateRPCMock,
 		registryFactory:      registryFactoryMock,
 		eventStorageExecutor: storageExecMock,
 		eventParsingExecutor: parsingExecMock,
@@ -280,7 +279,7 @@ func TestEventRetriever_GetEvents_EventParsingError(t *testing.T) {
 
 	storageEvents := &types.StorageDataRaw{}
 
-	stateProviderMock.On("GetStorageEvents", testMeta, blockHash).
+	eventProviderMock.On("GetStorageEvents", testMeta, blockHash).
 		Return(storageEvents, nil).
 		Once()
 
@@ -302,7 +301,7 @@ func TestEventRetriever_GetEvents_EventParsingError(t *testing.T) {
 		Return(nil, eventParsingError).
 		Once()
 
-	stateProviderMock.On("GetMetadata", blockHash).
+	stateRPCMock.On("GetMetadata", blockHash).
 		Return(testMeta, nil).
 		Once()
 
@@ -329,20 +328,22 @@ func TestEventRetriever_GetEvents_EventParsingError(t *testing.T) {
 		).Return([]*parser.Event{}, eventParsingError)
 
 	res, err := eventRetriever.GetEvents(blockHash)
-	assert.ErrorIs(t, err, eventParsingError)
+	assert.ErrorIs(t, err, ErrEventParsing)
 	assert.Nil(t, res)
 }
 
 func TestEventRetriever_updateInternalState(t *testing.T) {
 	eventParserMock := parser.NewEventParserMock(t)
-	stateProviderMock := state.NewProviderMock(t)
+	eventProviderMock := state.NewEventProviderMock(t)
+	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
 	storageExecMock := exec.NewRetryableExecutorMock[*types.StorageDataRaw](t)
 	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Event](t)
 
 	eventRetriever := &eventRetriever{
 		eventParser:          eventParserMock,
-		stateProvider:        stateProviderMock,
+		eventProvider:        eventProviderMock,
+		stateRPC:             stateRPCMock,
 		registryFactory:      registryFactoryMock,
 		eventStorageExecutor: storageExecMock,
 		eventParsingExecutor: parsingExecMock,
@@ -354,7 +355,7 @@ func TestEventRetriever_updateInternalState(t *testing.T) {
 
 	blockHash := types.NewHash([]byte{0, 1, 2, 3})
 
-	stateProviderMock.On("GetMetadata", blockHash).
+	stateRPCMock.On("GetMetadata", blockHash).
 		Return(testMeta, nil).
 		Once()
 
@@ -369,7 +370,7 @@ func TestEventRetriever_updateInternalState(t *testing.T) {
 
 	latestMeta := &types.Metadata{}
 
-	stateProviderMock.On("GetLatestMetadata").
+	stateRPCMock.On("GetMetadataLatest").
 		Return(latestMeta, nil).
 		Once()
 
@@ -385,14 +386,16 @@ func TestEventRetriever_updateInternalState(t *testing.T) {
 
 func TestEventRetriever_updateInternalState_MetadataRetrievalError(t *testing.T) {
 	eventParserMock := parser.NewEventParserMock(t)
-	stateProviderMock := state.NewProviderMock(t)
+	eventProviderMock := state.NewEventProviderMock(t)
+	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
 	storageExecMock := exec.NewRetryableExecutorMock[*types.StorageDataRaw](t)
 	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Event](t)
 
 	eventRetriever := &eventRetriever{
 		eventParser:          eventParserMock,
-		stateProvider:        stateProviderMock,
+		eventProvider:        eventProviderMock,
+		stateRPC:             stateRPCMock,
 		registryFactory:      registryFactoryMock,
 		eventStorageExecutor: storageExecMock,
 		eventParsingExecutor: parsingExecMock,
@@ -402,31 +405,33 @@ func TestEventRetriever_updateInternalState_MetadataRetrievalError(t *testing.T)
 
 	metadataRetrievalError := errors.New("error")
 
-	stateProviderMock.On("GetMetadata", blockHash).
+	stateRPCMock.On("GetMetadata", blockHash).
 		Return(nil, metadataRetrievalError).
 		Once()
 
 	err := eventRetriever.updateInternalState(&blockHash)
-	assert.ErrorIs(t, err, metadataRetrievalError)
+	assert.ErrorIs(t, err, ErrMetadataRetrieval)
 
-	stateProviderMock.On("GetLatestMetadata").
+	stateRPCMock.On("GetMetadataLatest").
 		Return(nil, metadataRetrievalError).
 		Once()
 
 	err = eventRetriever.updateInternalState(nil)
-	assert.ErrorIs(t, err, metadataRetrievalError)
+	assert.ErrorIs(t, err, ErrMetadataRetrieval)
 }
 
 func TestEventRetriever_updateInternalState_RegistryFactoryError(t *testing.T) {
 	eventParserMock := parser.NewEventParserMock(t)
-	stateProviderMock := state.NewProviderMock(t)
+	eventProviderMock := state.NewEventProviderMock(t)
+	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
 	storageExecMock := exec.NewRetryableExecutorMock[*types.StorageDataRaw](t)
 	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Event](t)
 
 	eventRetriever := &eventRetriever{
 		eventParser:          eventParserMock,
-		stateProvider:        stateProviderMock,
+		eventProvider:        eventProviderMock,
+		stateRPC:             stateRPCMock,
 		registryFactory:      registryFactoryMock,
 		eventStorageExecutor: storageExecMock,
 		eventParsingExecutor: parsingExecMock,
@@ -436,7 +441,7 @@ func TestEventRetriever_updateInternalState_RegistryFactoryError(t *testing.T) {
 
 	blockHash := types.NewHash([]byte{0, 1, 2, 3})
 
-	stateProviderMock.On("GetMetadata", blockHash).
+	stateRPCMock.On("GetMetadata", blockHash).
 		Return(testMeta, nil).
 		Once()
 
@@ -447,11 +452,11 @@ func TestEventRetriever_updateInternalState_RegistryFactoryError(t *testing.T) {
 		Once()
 
 	err := eventRetriever.updateInternalState(&blockHash)
-	assert.ErrorIs(t, err, registryFactoryError)
+	assert.ErrorIs(t, err, ErrEventRegistryCreation)
 
 	latestMeta := &types.Metadata{}
 
-	stateProviderMock.On("GetLatestMetadata").
+	stateRPCMock.On("GetMetadataLatest").
 		Return(latestMeta, nil).
 		Once()
 
@@ -460,5 +465,5 @@ func TestEventRetriever_updateInternalState_RegistryFactoryError(t *testing.T) {
 		Once()
 
 	err = eventRetriever.updateInternalState(nil)
-	assert.ErrorIs(t, err, registryFactoryError)
+	assert.ErrorIs(t, err, ErrEventRegistryCreation)
 }

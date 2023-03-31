@@ -1,49 +1,61 @@
 package retriever
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/exec"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/parser"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/chain"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/chain/generic"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/state"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+//nolint:lll
 //go:generate mockery --name ExtrinsicRetriever --structname ExtrinsicRetrieverMock --filename extrinsic_retriever_mock.go --inpackage
 
-type ExtrinsicRetriever interface {
-	GetExtrinsics(blockHash types.Hash) ([]*parser.Extrinsic, error)
+// ExtrinsicRetriever is the interface used for retrieving and decoding extrinsic information.
+//
+// This interface is generic over types A, S, P, please check generic.GenericExtrinsicSignature for more
+// information about these generic types.
+type ExtrinsicRetriever[A, S, P any] interface {
+	GetExtrinsics(blockHash types.Hash) ([]*parser.Extrinsic[A, S, P], error)
 }
 
-type extrinsicRetriever struct {
-	extrinsicParser parser.ExtrinsicParser
+// extrinsicRetriever implements the ExtrinsicRetriever interface.
+type extrinsicRetriever[
+	A, S, P any,
+	B generic.GenericSignedBlock[A, S, P],
+] struct {
+	extrinsicParser parser.ExtrinsicParser[A, S, P]
 
-	chainRPC chain.Chain
-	stateRPC state.State
+	genericChain generic.Chain[A, S, P, B]
+	stateRPC     state.State
 
 	registryFactory registry.Factory
 
-	chainExecutor            exec.RetryableExecutor[*types.SignedBlock]
-	extrinsicParsingExecutor exec.RetryableExecutor[[]*parser.Extrinsic]
+	chainExecutor            exec.RetryableExecutor[B]
+	extrinsicParsingExecutor exec.RetryableExecutor[[]*parser.Extrinsic[A, S, P]]
 
 	callRegistry registry.CallRegistry
 	meta         *types.Metadata
 }
 
-func NewExtrinsicRetriever(
-	extrinsicParser parser.ExtrinsicParser,
-	chainRPC chain.Chain,
+// NewExtrinsicRetriever creates a new ExtrinsicRetriever.
+func NewExtrinsicRetriever[
+	A, S, P any,
+	B generic.GenericSignedBlock[A, S, P],
+](
+	extrinsicParser parser.ExtrinsicParser[A, S, P],
+	genericChain generic.Chain[A, S, P, B],
 	stateRPC state.State,
 	registryFactory registry.Factory,
-	chainExecutor exec.RetryableExecutor[*types.SignedBlock],
-	extrinsicParsingExecutor exec.RetryableExecutor[[]*parser.Extrinsic],
-) (ExtrinsicRetriever, error) {
-	retriever := &extrinsicRetriever{
+	chainExecutor exec.RetryableExecutor[B],
+	extrinsicParsingExecutor exec.RetryableExecutor[[]*parser.Extrinsic[A, S, P]],
+) (ExtrinsicRetriever[A, S, P], error) {
+	retriever := &extrinsicRetriever[A, S, P, B]{
 		extrinsicParser:          extrinsicParser,
-		chainRPC:                 chainRPC,
+		genericChain:             genericChain,
 		stateRPC:                 stateRPC,
 		registryFactory:          registryFactory,
 		chainExecutor:            chainExecutor,
@@ -51,29 +63,49 @@ func NewExtrinsicRetriever(
 	}
 
 	if err := retriever.updateInternalState(nil); err != nil {
-		return nil, err
+		return nil, ErrInternalStateUpdate.Wrap(err)
 	}
 
 	return retriever, nil
 }
 
-func NewDefaultExtrinsicRetriever(
-	chainRPC chain.Chain,
+// NewDefaultExtrinsicRetriever creates a new ExtrinsicRetriever using defaults for:
+//
+// - parser.ExtrinsicParser
+// - registry.Factory
+// - exec.RetryableExecutor - used for retrieving generic.SignedBlock.
+// - exec.RetryableExecutor - used for parsing extrinsics.
+func NewDefaultExtrinsicRetriever[
+	A, S, P any,
+	B generic.GenericSignedBlock[A, S, P],
+](
+	genericChain generic.Chain[A, S, P, B],
 	stateRPC state.State,
-) (ExtrinsicRetriever, error) {
-	callParser := parser.NewExtrinsicParser()
+) (ExtrinsicRetriever[A, S, P], error) {
+	extrinsicParser := parser.NewExtrinsicParser[A, S, P]()
 	registryFactory := registry.NewFactory()
 
-	chainExecutor := exec.NewRetryableExecutor[*types.SignedBlock](exec.WithRetryTimeout(1 * time.Second))
-	extrinsicParsingExecutor := exec.NewRetryableExecutor[[]*parser.Extrinsic](exec.WithMaxRetryCount(1))
+	chainExecutor := exec.NewRetryableExecutor[B](exec.WithRetryTimeout(1 * time.Second))
+	extrinsicParsingExecutor := exec.NewRetryableExecutor[[]*parser.Extrinsic[A, S, P]](exec.WithMaxRetryCount(1))
 
-	return NewExtrinsicRetriever(callParser, chainRPC, stateRPC, registryFactory, chainExecutor, extrinsicParsingExecutor)
+	return NewExtrinsicRetriever[A, S, P, B](
+		extrinsicParser,
+		genericChain,
+		stateRPC,
+		registryFactory,
+		chainExecutor,
+		extrinsicParsingExecutor,
+	)
 }
 
-func (e *extrinsicRetriever) GetExtrinsics(blockHash types.Hash) ([]*parser.Extrinsic, error) {
+// GetExtrinsics retrieves a generic.SignedBlock and then parses the extrinsics found in it.
+//
+// Both the block retrieval and the extrinsic parsing are handled via the exec.RetryableExecutor
+// in order to ensure retries in case of network errors or parsing errors due to an outdated call registry.
+func (e *extrinsicRetriever[A, S, P, B]) GetExtrinsics(blockHash types.Hash) ([]*parser.Extrinsic[A, S, P], error) {
 	block, err := e.chainExecutor.ExecWithFallback(
-		func() (*types.SignedBlock, error) {
-			return e.chainRPC.GetBlock(blockHash)
+		func() (B, error) {
+			return e.genericChain.GetBlock(blockHash)
 		},
 		func() error {
 			return nil
@@ -81,11 +113,11 @@ func (e *extrinsicRetriever) GetExtrinsics(blockHash types.Hash) ([]*parser.Extr
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't retrieve block: %w", err)
+		return nil, ErrBlockRetrieval.Wrap(err)
 	}
 
 	calls, err := e.extrinsicParsingExecutor.ExecWithFallback(
-		func() ([]*parser.Extrinsic, error) {
+		func() ([]*parser.Extrinsic[A, S, P], error) {
 			return e.extrinsicParser.ParseExtrinsics(e.callRegistry, block)
 		},
 		func() error {
@@ -94,13 +126,15 @@ func (e *extrinsicRetriever) GetExtrinsics(blockHash types.Hash) ([]*parser.Extr
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't parse extrinsic calls: %w", err)
+		return nil, ErrExtrinsicParsing.Wrap(err)
 	}
 
 	return calls, nil
 }
 
-func (e *extrinsicRetriever) updateInternalState(blockHash *types.Hash) error {
+// updateInternalState will retrieve the metadata at the provided blockHash, if provided,
+// create a call registry based on this metadata and store both.
+func (e *extrinsicRetriever[A, S, P, B]) updateInternalState(blockHash *types.Hash) error {
 	var (
 		meta *types.Metadata
 		err  error
@@ -113,13 +147,13 @@ func (e *extrinsicRetriever) updateInternalState(blockHash *types.Hash) error {
 	}
 
 	if err != nil {
-		return fmt.Errorf("couldn't retrieve metadata: %w", err)
+		return ErrMetadataRetrieval.Wrap(err)
 	}
 
 	callRegistry, err := e.registryFactory.CreateCallRegistry(meta)
 
 	if err != nil {
-		return fmt.Errorf("couldn't create call registry: %w", err)
+		return ErrCallRegistryCreation.Wrap(err)
 	}
 
 	e.meta = meta

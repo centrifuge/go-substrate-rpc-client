@@ -5,57 +5,80 @@ import (
 	"fmt"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/chain/generic"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
-type Extrinsic struct {
+// Extrinsic holds all the information of a decoded block extrinsic.
+//
+// This type is generic over types A, S, P, please check generic.GenericExtrinsicSignature for more
+// information about these generic types.
+type Extrinsic[A, S, P any] struct {
 	Name       string
 	CallFields map[string]any
 	CallIndex  types.CallIndex
 	Version    byte
-	Signature  types.ExtrinsicSignatureV4
+	Signature  generic.GenericExtrinsicSignature[A, S, P]
 }
 
+//nolint:lll
 //go:generate mockery --name ExtrinsicParser --structname ExtrinsicParserMock --filename extrinsic_parser_mock.go --inpackage
 
-type ExtrinsicParser interface {
-	ParseExtrinsics(callRegistry registry.CallRegistry, block *types.SignedBlock) ([]*Extrinsic, error)
+// ExtrinsicParser is the interface used for parsing a block's extrinsics into []*Extrinsic.
+//
+// This interface is generic over types A, S, P, please check generic.GenericExtrinsicSignature for more
+// information about these generic types.
+//
+//nolint:lll
+type ExtrinsicParser[A, S, P any] interface {
+	ParseExtrinsics(callRegistry registry.CallRegistry, block generic.GenericSignedBlock[A, S, P]) ([]*Extrinsic[A, S, P], error)
 }
 
-type ExtrinsicParserFn func(callRegistry registry.CallRegistry, block *types.SignedBlock) ([]*Extrinsic, error)
+// ExtrinsicParserFn implements ExtrinsicParser.
+//
+//nolint:lll
+type ExtrinsicParserFn[A, S, P any] func(callRegistry registry.CallRegistry, block generic.GenericSignedBlock[A, S, P]) ([]*Extrinsic[A, S, P], error)
 
-func (e ExtrinsicParserFn) ParseExtrinsics(callRegistry registry.CallRegistry, block *types.SignedBlock) ([]*Extrinsic, error) {
+// ParseExtrinsics is the function required for satisfying the ExtrinsicParser interface.
+//
+//nolint:lll
+func (e ExtrinsicParserFn[A, S, P]) ParseExtrinsics(callRegistry registry.CallRegistry, block generic.GenericSignedBlock[A, S, P]) ([]*Extrinsic[A, S, P], error) {
 	return e(callRegistry, block)
 }
 
-func NewExtrinsicParser() ExtrinsicParser {
-	return ExtrinsicParserFn(func(callRegistry registry.CallRegistry, block *types.SignedBlock) ([]*Extrinsic, error) {
-		var extrinsics []*Extrinsic
+// NewExtrinsicParser creates a new ExtrinsicParser.
+func NewExtrinsicParser[A, S, P any]() ExtrinsicParser[A, S, P] {
+	// The ExtrinsicParserFn provided here is attempting to decode the types.Args of an extrinsic's method
+	// into a map of fields and their respective decoded values.
+	//
+	//nolint:lll
+	return ExtrinsicParserFn[A, S, P](func(callRegistry registry.CallRegistry, block generic.GenericSignedBlock[A, S, P]) ([]*Extrinsic[A, S, P], error) {
+		var extrinsics []*Extrinsic[A, S, P]
 
-		for i, extrinsic := range block.Block.Extrinsics {
-			callIndex := extrinsic.Method.CallIndex
+		for i, extrinsic := range block.GetGenericBlock().GetExtrinsics() {
+			callIndex := extrinsic.GetCall().CallIndex
 
 			callDecoder, ok := callRegistry[callIndex]
 
 			if !ok {
-				return nil, fmt.Errorf("couldn't find call decoder for extrinsic #%d", i)
+				return nil, ErrCallDecoderNotFound.Wrap(fmt.Errorf("extrinsic #%d", i))
 			}
 
-			decoder := scale.NewDecoder(bytes.NewReader(extrinsic.Method.Args))
+			decoder := scale.NewDecoder(bytes.NewReader(extrinsic.GetCall().Args))
 
 			callFields, err := callDecoder.Decode(decoder)
 
 			if err != nil {
-				return nil, fmt.Errorf("couldn't decode call fields for extrinsic #%d: %w", i, err)
+				return nil, ErrCallFieldsDecoding.Wrap(fmt.Errorf("extrinsic #%d: %w", i, err))
 			}
 
-			call := &Extrinsic{
+			call := &Extrinsic[A, S, P]{
 				Name:       callDecoder.Name,
 				CallFields: callFields,
 				CallIndex:  callIndex,
-				Version:    extrinsic.Version,
-				Signature:  extrinsic.Signature,
+				Version:    extrinsic.GetVersion(),
+				Signature:  extrinsic.GetSignature(),
 			}
 
 			extrinsics = append(extrinsics, call)

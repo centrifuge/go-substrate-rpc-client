@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"math/bits"
+	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 )
@@ -45,8 +46,7 @@ func NewBitOrderFromString(s string) (BitOrder, error) {
 type BitVec struct {
 	BitOrder BitOrder
 
-	NumBytes uint
-	Bits     uint
+	ByteSlice []uint8
 }
 
 func NewBitVec(bitOrder BitOrder) *BitVec {
@@ -56,53 +56,53 @@ func NewBitVec(bitOrder BitOrder) *BitVec {
 }
 
 func (b *BitVec) Decode(decoder scale.Decoder) error {
-	if err := b.GetMinimumNumberOfBytes(decoder); err != nil {
+	numBytes, err := b.GetMinimumNumberOfBytes(decoder)
+
+	if err != nil {
 		return err
 	}
 
-	var total uint
-
-	for i := uint(0); i < b.NumBytes; i++ {
-		total = total << 8
-
-		cb, err := decoder.ReadOneByte()
+	for i := uint(0); i < numBytes; i++ {
+		decodedByte, err := decoder.ReadOneByte()
 
 		if err != nil {
 			return err
 		}
 
 		if b.BitOrder == BitOrderLsb0 {
-			cb = bits.Reverse8(cb)
+			decodedByte = bits.Reverse8(decodedByte)
 		}
 
-		total = total | uint(cb)
+		b.ByteSlice = append(b.ByteSlice, decodedByte)
 	}
-
-	b.Bits = total
 
 	return nil
 }
 
-func (b *BitVec) GetMinimumNumberOfBytes(decoder scale.Decoder) error {
+func (b *BitVec) GetMinimumNumberOfBytes(decoder scale.Decoder) (uint, error) {
 	nb, err := decoder.DecodeUintCompact()
 
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	numberOfBits := nb.Uint64()
 
 	if numberOfBits == 0 {
-		return errors.New("invalid number of bits")
+		return 0, errors.New("invalid number of bits")
 	}
 
-	b.NumBytes = uint(math.Ceil(float64(numberOfBits) / 8))
-
-	return nil
+	return uint(math.Ceil(float64(numberOfBits) / 8)), nil
 }
 
 func (b *BitVec) String() string {
-	fmtArgs := b.NumBytes * 8
+	var sb strings.Builder
 
-	return fmt.Sprintf("%#0*b", fmtArgs, b.Bits)
+	sb.WriteString("0b")
+
+	for _, byte := range b.ByteSlice {
+		sb.WriteString(fmt.Sprintf("%08b", byte))
+	}
+
+	return sb.String()
 }

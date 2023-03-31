@@ -97,7 +97,6 @@ func TestFactory_CreateErrorRegistry_NoPalletWithErrors(t *testing.T) {
 }
 
 func TestFactory_CreateErrorRegistry_ErrorsTypeNotFound(t *testing.T) {
-	testModuleName := "TestModule"
 	errorLookupTypeID := 123
 
 	testMeta := &types.Metadata{
@@ -121,12 +120,11 @@ func TestFactory_CreateErrorRegistry_ErrorsTypeNotFound(t *testing.T) {
 	factory := NewFactory()
 
 	reg, err := factory.CreateErrorRegistry(testMeta)
-	assert.Equal(t, fmt.Sprintf("errors type %d not found for module '%s'", errorLookupTypeID, testModuleName), err.Error())
+	assert.ErrorIs(t, err, ErrErrorsTypeNotFound)
 	assert.Empty(t, reg)
 }
 
 func TestFactory_CreateErrorRegistry_ErrorsTypeNotAVariant(t *testing.T) {
-	testModuleName := "TestModule"
 	errorLookupTypeID := 123
 
 	testMeta := &types.Metadata{
@@ -156,7 +154,7 @@ func TestFactory_CreateErrorRegistry_ErrorsTypeNotAVariant(t *testing.T) {
 	factory := NewFactory()
 
 	reg, err := factory.CreateErrorRegistry(testMeta)
-	assert.Equal(t, fmt.Sprintf("errors type %d for module '%s' is not a variant", errorLookupTypeID, testModuleName), err.Error())
+	assert.ErrorIs(t, err, ErrErrorsTypeNotVariant)
 	assert.Empty(t, reg)
 }
 
@@ -207,7 +205,7 @@ func TestFactory_CreateErrorRegistry_GetTypeFieldsError(t *testing.T) {
 	factory := NewFactory()
 
 	reg, err := factory.CreateErrorRegistry(testMeta)
-	assert.Equal(t, "couldn't get fields for error 'TestModule.ErrorVariant1': type not found for field 'ErrorVariant1Field'", err.Error())
+	assert.ErrorIs(t, err, ErrErrorFieldsRetrieval)
 	assert.Empty(t, reg)
 }
 
@@ -303,7 +301,6 @@ func TestFactory_CreateCallRegistry_NoPalletWithCalls(t *testing.T) {
 }
 
 func TestFactory_CreateCallRegistry_CallsTypeNotFound(t *testing.T) {
-	testModuleName := "TestModule"
 	callLookupTypeID := 123
 
 	testMeta := &types.Metadata{
@@ -327,12 +324,11 @@ func TestFactory_CreateCallRegistry_CallsTypeNotFound(t *testing.T) {
 	factory := NewFactory()
 
 	reg, err := factory.CreateCallRegistry(testMeta)
-	assert.Equal(t, fmt.Sprintf("calls type %d not found for module '%s'", callLookupTypeID, testModuleName), err.Error())
+	assert.ErrorIs(t, err, ErrCallsTypeNotFound)
 	assert.Empty(t, reg)
 }
 
 func TestFactory_CreateCallRegistry_CallTypeNotAVariant(t *testing.T) {
-	testModuleName := "TestModule"
 	callLookupTypeID := 123
 
 	testMeta := &types.Metadata{
@@ -362,7 +358,7 @@ func TestFactory_CreateCallRegistry_CallTypeNotAVariant(t *testing.T) {
 	factory := NewFactory()
 
 	reg, err := factory.CreateCallRegistry(testMeta)
-	assert.Equal(t, fmt.Sprintf("calls type %d for module '%s' is not a variant", callLookupTypeID, testModuleName), err.Error())
+	assert.ErrorIs(t, err, ErrCallsTypeNotVariant)
 	assert.Empty(t, reg)
 }
 
@@ -413,7 +409,7 @@ func TestFactory_CreateCallRegistry_GetTypeFieldsError(t *testing.T) {
 	factory := NewFactory()
 
 	reg, err := factory.CreateCallRegistry(testMeta)
-	assert.Equal(t, "couldn't get fields for call 'TestModule.CallVariant1': type not found for field 'CallVariant1Field'", err.Error())
+	assert.ErrorIs(t, err, ErrCallFieldsRetrieval)
 	assert.Empty(t, reg)
 }
 
@@ -504,7 +500,6 @@ func TestFactory_CreateEventRegistry_NoPalletWithEvents(t *testing.T) {
 }
 
 func TestFactory_CreateEventRegistry_EventsTypeNotFound(t *testing.T) {
-	testModuleName := "TestModule"
 	eventLookupTypeID := 123
 
 	testMeta := &types.Metadata{
@@ -528,12 +523,11 @@ func TestFactory_CreateEventRegistry_EventsTypeNotFound(t *testing.T) {
 	factory := NewFactory()
 
 	reg, err := factory.CreateEventRegistry(testMeta)
-	assert.Equal(t, fmt.Sprintf("events type %d not found for module '%s'", eventLookupTypeID, testModuleName), err.Error())
+	assert.ErrorIs(t, err, ErrEventsTypeNotFound)
 	assert.Empty(t, reg)
 }
 
 func TestFactory_CreateEventRegistry_EventTypeNotAVariant(t *testing.T) {
-	testModuleName := "TestModule"
 	callLookupTypeID := 123
 
 	testMeta := &types.Metadata{
@@ -563,7 +557,7 @@ func TestFactory_CreateEventRegistry_EventTypeNotAVariant(t *testing.T) {
 	factory := NewFactory()
 
 	reg, err := factory.CreateEventRegistry(testMeta)
-	assert.Equal(t, fmt.Sprintf("events type %d for module '%s' is not a variant", callLookupTypeID, testModuleName), err.Error())
+	assert.ErrorIs(t, err, ErrEventsTypeNotVariant)
 	assert.Empty(t, reg)
 }
 
@@ -614,7 +608,7 @@ func TestFactory_CreateEventRegistry_GetTypeFieldError(t *testing.T) {
 	factory := NewFactory()
 
 	reg, err := factory.CreateEventRegistry(testMeta)
-	assert.Equal(t, "couldn't get fields for event 'TestModule.EventVariant1': type not found for field 'EventVariant1Field'", err.Error())
+	assert.ErrorIs(t, err, ErrEventFieldsRetrieval)
 	assert.Empty(t, reg)
 }
 
@@ -672,7 +666,7 @@ func TestFactory_getTypeFields(t *testing.T) {
 	assert.Equal(t, int64(fieldLookUpID), res[0].LookupIndex)
 }
 
-func TestFactory_getTypeFields_FieldTypeError(t *testing.T) {
+func TestFactory_getTypeFields_FieldDecoderRetrievalError(t *testing.T) {
 	fieldLookUpID := 123
 
 	testFieldName := "TestFieldName"
@@ -718,7 +712,7 @@ func TestFactory_getTypeFields_FieldTypeError(t *testing.T) {
 	factory.initStorages()
 
 	res, err := factory.getTypeFields(testMeta, testFields)
-	assert.Equal(t, "couldn't get field decoder for 'TestFieldName': couldn't get fields for composite type with name 'TestFieldName': type not found for field 'CompositeField1'", err.Error())
+	assert.ErrorIs(t, err, ErrFieldDecoderRetrieval)
 	assert.Nil(t, res)
 }
 
@@ -746,11 +740,11 @@ func TestFactory_getTypeFields_FieldTypeNotFoundError(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getTypeFields(testMeta, testFields)
-	assert.Equal(t, fmt.Sprintf("type not found for field '%s'", testFieldName), err.Error())
+	assert.ErrorIs(t, err, ErrFieldTypeNotFound)
 	assert.Nil(t, res)
 }
 
-func TestFactory_getFieldType_UnsupportedTypeError(t *testing.T) {
+func TestFactory_getFieldDecoder_UnsupportedTypeError(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	testFieldTypeDef := types.Si1TypeDef{
@@ -762,11 +756,11 @@ func TestFactory_getFieldType_UnsupportedTypeError(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
-	assert.Equal(t, "unsupported field type definition", err.Error())
+	assert.ErrorIs(t, err, ErrFieldTypeDefinitionNotSupported)
 	assert.Nil(t, res)
 }
 
-func TestFactory_getFieldType_Compact(t *testing.T) {
+func TestFactory_getFieldDecoder_Compact(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	compactFieldTypeLookupID := 456
@@ -801,7 +795,7 @@ func TestFactory_getFieldType_Compact(t *testing.T) {
 	assert.Equal(t, &ValueDecoder[types.UCompact]{}, res)
 }
 
-func TestFactory_getFieldType_Compact_TypeNotFoundError(t *testing.T) {
+func TestFactory_getFieldDecoder_Compact_TypeNotFoundError(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	compactFieldTypeLookupID := 456
@@ -824,11 +818,11 @@ func TestFactory_getFieldType_Compact_TypeNotFoundError(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
-	assert.Equal(t, "type not found for compact field with name 'TestFieldName'", err.Error())
+	assert.ErrorIs(t, err, ErrCompactFieldTypeNotFound)
 	assert.Nil(t, res)
 }
 
-func TestFactory_getFieldType_Composite(t *testing.T) {
+func TestFactory_getFieldDecoder_Composite(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	compositeFieldTypeLookupID1 := 123
@@ -906,7 +900,7 @@ func TestFactory_getFieldType_Composite(t *testing.T) {
 	assert.Equal(t, int64(compositeFieldTypeLookupID2), compositeFieldType.Fields[1].LookupIndex)
 }
 
-func TestFactory_getFieldType_Composite_FieldError(t *testing.T) {
+func TestFactory_getFieldDecoder_Composite_FieldError(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	compositeFieldTypeLookupID1 := 123
@@ -960,11 +954,11 @@ func TestFactory_getFieldType_Composite_FieldError(t *testing.T) {
 	factory.initStorages()
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
-	assert.Equal(t, fmt.Sprintf("couldn't get fields for composite type with name '%s': type not found for field '%s'", testFieldName, compositeFieldName2), err.Error())
+	assert.ErrorIs(t, err, ErrCompositeTypeFieldsRetrieval)
 	assert.Nil(t, res)
 }
 
-func TestFactory_getFieldType_Variant(t *testing.T) {
+func TestFactory_getFieldDecoder_Variant(t *testing.T) {
 	testFieldName := "TestField"
 
 	variantName1 := "Variant1"
@@ -1036,7 +1030,7 @@ func TestFactory_getFieldType_Variant(t *testing.T) {
 	assert.Equal(t, int64(variantFieldLookupID), compositeVariant.Fields[0].LookupIndex)
 }
 
-func TestFactory_getFieldType_Primitive(t *testing.T) {
+func TestFactory_getFieldDecoder_Primitive(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	testFieldTypeDef := types.Si1TypeDef{
@@ -1055,7 +1049,7 @@ func TestFactory_getFieldType_Primitive(t *testing.T) {
 	assert.Equal(t, &ValueDecoder[types.U8]{}, res)
 }
 
-func TestFactory_getFieldType_Array(t *testing.T) {
+func TestFactory_getFieldDecoder_Array(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	arrayItemTypeLookupID := 456
@@ -1100,7 +1094,7 @@ func TestFactory_getFieldType_Array(t *testing.T) {
 	assert.Equal(t, &ValueDecoder[types.U8]{}, arrayFieldType.ItemDecoder)
 }
 
-func TestFactory_getFieldType_Array_TypeNotFoundError(t *testing.T) {
+func TestFactory_getFieldDecoder_Array_TypeNotFoundError(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	arrayItemTypeLookupID := 456
@@ -1126,11 +1120,11 @@ func TestFactory_getFieldType_Array_TypeNotFoundError(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
-	assert.Equal(t, "type not found for array field with name 'TestFieldName'", err.Error())
+	assert.ErrorIs(t, err, ErrArrayFieldTypeNotFound)
 	assert.Nil(t, res)
 }
 
-func TestFactory_getFieldType_Slice(t *testing.T) {
+func TestFactory_getFieldDecoder_Slice(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	sliceItemTypeLookupID := 456
@@ -1172,7 +1166,7 @@ func TestFactory_getFieldType_Slice(t *testing.T) {
 	assert.Equal(t, &ValueDecoder[types.U256]{}, sliceFieldType.ItemDecoder)
 }
 
-func TestFactory_getFieldType_Slice_TypeNotFoundError(t *testing.T) {
+func TestFactory_getFieldDecoder_Slice_TypeNotFoundError(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	sliceItemTypeLookupID := 456
@@ -1196,11 +1190,11 @@ func TestFactory_getFieldType_Slice_TypeNotFoundError(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
-	assert.Equal(t, "type not found for vector field with name 'TestFieldName'", err.Error())
+	assert.ErrorIs(t, err, ErrVectorFieldTypeNotFound)
 	assert.Nil(t, res)
 }
 
-func TestFactory_getFieldType_Tuple(t *testing.T) {
+func TestFactory_getFieldDecoder_Tuple(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	tupleItemLookupID1 := 123
@@ -1264,7 +1258,7 @@ func TestFactory_getFieldType_Tuple(t *testing.T) {
 	assert.Equal(t, int64(tupleItemLookupID2), compositeFieldType.Fields[1].LookupIndex)
 }
 
-func TestFactory_getFieldType_Tuple_NilTuple(t *testing.T) {
+func TestFactory_getFieldDecoder_Tuple_NilTuple(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	testFieldTypeDef := types.Si1TypeDef{
@@ -1284,7 +1278,7 @@ func TestFactory_getFieldType_Tuple_NilTuple(t *testing.T) {
 	assert.Equal(t, &NoopDecoder{}, res)
 }
 
-func TestFactory_getFieldType_BitSequence(t *testing.T) {
+func TestFactory_getFieldDecoder_BitSequence(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	bitStoreLookupID := 123
@@ -1338,7 +1332,7 @@ func TestFactory_getFieldType_BitSequence(t *testing.T) {
 	assert.Equal(t, types.BitOrderLsb0, bitSequenceDecoder.BitOrder)
 }
 
-func TestFactory_getFieldType_BitSequence_BitStoreTypeNotFound(t *testing.T) {
+func TestFactory_getFieldDecoder_BitSequence_BitStoreTypeNotFound(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	bitStoreLookupID := 123
@@ -1376,11 +1370,11 @@ func TestFactory_getFieldType_BitSequence_BitStoreTypeNotFound(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
-	assert.Equal(t, "bit store type not found", err.Error())
+	assert.ErrorIs(t, err, ErrBitStoreTypeNotFound)
 	assert.Nil(t, res)
 }
 
-func TestFactory_getFieldType_BitSequence_BitStoreFieldTypeError(t *testing.T) {
+func TestFactory_getFieldDecoder_BitSequence_BitStoreFieldTypeError(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	bitStoreLookupID := 123
@@ -1428,11 +1422,11 @@ func TestFactory_getFieldType_BitSequence_BitStoreFieldTypeError(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
-	assert.Equal(t, "bit store type not supported", err.Error())
+	assert.ErrorIs(t, err, ErrBitStoreTypeNotSupported)
 	assert.Nil(t, res)
 }
 
-func TestFactory_getFieldType_BitSequence_BitOrderTypeNotFound(t *testing.T) {
+func TestFactory_getFieldDecoder_BitSequence_BitOrderTypeNotFound(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	bitStoreLookupID := 123
@@ -1470,11 +1464,11 @@ func TestFactory_getFieldType_BitSequence_BitOrderTypeNotFound(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
-	assert.Equal(t, "bit order type not found", err.Error())
+	assert.ErrorIs(t, err, ErrBitOrderTypeNotFound)
 	assert.Nil(t, res)
 }
 
-func TestFactory_getFieldType_BitSequence_BitOrderFieldTypeError(t *testing.T) {
+func TestFactory_getFieldDecoder_BitSequence_BitOrderCreationError(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	bitStoreLookupID := 123
@@ -1498,8 +1492,6 @@ func TestFactory_getFieldType_BitSequence_BitOrderFieldTypeError(t *testing.T) {
 			Si0TypeDefPrimitive: types.Si0TypeDefPrimitive(types.IsU8),
 		},
 	}
-
-	bitOrder := "unknown-order"
 
 	bitOrderType := &types.Si1Type{
 		Path: []types.Text{
@@ -1521,7 +1513,7 @@ func TestFactory_getFieldType_BitSequence_BitOrderFieldTypeError(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
-	assert.Equal(t, fmt.Sprintf("bit order '%s' not supported", bitOrder), err.Error())
+	assert.ErrorIs(t, err, ErrBitOrderCreation)
 	assert.Nil(t, res)
 }
 
@@ -1586,7 +1578,7 @@ func TestFactory_getVariantFieldType_CompositeVariantTypeFieldError(t *testing.T
 	factory.initStorages()
 
 	res, err := factory.getVariantFieldDecoder(testMeta, testFieldTypeDef)
-	assert.Equal(t, "couldn't get type fields for variant '1': couldn't get field decoder for 'VariantFieldName': couldn't get fields for composite type with name 'VariantFieldName': type not found for field 'CompositeVariantField'", err.Error())
+	assert.ErrorIs(t, err, ErrVariantTypeFieldsRetrieval)
 	assert.Nil(t, res)
 }
 
@@ -1777,7 +1769,7 @@ func TestFactory_getArrayFieldType_ItemFieldTypeError(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getArrayFieldDecoder(uint(arrayLen), testMeta, testFieldName, arrayItemTypeDef)
-	assert.Equal(t, "couldn't get array item field decoder: couldn't get fields for composite type with name 'TestFieldName': type not found for field 'CompositeField1'", err.Error())
+	assert.ErrorIs(t, err, ErrArrayItemFieldDecoderRetrieval)
 	assert.Nil(t, res)
 }
 
@@ -1830,7 +1822,7 @@ func TestFactory_getSliceFieldType_ItemFieldTypeError(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getSliceFieldDecoder(testMeta, testFieldName, sliceItemTypeDef)
-	assert.Equal(t, "couldn't get slice item field decoder: couldn't get fields for composite type with name 'TestFieldName': type not found for field 'CompositeField1'", err.Error())
+	assert.ErrorIs(t, err, ErrSliceItemFieldDecoderRetrieval)
 	assert.Nil(t, res)
 }
 
@@ -1929,11 +1921,11 @@ func TestFactory_getTupleType_TupleItemNotFound(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getTupleFieldDecoder(testMeta, testFieldName, tupleTypeDef)
-	assert.Equal(t, "type definition for tuple item 1 not found", err.Error())
+	assert.ErrorIs(t, err, ErrTupleItemTypeNotFound)
 	assert.Nil(t, res)
 }
 
-func TestFactory_getTupleType_TupleItemFieldTypeError(t *testing.T) {
+func TestFactory_getTupleType_TupleItemFieldDecoderError(t *testing.T) {
 	testFieldName := "TestFieldName"
 
 	tupleItemLookupID1 := 123
@@ -1987,7 +1979,7 @@ func TestFactory_getTupleType_TupleItemFieldTypeError(t *testing.T) {
 	factory := NewFactory().(*factory)
 
 	res, err := factory.getTupleFieldDecoder(testMeta, testFieldName, tupleTypeDef)
-	assert.Equal(t, "couldn't get field decoder for tuple item 1: couldn't get fields for composite type with name 'tuple_item_1': type not found for field 'CompositeField1'", err.Error())
+	assert.ErrorIs(t, err, ErrTupleItemFieldDecoderRetrieval)
 	assert.Nil(t, res)
 }
 
@@ -1995,7 +1987,7 @@ func Test_getPrimitiveType_UnsupportedTypeError(t *testing.T) {
 	primitiveTypeDef := types.Si0TypeDefPrimitive(32)
 
 	res, err := getPrimitiveDecoder(primitiveTypeDef)
-	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, ErrPrimitiveTypeNotSupported)
 	assert.Nil(t, res)
 }
 

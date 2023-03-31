@@ -52,11 +52,11 @@ func (f *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, erro
 		errorsType, ok := meta.AsMetadataV14.EfficientLookup[mod.Errors.Type.Int64()]
 
 		if !ok {
-			return nil, fmt.Errorf("errors type %d not found for module '%s'", mod.Errors.Type.Int64(), mod.Name)
+			return nil, ErrErrorsTypeNotFound.WithMsg("errors type '%d', module '%s'", mod.Errors.Type.Int64(), mod.Name)
 		}
 
 		if !errorsType.Def.IsVariant {
-			return nil, fmt.Errorf("errors type %d for module '%s' is not a variant", mod.Errors.Type.Int64(), mod.Name)
+			return nil, ErrErrorsTypeNotVariant.WithMsg("errors type '%d', module '%s'", mod.Errors.Type.Int64(), mod.Name)
 		}
 
 		for _, errorVariant := range errorsType.Def.Variant.Variants {
@@ -65,7 +65,7 @@ func (f *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, erro
 			errorFields, err := f.getTypeFields(meta, errorVariant.Fields)
 
 			if err != nil {
-				return nil, fmt.Errorf("couldn't get fields for error '%s': %w", errorName, err)
+				return nil, ErrErrorFieldsRetrieval.WithMsg(errorName).Wrap(err)
 			}
 
 			errorRegistry[errorName] = &Type{
@@ -76,7 +76,7 @@ func (f *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, erro
 	}
 
 	if err := f.resolveRecursiveDecoders(); err != nil {
-		return nil, err
+		return nil, ErrRecursiveDecodersResolving.Wrap(err)
 	}
 
 	return errorRegistry, nil
@@ -97,11 +97,11 @@ func (f *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error)
 		callsType, ok := meta.AsMetadataV14.EfficientLookup[mod.Calls.Type.Int64()]
 
 		if !ok {
-			return nil, fmt.Errorf("calls type %d not found for module '%s'", mod.Calls.Type.Int64(), mod.Name)
+			return nil, ErrCallsTypeNotFound.WithMsg("calls type '%d', module '%s'", mod.Calls.Type.Int64(), mod.Name)
 		}
 
 		if !callsType.Def.IsVariant {
-			return nil, fmt.Errorf("calls type %d for module '%s' is not a variant", mod.Calls.Type.Int64(), mod.Name)
+			return nil, ErrCallsTypeNotVariant.WithMsg("calls type '%d', module '%s'", mod.Calls.Type.Int64(), mod.Name)
 		}
 
 		for _, callVariant := range callsType.Def.Variant.Variants {
@@ -115,7 +115,7 @@ func (f *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error)
 			callFields, err := f.getTypeFields(meta, callVariant.Fields)
 
 			if err != nil {
-				return nil, fmt.Errorf("couldn't get fields for call '%s': %w", callName, err)
+				return nil, ErrCallFieldsRetrieval.WithMsg(callName).Wrap(err)
 			}
 
 			callRegistry[callIndex] = &Type{
@@ -126,7 +126,7 @@ func (f *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error)
 	}
 
 	if err := f.resolveRecursiveDecoders(); err != nil {
-		return nil, err
+		return nil, ErrRecursiveDecodersResolving.Wrap(err)
 	}
 
 	return callRegistry, nil
@@ -146,11 +146,11 @@ func (f *factory) CreateEventRegistry(meta *types.Metadata) (EventRegistry, erro
 		eventsType, ok := meta.AsMetadataV14.EfficientLookup[mod.Events.Type.Int64()]
 
 		if !ok {
-			return nil, fmt.Errorf("events type %d not found for module '%s'", mod.Events.Type.Int64(), mod.Name)
+			return nil, ErrEventsTypeNotFound.WithMsg("events type '%d', module '%s'", mod.Events.Type.Int64(), mod.Name)
 		}
 
 		if !eventsType.Def.IsVariant {
-			return nil, fmt.Errorf("events type %d for module '%s' is not a variant", mod.Events.Type.Int64(), mod.Name)
+			return nil, ErrEventsTypeNotVariant.WithMsg("events type '%d', module '%s'", mod.Events.Type.Int64(), mod.Name)
 		}
 
 		for _, eventVariant := range eventsType.Def.Variant.Variants {
@@ -161,7 +161,7 @@ func (f *factory) CreateEventRegistry(meta *types.Metadata) (EventRegistry, erro
 			eventFields, err := f.getTypeFields(meta, eventVariant.Fields)
 
 			if err != nil {
-				return nil, fmt.Errorf("couldn't get fields for event '%s': %w", eventName, err)
+				return nil, ErrEventFieldsRetrieval.WithMsg(eventName).Wrap(err)
 			}
 
 			eventRegistry[eventID] = &Type{
@@ -172,7 +172,7 @@ func (f *factory) CreateEventRegistry(meta *types.Metadata) (EventRegistry, erro
 	}
 
 	if err := f.resolveRecursiveDecoders(); err != nil {
-		return nil, err
+		return nil, ErrRecursiveDecodersResolving.Wrap(err)
 	}
 
 	return eventRegistry, nil
@@ -191,11 +191,19 @@ func (f *factory) resolveRecursiveDecoders() error {
 		fieldDecoder, ok := f.fieldStorage[recursiveFieldLookupIndex]
 
 		if !ok {
-			return fmt.Errorf("couldn't get field decoder for recursive field with lookup index %d", recursiveFieldLookupIndex)
+			return ErrFieldDecoderForRecursiveFieldNotFound.
+				WithMsg(
+					"recursive field lookup index %d",
+					recursiveFieldLookupIndex,
+				)
 		}
 
 		if _, ok := fieldDecoder.(*RecursiveDecoder); ok {
-			return fmt.Errorf("recursive field decoder with lookup index %d cannot be resolved with a non-recursive field decoder", recursiveFieldLookupIndex)
+			return ErrRecursiveFieldResolving.
+				WithMsg(
+					"recursive field lookup index %d",
+					recursiveFieldLookupIndex,
+				)
 		}
 
 		recursiveFieldDecoder.FieldDecoder = fieldDecoder
@@ -212,7 +220,7 @@ func (f *factory) getTypeFields(meta *types.Metadata, fields []types.Si1Field) (
 		fieldType, ok := meta.AsMetadataV14.EfficientLookup[field.Type.Int64()]
 
 		if !ok {
-			return nil, fmt.Errorf("type not found for field '%s'", field.Name)
+			return nil, ErrFieldTypeNotFound.WithMsg(string(field.Name))
 		}
 
 		fieldName := getFullFieldName(field, fieldType)
@@ -231,7 +239,7 @@ func (f *factory) getTypeFields(meta *types.Metadata, fields []types.Si1Field) (
 		fieldDecoder, err := f.getFieldDecoder(meta, fieldName, fieldTypeDef)
 
 		if err != nil {
-			return nil, fmt.Errorf("couldn't get field decoder for '%s': %w", fieldName, err)
+			return nil, ErrFieldDecoderRetrieval.WithMsg(fieldName).Wrap(err)
 		}
 
 		f.fieldStorage[field.Type.Int64()] = fieldDecoder
@@ -248,13 +256,17 @@ func (f *factory) getTypeFields(meta *types.Metadata, fields []types.Si1Field) (
 
 // getFieldDecoder returns the FieldDecoder based on the provided type definition.
 // nolint:funlen
-func (f *factory) getFieldDecoder(meta *types.Metadata, fieldName string, typeDef types.Si1TypeDef) (FieldDecoder, error) {
+func (f *factory) getFieldDecoder(
+	meta *types.Metadata,
+	fieldName string,
+	typeDef types.Si1TypeDef,
+) (FieldDecoder, error) {
 	switch {
 	case typeDef.IsCompact:
 		compactFieldType, ok := meta.AsMetadataV14.EfficientLookup[typeDef.Compact.Type.Int64()]
 
 		if !ok {
-			return nil, fmt.Errorf("type not found for compact field with name '%s'", fieldName)
+			return nil, ErrCompactFieldTypeNotFound.WithMsg(fieldName)
 		}
 
 		return f.getCompactFieldDecoder(meta, fieldName, compactFieldType.Def)
@@ -266,7 +278,7 @@ func (f *factory) getFieldDecoder(meta *types.Metadata, fieldName string, typeDe
 		fields, err := f.getTypeFields(meta, typeDef.Composite.Fields)
 
 		if err != nil {
-			return nil, fmt.Errorf("couldn't get fields for composite type with name '%s': %w", fieldName, err)
+			return nil, ErrCompositeTypeFieldsRetrieval.WithMsg(fieldName).Wrap(err)
 		}
 
 		compositeDecoder.Fields = fields
@@ -280,7 +292,7 @@ func (f *factory) getFieldDecoder(meta *types.Metadata, fieldName string, typeDe
 		arrayFieldType, ok := meta.AsMetadataV14.EfficientLookup[typeDef.Array.Type.Int64()]
 
 		if !ok {
-			return nil, fmt.Errorf("type not found for array field with name '%s'", fieldName)
+			return nil, ErrArrayFieldTypeNotFound.WithMsg(fieldName)
 		}
 
 		return f.getArrayFieldDecoder(uint(typeDef.Array.Len), meta, fieldName, arrayFieldType.Def)
@@ -288,7 +300,7 @@ func (f *factory) getFieldDecoder(meta *types.Metadata, fieldName string, typeDe
 		vectorFieldType, ok := meta.AsMetadataV14.EfficientLookup[typeDef.Sequence.Type.Int64()]
 
 		if !ok {
-			return nil, fmt.Errorf("type not found for vector field with name '%s'", fieldName)
+			return nil, ErrVectorFieldTypeNotFound.WithMsg(fieldName)
 		}
 
 		return f.getSliceFieldDecoder(meta, fieldName, vectorFieldType.Def)
@@ -301,7 +313,7 @@ func (f *factory) getFieldDecoder(meta *types.Metadata, fieldName string, typeDe
 	case typeDef.IsBitSequence:
 		return f.getBitSequenceDecoder(meta, fieldName, typeDef.BitSequence)
 	default:
-		return nil, errors.New("unsupported field type definition")
+		return nil, ErrFieldTypeDefinitionNotSupported.WithMsg(fieldName)
 	}
 }
 
@@ -330,7 +342,7 @@ func (f *factory) getVariantFieldDecoder(meta *types.Metadata, typeDef types.Si1
 		fields, err := f.getTypeFields(meta, variant.Fields)
 
 		if err != nil {
-			return nil, fmt.Errorf("couldn't get type fields for variant '%d': %w", variant.Index, err)
+			return nil, ErrVariantTypeFieldsRetrieval.WithMsg("variant '%d'", variant.Index).Wrap(err)
 		}
 
 		compositeDecoder.Fields = fields
@@ -366,7 +378,7 @@ func (f *factory) getCompactFieldDecoder(meta *types.Metadata, fieldName string,
 			itemTypeDef, ok := meta.AsMetadataV14.EfficientLookup[item.Int64()]
 
 			if !ok {
-				return nil, fmt.Errorf("type definition for tuple item %d not found", item.Int64())
+				return nil, ErrCompactTupleItemTypeNotFound.WithMsg("tuple item '%d'", item.Int64())
 			}
 
 			fieldName := fmt.Sprintf(tupleItemFieldNameFormat, i)
@@ -374,7 +386,9 @@ func (f *factory) getCompactFieldDecoder(meta *types.Metadata, fieldName string,
 			itemFieldDecoder, err := f.getCompactFieldDecoder(meta, fieldName, itemTypeDef.Def)
 
 			if err != nil {
-				return nil, fmt.Errorf("couldn't get tuple field decoder: %w", err)
+				return nil, ErrCompactTupleItemFieldDecoderRetrieval.
+					WithMsg("tuple item '%d'", item.Int64()).
+					Wrap(err)
 			}
 
 			compositeDecoder.Fields = append(compositeDecoder.Fields, &Field{
@@ -396,7 +410,7 @@ func (f *factory) getCompactFieldDecoder(meta *types.Metadata, fieldName string,
 			compactCompositeFieldType, ok := meta.AsMetadataV14.EfficientLookup[compactCompositeField.Type.Int64()]
 
 			if !ok {
-				return nil, errors.New("compact composite field type not found")
+				return nil, ErrCompactCompositeFieldTypeNotFound
 			}
 
 			compactFieldName := getFullFieldName(compactCompositeField, compactCompositeFieldType)
@@ -404,7 +418,7 @@ func (f *factory) getCompactFieldDecoder(meta *types.Metadata, fieldName string,
 			compactCompositeDecoder, err := f.getCompactFieldDecoder(meta, compactFieldName, compactCompositeFieldType.Def)
 
 			if err != nil {
-				return nil, fmt.Errorf("couldn't decode compact composite type: %w", err)
+				return nil, ErrCompactCompositeFieldDecoderRetrieval.Wrap(err)
 			}
 
 			compositeDecoder.Fields = append(compositeDecoder.Fields, &Field{
@@ -426,26 +440,33 @@ func (f *factory) getArrayFieldDecoder(arrayLen uint, meta *types.Metadata, fiel
 	itemFieldDecoder, err := f.getFieldDecoder(meta, fieldName, typeDef)
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't get array item field decoder: %w", err)
+		return nil, ErrArrayItemFieldDecoderRetrieval.Wrap(err)
 	}
 
 	return &ArrayDecoder{Length: arrayLen, ItemDecoder: itemFieldDecoder}, nil
 }
 
 // getSliceFieldDecoder parses a slice type definition and returns an SliceDecoder.
-// nolint:lll
-func (f *factory) getSliceFieldDecoder(meta *types.Metadata, fieldName string, typeDef types.Si1TypeDef) (FieldDecoder, error) {
+func (f *factory) getSliceFieldDecoder(
+	meta *types.Metadata,
+	fieldName string,
+	typeDef types.Si1TypeDef,
+) (FieldDecoder, error) {
 	itemFieldDecoder, err := f.getFieldDecoder(meta, fieldName, typeDef)
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't get slice item field decoder: %w", err)
+		return nil, ErrSliceItemFieldDecoderRetrieval.Wrap(err)
 	}
 
 	return &SliceDecoder{itemFieldDecoder}, nil
 }
 
 // getTupleFieldDecoder parses a tuple type definition and returns a CompositeDecoder.
-func (f *factory) getTupleFieldDecoder(meta *types.Metadata, fieldName string, tuple types.Si1TypeDefTuple) (FieldDecoder, error) {
+func (f *factory) getTupleFieldDecoder(
+	meta *types.Metadata,
+	fieldName string,
+	tuple types.Si1TypeDefTuple,
+) (FieldDecoder, error) {
 	compositeDecoder := &CompositeDecoder{
 		FieldName: fieldName,
 	}
@@ -454,7 +475,7 @@ func (f *factory) getTupleFieldDecoder(meta *types.Metadata, fieldName string, t
 		itemTypeDef, ok := meta.AsMetadataV14.EfficientLookup[item.Int64()]
 
 		if !ok {
-			return nil, fmt.Errorf("type definition for tuple item %d not found", i)
+			return nil, ErrTupleItemTypeNotFound.WithMsg("tuple item '%d'", i)
 		}
 
 		tupleFieldName := fmt.Sprintf(tupleItemFieldNameFormat, i)
@@ -462,7 +483,7 @@ func (f *factory) getTupleFieldDecoder(meta *types.Metadata, fieldName string, t
 		itemFieldDecoder, err := f.getFieldDecoder(meta, tupleFieldName, itemTypeDef.Def)
 
 		if err != nil {
-			return nil, fmt.Errorf("couldn't get field decoder for tuple item %d: %w", i, err)
+			return nil, ErrTupleItemFieldDecoderRetrieval.Wrap(err)
 		}
 
 		compositeDecoder.Fields = append(compositeDecoder.Fields, &Field{
@@ -475,27 +496,31 @@ func (f *factory) getTupleFieldDecoder(meta *types.Metadata, fieldName string, t
 	return compositeDecoder, nil
 }
 
-func (f *factory) getBitSequenceDecoder(meta *types.Metadata, fieldName string, bitSequenceTypeDef types.Si1TypeDefBitSequence) (FieldDecoder, error) {
+func (f *factory) getBitSequenceDecoder(
+	meta *types.Metadata,
+	fieldName string,
+	bitSequenceTypeDef types.Si1TypeDefBitSequence,
+) (FieldDecoder, error) {
 	bitStoreType, ok := meta.AsMetadataV14.EfficientLookup[bitSequenceTypeDef.BitStoreType.Int64()]
 
 	if !ok {
-		return nil, errors.New("bit store type not found")
+		return nil, ErrBitStoreTypeNotFound.WithMsg(fieldName)
 	}
 
 	if bitStoreType.Def.Primitive.Si0TypeDefPrimitive != types.IsU8 {
-		return nil, errors.New("bit store type not supported")
+		return nil, ErrBitStoreTypeNotSupported.WithMsg(fieldName)
 	}
 
 	bitOrderType, ok := meta.AsMetadataV14.EfficientLookup[bitSequenceTypeDef.BitOrderType.Int64()]
 
 	if !ok {
-		return nil, errors.New("bit order type not found")
+		return nil, ErrBitOrderTypeNotFound.WithMsg(fieldName)
 	}
 
 	bitOrder, err := types.NewBitOrderFromString(getBitOrderString(bitOrderType.Path))
 
 	if err != nil {
-		return nil, err
+		return nil, ErrBitOrderCreation.Wrap(err)
 	}
 
 	bitSequenceDecoder := &BitSequenceDecoder{
@@ -550,11 +575,12 @@ func getPrimitiveDecoder(primitiveTypeDef types.Si0TypeDefPrimitive) (FieldDecod
 	case types.IsI256:
 		return &ValueDecoder[types.I256]{}, nil
 	default:
-		return nil, fmt.Errorf("unsupported primitive type %v", primitiveTypeDef)
+		return nil, ErrPrimitiveTypeNotSupported.WithMsg("primitive type %v", primitiveTypeDef)
 	}
 }
 
-// getStoredFieldDecoder will attempt to return a FieldDecoder from storage, and perform an extra check for recursive decoders.
+// getStoredFieldDecoder will attempt to return a FieldDecoder from storage,
+// and perform an extra check for recursive decoders.
 func (f *factory) getStoredFieldDecoder(fieldLookupIndex int64) (FieldDecoder, bool) {
 	if ft, ok := f.fieldStorage[fieldLookupIndex]; ok {
 		if rt, ok := ft.(*RecursiveDecoder); ok {
@@ -620,7 +646,7 @@ func (t *Type) Decode(decoder *scale.Decoder) (map[string]any, error) {
 		value, err := field.FieldDecoder.Decode(decoder)
 
 		if err != nil {
-			return nil, err
+			return nil, ErrTypeFieldDecoding.Wrap(err)
 		}
 
 		fieldMap[field.Name] = value
@@ -658,13 +684,13 @@ func (v *VariantDecoder) Decode(decoder *scale.Decoder) (any, error) {
 	variantByte, err := decoder.ReadOneByte()
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't read variant byte: %w", err)
+		return nil, ErrVariantByteDecoding.Wrap(err)
 	}
 
 	variantDecoder, ok := v.FieldDecoderMap[variantByte]
 
 	if !ok {
-		return nil, fmt.Errorf("variant decoder for variant %d not found", variantByte)
+		return nil, ErrVariantFieldDecoderNotFound.WithMsg("variant '%d'", variantByte)
 	}
 
 	if _, ok := variantDecoder.(*NoopDecoder); ok {
@@ -682,7 +708,7 @@ type ArrayDecoder struct {
 
 func (a *ArrayDecoder) Decode(decoder *scale.Decoder) (any, error) {
 	if a.ItemDecoder == nil {
-		return nil, errors.New("array item decoder not found")
+		return nil, ErrArrayItemDecoderNotFound
 	}
 
 	slice := make([]any, 0, a.Length)
@@ -691,7 +717,7 @@ func (a *ArrayDecoder) Decode(decoder *scale.Decoder) (any, error) {
 		item, err := a.ItemDecoder.Decode(decoder)
 
 		if err != nil {
-			return nil, err
+			return nil, ErrArrayItemDecoding.Wrap(err)
 		}
 
 		slice = append(slice, item)
@@ -707,13 +733,13 @@ type SliceDecoder struct {
 
 func (s *SliceDecoder) Decode(decoder *scale.Decoder) (any, error) {
 	if s.ItemDecoder == nil {
-		return nil, errors.New("slice item decoder not found")
+		return nil, ErrSliceItemDecoderNotFound
 	}
 
 	sliceLen, err := decoder.DecodeUintCompact()
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't decode slice length: %w", err)
+		return nil, ErrSliceLengthDecoding.Wrap(err)
 	}
 
 	slice := make([]any, 0, sliceLen.Uint64())
@@ -722,7 +748,7 @@ func (s *SliceDecoder) Decode(decoder *scale.Decoder) (any, error) {
 		item, err := s.ItemDecoder.Decode(decoder)
 
 		if err != nil {
-			return nil, err
+			return nil, ErrSliceItemDecoding.Wrap(err)
 		}
 
 		slice = append(slice, item)
@@ -744,7 +770,7 @@ func (e *CompositeDecoder) Decode(decoder *scale.Decoder) (any, error) {
 		value, err := field.FieldDecoder.Decode(decoder)
 
 		if err != nil {
-			return nil, err
+			return nil, ErrCompositeFieldDecoding.Wrap(err)
 		}
 
 		fieldMap[field.Name] = value
@@ -760,7 +786,7 @@ func (v *ValueDecoder[T]) Decode(decoder *scale.Decoder) (any, error) {
 	var t T
 
 	if err := decoder.Decode(&t); err != nil {
-		return nil, err
+		return nil, ErrValueDecoding.Wrap(err)
 	}
 
 	return t, nil
@@ -773,13 +799,13 @@ type RecursiveDecoder struct {
 
 func (r *RecursiveDecoder) Decode(decoder *scale.Decoder) (any, error) {
 	if r.FieldDecoder == nil {
-		return nil, errors.New("recursive field decoder not found")
+		return nil, ErrRecursiveFieldDecoderNotFound
 	}
 
 	return r.FieldDecoder.Decode(decoder)
 }
 
-// BitSequenceDecoder holds the decoders for the bit store and the bit order or a bit sequence.
+// BitSequenceDecoder holds decoding information for a bit sequence.
 type BitSequenceDecoder struct {
 	FieldName string
 	BitOrder  types.BitOrder
@@ -789,7 +815,7 @@ func (b *BitSequenceDecoder) Decode(decoder *scale.Decoder) (any, error) {
 	bitVec := types.NewBitVec(b.BitOrder)
 
 	if err := bitVec.Decode(*decoder); err != nil {
-		return nil, err
+		return nil, ErrBitVecDecoding.Wrap(err)
 	}
 
 	return map[string]string{

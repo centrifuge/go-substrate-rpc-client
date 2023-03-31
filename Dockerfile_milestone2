@@ -1,0 +1,7 @@
+FROM golang:1.18
+
+COPY . /go-substrate-rpc-client/events-parsing-v2/milestone-2
+
+WORKDIR /go-substrate-rpc-client/events-parsing-v2/milestone-2
+
+CMD go test -v ./registry/... --cover

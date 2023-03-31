@@ -159,7 +159,7 @@ func TestEventParserFn_ParseEvents_EventCountDecodeError(t *testing.T) {
 
 	// No storage data
 	res, err := eventParser.ParseEvents(reg, &types.StorageDataRaw{})
-	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, ErrEventsCountDecoding)
 	assert.Nil(t, res)
 }
 
@@ -202,7 +202,7 @@ func TestEventParserFn_ParseEvents_PhaseDecodeError(t *testing.T) {
 	storageData := types.StorageDataRaw(buf.Bytes())
 
 	res, err := eventParser.ParseEvents(reg, &storageData)
-	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, ErrEventPhaseDecoding)
 	assert.Nil(t, res)
 }
 
@@ -251,7 +251,7 @@ func TestEventParserFn_ParseEvents_EventIDDecodeError(t *testing.T) {
 	storageData := types.StorageDataRaw(buf.Bytes())
 
 	res, err := eventParser.ParseEvents(reg, &storageData)
-	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, ErrEventIDDecoding)
 	assert.Nil(t, res)
 }
 
@@ -304,7 +304,7 @@ func TestEventParserFn_ParseEvents_EventFieldsDecodeError(t *testing.T) {
 	storageData := types.StorageDataRaw(buf.Bytes())
 
 	res, err := eventParser.ParseEvents(reg, &storageData)
-	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, ErrEventFieldsDecoding)
 	assert.Nil(t, res)
 }
 
@@ -353,7 +353,7 @@ func TestEventParserFn_ParseEvents_MissingEventDecoder(t *testing.T) {
 
 	// Empty registry, decoding should fail.
 	res, err := eventParser.ParseEvents(registry.EventRegistry{}, &storageData)
-	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, ErrEventDecoderNotFound)
 	assert.Nil(t, res)
 }
 
@@ -417,7 +417,7 @@ func TestEventParserFn_ParseEvents_TopicsDecodeError(t *testing.T) {
 	storageData := types.StorageDataRaw(buf.Bytes())
 
 	res, err := eventParser.ParseEvents(reg, &storageData)
-	assert.NotNil(t, err)
+	assert.ErrorIs(t, err, ErrEventTopicsDecoding)
 	assert.Nil(t, res)
 }
 

@@ -7,7 +7,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/exec"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/parser"
-	chainMocks "github.com/centrifuge/go-substrate-rpc-client/v4/rpc/chain/mocks"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/chain/generic"
 	stateMocks "github.com/centrifuge/go-substrate-rpc-client/v4/rpc/state/mocks"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/stretchr/testify/assert"
@@ -15,12 +15,35 @@ import (
 )
 
 func TestExtrinsicRetriever_New(t *testing.T) {
-	extrinsicParserMock := parser.NewExtrinsicParserMock(t)
-	chainRPCMock := chainMocks.NewChain(t)
+	extrinsicParserMock := parser.NewExtrinsicParserMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	](t)
+
+	genericChainMock := generic.NewChainMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	](t)
+
 	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
-	chainExecMock := exec.NewRetryableExecutorMock[*types.SignedBlock](t)
-	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic](t)
+	chainExecMock := exec.NewRetryableExecutorMock[*generic.SignedBlock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
+	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
 
 	latestMeta := &types.Metadata{}
 
@@ -34,41 +57,90 @@ func TestExtrinsicRetriever_New(t *testing.T) {
 		Return(callRegistry, nil).
 		Once()
 
-	res, err := NewExtrinsicRetriever(
+	res, err := NewExtrinsicRetriever[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	](
 		extrinsicParserMock,
-		chainRPCMock,
+		genericChainMock,
 		stateRPCMock,
 		registryFactoryMock,
 		chainExecMock,
 		parsingExecMock,
 	)
 	assert.NoError(t, err)
-	assert.IsType(t, &extrinsicRetriever{}, res)
+	assert.IsType(t, &extrinsicRetriever[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	]{}, res)
 }
 
 func TestExtrinsicRetriever_New_InternalStateUpdateError(t *testing.T) {
-	extrinsicParserMock := parser.NewExtrinsicParserMock(t)
-	chainRPCMock := chainMocks.NewChain(t)
+	extrinsicParserMock := parser.NewExtrinsicParserMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	](t)
+
+	genericChainMock := generic.NewChainMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	](t)
+
 	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
-	chainExecMock := exec.NewRetryableExecutorMock[*types.SignedBlock](t)
-	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic](t)
-
+	chainExecMock := exec.NewRetryableExecutorMock[*generic.SignedBlock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
+	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
 	metadataRetrievalError := errors.New("error")
 
 	stateRPCMock.On("GetMetadataLatest").
 		Return(nil, metadataRetrievalError).
 		Once()
 
-	res, err := NewExtrinsicRetriever(
+	res, err := NewExtrinsicRetriever[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	](
 		extrinsicParserMock,
-		chainRPCMock,
+		genericChainMock,
 		stateRPCMock,
 		registryFactoryMock,
 		chainExecMock,
 		parsingExecMock,
 	)
-	assert.ErrorIs(t, err, metadataRetrievalError)
+	assert.ErrorIs(t, err, ErrInternalStateUpdate)
 	assert.Nil(t, res)
 
 	latestMeta := &types.Metadata{}
@@ -83,20 +155,39 @@ func TestExtrinsicRetriever_New_InternalStateUpdateError(t *testing.T) {
 		Return(nil, registryFactoryError).
 		Once()
 
-	res, err = NewExtrinsicRetriever(
+	res, err = NewExtrinsicRetriever[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	](
 		extrinsicParserMock,
-		chainRPCMock,
+		genericChainMock,
 		stateRPCMock,
 		registryFactoryMock,
 		chainExecMock,
 		parsingExecMock,
 	)
-	assert.ErrorIs(t, err, registryFactoryError)
+	assert.ErrorIs(t, err, ErrInternalStateUpdate)
 	assert.Nil(t, res)
 }
 
 func TestExtrinsicRetriever_NewDefault(t *testing.T) {
-	chainRPCMock := chainMocks.NewChain(t)
+	genericChainMock := generic.NewChainMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	](t)
+
 	stateRPCMock := stateMocks.NewState(t)
 
 	latestMeta := &types.Metadata{}
@@ -105,45 +196,102 @@ func TestExtrinsicRetriever_NewDefault(t *testing.T) {
 		Return(latestMeta, nil).
 		Once()
 
-	res, err := NewDefaultExtrinsicRetriever(chainRPCMock, stateRPCMock)
-	assert.NoError(t, err)
-	assert.IsType(t, &extrinsicRetriever{}, res)
+	res, err := NewDefaultExtrinsicRetriever[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	](genericChainMock, stateRPCMock)
 
-	retriever := res.(*extrinsicRetriever)
-	assert.IsType(t, parser.NewExtrinsicParser(), retriever.extrinsicParser)
+	assert.NoError(t, err)
+	assert.IsType(t, &extrinsicRetriever[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	]{}, res)
+
+	retriever := res.(*extrinsicRetriever[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	])
+	assert.IsType(t, parser.NewExtrinsicParser[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	](), retriever.extrinsicParser)
 	assert.IsType(t, registry.NewFactory(), retriever.registryFactory)
-	assert.IsType(t, exec.NewRetryableExecutor[*types.SignedBlock](), retriever.chainExecutor)
-	assert.IsType(t, exec.NewRetryableExecutor[[]*parser.Extrinsic](), retriever.extrinsicParsingExecutor)
+	assert.IsType(t, exec.NewRetryableExecutor[*generic.SignedBlock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](), retriever.chainExecutor)
+	assert.IsType(t, exec.NewRetryableExecutor[[]*parser.Extrinsic[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](), retriever.extrinsicParsingExecutor)
 	assert.Equal(t, latestMeta, retriever.meta)
 	assert.NotNil(t, retriever.callRegistry)
 }
 
-func TestExtrinsicRetriever_NewDefault_MetadataRetrievalError(t *testing.T) {
-	chainRPCMock := chainMocks.NewChain(t)
-	stateRPCMock := stateMocks.NewState(t)
-
-	metadataRetrievalError := errors.New("error")
-
-	stateRPCMock.On("GetMetadataLatest").
-		Return(nil, metadataRetrievalError).
-		Once()
-
-	res, err := NewDefaultExtrinsicRetriever(chainRPCMock, stateRPCMock)
-	assert.ErrorIs(t, err, metadataRetrievalError)
-	assert.Nil(t, res)
-}
-
 func TestExtrinsicRetriever_GetExtrinsics(t *testing.T) {
-	extrinsicParserMock := parser.NewExtrinsicParserMock(t)
-	chainRPCMock := chainMocks.NewChain(t)
+	extrinsicParserMock := parser.NewExtrinsicParserMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	](t)
+
+	genericChainMock := generic.NewChainMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	](t)
+
 	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
-	chainExecMock := exec.NewRetryableExecutorMock[*types.SignedBlock](t)
-	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic](t)
+	chainExecMock := exec.NewRetryableExecutorMock[*generic.SignedBlock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
+	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
 
-	extrinsicRetriever := &extrinsicRetriever{
+	extrinsicRetriever := &extrinsicRetriever[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	]{
 		extrinsicParser:          extrinsicParserMock,
-		chainRPC:                 chainRPCMock,
+		genericChain:             genericChainMock,
 		stateRPC:                 stateRPCMock,
 		registryFactory:          registryFactoryMock,
 		chainExecutor:            chainExecMock,
@@ -160,16 +308,24 @@ func TestExtrinsicRetriever_GetExtrinsics(t *testing.T) {
 
 	blockHash := types.NewHash([]byte{0, 1, 2, 3})
 
-	signedBlock := &types.SignedBlock{}
+	signedBlock := &generic.SignedBlock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]{}
 
-	chainRPCMock.On("GetBlock", blockHash).
+	genericChainMock.On("GetBlock", blockHash).
 		Return(signedBlock, nil).
 		Once()
 
 	chainExecMock.On("ExecWithFallback", mock.Anything, mock.Anything).
 		Run(
 			func(args mock.Arguments) {
-				execFn, ok := args.Get(0).(func() (*types.SignedBlock, error))
+				execFn, ok := args.Get(0).(func() (*generic.SignedBlock[
+					types.MultiAddress,
+					types.MultiSignature,
+					generic.DefaultPaymentFields,
+				], error))
 				assert.True(t, ok)
 
 				execFnRes, err := execFn()
@@ -178,7 +334,11 @@ func TestExtrinsicRetriever_GetExtrinsics(t *testing.T) {
 			},
 		).Return(signedBlock, nil)
 
-	parsedExtrinsics := []*parser.Extrinsic{}
+	var parsedExtrinsics []*parser.Extrinsic[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]
 
 	extrinsicParserMock.On("ParseExtrinsics", callRegistry, signedBlock).
 		Return(parsedExtrinsics, nil).
@@ -187,7 +347,11 @@ func TestExtrinsicRetriever_GetExtrinsics(t *testing.T) {
 	parsingExecMock.On("ExecWithFallback", mock.Anything, mock.Anything).
 		Run(
 			func(args mock.Arguments) {
-				execFn, ok := args.Get(0).(func() ([]*parser.Extrinsic, error))
+				execFn, ok := args.Get(0).(func() ([]*parser.Extrinsic[
+					types.MultiAddress,
+					types.MultiSignature,
+					generic.DefaultPaymentFields,
+				], error))
 				assert.True(t, ok)
 
 				execFnRes, err := execFn()
@@ -202,16 +366,48 @@ func TestExtrinsicRetriever_GetExtrinsics(t *testing.T) {
 }
 
 func TestExtrinsicRetriever_GetExtrinsics_BlockRetrievalError(t *testing.T) {
-	extrinsicParserMock := parser.NewExtrinsicParserMock(t)
-	chainRPCMock := chainMocks.NewChain(t)
+	extrinsicParserMock := parser.NewExtrinsicParserMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	](t)
+
+	genericChainMock := generic.NewChainMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	](t)
+
 	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
-	chainExecMock := exec.NewRetryableExecutorMock[*types.SignedBlock](t)
-	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic](t)
+	chainExecMock := exec.NewRetryableExecutorMock[*generic.SignedBlock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
+	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
 
-	extrinsicRetriever := &extrinsicRetriever{
+	extrinsicRetriever := &extrinsicRetriever[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	]{
 		extrinsicParser:          extrinsicParserMock,
-		chainRPC:                 chainRPCMock,
+		genericChain:             genericChainMock,
 		stateRPC:                 stateRPCMock,
 		registryFactory:          registryFactoryMock,
 		chainExecutor:            chainExecMock,
@@ -230,43 +426,85 @@ func TestExtrinsicRetriever_GetExtrinsics_BlockRetrievalError(t *testing.T) {
 
 	blockRetrievalError := errors.New("error")
 
-	chainRPCMock.On("GetBlock", blockHash).
-		Return(nil, blockRetrievalError).
+	signedBlock := &generic.SignedBlock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]{}
+
+	genericChainMock.On("GetBlock", blockHash).
+		Return(signedBlock, blockRetrievalError).
 		Once()
 
 	chainExecMock.On("ExecWithFallback", mock.Anything, mock.Anything).
 		Run(
 			func(args mock.Arguments) {
-				execFn, ok := args.Get(0).(func() (*types.SignedBlock, error))
+				execFn, ok := args.Get(0).(func() (*generic.SignedBlock[
+					types.MultiAddress,
+					types.MultiSignature,
+					generic.DefaultPaymentFields,
+				], error))
 				assert.True(t, ok)
 
 				execFnRes, err := execFn()
 				assert.ErrorIs(t, err, blockRetrievalError)
-				assert.Nil(t, execFnRes)
+				assert.Equal(t, signedBlock, execFnRes)
 
 				fallbackFn, ok := args.Get(1).(func() error)
 				assert.True(t, ok)
 
 				assert.NoError(t, fallbackFn())
 			},
-		).Return(&types.SignedBlock{}, blockRetrievalError)
+		).Return(signedBlock, blockRetrievalError)
 
 	res, err := extrinsicRetriever.GetExtrinsics(blockHash)
-	assert.ErrorIs(t, err, blockRetrievalError)
+	assert.ErrorIs(t, err, ErrBlockRetrieval)
 	assert.Nil(t, res)
 }
 
 func TestExtrinsicRetriever_GetExtrinsics_ExtrinsicParsingError(t *testing.T) {
-	extrinsicParserMock := parser.NewExtrinsicParserMock(t)
-	chainRPCMock := chainMocks.NewChain(t)
+	extrinsicParserMock := parser.NewExtrinsicParserMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	](t)
+
+	genericChainMock := generic.NewChainMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	](t)
+
 	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
-	chainExecMock := exec.NewRetryableExecutorMock[*types.SignedBlock](t)
-	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic](t)
+	chainExecMock := exec.NewRetryableExecutorMock[*generic.SignedBlock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
+	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
 
-	extrinsicRetriever := &extrinsicRetriever{
+	extrinsicRetriever := &extrinsicRetriever[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	]{
 		extrinsicParser:          extrinsicParserMock,
-		chainRPC:                 chainRPCMock,
+		genericChain:             genericChainMock,
 		stateRPC:                 stateRPCMock,
 		registryFactory:          registryFactoryMock,
 		chainExecutor:            chainExecMock,
@@ -283,16 +521,24 @@ func TestExtrinsicRetriever_GetExtrinsics_ExtrinsicParsingError(t *testing.T) {
 
 	blockHash := types.NewHash([]byte{0, 1, 2, 3})
 
-	signedBlock := &types.SignedBlock{}
+	signedBlock := &generic.SignedBlock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]{}
 
-	chainRPCMock.On("GetBlock", blockHash).
+	genericChainMock.On("GetBlock", blockHash).
 		Return(signedBlock, nil).
 		Once()
 
 	chainExecMock.On("ExecWithFallback", mock.Anything, mock.Anything).
 		Run(
 			func(args mock.Arguments) {
-				execFn, ok := args.Get(0).(func() (*types.SignedBlock, error))
+				execFn, ok := args.Get(0).(func() (*generic.SignedBlock[
+					types.MultiAddress,
+					types.MultiSignature,
+					generic.DefaultPaymentFields,
+				], error))
 				assert.True(t, ok)
 
 				execFnRes, err := execFn()
@@ -318,7 +564,11 @@ func TestExtrinsicRetriever_GetExtrinsics_ExtrinsicParsingError(t *testing.T) {
 	parsingExecMock.On("ExecWithFallback", mock.Anything, mock.Anything).
 		Run(
 			func(args mock.Arguments) {
-				execFn, ok := args.Get(0).(func() ([]*parser.Extrinsic, error))
+				execFn, ok := args.Get(0).(func() ([]*parser.Extrinsic[
+					types.MultiAddress,
+					types.MultiSignature,
+					generic.DefaultPaymentFields,
+				], error))
 				assert.True(t, ok)
 
 				execFnRes, err := execFn()
@@ -331,24 +581,60 @@ func TestExtrinsicRetriever_GetExtrinsics_ExtrinsicParsingError(t *testing.T) {
 				err = fallbackFn()
 				assert.NoError(t, err)
 			},
-		).Return([]*parser.Extrinsic{}, extrinsicParsingError)
+		).Return([]*parser.Extrinsic[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]{}, extrinsicParsingError)
 
 	res, err := extrinsicRetriever.GetExtrinsics(blockHash)
-	assert.ErrorIs(t, err, extrinsicParsingError)
+	assert.ErrorIs(t, err, ErrExtrinsicParsing)
 	assert.Nil(t, res)
 }
 
 func TestExtrinsicRetriever_updateInternalState(t *testing.T) {
-	extrinsicParserMock := parser.NewExtrinsicParserMock(t)
-	chainRPCMock := chainMocks.NewChain(t)
+	extrinsicParserMock := parser.NewExtrinsicParserMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	](t)
+
+	genericChainMock := generic.NewChainMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	](t)
+
 	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
-	chainExecMock := exec.NewRetryableExecutorMock[*types.SignedBlock](t)
-	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic](t)
+	chainExecMock := exec.NewRetryableExecutorMock[*generic.SignedBlock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
+	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
 
-	extrinsicRetriever := &extrinsicRetriever{
+	extrinsicRetriever := &extrinsicRetriever[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	]{
 		extrinsicParser:          extrinsicParserMock,
-		chainRPC:                 chainRPCMock,
+		genericChain:             genericChainMock,
 		stateRPC:                 stateRPCMock,
 		registryFactory:          registryFactoryMock,
 		chainExecutor:            chainExecMock,
@@ -387,16 +673,48 @@ func TestExtrinsicRetriever_updateInternalState(t *testing.T) {
 }
 
 func TestExtrinsicRetriever_updateInternalState_MetadataRetrievalError(t *testing.T) {
-	extrinsicParserMock := parser.NewExtrinsicParserMock(t)
-	chainRPCMock := chainMocks.NewChain(t)
+	extrinsicParserMock := parser.NewExtrinsicParserMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	](t)
+
+	genericChainMock := generic.NewChainMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	](t)
+
 	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
-	chainExecMock := exec.NewRetryableExecutorMock[*types.SignedBlock](t)
-	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic](t)
+	chainExecMock := exec.NewRetryableExecutorMock[*generic.SignedBlock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
+	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
 
-	extrinsicRetriever := &extrinsicRetriever{
+	extrinsicRetriever := &extrinsicRetriever[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	]{
 		extrinsicParser:          extrinsicParserMock,
-		chainRPC:                 chainRPCMock,
+		genericChain:             genericChainMock,
 		stateRPC:                 stateRPCMock,
 		registryFactory:          registryFactoryMock,
 		chainExecutor:            chainExecMock,
@@ -412,27 +730,59 @@ func TestExtrinsicRetriever_updateInternalState_MetadataRetrievalError(t *testin
 		Once()
 
 	err := extrinsicRetriever.updateInternalState(&blockHash)
-	assert.ErrorIs(t, err, metadataRetrievalError)
+	assert.ErrorIs(t, err, ErrMetadataRetrieval)
 
 	stateRPCMock.On("GetMetadataLatest").
 		Return(nil, metadataRetrievalError).
 		Once()
 
 	err = extrinsicRetriever.updateInternalState(nil)
-	assert.ErrorIs(t, err, metadataRetrievalError)
+	assert.ErrorIs(t, err, ErrMetadataRetrieval)
 }
 
 func TestExtrinsicRetriever_updateInternalState_RegistryFactoryError(t *testing.T) {
-	extrinsicParserMock := parser.NewExtrinsicParserMock(t)
-	chainRPCMock := chainMocks.NewChain(t)
+	extrinsicParserMock := parser.NewExtrinsicParserMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	](t)
+
+	genericChainMock := generic.NewChainMock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	](t)
+
 	stateRPCMock := stateMocks.NewState(t)
 	registryFactoryMock := registry.NewFactoryMock(t)
-	chainExecMock := exec.NewRetryableExecutorMock[*types.SignedBlock](t)
-	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic](t)
+	chainExecMock := exec.NewRetryableExecutorMock[*generic.SignedBlock[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
+	parsingExecMock := exec.NewRetryableExecutorMock[[]*parser.Extrinsic[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]](t)
 
-	extrinsicRetriever := &extrinsicRetriever{
+	extrinsicRetriever := &extrinsicRetriever[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.SignedBlock[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		],
+	]{
 		extrinsicParser:          extrinsicParserMock,
-		chainRPC:                 chainRPCMock,
+		genericChain:             genericChainMock,
 		stateRPC:                 stateRPCMock,
 		registryFactory:          registryFactoryMock,
 		chainExecutor:            chainExecMock,
@@ -454,7 +804,7 @@ func TestExtrinsicRetriever_updateInternalState_RegistryFactoryError(t *testing.
 		Once()
 
 	err := extrinsicRetriever.updateInternalState(&blockHash)
-	assert.ErrorIs(t, err, registryFactoryError)
+	assert.ErrorIs(t, err, ErrCallRegistryCreation)
 
 	latestMeta := &types.Metadata{}
 
@@ -467,5 +817,5 @@ func TestExtrinsicRetriever_updateInternalState_RegistryFactoryError(t *testing.
 		Once()
 
 	err = extrinsicRetriever.updateInternalState(nil)
-	assert.ErrorIs(t, err, registryFactoryError)
+	assert.ErrorIs(t, err, ErrCallRegistryCreation)
 }

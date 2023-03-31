@@ -9,6 +9,7 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+// Event holds all the information of a decoded storage event.
 type Event struct {
 	Name    string
 	Fields  map[string]any
@@ -19,24 +20,30 @@ type Event struct {
 
 //go:generate mockery --name EventParser --structname EventParserMock --filename event_parser_mock.go --inpackage
 
+// EventParser is the interface used for parsing event storage data into []*Event.
 type EventParser interface {
 	ParseEvents(eventRegistry registry.EventRegistry, sd *types.StorageDataRaw) ([]*Event, error)
 }
 
+// EventParserFn implements EventParser.
 type EventParserFn func(eventRegistry registry.EventRegistry, sd *types.StorageDataRaw) ([]*Event, error)
 
+// ParseEvents is the function required for satisfying the EventParser interface.
 func (f EventParserFn) ParseEvents(eventRegistry registry.EventRegistry, sd *types.StorageDataRaw) ([]*Event, error) {
 	return f(eventRegistry, sd)
 }
 
+// NewEventParser creates a new EventParser.
 func NewEventParser() EventParser {
+	// The EventParserFn provided here is decoding the total number of events from the storage data then attempts
+	// to decode all the information for each event.
 	return EventParserFn(func(eventRegistry registry.EventRegistry, sd *types.StorageDataRaw) ([]*Event, error) {
 		decoder := scale.NewDecoder(bytes.NewReader(*sd))
 
 		eventsCount, err := decoder.DecodeUintCompact()
 
 		if err != nil {
-			return nil, fmt.Errorf("couldn't get number of events: %w", err)
+			return nil, ErrEventsCountDecoding.Wrap(err)
 		}
 
 		var events []*Event
@@ -45,31 +52,31 @@ func NewEventParser() EventParser {
 			var phase types.Phase
 
 			if err := decoder.Decode(&phase); err != nil {
-				return nil, fmt.Errorf("couldn't decode Phase for event #%d: %w", i, err)
+				return nil, ErrEventPhaseDecoding.Wrap(fmt.Errorf("event #%d: %w", i, err))
 			}
 
 			var eventID types.EventID
 
 			if err := decoder.Decode(&eventID); err != nil {
-				return nil, fmt.Errorf("couldn't decode event ID for event #%d: %w", i, err)
+				return nil, ErrEventIDDecoding.Wrap(fmt.Errorf("event #%d: %w", i, err))
 			}
 
 			eventDecoder, ok := eventRegistry[eventID]
 
 			if !ok {
-				return nil, fmt.Errorf("couldn't find decoder for event #%d with ID: %v", i, eventID)
+				return nil, ErrEventDecoderNotFound.WithMsg("event #%d with ID: %v", i, eventID)
 			}
 
 			eventFields, err := eventDecoder.Decode(decoder)
 
 			if err != nil {
-				return nil, fmt.Errorf("couldn't decode event fields: %w", err)
+				return nil, ErrEventFieldsDecoding.Wrap(fmt.Errorf("event #%d: %w", i, err))
 			}
 
 			var topics []types.Hash
 
 			if err := decoder.Decode(&topics); err != nil {
-				return nil, fmt.Errorf("unable to decode topics for event #%v: %w", i, err)
+				return nil, ErrEventTopicsDecoding.Wrap(fmt.Errorf("event #%d: %w", i, err))
 			}
 
 			event := &Event{
