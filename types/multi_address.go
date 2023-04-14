@@ -60,8 +60,10 @@ func (m MultiAddress) Encode(encoder scale.Encoder) error {
 	var err error
 	switch {
 	case m.IsID:
-		if err = encoder.PushByte(0); err != nil {
-			return err
+		if !defaultOptions.NoPalletIndices { // Skip in case target chain doesn't include indices pallet
+			if err = encoder.PushByte(0); err != nil {
+				return err
+			}
 		}
 
 		return encoder.Encode(m.AsID)
@@ -98,6 +100,21 @@ func (m *MultiAddress) Decode(decoder scale.Decoder) error {
 	b, err := decoder.ReadOneByte()
 	if err != nil {
 		return err
+	}
+
+	if defaultOptions.NoPalletIndices {
+		var sm [31]byte // Reading Address[32] minus b already read
+		err = decoder.Decode(&sm)
+		if err != nil {
+			return err
+		}
+		accountID, err := NewAccountID(append([]byte{b}, sm[:]...)) // Push b back to the front
+		if err != nil {
+			return err
+		}
+		m.AsID = *accountID
+		m.IsID = true
+		return nil
 	}
 
 	switch b {
