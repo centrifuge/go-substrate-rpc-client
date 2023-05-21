@@ -26,7 +26,7 @@ type JunctionV1 struct {
 
 	IsAccountID32        bool
 	AccountID32NetworkID NetworkID
-	AccountID            []U8
+	AccountID            [32]U8
 
 	IsAccountIndex64        bool
 	AccountIndex64NetworkID NetworkID
