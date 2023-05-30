@@ -7,11 +7,11 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/centrifuge/go-substrate-rpc-client)](https://goreportcard.com/report/github.com/centrifuge/go-substrate-rpc-client)
 
 Substrate RPC client in Go. It provides APIs and types around Polkadot and any Substrate-based chain RPC calls.
-This client is modelled after [polkadot-js/api](https://github.com/polkadot-js/api).
+This client is modeled after [polkadot-js/api](https://github.com/polkadot-js/api).
 
 ## State
 
-This package is feature complete, but it is relatively new and might still contain bugs. We advice to use it with caution in production. It comes without any warranties, please refer to LICENCE for details.
+This package is feature complete, but it is relatively new and might still contain bugs. We advise to use it with caution in production. It comes without any warranties, please refer to LICENCE for details.
 
 ## Documentation & Usage Examples
 
@@ -39,7 +39,7 @@ the tests within a tests-dedicated Docker container or without a container.
 
 Visit https://polkadot.js.org/apps for inspection
 
-**Note**: To use a custom Substrate endpoint, first set the enviromment variable before running the tests:
+**Note**: To use a custom Substrate endpoint, first set the environment variable before running the tests:
 `export RPC_URL="http://example.com:9934"`
 
 ### Adding support for new RPC methods
