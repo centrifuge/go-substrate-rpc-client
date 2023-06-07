@@ -2516,6 +2516,23 @@ type EventTreasuryDeposit struct {
 	Topics    []Hash
 }
 
+// EventTreasurySpendApproved is emitted when a spend is approved.
+type EventTreasurySpendApproved struct {
+	Phase         Phase
+	ProposalIndex U32
+	Amount        U128
+	Beneficiary   AccountID
+	Topics        []Hash
+}
+
+// EventTreasuryUpdatedInactive is emitted when the inactive funds of the pallet have been updated.
+type EventTreasuryUpdatedInactive struct {
+	Phase       Phase
+	Reactivated U128
+	Deactivated U128
+	Topics      []Hash
+}
+
 // EventTipsNewTip is emitted when a new tip suggestion has been opened.
 type EventTipsNewTip struct {
 	Phase  Phase
