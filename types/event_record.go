@@ -237,6 +237,9 @@ type EventRecords struct {
 
 	Offences_Offence []EventOffencesOffence `test-gen-blockchain:"polkadot"`
 
+	OrmlAssetRegistry_RegisteredAsset []EventOrmlAssetRegistryRegisteredAsset `test-gen-blockchain:"polkadot"`
+	OrmlAssetRegistry_UpdatedAsset    []EventOrmlAssetRegistryUpdatedAsset    `test-gen-blockchain:"polkadot"`
+
 	Paras_CurrentCodeUpdated   []EventParasCurrentCodeUpdated   `test-gen-blockchain:"polkadot"`
 	Paras_CurrentHeadUpdated   []EventParasCurrentHeadUpdated   `test-gen-blockchain:"polkadot"`
 	Paras_CodeUpgradeScheduled []EventParasCodeUpgradeScheduled `test-gen-blockchain:"polkadot"`

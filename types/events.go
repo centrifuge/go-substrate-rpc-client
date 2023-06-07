@@ -270,6 +270,40 @@ type EventOffencesOffence struct {
 	Topics         []Hash
 }
 
+type EventOrmlAssetRegistryRegisteredAsset struct {
+	Phase    Phase
+	AssetID  CurrencyID
+	Metadata AssetMetadata
+	Topics   []Hash
+}
+
+type EventOrmlAssetRegistryUpdatedAsset struct {
+	Phase    Phase
+	AssetID  CurrencyID
+	Metadata AssetMetadata
+	Topics   []Hash
+}
+
+type AssetMetadata struct {
+	Decimals           U32
+	Name               []U8
+	Symbol             []U8
+	ExistentialBalance U128
+	Location           Option[VersionedMultiLocation]
+	Additional         CustomMetadata
+}
+
+type CustomMetadata struct {
+	Xcm          XcmMetadata
+	Mintable     bool
+	Permissioned bool
+	PoolCurrency bool
+}
+
+type XcmMetadata struct {
+	FeePerSecond Option[U128]
+}
+
 // EventParasCurrentCodeUpdated is emitted when the current code has been updated for a Para.
 type EventParasCurrentCodeUpdated struct {
 	Phase       Phase
