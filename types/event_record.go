@@ -237,6 +237,9 @@ type EventRecords struct {
 
 	Offences_Offence []EventOffencesOffence `test-gen-blockchain:"polkadot"`
 
+	OrmlAssetRegistry_RegisteredAsset []EventOrmlAssetRegistryRegisteredAsset `test-gen-blockchain:"polkadot"`
+	OrmlAssetRegistry_UpdatedAsset    []EventOrmlAssetRegistryUpdatedAsset    `test-gen-blockchain:"polkadot"`
+
 	Paras_CurrentCodeUpdated   []EventParasCurrentCodeUpdated   `test-gen-blockchain:"polkadot"`
 	Paras_CurrentHeadUpdated   []EventParasCurrentHeadUpdated   `test-gen-blockchain:"polkadot"`
 	Paras_CodeUpgradeScheduled []EventParasCodeUpgradeScheduled `test-gen-blockchain:"polkadot"`
@@ -380,13 +383,15 @@ type EventRecords struct {
 
 	TransactionPayment_TransactionFeePaid []EventTransactionPaymentTransactionFeePaid `test-gen-blockchain:"westend"`
 
-	Treasury_Awarded  []EventTreasuryAwarded  `test-gen-blockchain:"altair"`
-	Treasury_Burnt    []EventTreasuryBurnt    `test-gen-blockchain:"altair"`
-	Treasury_Deposit  []EventTreasuryDeposit  `test-gen-blockchain:"altair"`
-	Treasury_Proposed []EventTreasuryProposed `test-gen-blockchain:"altair"`
-	Treasury_Rejected []EventTreasuryRejected `test-gen-blockchain:"altair"`
-	Treasury_Rollover []EventTreasuryRollover `test-gen-blockchain:"altair"`
-	Treasury_Spending []EventTreasurySpending `test-gen-blockchain:"altair"`
+	Treasury_Proposed        []EventTreasuryProposed        `test-gen-blockchain:"altair"`
+	Treasury_Spending        []EventTreasurySpending        `test-gen-blockchain:"altair"`
+	Treasury_Awarded         []EventTreasuryAwarded         `test-gen-blockchain:"altair"`
+	Treasury_Rejected        []EventTreasuryRejected        `test-gen-blockchain:"altair"`
+	Treasury_Burnt           []EventTreasuryBurnt           `test-gen-blockchain:"altair"`
+	Treasury_Rollover        []EventTreasuryRollover        `test-gen-blockchain:"altair"`
+	Treasury_Deposit         []EventTreasuryDeposit         `test-gen-blockchain:"altair"`
+	Treasury_SpendApproved   []EventTreasurySpendApproved   `test-gen-blockchain:"altair"`
+	Treasury_UpdatedInactive []EventTreasuryUpdatedInactive `test-gen-blockchain:"altair"`
 
 	Uniques_ApprovalCancelled    []EventUniquesApprovalCancelled    `test-gen-blockchain:"altair"`
 	Uniques_ApprovedTransfer     []EventUniquesApprovedTransfer     `test-gen-blockchain:"altair"`

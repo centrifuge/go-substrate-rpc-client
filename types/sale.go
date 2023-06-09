@@ -16,7 +16,11 @@
 
 package types
 
-import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+import (
+	"errors"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
+)
 
 type Tranche struct {
 	FirstVal  U64
@@ -51,20 +55,50 @@ func (p *PermissionedCurrency) Encode(_ scale.Encoder) error {
 	return nil
 }
 
+type StakingCurrency struct {
+	IsBlockRewards bool
+}
+
+func (s *StakingCurrency) Decode(decoder scale.Decoder) error {
+	b, err := decoder.ReadOneByte()
+	if err != nil {
+		return err
+	}
+
+	switch b {
+	case 0:
+		s.IsBlockRewards = true
+
+		return nil
+	default:
+		return errors.New("unsupported staking currency")
+	}
+}
+
+func (s StakingCurrency) Encode(encoder scale.Encoder) error {
+	switch {
+	case s.IsBlockRewards:
+		return encoder.PushByte(0)
+	default:
+		return errors.New("unsupported staking currency")
+	}
+}
+
 type CurrencyID struct {
 	IsNative bool
-
-	IsUsd bool
 
 	IsTranche bool
 	Tranche   Tranche
 
 	IsKSM bool
 
-	IsKUSD bool
+	IsAUSD bool
 
-	IsPermissioned       bool
-	PermissionedCurrency PermissionedCurrency
+	IsForeignAsset bool
+	AsForeignAsset U32
+
+	IsStaking bool
+	AsStaking StakingCurrency
 }
 
 func (c *CurrencyID) Decode(decoder scale.Decoder) error {
@@ -76,50 +110,62 @@ func (c *CurrencyID) Decode(decoder scale.Decoder) error {
 	switch b {
 	case 0:
 		c.IsNative = true
+
+		return nil
 	case 1:
-		c.IsUsd = true
-	case 2:
 		c.IsTranche = true
 
 		return decoder.Decode(&c.Tranche)
-	case 3:
+	case 2:
 		c.IsKSM = true
+
+		return nil
+	case 3:
+		c.IsAUSD = true
+
+		return nil
 	case 4:
-		c.IsKUSD = true
+		c.IsForeignAsset = true
+
+		return decoder.Decode(&c.AsForeignAsset)
 	case 5:
-		c.IsPermissioned = true
+		c.IsStaking = true
 
-		return decoder.Decode(&c.PermissionedCurrency)
+		return decoder.Decode(&c.AsStaking)
+	default:
+		return errors.New("unsupported currency ID")
 	}
-
-	return nil
 }
 
 func (c CurrencyID) Encode(encoder scale.Encoder) error {
 	switch {
 	case c.IsNative:
 		return encoder.PushByte(0)
-	case c.IsUsd:
-		return encoder.PushByte(1)
 	case c.IsTranche:
-		if err := encoder.PushByte(2); err != nil {
+		if err := encoder.PushByte(1); err != nil {
 			return err
 		}
 
 		return encoder.Encode(c.Tranche)
 	case c.IsKSM:
+		return encoder.PushByte(2)
+	case c.IsAUSD:
 		return encoder.PushByte(3)
-	case c.IsKUSD:
-		return encoder.PushByte(4)
-	case c.IsPermissioned:
+	case c.IsForeignAsset:
+		if err := encoder.PushByte(4); err != nil {
+			return err
+		}
+
+		return encoder.Encode(c.AsForeignAsset)
+	case c.IsStaking:
 		if err := encoder.PushByte(5); err != nil {
 			return err
 		}
 
-		return encoder.Encode(c.PermissionedCurrency)
+		return encoder.Encode(c.AsStaking)
+	default:
+		return errors.New("unsupported currency ID")
 	}
-
-	return nil
 }
 
 type Price struct {

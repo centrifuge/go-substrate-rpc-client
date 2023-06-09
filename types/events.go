@@ -270,6 +270,40 @@ type EventOffencesOffence struct {
 	Topics         []Hash
 }
 
+type EventOrmlAssetRegistryRegisteredAsset struct {
+	Phase    Phase
+	AssetID  CurrencyID
+	Metadata AssetMetadata
+	Topics   []Hash
+}
+
+type EventOrmlAssetRegistryUpdatedAsset struct {
+	Phase    Phase
+	AssetID  CurrencyID
+	Metadata AssetMetadata
+	Topics   []Hash
+}
+
+type AssetMetadata struct {
+	Decimals           U32
+	Name               []U8
+	Symbol             []U8
+	ExistentialBalance U128
+	Location           Option[VersionedMultiLocation]
+	Additional         CustomMetadata
+}
+
+type CustomMetadata struct {
+	Xcm          XcmMetadata
+	Mintable     bool
+	Permissioned bool
+	PoolCurrency bool
+}
+
+type XcmMetadata struct {
+	FeePerSecond Option[U128]
+}
+
 // EventParasCurrentCodeUpdated is emitted when the current code has been updated for a Para.
 type EventParasCurrentCodeUpdated struct {
 	Phase       Phase
@@ -2514,6 +2548,23 @@ type EventTreasuryDeposit struct {
 	Phase     Phase
 	Deposited U128
 	Topics    []Hash
+}
+
+// EventTreasurySpendApproved is emitted when a spend is approved.
+type EventTreasurySpendApproved struct {
+	Phase         Phase
+	ProposalIndex U32
+	Amount        U128
+	Beneficiary   AccountID
+	Topics        []Hash
+}
+
+// EventTreasuryUpdatedInactive is emitted when the inactive funds of the pallet have been updated.
+type EventTreasuryUpdatedInactive struct {
+	Phase       Phase
+	Reactivated U128
+	Deactivated U128
+	Topics      []Hash
 }
 
 // EventTipsNewTip is emitted when a new tip suggestion has been opened.
