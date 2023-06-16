@@ -598,7 +598,7 @@ func (f *factory) getStoredFieldDecoder(fieldLookupIndex int64) (FieldDecoder, b
 }
 
 const (
-	fieldSeparator    = "_"
+	fieldSeparator    = "."
 	lookupIndexFormat = "lookup_index_%d"
 )
 
