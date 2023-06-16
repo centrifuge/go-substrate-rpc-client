@@ -10,6 +10,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
+type DefaultGenericSignedBlock = SignedBlock[
+	types.MultiAddress,
+	types.MultiSignature,
+	DefaultPaymentFields,
+]
+
 // GenericSignedBlock is the interface that represents the block of a particular chain.
 //
 // This interface is generic over types A, S, P, please check GenericExtrinsicSignature for more

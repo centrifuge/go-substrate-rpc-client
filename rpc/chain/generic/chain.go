@@ -42,6 +42,23 @@ func NewChain[
 	}
 }
 
+type DefaultChain = Chain[
+	types.MultiAddress,
+	types.MultiSignature,
+	DefaultPaymentFields,
+	*DefaultGenericSignedBlock,
+]
+
+// NewDefaultChain creates a new instance of Chain.
+func NewDefaultChain(client client.Client) DefaultChain {
+	return NewChain[
+		types.MultiAddress,
+		types.MultiSignature,
+		DefaultPaymentFields,
+		*DefaultGenericSignedBlock,
+	](client)
+}
+
 // GetBlock retrieves a generic block B found at blockHash.
 func (g *genericChain[A, S, P, B]) GetBlock(blockHash types.Hash) (B, error) {
 	return g.getBlock(&blockHash)
