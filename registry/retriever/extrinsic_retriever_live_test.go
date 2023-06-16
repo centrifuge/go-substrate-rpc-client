@@ -27,34 +27,34 @@ var (
 		]{
 			url: "wss://fullnode.parachain.centrifuge.io",
 		},
-		//&testChain[
-		//	types.MultiAddress,
-		//	types.MultiSignature,
-		//	generic.DefaultPaymentFields,
-		//]{
-		//	url: "wss://rpc.polkadot.io",
-		//},
-		//&testChain[
-		//	types.MultiAddress,
-		//	types.MultiSignature,
-		//	generic.PaymentFieldsWithAssetID,
-		//]{
-		//	url: "wss://statemint-rpc.polkadot.io",
-		//},
-		//&testChain[
-		//	types.MultiAddress,
-		//	AcalaMultiSignature,
-		//	generic.DefaultPaymentFields,
-		//]{
-		//	url: "wss://acala-rpc-0.aca-api.network",
-		//},
-		//&testChain[
-		//	[20]byte,
-		//	[65]byte,
-		//	generic.DefaultPaymentFields,
-		//]{
-		//	url: "wss://wss.api.moonbeam.network",
-		//},
+		&testChain[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.DefaultPaymentFields,
+		]{
+			url: "wss://rpc.polkadot.io",
+		},
+		&testChain[
+			types.MultiAddress,
+			types.MultiSignature,
+			generic.PaymentFieldsWithAssetID,
+		]{
+			url: "wss://statemint-rpc.polkadot.io",
+		},
+		&testChain[
+			types.MultiAddress,
+			AcalaMultiSignature,
+			generic.DefaultPaymentFields,
+		]{
+			url: "wss://acala-rpc-0.aca-api.network",
+		},
+		&testChain[
+			[20]byte,
+			[65]byte,
+			generic.DefaultPaymentFields,
+		]{
+			url: "wss://wss.api.moonbeam.network",
+		},
 	}
 )
 
