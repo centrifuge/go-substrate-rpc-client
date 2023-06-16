@@ -7,8 +7,12 @@ import (
 	"log"
 	"sync"
 	"testing"
+	"time"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/exec"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/parser"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/chain/generic"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
@@ -84,6 +88,8 @@ type testChain[
 	url string
 }
 
+const maxRetrievedExtrinsics = 1000
+
 func (t *testChain[A, S, P]) GetTestFn() testFn {
 	return func(wg *sync.WaitGroup) {
 		defer wg.Done()
@@ -99,7 +105,20 @@ func (t *testChain[A, S, P]) GetTestFn() testFn {
 
 		chain := generic.NewChain[A, S, P, *generic.SignedBlock[A, S, P]](api.Client)
 
-		extrinsicRetriever, err := NewDefaultExtrinsicRetriever[A, S, P](chain, api.RPC.State)
+		extrinsicParser := parser.NewExtrinsicParser[A, S, P]()
+		registryFactory := registry.NewFactory()
+
+		chainExecutor := exec.NewRetryableExecutor[*generic.SignedBlock[A, S, P]](exec.WithRetryTimeout(1 * time.Second))
+		extrinsicParsingExecutor := exec.NewRetryableExecutor[[]*parser.Extrinsic[A, S, P]](exec.WithMaxRetryCount(1))
+
+		extrinsicRetriever, err := NewExtrinsicRetriever[A, S, P](
+			extrinsicParser,
+			chain,
+			api.RPC.State,
+			registryFactory,
+			chainExecutor,
+			extrinsicParsingExecutor,
+		)
 
 		if err != nil {
 			log.Printf("Couldn't create extrinsic retriever: %s", err)
@@ -113,7 +132,7 @@ func (t *testChain[A, S, P]) GetTestFn() testFn {
 			return
 		}
 
-		processedBlockCount := 0
+		extrinsicsCount := 0
 
 		for {
 			blockHash, err := api.RPC.Chain.GetBlockHash(uint64(header.Number))
@@ -123,10 +142,20 @@ func (t *testChain[A, S, P]) GetTestFn() testFn {
 				return
 			}
 
-			_, err = extrinsicRetriever.GetExtrinsics(blockHash)
+			extrinsics, err := extrinsicRetriever.GetExtrinsics(blockHash)
 
 			if err != nil {
 				log.Printf("Couldn't retrieve extrinsics for '%s', block number %d: %s\n", testURL, header.Number, err)
+			}
+
+			log.Printf("Found %d extrinsics for '%s', at block number %d.\n", len(extrinsics), testURL, header.Number)
+
+			extrinsicsCount += len(extrinsics)
+
+			if extrinsicsCount >= maxRetrievedExtrinsics {
+				log.Printf("Retrieved a total of %d extrinsics for '%s', last block number %d. Stopping now.\n", extrinsicsCount, testURL, header.Number)
+
+				return
 			}
 
 			header, err = api.RPC.Chain.GetHeader(header.ParentHash)
@@ -135,12 +164,6 @@ func (t *testChain[A, S, P]) GetTestFn() testFn {
 				log.Printf("Couldn't retrieve header for block number '%d' for '%s': %s\n", header.Number, testURL, err)
 
 				return
-			}
-
-			processedBlockCount++
-
-			if processedBlockCount%500 == 0 {
-				log.Printf("Retrieved calls for %d blocks for '%s' so far, last block number %d\n", processedBlockCount, testURL, header.Number)
 			}
 		}
 	}

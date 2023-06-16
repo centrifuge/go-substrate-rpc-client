@@ -21,6 +21,8 @@ var (
 	}
 )
 
+const maxRetrievedEvents = 10000
+
 func TestLive_EventRetriever_GetEvents(t *testing.T) {
 	t.Parallel()
 
@@ -55,7 +57,7 @@ func TestLive_EventRetriever_GetEvents(t *testing.T) {
 				return
 			}
 
-			processedBlockCount := 0
+			eventsCount := 0
 
 			for {
 				blockHash, err := api.RPC.Chain.GetBlockHash(uint64(header.Number))
@@ -65,10 +67,20 @@ func TestLive_EventRetriever_GetEvents(t *testing.T) {
 					return
 				}
 
-				_, err = retriever.GetEvents(blockHash)
+				events, err := retriever.GetEvents(blockHash)
 
 				if err != nil {
 					log.Printf("Couldn't retrieve events for '%s', block number %d: %s\n", testURL, header.Number, err)
+					return
+				}
+
+				log.Printf("Found %d events for '%s', at block number %d.\n", len(events), testURL, header.Number)
+
+				eventsCount += len(events)
+
+				if eventsCount > maxRetrievedEvents {
+					log.Printf("Retrieved a total of %d events for '%s', last block number %d. Stopping now.\n", eventsCount, testURL, header.Number)
+
 					return
 				}
 
@@ -78,12 +90,6 @@ func TestLive_EventRetriever_GetEvents(t *testing.T) {
 					log.Printf("Couldn't retrieve header for block number '%d' for '%s': %s\n", header.Number, testURL, err)
 
 					return
-				}
-
-				processedBlockCount++
-
-				if processedBlockCount%1000 == 0 {
-					log.Printf("Retrieved events for %d blocks for '%s' so far, last block number %d\n", processedBlockCount, testURL, header.Number)
 				}
 			}
 		}()

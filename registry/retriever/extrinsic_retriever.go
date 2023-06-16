@@ -1,8 +1,6 @@
 package retriever
 
 import (
-	"time"
-
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/exec"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/parser"
@@ -69,26 +67,39 @@ func NewExtrinsicRetriever[
 	return retriever, nil
 }
 
-// NewDefaultExtrinsicRetriever creates a new ExtrinsicRetriever using defaults for:
+// DefaultExtrinsicRetriever is the ExtrinsicRetriever interface with default for the generic types:
 //
-// - parser.ExtrinsicParser
-// - registry.Factory
-// - exec.RetryableExecutor - used for retrieving generic.SignedBlock.
-// - exec.RetryableExecutor - used for parsing extrinsics.
-func NewDefaultExtrinsicRetriever[
-	A, S, P any,
-	B generic.GenericSignedBlock[A, S, P],
-](
-	genericChain generic.Chain[A, S, P, B],
+// Address - types.MultiAddress
+// Signature - types.MultiSignature
+// PaymentFields - generic.DefaultPaymentFields
+type DefaultExtrinsicRetriever = ExtrinsicRetriever[
+	types.MultiAddress,
+	types.MultiSignature,
+	generic.DefaultPaymentFields,
+]
+
+// NewDefaultExtrinsicRetriever returns a DefaultExtrinsicRetriever with defaults for the generic types:
+//
+// Address - types.MultiAddress
+// Signature - types.MultiSignature
+// PaymentFields - generic.DefaultPaymentFields
+// Block - *generic.DefaultGenericSignedBlock
+//
+// Note that these generic defaults also apply to the args.
+func NewDefaultExtrinsicRetriever(
+	extrinsicParser parser.DefaultExtrinsicParser,
+	genericChain generic.DefaultChain,
 	stateRPC state.State,
-) (ExtrinsicRetriever[A, S, P], error) {
-	extrinsicParser := parser.NewExtrinsicParser[A, S, P]()
-	registryFactory := registry.NewFactory()
-
-	chainExecutor := exec.NewRetryableExecutor[B](exec.WithRetryTimeout(1 * time.Second))
-	extrinsicParsingExecutor := exec.NewRetryableExecutor[[]*parser.Extrinsic[A, S, P]](exec.WithMaxRetryCount(1))
-
-	return NewExtrinsicRetriever[A, S, P, B](
+	registryFactory registry.Factory,
+	chainExecutor exec.RetryableExecutor[*generic.DefaultGenericSignedBlock],
+	extrinsicParsingExecutor exec.RetryableExecutor[[]*parser.DefaultExtrinsic],
+) (DefaultExtrinsicRetriever, error) {
+	return NewExtrinsicRetriever[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+		*generic.DefaultGenericSignedBlock,
+	](
 		extrinsicParser,
 		genericChain,
 		stateRPC,
