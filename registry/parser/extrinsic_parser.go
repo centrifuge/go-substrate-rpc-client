@@ -10,6 +10,17 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+// DefaultExtrinsic is the Extrinsic with defaults for the generic types:
+//
+// Address - types.MultiAddress
+// Signature - types.MultiSignature
+// PaymentFields - generic.DefaultPaymentFields
+type DefaultExtrinsic = Extrinsic[
+	types.MultiAddress,
+	types.MultiSignature,
+	generic.DefaultPaymentFields,
+]
+
 // Extrinsic holds all the information of a decoded block extrinsic.
 //
 // This type is generic over types A, S, P, please check generic.GenericExtrinsicSignature for more
@@ -86,4 +97,24 @@ func NewExtrinsicParser[A, S, P any]() ExtrinsicParser[A, S, P] {
 
 		return extrinsics, nil
 	})
+}
+
+// DefaultExtrinsicParser is the ExtrinsicParser interface with defaults for the generic types:
+//
+// Address - types.MultiAddress
+// Signature - types.MultiSignature
+// PaymentFields - generic.DefaultPaymentFields
+type DefaultExtrinsicParser = ExtrinsicParser[
+	types.MultiAddress,
+	types.MultiSignature,
+	generic.DefaultPaymentFields,
+]
+
+// NewDefaultExtrinsicParser returns a DefaultExtrinsicParser.
+func NewDefaultExtrinsicParser() DefaultExtrinsicParser {
+	return NewExtrinsicParser[
+		types.MultiAddress,
+		types.MultiSignature,
+		generic.DefaultPaymentFields,
+	]()
 }
