@@ -492,7 +492,12 @@ func (pd Decoder) DecodeIntoReflectValue(target reflect.Value) error {
 
 // DecodeUintCompact decodes a compact-encoded integer. See EncodeUintCompact method.
 func (pd Decoder) DecodeUintCompact() (*big.Int, error) {
-	b, _ := pd.ReadOneByte()
+	b, err := pd.ReadOneByte()
+
+	if err != nil {
+		return nil, err
+	}
+
 	mode := b & 3
 	switch mode {
 	case 0:
