@@ -17,6 +17,8 @@ This package is feature complete, but it is relatively new and might still conta
 
 Please refer to https://godoc.org/github.com/centrifuge/go-substrate-rpc-client
 
+### Usage test examples of Dynamic Parsing of events & extrinsics
+[Registry docs](registry/REGISTRY.md)
 ## Contributing
 
 1. Install dependencies by running `make`
