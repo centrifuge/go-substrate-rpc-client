@@ -17,6 +17,7 @@
 package types
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
@@ -294,10 +295,75 @@ type AssetMetadata struct {
 }
 
 type CustomMetadata struct {
-	Xcm          XcmMetadata
-	Mintable     bool
-	Permissioned bool
-	PoolCurrency bool
+	Transferability CrossChainTransferability
+	Mintable        bool
+	Permissioned    bool
+	PoolCurrency    bool
+}
+
+type CrossChainTransferability struct {
+	IsNone bool
+
+	IsXcm bool
+	AsXcm XcmMetadata
+
+	IsConnectors bool
+
+	IsAll bool
+	AsAll XcmMetadata
+}
+
+func (c *CrossChainTransferability) Decode(decoder scale.Decoder) error {
+	b, err := decoder.ReadOneByte()
+
+	if err != nil {
+		return err
+	}
+
+	switch b {
+	case 0:
+		c.IsNone = true
+
+		return nil
+	case 1:
+		c.IsXcm = true
+
+		return decoder.Decode(&c.AsXcm)
+	case 2:
+		c.IsConnectors = true
+
+		return nil
+
+	case 3:
+		c.IsAll = true
+
+		return decoder.Decode(&c.AsAll)
+	default:
+		return errors.New("unsupported cross chain transferability")
+	}
+}
+
+func (c CrossChainTransferability) Encode(encoder scale.Encoder) error {
+	switch {
+	case c.IsNone:
+		return encoder.PushByte(0)
+	case c.IsXcm:
+		if err := encoder.PushByte(1); err != nil {
+			return err
+		}
+
+		return encoder.Encode(c.AsXcm)
+	case c.IsConnectors:
+		return encoder.PushByte(2)
+	case c.IsAll:
+		if err := encoder.PushByte(3); err != nil {
+			return err
+		}
+
+		return encoder.Encode(c.AsAll)
+	default:
+		return errors.New("unsupported cross chain transferability")
+	}
 }
 
 type XcmMetadata struct {
