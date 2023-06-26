@@ -48,11 +48,11 @@ generate-mocks:      ## generate mocks
 
 test-milestone2:
 	@docker build -t gsrpc-m2 -f Dockerfile_milestone2 .
-	@docker run --rm gsrpc-m2 --name gsrpc-m2
+	@docker run --rm gsrpc-m2
 
 test-milestone2-live:
 	@docker build -t gsrpc-m2-live -f Dockerfile_milestone2_live .
-	@docker run --rm gsrpc-m2-live --name gsrpc-m2-live
+	@docker run --rm gsrpc-m2-live
 
 help: 				## shows this help
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
