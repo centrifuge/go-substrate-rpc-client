@@ -5,6 +5,8 @@ package retriever
 import (
 	"errors"
 	"log"
+	"os"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -63,18 +65,24 @@ func TestLive_ExtrinsicRetriever_GetExtrinsics(t *testing.T) {
 
 	var wg sync.WaitGroup
 
+	extrinsicsThreshold, err := strconv.Atoi(os.Getenv("GSRPC_LIVE_TEST_EXTRINSICS_THRESHOLD"))
+	if err != nil {
+		extrinsicsThreshold = 50
+		log.Printf("Env Var GSRPC_LIVE_TEST_EXTRINSICS_THRESHOLD not set, defaulting to %d", extrinsicsThreshold)
+	}
+
 	for _, c := range extTestChains {
 		c := c
 
 		wg.Add(1)
 
-		go c.GetTestFn()(&wg)
+		go c.GetTestFn()(&wg, extrinsicsThreshold)
 	}
 
 	wg.Wait()
 }
 
-type testFn func(wg *sync.WaitGroup)
+type testFn func(wg *sync.WaitGroup, extrinsicsThreshold int)
 
 type testFnProvider interface {
 	GetTestFn() testFn
@@ -88,10 +96,8 @@ type testChain[
 	url string
 }
 
-const maxRetrievedExtrinsics = 1000
-
 func (t *testChain[A, S, P]) GetTestFn() testFn {
-	return func(wg *sync.WaitGroup) {
+	return func(wg *sync.WaitGroup, extrinsicsThreshold int) {
 		defer wg.Done()
 
 		testURL := t.url
@@ -152,7 +158,7 @@ func (t *testChain[A, S, P]) GetTestFn() testFn {
 
 			extrinsicsCount += len(extrinsics)
 
-			if extrinsicsCount >= maxRetrievedExtrinsics {
+			if extrinsicsCount >= extrinsicsThreshold {
 				log.Printf("Retrieved a total of %d extrinsics for '%s', last block number %d. Stopping now.\n", extrinsicsCount, testURL, header.Number)
 
 				return

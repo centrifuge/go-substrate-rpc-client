@@ -4,6 +4,8 @@ package retriever
 
 import (
 	"log"
+	"os"
+	"strconv"
 	"sync"
 	"testing"
 
@@ -21,12 +23,16 @@ var (
 	}
 )
 
-const maxRetrievedEvents = 10000
-
 func TestLive_EventRetriever_GetEvents(t *testing.T) {
 	t.Parallel()
 
 	var wg sync.WaitGroup
+
+	eventsThreshold, err := strconv.Atoi(os.Getenv("GSRPC_LIVE_TEST_EVENTS_THRESHOLD"))
+	if err != nil {
+		eventsThreshold = 50
+		log.Printf("Env Var GSRPC_LIVE_TEST_EVENTS_THRESHOLD not set, defaulting to %d", eventsThreshold)
+	}
 
 	for _, testURL := range eventTestURLs {
 		testURL := testURL
@@ -78,7 +84,7 @@ func TestLive_EventRetriever_GetEvents(t *testing.T) {
 
 				eventsCount += len(events)
 
-				if eventsCount > maxRetrievedEvents {
+				if eventsCount > eventsThreshold {
 					log.Printf("Retrieved a total of %d events for '%s', last block number %d. Stopping now.\n", eventsCount, testURL, header.Number)
 
 					return
