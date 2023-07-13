@@ -271,6 +271,131 @@ type EventOffencesOffence struct {
 	Topics         []Hash
 }
 
+type EventOrmlTokensEndowed struct {
+	Phase      Phase
+	CurrencyID CurrencyID
+	Who        AccountID
+	Amount     U128
+	Topics     []Hash
+}
+
+type EventOrmlTokensDustLost struct {
+	Phase      Phase
+	CurrencyID CurrencyID
+	Who        AccountID
+	Amount     U128
+	Topics     []Hash
+}
+
+type EventOrmlTokensTransfer struct {
+	Phase      Phase
+	CurrencyID CurrencyID
+	From       AccountID
+	To         AccountID
+	Amount     U128
+	Topics     []Hash
+}
+
+type EventOrmlTokensReserved struct {
+	Phase      Phase
+	CurrencyID CurrencyID
+	Who        AccountID
+	Amount     U128
+	Topics     []Hash
+}
+
+type EventOrmlTokensUnreserved struct {
+	Phase      Phase
+	CurrencyID CurrencyID
+	Who        AccountID
+	Amount     U128
+	Topics     []Hash
+}
+
+type EventOrmlTokensReserveRepatriated struct {
+	Phase      Phase
+	CurrencyID CurrencyID
+	From       AccountID
+	To         AccountID
+	Amount     U128
+	Status     BalanceStatus
+	Topics     []Hash
+}
+
+type EventOrmlTokensBalanceSet struct {
+	Phase      Phase
+	CurrencyID CurrencyID
+	Who        AccountID
+	Free       U128
+	Reserved   U128
+	Topics     []Hash
+}
+
+type EventOrmlTokensTotalIssuanceSet struct {
+	Phase      Phase
+	CurrencyID CurrencyID
+	Amount     U128
+	Topics     []Hash
+}
+
+type EventOrmlTokensWithdrawn struct {
+	Phase      Phase
+	CurrencyID CurrencyID
+	Who        AccountID
+	Amount     U128
+	Topics     []Hash
+}
+
+type EventOrmlTokensSlashed struct {
+	Phase          Phase
+	CurrencyID     CurrencyID
+	Who            AccountID
+	FreeAmount     U128
+	ReservedAmount U128
+	Topics         []Hash
+}
+
+type EventOrmlTokensDeposited struct {
+	Phase      Phase
+	CurrencyID CurrencyID
+	Who        AccountID
+	Amount     U128
+	Topics     []Hash
+}
+
+type EventOrmlTokensLockSet struct {
+	Phase      Phase
+	LockID     [8]U8
+	CurrencyID CurrencyID
+	Who        AccountID
+	Amount     U128
+	Topics     []Hash
+}
+
+type EventOrmlTokensLockRemoved struct {
+	Phase      Phase
+	LockID     [8]U8
+	CurrencyID CurrencyID
+	Who        AccountID
+	Topics     []Hash
+}
+
+type EventOrmlTokensLocked struct {
+	Phase      Phase
+	CurrencyID CurrencyID
+	Who        AccountID
+	Amount     U128
+	Topics     []Hash
+}
+
+type EventOrmlTokensUnlocked struct {
+	Phase      Phase
+	CurrencyID CurrencyID
+	Who        AccountID
+	Amount     U128
+	Topics     []Hash
+}
+
 type EventOrmlAssetRegistryRegisteredAsset struct {
 	Phase    Phase
 	AssetID  CurrencyID

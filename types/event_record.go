@@ -240,6 +240,22 @@ type EventRecords struct {
 	OrmlAssetRegistry_RegisteredAsset []EventOrmlAssetRegistryRegisteredAsset `test-gen-blockchain:"polkadot"`
 	OrmlAssetRegistry_UpdatedAsset    []EventOrmlAssetRegistryUpdatedAsset    `test-gen-blockchain:"polkadot"`
 
+	OrmlTokens_Endowed            []EventOrmlTokensEndowed            `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_DustLost           []EventOrmlTokensDustLost           `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_Transfer           []EventOrmlTokensTransfer           `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_Reserved           []EventOrmlTokensReserved           `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_Unreserved         []EventOrmlTokensUnreserved         `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_ReserveRepatriated []EventOrmlTokensReserveRepatriated `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_BalanceSet         []EventOrmlTokensBalanceSet         `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_TotalIssuanceSet   []EventOrmlTokensTotalIssuanceSet   `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_Withdrawn          []EventOrmlTokensWithdrawn          `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_Slashed            []EventOrmlTokensSlashed            `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_Deposited          []EventOrmlTokensDeposited          `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_LockSet            []EventOrmlTokensLockSet            `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_LockRemoved        []EventOrmlTokensLockRemoved        `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_Locked             []EventOrmlTokensLocked             `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_Unlocked           []EventOrmlTokensUnlocked           `test-gen-blockchain:"centrifuge-parachain"`
+
 	Paras_CurrentCodeUpdated   []EventParasCurrentCodeUpdated   `test-gen-blockchain:"polkadot"`
 	Paras_CurrentHeadUpdated   []EventParasCurrentHeadUpdated   `test-gen-blockchain:"polkadot"`
 	Paras_CodeUpgradeScheduled []EventParasCodeUpgradeScheduled `test-gen-blockchain:"polkadot"`
