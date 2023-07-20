@@ -27,21 +27,34 @@ type ErrorRegistry map[string]*Type
 // EventRegistry maps an event ID to its Type.
 type EventRegistry map[types.EventID]*Type
 
+// FieldOverride is used to override the default FieldDecoder for a particular type.
+type FieldOverride struct {
+	FieldLookupIndex int64
+	FieldDecoder     FieldDecoder
+}
+
 type factory struct {
 	fieldStorage          map[int64]FieldDecoder
 	recursiveFieldStorage map[int64]*RecursiveDecoder
 }
 
-// NewFactory creates a new Factory.
-func NewFactory() Factory {
-	return &factory{}
+// NewFactory creates a new Factory using the provided overrides, if any.
+func NewFactory(fieldOverrides ...FieldOverride) Factory {
+	f := &factory{}
+
+	f.fieldStorage = make(map[int64]FieldDecoder)
+	f.recursiveFieldStorage = make(map[int64]*RecursiveDecoder)
+
+	for _, fieldOverride := range fieldOverrides {
+		f.fieldStorage[fieldOverride.FieldLookupIndex] = fieldOverride.FieldDecoder
+	}
+
+	return f
 }
 
 // CreateErrorRegistry creates the registry that contains the types for errors.
 // nolint:dupl
 func (f *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, error) {
-	f.initStorages()
-
 	errorRegistry := make(map[string]*Type)
 
 	for _, mod := range meta.AsMetadataV14.Pallets {
@@ -85,8 +98,6 @@ func (f *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, erro
 // CreateCallRegistry creates the registry that contains the types for calls.
 // nolint:dupl
 func (f *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error) {
-	f.initStorages()
-
 	callRegistry := make(map[types.CallIndex]*Type)
 
 	for _, mod := range meta.AsMetadataV14.Pallets {
@@ -134,8 +145,6 @@ func (f *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error)
 
 // CreateEventRegistry creates the registry that contains the types for events.
 func (f *factory) CreateEventRegistry(meta *types.Metadata) (EventRegistry, error) {
-	f.initStorages()
-
 	eventRegistry := make(map[types.EventID]*Type)
 
 	for _, mod := range meta.AsMetadataV14.Pallets {
@@ -178,16 +187,15 @@ func (f *factory) CreateEventRegistry(meta *types.Metadata) (EventRegistry, erro
 	return eventRegistry, nil
 }
 
-// initStorages initializes the storages used when creating registries.
-func (f *factory) initStorages() {
-	f.fieldStorage = make(map[int64]FieldDecoder)
-	f.recursiveFieldStorage = make(map[int64]*RecursiveDecoder)
-}
-
 // resolveRecursiveDecoders resolves all recursive decoders with their according FieldDecoder.
 // nolint:lll
 func (f *factory) resolveRecursiveDecoders() error {
 	for recursiveFieldLookupIndex, recursiveFieldDecoder := range f.recursiveFieldStorage {
+		if recursiveFieldDecoder.FieldDecoder != nil {
+			// Skip if the inner FieldDecoder is present, this could be an override.
+			continue
+		}
+
 		fieldDecoder, ok := f.fieldStorage[recursiveFieldLookupIndex]
 
 		if !ok {

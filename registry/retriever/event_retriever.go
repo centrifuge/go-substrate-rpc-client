@@ -69,9 +69,10 @@ func NewEventRetriever(
 func NewDefaultEventRetriever(
 	eventProvider regState.EventProvider,
 	stateRPC state.State,
+	fieldOverrides ...registry.FieldOverride,
 ) (EventRetriever, error) {
 	eventParser := parser.NewEventParser()
-	registryFactory := registry.NewFactory()
+	registryFactory := registry.NewFactory(fieldOverrides...)
 
 	eventStorageExecutor := exec.NewRetryableExecutor[*types.StorageDataRaw](exec.WithRetryTimeout(1 * time.Second))
 	eventParsingExecutor := exec.NewRetryableExecutor[[]*parser.Event](exec.WithMaxRetryCount(1))

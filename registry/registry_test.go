@@ -209,7 +209,7 @@ func TestFactory_CreateErrorRegistry_GetTypeFieldsError(t *testing.T) {
 	assert.Empty(t, reg)
 }
 
-func TestFactory_CreateCallRegistryWithLiveMetadata(t *testing.T) {
+func TestFactory_CreateCallRegistry_WithLiveMetadata(t *testing.T) {
 	var tests = []struct {
 		Chain       string
 		MetadataHex string
@@ -280,6 +280,41 @@ func TestFactory_CreateCallRegistryWithLiveMetadata(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestFactory_CreateCallRegistry_Overrides(t *testing.T) {
+	var meta types.Metadata
+
+	err := codec.DecodeFromHex(test.CentrifugeMetadataHex, &meta)
+	assert.NoError(t, err)
+
+	t.Log("Metadata was decoded successfully")
+
+	// Lookup index for U64 in the test.CentrifugeMetadataHex
+	targetLookupIndex := int64(10)
+
+	f := NewFactory().(*factory)
+
+	_, err = f.CreateCallRegistry(&meta)
+	assert.NoError(t, err)
+
+	assert.Equal(t, f.fieldStorage[targetLookupIndex], &ValueDecoder[types.U64]{})
+
+	// With override
+
+	fieldOverride := FieldOverride{
+		FieldLookupIndex: targetLookupIndex,
+		FieldDecoder:     &ValueDecoder[types.I64]{},
+	}
+
+	f = NewFactory(fieldOverride).(*factory)
+
+	assert.Equal(t, f.fieldStorage[targetLookupIndex], &ValueDecoder[types.I64]{})
+
+	_, err = f.CreateCallRegistry(&meta)
+	assert.NoError(t, err)
+
+	assert.Equal(t, f.fieldStorage[targetLookupIndex], &ValueDecoder[types.I64]{})
 }
 
 func TestFactory_CreateCallRegistry_NoPalletWithCalls(t *testing.T) {
@@ -413,7 +448,7 @@ func TestFactory_CreateCallRegistry_GetTypeFieldsError(t *testing.T) {
 	assert.Empty(t, reg)
 }
 
-func TestFactory_CreateEventRegistryWithLiveMetadata(t *testing.T) {
+func TestFactory_CreateEventRegistry_WithLiveMetadata(t *testing.T) {
 	var tests = []struct {
 		Chain       string
 		MetadataHex string
@@ -655,7 +690,6 @@ func TestFactory_getTypeFields(t *testing.T) {
 	}
 
 	factory := NewFactory().(*factory)
-	factory.initStorages()
 
 	res, err := factory.getTypeFields(testMeta, testFields)
 	assert.NoError(t, err)
@@ -709,7 +743,6 @@ func TestFactory_getTypeFields_FieldDecoderRetrievalError(t *testing.T) {
 	}
 
 	factory := NewFactory().(*factory)
-	factory.initStorages()
 
 	res, err := factory.getTypeFields(testMeta, testFields)
 	assert.ErrorIs(t, err, ErrFieldDecoderRetrieval)
@@ -882,7 +915,6 @@ func TestFactory_getFieldDecoder_Composite(t *testing.T) {
 	}
 
 	factory := NewFactory().(*factory)
-	factory.initStorages()
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
 	assert.NoError(t, err)
@@ -951,7 +983,6 @@ func TestFactory_getFieldDecoder_Composite_FieldError(t *testing.T) {
 	}
 
 	factory := NewFactory().(*factory)
-	factory.initStorages()
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
 	assert.ErrorIs(t, err, ErrCompositeTypeFieldsRetrieval)
@@ -1010,7 +1041,6 @@ func TestFactory_getFieldDecoder_Variant(t *testing.T) {
 	}
 
 	factory := NewFactory().(*factory)
-	factory.initStorages()
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
 	assert.NoError(t, err)
@@ -1575,7 +1605,6 @@ func TestFactory_getVariantFieldType_CompositeVariantTypeFieldError(t *testing.T
 	}
 
 	factory := NewFactory().(*factory)
-	factory.initStorages()
 
 	res, err := factory.getVariantFieldDecoder(testMeta, testFieldTypeDef)
 	assert.ErrorIs(t, err, ErrVariantTypeFieldsRetrieval)
