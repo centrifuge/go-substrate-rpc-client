@@ -1,8 +1,12 @@
 package registry
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"testing"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry/test"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
@@ -2018,6 +2022,502 @@ func Test_getPrimitiveType_UnsupportedTypeError(t *testing.T) {
 	res, err := getPrimitiveDecoder(primitiveTypeDef)
 	assert.ErrorIs(t, err, ErrPrimitiveTypeNotSupported)
 	assert.Nil(t, res)
+}
+
+func Test_TypeDecoder(t *testing.T) {
+	testData := []any{
+		types.U8(1),
+		types.U16(2),
+		types.U32(3),
+	}
+
+	typeDecoder := &TypeDecoder{
+		Name: "test_decoder_1",
+		Fields: []*Field{
+			{
+				Name:         "field_1",
+				FieldDecoder: &ValueDecoder[types.U8]{},
+				LookupIndex:  0,
+			},
+			{
+				Name:         "field_2",
+				FieldDecoder: &ValueDecoder[types.U16]{},
+				LookupIndex:  1,
+			},
+			{
+				Name:         "field_3",
+				FieldDecoder: &ValueDecoder[types.U32]{},
+				LookupIndex:  2,
+			},
+		},
+	}
+
+	encodedTestData, err := encodeTestData(testData)
+	assert.NoError(t, err)
+
+	decoder := scale.NewDecoder(bytes.NewReader(encodedTestData))
+
+	res, err := typeDecoder.Decode(decoder)
+	assert.NoError(t, err)
+	assert.Len(t, res, len(testData))
+	assert.Equal(t, typeDecoder.Fields[0].Name, res[0].Name)
+	assert.Equal(t, typeDecoder.Fields[0].LookupIndex, res[0].LookupIndex)
+	assert.Equal(t, testData[0], res[0].Value)
+}
+
+func Test_TypeDecoder_FieldDecodingError(t *testing.T) {
+	testData := []any{
+		types.U32(3),
+	}
+
+	typeDecoder := &TypeDecoder{
+		Name: "test_decoder_1",
+		Fields: []*Field{
+			{
+				Name:         "field_1",
+				FieldDecoder: &ValueDecoder[[32]types.U8]{},
+				LookupIndex:  0,
+			},
+		},
+	}
+
+	encodedTestData, err := encodeTestData(testData)
+	assert.NoError(t, err)
+
+	decoder := scale.NewDecoder(bytes.NewReader(encodedTestData))
+
+	res, err := typeDecoder.Decode(decoder)
+	assert.ErrorIs(t, err, ErrTypeFieldDecoding)
+	assert.Nil(t, res)
+}
+
+func TestDecodedFields_Encode(t *testing.T) {
+	testStruct := &decodedFieldTest{
+		FirstField:  4,
+		SecondField: 5,
+		ThirdField:  6,
+	}
+
+	testData := []any{
+		types.U8(1),
+		testStruct,
+		types.U32(3),
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	encodedTestData, err := encodeTestData(testData)
+	assert.NoError(t, err)
+
+	encodedFields, err := decodedFields.Encode()
+	assert.NoError(t, err)
+
+	assert.Equal(t, encodedTestData, encodedFields)
+}
+
+func TestDecodedFields_EncodeError(t *testing.T) {
+	testStruct := &decodedFieldTest{
+		Error: true,
+	}
+
+	testData := []any{
+		types.U8(1),
+		testStruct,
+		types.U32(3),
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	encodedFields, err := decodedFields.Encode()
+	assert.NotNil(t, err)
+	assert.Nil(t, encodedFields)
+}
+
+func TestDecodedFields_DecodeInto(t *testing.T) {
+	testData := []any{
+		types.U8(1),
+		types.U16(2),
+		types.U32(3),
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	var testStruct decodedFieldTest
+
+	err := decodedFields.DecodeInto(&testStruct)
+	assert.NoError(t, err)
+	assert.Equal(t, testData[0], testStruct.FirstField)
+	assert.Equal(t, testData[1], testStruct.SecondField)
+	assert.Equal(t, testData[2], testStruct.ThirdField)
+}
+
+func TestDecodedFields_DecodeInto_EncodeError(t *testing.T) {
+	testStruct := &decodedFieldTest{
+		Error: true,
+	}
+
+	testData := []any{
+		types.U8(1),
+		testStruct,
+		types.U32(3),
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	var decodeStruct decodedFieldTest
+
+	err := decodedFields.DecodeInto(&decodeStruct)
+	assert.NotNil(t, err)
+}
+
+func TestDecodedFields_DecodeInto_DecodeError(t *testing.T) {
+	testData := []any{
+		types.U8(1),
+		types.U16(2),
+		types.U32(3),
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	var testStruct errStruct
+
+	err := decodedFields.DecodeInto(&testStruct)
+	assert.NotNil(t, err)
+}
+
+func Test_ProcessDecodedFieldValue(t *testing.T) {
+	testData := []any{
+		types.U8(1),
+		types.U16(2),
+		types.U32(3),
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	// Field index match
+	res, err := ProcessDecodedFieldValue[types.U32](
+		decodedFields,
+		func(fieldIndex int, field *DecodedField) bool {
+			return fieldIndex == len(testData)-1
+		},
+		func(value any) (types.U32, error) {
+			res, ok := value.(types.U32)
+			assert.True(t, ok)
+
+			return res, nil
+		},
+	)
+
+	assert.NoError(t, err)
+	assert.Equal(t, testData[2], res)
+
+	// Field name match
+	res, err = ProcessDecodedFieldValue[types.U32](
+		decodedFields,
+		func(fieldIndex int, field *DecodedField) bool {
+			return field.Name == "decoded_field_2"
+		},
+		func(value any) (types.U32, error) {
+			res, ok := value.(types.U32)
+			assert.True(t, ok)
+
+			return res, nil
+		},
+	)
+
+	assert.NoError(t, err)
+	assert.Equal(t, testData[2], res)
+
+	// Field lookup index match
+	res, err = ProcessDecodedFieldValue[types.U32](
+		decodedFields,
+		func(fieldIndex int, field *DecodedField) bool {
+			return field.LookupIndex == 2
+		},
+		func(value any) (types.U32, error) {
+			res, ok := value.(types.U32)
+			assert.True(t, ok)
+
+			return res, nil
+		},
+	)
+
+	assert.NoError(t, err)
+	assert.Equal(t, testData[2], res)
+}
+
+func Test_ProcessDecodedFieldValue_FieldNotFoundError(t *testing.T) {
+	testData := []any{
+		types.U8(1),
+		types.U16(2),
+		types.U32(3),
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	res, err := ProcessDecodedFieldValue[types.U32](
+		decodedFields,
+		func(fieldIndex int, field *DecodedField) bool {
+			return false
+		},
+		func(value any) (types.U32, error) {
+			res, ok := value.(types.U32)
+			assert.True(t, ok)
+
+			return res, nil
+		},
+	)
+
+	assert.ErrorIs(t, err, ErrDecodedFieldNotFound)
+	assert.Equal(t, types.U32(0), res)
+}
+
+func Test_ProcessDecodedFieldValue_FieldValueProcessingError(t *testing.T) {
+	testData := []any{
+		types.U8(1),
+		types.U16(2),
+		types.U32(3),
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	res, err := ProcessDecodedFieldValue[types.U32](
+		decodedFields,
+		func(fieldIndex int, field *DecodedField) bool {
+			return fieldIndex == len(testData)-1
+		},
+		func(value any) (types.U32, error) {
+			return 0, errors.New("error")
+		},
+	)
+
+	assert.ErrorIs(t, err, ErrDecodedFieldValueProcessingError)
+	assert.Equal(t, types.U32(0), res)
+}
+
+func Test_GetDecodedFieldAsType(t *testing.T) {
+	testData := []any{
+		types.U8(1),
+		types.U16(2),
+		types.U32(3),
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	res, err := GetDecodedFieldAsType[types.U8](
+		decodedFields,
+		func(fieldIndex int, field *DecodedField) bool {
+			return fieldIndex == 0
+		},
+	)
+
+	assert.NoError(t, err)
+	assert.Equal(t, testData[0], res)
+}
+
+func Test_GetDecodedFieldAsType_FieldNotFound(t *testing.T) {
+	testData := []any{
+		types.U8(1),
+		types.U16(2),
+		types.U32(3),
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	res, err := GetDecodedFieldAsType[types.U8](
+		decodedFields,
+		func(fieldIndex int, field *DecodedField) bool {
+			return fieldIndex == len(testData)
+		},
+	)
+
+	assert.ErrorIs(t, err, ErrDecodedFieldNotFound)
+	assert.Equal(t, types.U8(0), res)
+}
+
+func Test_GetDecodedFieldAsType_ValueTypeMismatch(t *testing.T) {
+	testData := []any{
+		types.U8(1),
+		types.U16(2),
+		types.U32(3),
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	res, err := GetDecodedFieldAsType[types.U8](
+		decodedFields,
+		func(fieldIndex int, field *DecodedField) bool {
+			return fieldIndex == len(testData)-1
+		},
+	)
+
+	assert.ErrorIs(t, err, ErrDecodedFieldValueTypeMismatch)
+	assert.Equal(t, types.U8(0), res)
+}
+
+func Test_GetDecodedFieldAsSliceOfType(t *testing.T) {
+	testData := []any{
+		types.U8(1),
+		[]any{
+			types.U16(0),
+			types.U16(1),
+			types.U16(2),
+		},
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	res, err := GetDecodedFieldAsSliceOfType[types.U16](
+		decodedFields,
+		func(fieldIndex int, field *DecodedField) bool {
+			return fieldIndex == len(testData)-1
+		},
+	)
+
+	assert.NoError(t, err)
+	assert.Equal(t, []types.U16{0, 1, 2}, res)
+}
+
+func Test_GetDecodedFieldAsSliceOfType_DecodedFieldNotFound(t *testing.T) {
+	testData := []any{
+		types.U8(1),
+		[]any{
+			types.U16(0),
+			types.U16(1),
+			types.U16(2),
+		},
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	res, err := GetDecodedFieldAsSliceOfType[types.U16](
+		decodedFields,
+		func(fieldIndex int, field *DecodedField) bool {
+			return fieldIndex == len(testData)
+		},
+	)
+
+	assert.ErrorIs(t, err, ErrDecodedFieldNotFound)
+	assert.Nil(t, res)
+}
+
+func Test_GetDecodedFieldAsSliceOfType_NotAGenericSlice(t *testing.T) {
+	testData := []any{
+		types.U8(1),
+		// Slices in decoded fields are expected to be []any
+		[]types.U16{
+			0,
+			1,
+			2,
+		},
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	res, err := GetDecodedFieldAsSliceOfType[types.U16](
+		decodedFields,
+		func(fieldIndex int, field *DecodedField) bool {
+			return fieldIndex == len(testData)-1
+		},
+	)
+
+	assert.ErrorIs(t, err, ErrDecodedFieldValueNotAGenericSlice)
+	assert.Nil(t, res)
+}
+
+func Test_GetDecodedFieldAsSliceOfType_SliceItemTypeMismatch(t *testing.T) {
+	testData := []any{
+		types.U8(1),
+		[]any{
+			types.U16(0),
+			types.U16(1),
+			types.U16(2),
+		},
+	}
+
+	decodedFields := testDataToDecodedFields(testData)
+
+	res, err := GetDecodedFieldAsSliceOfType[types.U8](
+		decodedFields,
+		func(fieldIndex int, field *DecodedField) bool {
+			return fieldIndex == len(testData)-1
+		},
+	)
+
+	assert.ErrorIs(t, err, ErrDecodedFieldValueTypeMismatch)
+	assert.Nil(t, res)
+}
+
+type errStruct struct{}
+
+func (e *errStruct) Decode(_ scale.Decoder) error {
+	return errors.New("error")
+}
+
+type decodedFieldTest struct {
+	FirstField  types.U8
+	SecondField types.U16
+	ThirdField  types.U32
+
+	Error bool
+}
+
+func (d *decodedFieldTest) Decode(decoder scale.Decoder) error {
+	if err := decoder.Decode(&d.FirstField); err != nil {
+		return err
+	}
+
+	if err := decoder.Decode(&d.SecondField); err != nil {
+		return err
+	}
+
+	return decoder.Decode(&d.ThirdField)
+}
+
+func (d decodedFieldTest) Encode(encoder scale.Encoder) error {
+	if d.Error {
+		return errors.New("encode error")
+	}
+
+	if err := encoder.Encode(d.FirstField); err != nil {
+		return err
+	}
+
+	if err := encoder.Encode(d.SecondField); err != nil {
+		return err
+	}
+
+	return encoder.Encode(d.ThirdField)
+}
+
+func testDataToDecodedFields(data []any) DecodedFields {
+	var res DecodedFields
+
+	for i, datum := range data {
+		res = append(res, &DecodedField{
+			Name:        fmt.Sprintf("decoded_field_%d", i),
+			Value:       datum,
+			LookupIndex: int64(i),
+		})
+	}
+
+	return res
+}
+
+func encodeTestData(data []any) ([]byte, error) {
+	var res []byte
+
+	for _, datum := range data {
+		b, err := codec.Encode(datum)
+
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, b...)
+	}
+
+	return res, nil
 }
 
 type testAsserter struct {

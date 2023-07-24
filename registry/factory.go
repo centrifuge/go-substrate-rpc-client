@@ -7,6 +7,7 @@ import (
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 //go:generate mockery --name Factory --structname FactoryMock --filename factory_mock.go --inpackage
@@ -18,14 +19,14 @@ type Factory interface {
 	CreateEventRegistry(meta *types.Metadata) (EventRegistry, error)
 }
 
-// CallRegistry maps a call name to its Type.
-type CallRegistry map[types.CallIndex]*Type
+// CallRegistry maps a call name to its TypeDecoder.
+type CallRegistry map[types.CallIndex]*TypeDecoder
 
-// ErrorRegistry maps an error name to its Type.
-type ErrorRegistry map[string]*Type
+// ErrorRegistry maps an error name to its TypeDecoder.
+type ErrorRegistry map[string]*TypeDecoder
 
-// EventRegistry maps an event ID to its Type.
-type EventRegistry map[types.EventID]*Type
+// EventRegistry maps an event ID to its TypeDecoder.
+type EventRegistry map[types.EventID]*TypeDecoder
 
 // FieldOverride is used to override the default FieldDecoder for a particular type.
 type FieldOverride struct {
@@ -55,7 +56,7 @@ func NewFactory(fieldOverrides ...FieldOverride) Factory {
 // CreateErrorRegistry creates the registry that contains the types for errors.
 // nolint:dupl
 func (f *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, error) {
-	errorRegistry := make(map[string]*Type)
+	errorRegistry := make(map[string]*TypeDecoder)
 
 	for _, mod := range meta.AsMetadataV14.Pallets {
 		if !mod.HasErrors {
@@ -81,7 +82,7 @@ func (f *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, erro
 				return nil, ErrErrorFieldsRetrieval.WithMsg(errorName).Wrap(err)
 			}
 
-			errorRegistry[errorName] = &Type{
+			errorRegistry[errorName] = &TypeDecoder{
 				Name:   errorName,
 				Fields: errorFields,
 			}
@@ -98,7 +99,7 @@ func (f *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, erro
 // CreateCallRegistry creates the registry that contains the types for calls.
 // nolint:dupl
 func (f *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error) {
-	callRegistry := make(map[types.CallIndex]*Type)
+	callRegistry := make(map[types.CallIndex]*TypeDecoder)
 
 	for _, mod := range meta.AsMetadataV14.Pallets {
 		if !mod.HasCalls {
@@ -129,7 +130,7 @@ func (f *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error)
 				return nil, ErrCallFieldsRetrieval.WithMsg(callName).Wrap(err)
 			}
 
-			callRegistry[callIndex] = &Type{
+			callRegistry[callIndex] = &TypeDecoder{
 				Name:   callName,
 				Fields: callFields,
 			}
@@ -145,7 +146,7 @@ func (f *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error)
 
 // CreateEventRegistry creates the registry that contains the types for events.
 func (f *factory) CreateEventRegistry(meta *types.Metadata) (EventRegistry, error) {
-	eventRegistry := make(map[types.EventID]*Type)
+	eventRegistry := make(map[types.EventID]*TypeDecoder)
 
 	for _, mod := range meta.AsMetadataV14.Pallets {
 		if !mod.HasEvents {
@@ -173,7 +174,7 @@ func (f *factory) CreateEventRegistry(meta *types.Metadata) (EventRegistry, erro
 				return nil, ErrEventFieldsRetrieval.WithMsg(eventName).Wrap(err)
 			}
 
-			eventRegistry[eventID] = &Type{
+			eventRegistry[eventID] = &TypeDecoder{
 				Name:   eventName,
 				Fields: eventFields,
 			}
@@ -641,35 +642,6 @@ func getFieldName(field types.Si1Field) string {
 	}
 }
 
-// Type represents a parsed metadata type.
-type Type struct {
-	Name   string
-	Fields []*Field
-}
-
-func (t *Type) Decode(decoder *scale.Decoder) (map[string]any, error) {
-	fieldMap := make(map[string]any)
-
-	for _, field := range t.Fields {
-		value, err := field.FieldDecoder.Decode(decoder)
-
-		if err != nil {
-			return nil, ErrTypeFieldDecoding.Wrap(err)
-		}
-
-		fieldMap[field.Name] = value
-	}
-
-	return fieldMap, nil
-}
-
-// Field represents one field of a Type.
-type Field struct {
-	Name         string
-	FieldDecoder FieldDecoder
-	LookupIndex  int64
-}
-
 // FieldDecoder is the interface implemented by all the different types that are available.
 type FieldDecoder interface {
 	Decode(decoder *scale.Decoder) (any, error)
@@ -829,4 +801,196 @@ func (b *BitSequenceDecoder) Decode(decoder *scale.Decoder) (any, error) {
 	return map[string]string{
 		b.FieldName: bitVec.String(),
 	}, nil
+}
+
+// TypeDecoder holds all information required to decode a particular type.
+type TypeDecoder struct {
+	Name   string
+	Fields []*Field
+}
+
+func (t *TypeDecoder) Decode(decoder *scale.Decoder) (DecodedFields, error) {
+	if t == nil {
+		return nil, ErrNilTypeDecoder
+	}
+
+	var decodedFields DecodedFields
+
+	for _, field := range t.Fields {
+		decodedField, err := field.Decode(decoder)
+
+		if err != nil {
+			return nil, ErrTypeFieldDecoding.Wrap(err)
+		}
+
+		decodedFields = append(decodedFields, decodedField)
+	}
+
+	return decodedFields, nil
+}
+
+// Field represents one field of a TypeDecoder.
+type Field struct {
+	Name         string
+	FieldDecoder FieldDecoder
+	LookupIndex  int64
+}
+
+func (f *Field) Decode(decoder *scale.Decoder) (*DecodedField, error) {
+	if f == nil {
+		return nil, ErrNilField
+	}
+
+	if f.FieldDecoder == nil {
+		return nil, ErrNilFieldDecoder
+	}
+
+	value, err := f.FieldDecoder.Decode(decoder)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &DecodedField{
+		Name:        f.Name,
+		Value:       value,
+		LookupIndex: f.LookupIndex,
+	}, nil
+}
+
+// DecodedField holds the name, value and lookup index of a field that was decoded.
+type DecodedField struct {
+	Name        string
+	Value       any
+	LookupIndex int64
+}
+
+type DecodedFields []*DecodedField
+
+// Encode encodes all fields to the Scale encoding.
+func (d *DecodedFields) Encode() ([]byte, error) {
+	var encodedFields []byte
+
+	for _, decodedField := range *d {
+		b, err := codec.Encode(decodedField.Value)
+
+		if err != nil {
+			return nil, ErrFieldEncode.Wrap(err)
+		}
+
+		encodedFields = append(encodedFields, b...)
+	}
+
+	return encodedFields, nil
+}
+
+// DecodeInto encodes all fields and attempts to decode into the provided target.
+func (d *DecodedFields) DecodeInto(target any) error {
+	b, err := d.Encode()
+
+	if err != nil {
+		return err
+	}
+
+	if err := codec.Decode(b, target); err != nil {
+		return ErrDecodeToTarget.Wrap(err)
+	}
+
+	return nil
+}
+
+type DecodedFieldPredicateFn func(fieldIndex int, field *DecodedField) bool
+type DecodedValueProcessingFn[T any] func(value any) (T, error)
+
+// ProcessDecodedFieldValue applies the processing func to the value of the field
+// that matches the provided predicate func.
+func ProcessDecodedFieldValue[T any](
+	decodedFields DecodedFields,
+	fieldPredicateFn DecodedFieldPredicateFn,
+	valueProcessingFn DecodedValueProcessingFn[T],
+) (T, error) {
+	var t T
+
+	for decodedFieldIndex, decodedField := range decodedFields {
+		if !fieldPredicateFn(decodedFieldIndex, decodedField) {
+			continue
+		}
+
+		res, err := valueProcessingFn(decodedField.Value)
+
+		if err != nil {
+			return t, ErrDecodedFieldValueProcessingError.Wrap(err)
+		}
+
+		return res, nil
+	}
+
+	return t, ErrDecodedFieldNotFound
+}
+
+// GetDecodedFieldAsType returns the value of the field that matches the provided predicate func
+// as the provided generic argument.
+func GetDecodedFieldAsType[T any](
+	decodedFields DecodedFields,
+	fieldPredicateFn DecodedFieldPredicateFn,
+) (T, error) {
+	return ProcessDecodedFieldValue(
+		decodedFields,
+		fieldPredicateFn,
+		func(value any) (T, error) {
+			if res, ok := value.(T); ok {
+				return res, nil
+			}
+
+			var t T
+
+			err := fmt.Errorf("expected %T, got %T", t, value)
+
+			return t, ErrDecodedFieldValueTypeMismatch.Wrap(err)
+		},
+	)
+}
+
+// GetDecodedFieldAsSliceOfType returns the value of the field that matches the provided predicate func
+// as a slice of the provided generic argument.
+func GetDecodedFieldAsSliceOfType[T any](
+	decodedFields DecodedFields,
+	fieldPredicateFn DecodedFieldPredicateFn,
+) ([]T, error) {
+	return ProcessDecodedFieldValue(
+		decodedFields,
+		fieldPredicateFn,
+		func(value any) ([]T, error) {
+			v, ok := value.([]any)
+
+			if !ok {
+				return nil, ErrDecodedFieldValueNotAGenericSlice
+			}
+
+			res, err := convertSliceToType[T](v)
+
+			if err != nil {
+				return nil, ErrDecodedFieldValueTypeMismatch.Wrap(err)
+			}
+
+			return res, nil
+		},
+	)
+}
+
+func convertSliceToType[T any](slice []any) ([]T, error) {
+	res := make([]T, 0)
+
+	for _, item := range slice {
+		if v, ok := item.(T); ok {
+			res = append(res, v)
+			continue
+		}
+
+		var t T
+
+		return nil, fmt.Errorf("expected %T, got %T", t, item)
+	}
+
+	return res, nil
 }

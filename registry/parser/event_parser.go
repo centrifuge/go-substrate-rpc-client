@@ -12,7 +12,7 @@ import (
 // Event holds all the information of a decoded storage event.
 type Event struct {
 	Name    string
-	Fields  map[string]any
+	Fields  registry.DecodedFields
 	EventID types.EventID
 	Phase   *types.Phase
 	Topics  []types.Hash

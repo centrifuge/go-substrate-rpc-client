@@ -28,7 +28,7 @@ func TestEventRetriever_New(t *testing.T) {
 		Return(latestMeta, nil).
 		Once()
 
-	eventRegistry := registry.EventRegistry(map[types.EventID]*registry.Type{})
+	eventRegistry := registry.EventRegistry(map[types.EventID]*registry.TypeDecoder{})
 
 	registryFactoryMock.On("CreateEventRegistry", latestMeta).
 		Return(eventRegistry, nil).
@@ -139,7 +139,7 @@ func TestEventRetriever_GetEvents(t *testing.T) {
 
 	eventRetriever.meta = testMeta
 
-	eventRegistry := registry.EventRegistry(map[types.EventID]*registry.Type{})
+	eventRegistry := registry.EventRegistry(map[types.EventID]*registry.TypeDecoder{})
 
 	eventRetriever.eventRegistry = eventRegistry
 
@@ -207,7 +207,7 @@ func TestEventRetriever_GetEvents_StorageRetrievalError(t *testing.T) {
 
 	eventRetriever.meta = testMeta
 
-	eventRegistry := registry.EventRegistry(map[types.EventID]*registry.Type{})
+	eventRegistry := registry.EventRegistry(map[types.EventID]*registry.TypeDecoder{})
 
 	eventRetriever.eventRegistry = eventRegistry
 
@@ -271,7 +271,7 @@ func TestEventRetriever_GetEvents_EventParsingError(t *testing.T) {
 
 	eventRetriever.meta = testMeta
 
-	eventRegistry := registry.EventRegistry(map[types.EventID]*registry.Type{})
+	eventRegistry := registry.EventRegistry(map[types.EventID]*registry.TypeDecoder{})
 
 	eventRetriever.eventRegistry = eventRegistry
 
@@ -351,7 +351,7 @@ func TestEventRetriever_updateInternalState(t *testing.T) {
 
 	testMeta := &types.Metadata{}
 
-	eventRegistry := registry.EventRegistry(map[types.EventID]*registry.Type{})
+	eventRegistry := registry.EventRegistry(map[types.EventID]*registry.TypeDecoder{})
 
 	blockHash := types.NewHash([]byte{0, 1, 2, 3})
 

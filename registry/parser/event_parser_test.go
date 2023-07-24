@@ -422,8 +422,8 @@ func TestEventParserFn_ParseEvents_TopicsDecodeError(t *testing.T) {
 }
 
 func assertEventFieldInformationIsCorrect(t *testing.T, testFields []testField, event *Event) {
-	for _, testField := range testFields {
-		assert.Equal(t, testField.Value, event.Fields[testField.Name])
+	for testFieldIndex, testField := range testFields {
+		assert.Equal(t, testField.Value, event.Fields[testFieldIndex].Value)
 	}
 }
 
@@ -468,7 +468,7 @@ func getEncodedEventData(testEvents []testEvent) ([]byte, error) {
 }
 
 func getRegistryForTestEvents(testEvents []testEvent) (registry.EventRegistry, error) {
-	eventRegistry := registry.EventRegistry(map[types.EventID]*registry.Type{})
+	eventRegistry := registry.EventRegistry(map[types.EventID]*registry.TypeDecoder{})
 
 	for _, testEvent := range testEvents {
 		regFields, err := getTestRegistryFields(testEvent.EventFields)
@@ -477,7 +477,7 @@ func getRegistryForTestEvents(testEvents []testEvent) (registry.EventRegistry, e
 			return nil, err
 		}
 
-		eventRegistry[testEvent.EventID] = &registry.Type{
+		eventRegistry[testEvent.EventID] = &registry.TypeDecoder{
 			Name:   testEvent.Name,
 			Fields: regFields,
 		}
