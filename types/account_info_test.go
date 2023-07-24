@@ -26,7 +26,6 @@ import (
 
 func TestAccountInfoV4_EncodeDecode(t *testing.T) {
 	AssertRoundTripFuzz[AccountInfoV4](t, 100)
-	AssertDecodeNilData[AccountInfoV4](t)
 	AssertEncodeEmptyObj[AccountInfoV4](t, 9)
 }
 

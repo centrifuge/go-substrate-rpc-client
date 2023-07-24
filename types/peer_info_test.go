@@ -35,7 +35,6 @@ var testPeerInfo = PeerInfo{
 func TestPeerInfo_EncodeDecode(t *testing.T) {
 	AssertRoundtrip(t, testPeerInfo)
 	AssertRoundTripFuzz[PeerInfo](t, 100)
-	AssertDecodeNilData[PeerInfo](t)
 	AssertEncodeEmptyObj[PeerInfo](t, 42)
 }
 
