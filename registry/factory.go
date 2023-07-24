@@ -744,7 +744,7 @@ type CompositeDecoder struct {
 }
 
 func (e *CompositeDecoder) Decode(decoder *scale.Decoder) (any, error) {
-	fieldMap := make(map[string]any)
+	var decodedFields DecodedFields
 
 	for _, field := range e.Fields {
 		value, err := field.FieldDecoder.Decode(decoder)
@@ -753,10 +753,14 @@ func (e *CompositeDecoder) Decode(decoder *scale.Decoder) (any, error) {
 			return nil, ErrCompositeFieldDecoding.Wrap(err)
 		}
 
-		fieldMap[field.Name] = value
+		decodedFields = append(decodedFields, &DecodedField{
+			Name:        field.Name,
+			Value:       value,
+			LookupIndex: field.LookupIndex,
+		})
 	}
 
-	return fieldMap, nil
+	return decodedFields, nil
 }
 
 // ValueDecoder decodes a primitive type.
