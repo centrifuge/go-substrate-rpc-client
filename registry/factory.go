@@ -7,7 +7,6 @@ import (
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
 //go:generate mockery --name Factory --structname FactoryMock --filename factory_mock.go --inpackage
@@ -22,8 +21,13 @@ type Factory interface {
 // CallRegistry maps a call name to its TypeDecoder.
 type CallRegistry map[types.CallIndex]*TypeDecoder
 
+type ErrorID struct {
+	ModuleIndex types.U8
+	ErrorIndex  [4]types.U8
+}
+
 // ErrorRegistry maps an error name to its TypeDecoder.
-type ErrorRegistry map[string]*TypeDecoder
+type ErrorRegistry map[ErrorID]*TypeDecoder
 
 // EventRegistry maps an event ID to its TypeDecoder.
 type EventRegistry map[types.EventID]*TypeDecoder
@@ -56,7 +60,7 @@ func NewFactory(fieldOverrides ...FieldOverride) Factory {
 // CreateErrorRegistry creates the registry that contains the types for errors.
 // nolint:dupl
 func (f *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, error) {
-	errorRegistry := make(map[string]*TypeDecoder)
+	errorRegistry := make(map[ErrorID]*TypeDecoder)
 
 	for _, mod := range meta.AsMetadataV14.Pallets {
 		if !mod.HasErrors {
@@ -82,7 +86,12 @@ func (f *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, erro
 				return nil, ErrErrorFieldsRetrieval.WithMsg(errorName).Wrap(err)
 			}
 
-			errorRegistry[errorName] = &TypeDecoder{
+			errorID := ErrorID{
+				ModuleIndex: mod.Index,
+				ErrorIndex:  [4]types.U8{errorVariant.Index},
+			}
+
+			errorRegistry[errorID] = &TypeDecoder{
 				Name:   errorName,
 				Fields: errorFields,
 			}
@@ -869,39 +878,15 @@ type DecodedField struct {
 	LookupIndex int64
 }
 
+func (d DecodedField) Encode(encoder scale.Encoder) error {
+	if d.Value == nil {
+		return nil
+	}
+
+	return encoder.Encode(d.Value)
+}
+
 type DecodedFields []*DecodedField
-
-// Encode encodes all fields to the Scale encoding.
-func (d *DecodedFields) Encode() ([]byte, error) {
-	var encodedFields []byte
-
-	for _, decodedField := range *d {
-		b, err := codec.Encode(decodedField.Value)
-
-		if err != nil {
-			return nil, ErrFieldEncode.Wrap(err)
-		}
-
-		encodedFields = append(encodedFields, b...)
-	}
-
-	return encodedFields, nil
-}
-
-// DecodeInto encodes all fields and attempts to decode into the provided target.
-func (d *DecodedFields) DecodeInto(target any) error {
-	b, err := d.Encode()
-
-	if err != nil {
-		return err
-	}
-
-	if err := codec.Decode(b, target); err != nil {
-		return ErrDecodeToTarget.Wrap(err)
-	}
-
-	return nil
-}
 
 type DecodedFieldPredicateFn func(fieldIndex int, field *DecodedField) bool
 type DecodedValueProcessingFn[T any] func(value any) (T, error)

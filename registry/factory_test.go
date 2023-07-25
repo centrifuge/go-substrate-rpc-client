@@ -70,10 +70,13 @@ func TestFactory_CreateErrorRegistryWithLiveMetadata(t *testing.T) {
 				assert.True(t, errorsType.Def.IsVariant, fmt.Sprintf("Error type %d not a variant", pallet.Events.Type.Int64()))
 
 				for _, errorVariant := range errorsType.Def.Variant.Variants {
-					errorName := fmt.Sprintf("%s.%s", pallet.Name, errorVariant.Name)
+					errorID := ErrorID{
+						ModuleIndex: pallet.Index,
+						ErrorIndex:  [4]types.U8{errorVariant.Index},
+					}
 
-					registryErrorType, ok := reg[errorName]
-					assert.True(t, ok, fmt.Sprintf("Error '%s' not found in registry", errorName))
+					registryErrorType, ok := reg[errorID]
+					assert.True(t, ok, fmt.Sprintf("Error '%v' not found in registry", errorID))
 
 					testAsserter.assertRegistryItemContainsAllTypes(t, meta, registryErrorType.Fields, errorVariant.Fields)
 				}
@@ -2089,100 +2092,6 @@ func Test_TypeDecoder_FieldDecodingError(t *testing.T) {
 	res, err := typeDecoder.Decode(decoder)
 	assert.ErrorIs(t, err, ErrTypeFieldDecoding)
 	assert.Nil(t, res)
-}
-
-func TestDecodedFields_Encode(t *testing.T) {
-	testStruct := &decodedFieldTest{
-		FirstField:  4,
-		SecondField: 5,
-		ThirdField:  6,
-	}
-
-	testData := []any{
-		types.U8(1),
-		testStruct,
-		types.U32(3),
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	encodedTestData, err := encodeTestData(testData)
-	assert.NoError(t, err)
-
-	encodedFields, err := decodedFields.Encode()
-	assert.NoError(t, err)
-
-	assert.Equal(t, encodedTestData, encodedFields)
-}
-
-func TestDecodedFields_EncodeError(t *testing.T) {
-	testStruct := &decodedFieldTest{
-		Error: true,
-	}
-
-	testData := []any{
-		types.U8(1),
-		testStruct,
-		types.U32(3),
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	encodedFields, err := decodedFields.Encode()
-	assert.NotNil(t, err)
-	assert.Nil(t, encodedFields)
-}
-
-func TestDecodedFields_DecodeInto(t *testing.T) {
-	testData := []any{
-		types.U8(1),
-		types.U16(2),
-		types.U32(3),
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	var testStruct decodedFieldTest
-
-	err := decodedFields.DecodeInto(&testStruct)
-	assert.NoError(t, err)
-	assert.Equal(t, testData[0], testStruct.FirstField)
-	assert.Equal(t, testData[1], testStruct.SecondField)
-	assert.Equal(t, testData[2], testStruct.ThirdField)
-}
-
-func TestDecodedFields_DecodeInto_EncodeError(t *testing.T) {
-	testStruct := &decodedFieldTest{
-		Error: true,
-	}
-
-	testData := []any{
-		types.U8(1),
-		testStruct,
-		types.U32(3),
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	var decodeStruct decodedFieldTest
-
-	err := decodedFields.DecodeInto(&decodeStruct)
-	assert.NotNil(t, err)
-}
-
-func TestDecodedFields_DecodeInto_DecodeError(t *testing.T) {
-	testData := []any{
-		types.U8(1),
-		types.U16(2),
-		types.U32(3),
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	var testStruct errStruct
-
-	err := decodedFields.DecodeInto(&testStruct)
-	assert.NotNil(t, err)
 }
 
 func Test_ProcessDecodedFieldValue(t *testing.T) {
