@@ -41,25 +41,31 @@ type FieldOverride struct {
 type factory struct {
 	fieldStorage          map[int64]FieldDecoder
 	recursiveFieldStorage map[int64]*RecursiveDecoder
+	fieldOverrides        []FieldOverride
 }
 
 // NewFactory creates a new Factory using the provided overrides, if any.
 func NewFactory(fieldOverrides ...FieldOverride) Factory {
 	f := &factory{}
+	f.fieldOverrides = fieldOverrides
 
+	return f
+}
+
+func (f *factory) resetStorages() {
 	f.fieldStorage = make(map[int64]FieldDecoder)
 	f.recursiveFieldStorage = make(map[int64]*RecursiveDecoder)
 
-	for _, fieldOverride := range fieldOverrides {
+	for _, fieldOverride := range f.fieldOverrides {
 		f.fieldStorage[fieldOverride.FieldLookupIndex] = fieldOverride.FieldDecoder
 	}
-
-	return f
 }
 
 // CreateErrorRegistry creates the registry that contains the types for errors.
 // nolint:dupl
 func (f *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, error) {
+	f.resetStorages()
+
 	errorRegistry := make(map[ErrorID]*TypeDecoder)
 
 	for _, mod := range meta.AsMetadataV14.Pallets {
@@ -108,6 +114,8 @@ func (f *factory) CreateErrorRegistry(meta *types.Metadata) (ErrorRegistry, erro
 // CreateCallRegistry creates the registry that contains the types for calls.
 // nolint:dupl
 func (f *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error) {
+	f.resetStorages()
+
 	callRegistry := make(map[types.CallIndex]*TypeDecoder)
 
 	for _, mod := range meta.AsMetadataV14.Pallets {
@@ -155,6 +163,8 @@ func (f *factory) CreateCallRegistry(meta *types.Metadata) (CallRegistry, error)
 
 // CreateEventRegistry creates the registry that contains the types for events.
 func (f *factory) CreateEventRegistry(meta *types.Metadata) (EventRegistry, error) {
+	f.resetStorages()
+
 	eventRegistry := make(map[types.EventID]*TypeDecoder)
 
 	for _, mod := range meta.AsMetadataV14.Pallets {
