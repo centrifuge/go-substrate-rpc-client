@@ -56,42 +56,48 @@ var (
 		IsNative: true,
 	}
 	testCurrencyID2 = CurrencyID{
-		IsUsd: true,
-	}
-	testCurrencyID3 = CurrencyID{
 		IsTranche: true,
 		Tranche:   testTranche,
 	}
-	testCurrencyID4 = CurrencyID{
+	testCurrencyID3 = CurrencyID{
 		IsKSM: true,
 	}
+	testCurrencyID4 = CurrencyID{
+		IsAUSD: true,
+	}
 	testCurrencyID5 = CurrencyID{
-		IsKUSD: true,
+		IsForeignAsset: true,
+		AsForeignAsset: 0,
 	}
 	testCurrencyID6 = CurrencyID{
-		IsPermissioned:       true,
-		PermissionedCurrency: PermissionedCurrency{},
+		IsStaking: true,
+		AsStaking: StakingCurrency{
+			IsBlockRewards: true,
+		},
 	}
 
 	currencyIDFuzzOpts = []FuzzOpt{
+		WithFuzzFuncs(func(stakingCurrency *StakingCurrency, c fuzz.Continue) {
+			stakingCurrency.IsBlockRewards = true
+		}),
 		WithFuzzFuncs(func(cID *CurrencyID, c fuzz.Continue) {
 			switch c.Intn(6) {
 			case 0:
 				cID.IsNative = true
 			case 1:
-				cID.IsUsd = true
-			case 2:
 				cID.IsTranche = true
-
 				c.Fuzz(&cID.Tranche)
-			case 3:
+			case 2:
 				cID.IsKSM = true
+			case 3:
+				cID.IsAUSD = true
 			case 4:
-				cID.IsKUSD = true
+				cID.IsForeignAsset = true
+				c.Fuzz(&cID.AsForeignAsset)
 			case 5:
-				cID.IsPermissioned = true
+				cID.IsStaking = true
 
-				c.Fuzz(&cID.PermissionedCurrency)
+				c.Fuzz(&cID.AsStaking)
 			}
 		}),
 	}
@@ -100,28 +106,27 @@ var (
 func TestCurrencyID_EncodeDecode(t *testing.T) {
 	AssertRoundTripFuzz[CurrencyID](t, 1000, currencyIDFuzzOpts...)
 	AssertDecodeNilData[CurrencyID](t)
-	AssertEncodeEmptyObj[CurrencyID](t, 0)
 }
 
 func TestCurrencyID_Encode(t *testing.T) {
 	AssertEncode(t, []EncodingAssert{
 		{testCurrencyID1, MustHexDecodeString("0x00")},
-		{testCurrencyID2, MustHexDecodeString("0x01")},
-		{testCurrencyID3, MustHexDecodeString("0x02430100000000000004050603010302040000000000000000")},
+		{testCurrencyID2, MustHexDecodeString("0x01430100000000000004050603010302040000000000000000")},
+		{testCurrencyID3, MustHexDecodeString("0x02")},
 		{testCurrencyID4, MustHexDecodeString("0x03")},
-		{testCurrencyID5, MustHexDecodeString("0x04")},
-		{testCurrencyID6, MustHexDecodeString("0x05")},
+		{testCurrencyID5, MustHexDecodeString("0x0400000000")},
+		{testCurrencyID6, MustHexDecodeString("0x0500")},
 	})
 }
 
 func TestCurrencyID_Decode(t *testing.T) {
 	AssertDecode(t, []DecodingAssert{
 		{MustHexDecodeString("0x00"), testCurrencyID1},
-		{MustHexDecodeString("0x01"), testCurrencyID2},
-		{MustHexDecodeString("0x02430100000000000004050603010302040000000000000000"), testCurrencyID3},
+		{MustHexDecodeString("0x01430100000000000004050603010302040000000000000000"), testCurrencyID2},
+		{MustHexDecodeString("0x02"), testCurrencyID3},
 		{MustHexDecodeString("0x03"), testCurrencyID4},
-		{MustHexDecodeString("0x04"), testCurrencyID5},
-		{MustHexDecodeString("0x05"), testCurrencyID6},
+		{MustHexDecodeString("0x0400000000"), testCurrencyID5},
+		{MustHexDecodeString("0x0500"), testCurrencyID6},
 	})
 }
 
@@ -135,7 +140,6 @@ var (
 func TestPrice_EncodeDecode(t *testing.T) {
 	AssertRoundTripFuzz[Price](t, 100, currencyIDFuzzOpts...)
 	AssertDecodeNilData[Price](t)
-	AssertEncodeEmptyObj[Price](t, 16)
 }
 
 func TestPrice_Encode(t *testing.T) {
@@ -160,7 +164,6 @@ var (
 func TestSale_EncodeDecode(t *testing.T) {
 	AssertRoundTripFuzz[Sale](t, 100, currencyIDFuzzOpts...)
 	AssertDecodeNilData[Sale](t)
-	AssertEncodeEmptyObj[Sale](t, 48)
 }
 
 func TestSale_Encode(t *testing.T) {

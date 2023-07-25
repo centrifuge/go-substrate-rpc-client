@@ -51,7 +51,7 @@ func TestExtrinsicRetriever_New(t *testing.T) {
 		Return(latestMeta, nil).
 		Once()
 
-	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.Type{})
+	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.TypeDecoder{})
 
 	registryFactoryMock.On("CreateCallRegistry", latestMeta).
 		Return(callRegistry, nil).
@@ -196,7 +196,7 @@ func TestExtrinsicRetriever_NewDefault(t *testing.T) {
 
 	registryFactoryMock := registry.NewFactoryMock(t)
 
-	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.Type{})
+	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.TypeDecoder{})
 
 	registryFactoryMock.On("CreateCallRegistry", latestMeta).
 		Return(callRegistry, nil).
@@ -285,7 +285,7 @@ func TestExtrinsicRetriever_GetExtrinsics(t *testing.T) {
 
 	extrinsicRetriever.meta = testMeta
 
-	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.Type{})
+	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.TypeDecoder{})
 
 	extrinsicRetriever.callRegistry = callRegistry
 
@@ -401,7 +401,7 @@ func TestExtrinsicRetriever_GetExtrinsics_BlockRetrievalError(t *testing.T) {
 
 	extrinsicRetriever.meta = testMeta
 
-	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.Type{})
+	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.TypeDecoder{})
 
 	extrinsicRetriever.callRegistry = callRegistry
 
@@ -498,7 +498,7 @@ func TestExtrinsicRetriever_GetExtrinsics_ExtrinsicParsingError(t *testing.T) {
 
 	extrinsicRetriever.meta = testMeta
 
-	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.Type{})
+	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.TypeDecoder{})
 
 	extrinsicRetriever.callRegistry = callRegistry
 
@@ -626,7 +626,7 @@ func TestExtrinsicRetriever_updateInternalState(t *testing.T) {
 
 	testMeta := &types.Metadata{}
 
-	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.Type{})
+	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.TypeDecoder{})
 
 	blockHash := types.NewHash([]byte{0, 1, 2, 3})
 

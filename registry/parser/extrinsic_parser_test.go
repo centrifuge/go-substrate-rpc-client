@@ -264,8 +264,8 @@ func TestExtrinsicParserFn_ParseExtrinsics_DecodeError(t *testing.T) {
 }
 
 func assertExtrinsicFieldInformationIsCorrect[A, S, P any](t *testing.T, testFields []testField, extrinsic *Extrinsic[A, S, P]) {
-	for _, testField := range testFields {
-		assert.Equal(t, testField.Value, extrinsic.CallFields[testField.Name])
+	for testFieldIndex, testField := range testFields {
+		assert.Equal(t, testField.Value, extrinsic.CallFields[testFieldIndex].Value)
 	}
 }
 
@@ -301,7 +301,7 @@ func getExtrinsicParsingTestData[A, S, P any](testExtrinsics []testExtrinsic[A, 
 }
 
 func getRegistryForTestExtrinsic[A, S, P any](testExtrinsics []testExtrinsic[A, S, P]) (registry.CallRegistry, error) {
-	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.Type{})
+	callRegistry := registry.CallRegistry(map[types.CallIndex]*registry.TypeDecoder{})
 
 	for _, testExtrinsic := range testExtrinsics {
 		regFields, err := getTestRegistryFields(testExtrinsic.CallFields)
@@ -310,7 +310,7 @@ func getRegistryForTestExtrinsic[A, S, P any](testExtrinsics []testExtrinsic[A, 
 			return nil, err
 		}
 
-		callRegistry[testExtrinsic.CallIndex] = &registry.Type{
+		callRegistry[testExtrinsic.CallIndex] = &registry.TypeDecoder{
 			Name:   testExtrinsic.Name,
 			Fields: regFields,
 		}

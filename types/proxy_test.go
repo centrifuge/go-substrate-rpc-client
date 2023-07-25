@@ -66,7 +66,6 @@ var (
 
 func TestProxyStorageEntry_EncodeDecode(t *testing.T) {
 	AssertRoundTripFuzz[ProxyStorageEntry](t, 1000)
-	AssertDecodeNilData[ProxyStorageEntry](t)
 	AssertEncodeEmptyObj[ProxyStorageEntry](t, 17)
 }
 

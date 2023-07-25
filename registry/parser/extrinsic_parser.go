@@ -27,7 +27,7 @@ type DefaultExtrinsic = Extrinsic[
 // information about these generic types.
 type Extrinsic[A, S, P any] struct {
 	Name       string
-	CallFields map[string]any
+	CallFields registry.DecodedFields
 	CallIndex  types.CallIndex
 	Version    byte
 	Signature  generic.GenericExtrinsicSignature[A, S, P]
