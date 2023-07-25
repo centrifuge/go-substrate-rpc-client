@@ -523,6 +523,32 @@ func TestFactory_CreateEventRegistry_WithLiveMetadata(t *testing.T) {
 	}
 }
 
+func TestFactory_CreateEventRegistry_Overrides(t *testing.T) {
+	var meta types.Metadata
+
+	err := codec.DecodeFromHex(test.CentrifugeMetadataHex, &meta)
+	assert.NoError(t, err)
+
+	t.Log("Metadata was decoded successfully")
+
+	// Lookup index for DispatchInfo in the test.CentrifugeMetadataHex
+	targetLookupIndex := int64(21)
+
+	fieldOverride := FieldOverride{
+		FieldLookupIndex: targetLookupIndex,
+		FieldDecoder:     &ValueDecoder[types.DispatchInfo]{},
+	}
+
+	f := NewFactory(fieldOverride).(*factory)
+
+	assert.Equal(t, f.fieldStorage[targetLookupIndex], &ValueDecoder[types.DispatchInfo]{})
+
+	_, err = f.CreateEventRegistry(&meta)
+	assert.NoError(t, err)
+
+	assert.Equal(t, f.fieldStorage[targetLookupIndex], &ValueDecoder[types.DispatchInfo]{})
+}
+
 func TestFactory_CreateEventRegistry_NoPalletWithEvents(t *testing.T) {
 	testMeta := &types.Metadata{
 		AsMetadataV14: types.MetadataV14{
@@ -2025,6 +2051,72 @@ func Test_getPrimitiveType_UnsupportedTypeError(t *testing.T) {
 	res, err := getPrimitiveDecoder(primitiveTypeDef)
 	assert.ErrorIs(t, err, ErrPrimitiveTypeNotSupported)
 	assert.Nil(t, res)
+}
+
+func TestFactory_Overrides(t *testing.T) {
+	var meta types.Metadata
+
+	err := codec.DecodeFromHex(test.CentrifugeMetadataHex, &meta)
+	assert.NoError(t, err)
+
+	t.Log("Metadata was decoded successfully")
+
+	// Lookup index for DispatchInfo in the test.CentrifugeMetadataHex
+	targetLookupIndex := int64(21)
+
+	fieldOverride := FieldOverride{
+		FieldLookupIndex: targetLookupIndex,
+		FieldDecoder:     &ValueDecoder[types.DispatchInfo]{},
+	}
+
+	f := NewFactory(fieldOverride).(*factory)
+
+	assert.Equal(t, f.fieldStorage[targetLookupIndex], &ValueDecoder[types.DispatchInfo]{})
+
+	reg, err := f.CreateEventRegistry(&meta)
+	assert.NoError(t, err)
+
+	assert.Equal(t, f.fieldStorage[targetLookupIndex], &ValueDecoder[types.DispatchInfo]{})
+
+	// Event ID for System.ExtrinsicSuccess
+	extrinsicSuccessEventID := types.EventID{0, 0}
+
+	testDispatchInfo := types.DispatchInfo{
+		Weight: types.Weight{
+			RefTime:   types.NewUCompactFromUInt(1),
+			ProofSize: types.NewUCompactFromUInt(2),
+		},
+		Class: types.DispatchClass{
+			IsNormal: true,
+		},
+		PaysFee: types.Pays{
+			IsYes: true,
+		},
+	}
+
+	encodedTestDispatchInfo, err := codec.Encode(testDispatchInfo)
+	assert.NoError(t, err)
+
+	extrinsicSuccessEventDecoder, ok := reg[extrinsicSuccessEventID]
+	assert.True(t, ok)
+
+	res, err := extrinsicSuccessEventDecoder.Decode(scale.NewDecoder(bytes.NewReader(encodedTestDispatchInfo)))
+	assert.NoError(t, err)
+	assert.NotNil(t, res)
+
+	value, err := ProcessDecodedFieldValue[types.DispatchInfo](
+		res,
+		func(fieldIndex int, field *DecodedField) bool {
+			return field.LookupIndex == targetLookupIndex
+		},
+		func(value any) (types.DispatchInfo, error) {
+			dispatchInfo, ok := value.(types.DispatchInfo)
+			assert.True(t, ok)
+
+			return dispatchInfo, nil
+		},
+	)
+	assert.Equal(t, testDispatchInfo, value)
 }
 
 func Test_TypeDecoder(t *testing.T) {
