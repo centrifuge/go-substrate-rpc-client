@@ -33,6 +33,8 @@ type Client interface {
 	// args must be encoded in the format RPC understands
 	Call(result interface{}, method string, args ...interface{}) error
 
+	CallContext(ctx context.Context, result interface{}, method string, args ...interface{}) error
+
 	Subscribe(ctx context.Context, namespace, subscribeMethodSuffix, unsubscribeMethodSuffix,
 		notificationMethodSuffix string, channel interface{}, args ...interface{}) (
 		*gethrpc.ClientSubscription, error)
@@ -73,8 +75,14 @@ func Connect(url string) (Client, error) {
 }
 
 func CallWithBlockHash(c Client, target interface{}, method string, blockHash *types.Hash, args ...interface{}) error {
+	ctx := context.Background()
+
+	return CallWithBlockHashContext(ctx, c, target, method, blockHash, args...)
+}
+
+func CallWithBlockHashContext(ctx context.Context, c Client, target interface{}, method string, blockHash *types.Hash, args ...interface{}) error {
 	if blockHash == nil {
-		err := c.Call(target, method, args...)
+		err := c.CallContext(ctx, target, method, args...)
 		if err != nil {
 			return err
 		}
@@ -85,7 +93,7 @@ func CallWithBlockHash(c Client, target interface{}, method string, blockHash *t
 		return err
 	}
 	args = append(args, hexHash)
-	err = c.Call(target, method, args...)
+	err = c.CallContext(ctx, target, method, args...)
 	if err != nil {
 		return err
 	}
