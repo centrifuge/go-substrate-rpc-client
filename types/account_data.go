@@ -26,6 +26,6 @@ type AccountInfo struct {
 		Free       U128
 		Reserved   U128
 		MiscFrozen U128
-		FreeFrozen U128
+		Flags      U128
 	}
 }
