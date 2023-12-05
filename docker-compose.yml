@@ -3,12 +3,12 @@ version: '2'
 services:
   substrate:
     container_name: substrate
-    image: parity/polkadot:v0.9.21
+    image: parity/polkadot:v0.9.43
     ports:
       - 9933:9933
       - 9944:9944
       - 30333:30333
-    command: --dev --rpc-external --ws-external --rpc-methods Unsafe --offchain-worker Always
+    command: --dev --rpc-external --rpc-methods Unsafe --offchain-worker Always
   gsrpc-test:
     image: gsrpc-test
     build: .

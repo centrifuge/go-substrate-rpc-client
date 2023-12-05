@@ -1,6 +1,7 @@
 package generic
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
@@ -21,20 +22,20 @@ func TestGenericDefaultChain_GetBlock(t *testing.T) {
 
 	blockJustification := []byte{4, 5, 6}
 
-	clientMock.On("Call", mock.Anything, mock.Anything, mock.Anything).
+	clientMock.On("CallContext", context.Background(), mock.Anything, mock.Anything, mock.Anything).
 		Run(
 			func(args mock.Arguments) {
-				target, ok := args.Get(0).(**DefaultGenericSignedBlock)
+				target, ok := args.Get(1).(**DefaultGenericSignedBlock)
 				assert.True(t, ok)
 
 				*target = new(DefaultGenericSignedBlock)
 				(**target).Justification = blockJustification
 
-				method, ok := args.Get(1).(string)
+				method, ok := args.Get(2).(string)
 				assert.True(t, ok)
 				assert.Equal(t, getBlockMethod, method)
 
-				hashStr, ok := args.Get(2).(string)
+				hashStr, ok := args.Get(3).(string)
 				assert.True(t, ok)
 
 				encodedBlockHash := hexutil.Encode(blockHash[:])
@@ -54,17 +55,17 @@ func TestGenericDefaultChain_GetBlock_BlockCallError(t *testing.T) {
 
 	blockHash := types.Hash{1, 2, 3}
 
-	clientMock.On("Call", mock.Anything, mock.Anything, mock.Anything).
+	clientMock.On("CallContext", context.Background(), mock.Anything, mock.Anything, mock.Anything).
 		Run(
 			func(args mock.Arguments) {
-				_, ok := args.Get(0).(**DefaultGenericSignedBlock)
+				_, ok := args.Get(1).(**DefaultGenericSignedBlock)
 				assert.True(t, ok)
 
-				method, ok := args.Get(1).(string)
+				method, ok := args.Get(2).(string)
 				assert.True(t, ok)
 				assert.Equal(t, getBlockMethod, method)
 
-				hashStr, ok := args.Get(2).(string)
+				hashStr, ok := args.Get(3).(string)
 				assert.True(t, ok)
 
 				encodedBlockHash := hexutil.Encode(blockHash[:])
@@ -84,16 +85,16 @@ func TestGenericDefaultChain_GetBlockLatest(t *testing.T) {
 
 	blockJustification := []byte{4, 5, 6}
 
-	clientMock.On("Call", mock.Anything, mock.Anything, mock.Anything).
+	clientMock.On("CallContext", context.Background(), mock.Anything, mock.Anything, mock.Anything).
 		Run(
 			func(args mock.Arguments) {
-				target, ok := args.Get(0).(**DefaultGenericSignedBlock)
+				target, ok := args.Get(1).(**DefaultGenericSignedBlock)
 				assert.True(t, ok)
 
 				*target = new(DefaultGenericSignedBlock)
 				(**target).Justification = blockJustification
 
-				method, ok := args.Get(1).(string)
+				method, ok := args.Get(2).(string)
 				assert.True(t, ok)
 				assert.Equal(t, getBlockMethod, method)
 			},
@@ -109,13 +110,13 @@ func TestGenericDefaultChain_GetBlockLatest_BlockCallError(t *testing.T) {
 
 	genericChain := NewDefaultChain(clientMock)
 
-	clientMock.On("Call", mock.Anything, mock.Anything, mock.Anything).
+	clientMock.On("CallContext", context.Background(), mock.Anything, mock.Anything, mock.Anything).
 		Run(
 			func(args mock.Arguments) {
-				_, ok := args.Get(0).(**DefaultGenericSignedBlock)
+				_, ok := args.Get(1).(**DefaultGenericSignedBlock)
 				assert.True(t, ok)
 
-				method, ok := args.Get(1).(string)
+				method, ok := args.Get(2).(string)
 				assert.True(t, ok)
 				assert.Equal(t, getBlockMethod, method)
 			},
@@ -160,20 +161,20 @@ func (td *testBlockData[A, S, P]) runTest(t *testing.T) {
 
 		blockJustification := []byte{4, 5, 6}
 
-		clientMock.On("Call", mock.Anything, mock.Anything, mock.Anything).
+		clientMock.On("CallContext", context.Background(), mock.Anything, mock.Anything, mock.Anything).
 			Run(
 				func(args mock.Arguments) {
-					target, ok := args.Get(0).(**SignedBlock[A, S, P])
+					target, ok := args.Get(1).(**SignedBlock[A, S, P])
 					assert.True(t, ok)
 
 					*target = new(SignedBlock[A, S, P])
 					(*target).Justification = blockJustification
 
-					method, ok := args.Get(1).(string)
+					method, ok := args.Get(2).(string)
 					assert.True(t, ok)
 					assert.Equal(t, getBlockMethod, method)
 
-					hashStr, ok := args.Get(2).(string)
+					hashStr, ok := args.Get(3).(string)
 					assert.True(t, ok)
 
 					encodedBlockHash := hexutil.Encode(blockHash[:])
@@ -193,17 +194,17 @@ func (td *testBlockData[A, S, P]) runTest(t *testing.T) {
 
 		blockHash := types.Hash{1, 2, 3}
 
-		clientMock.On("Call", mock.Anything, mock.Anything, mock.Anything).
+		clientMock.On("CallContext", context.Background(), mock.Anything, mock.Anything, mock.Anything).
 			Run(
 				func(args mock.Arguments) {
-					_, ok := args.Get(0).(**SignedBlock[A, S, P])
+					_, ok := args.Get(1).(**SignedBlock[A, S, P])
 					assert.True(t, ok)
 
-					method, ok := args.Get(1).(string)
+					method, ok := args.Get(2).(string)
 					assert.True(t, ok)
 					assert.Equal(t, getBlockMethod, method)
 
-					hashStr, ok := args.Get(2).(string)
+					hashStr, ok := args.Get(3).(string)
 					assert.True(t, ok)
 
 					encodedBlockHash := hexutil.Encode(blockHash[:])
@@ -223,16 +224,16 @@ func (td *testBlockData[A, S, P]) runTest(t *testing.T) {
 
 		blockJustification := []byte{4, 5, 6}
 
-		clientMock.On("Call", mock.Anything, mock.Anything, mock.Anything).
+		clientMock.On("CallContext", context.Background(), mock.Anything, mock.Anything, mock.Anything).
 			Run(
 				func(args mock.Arguments) {
-					target, ok := args.Get(0).(**SignedBlock[A, S, P])
+					target, ok := args.Get(1).(**SignedBlock[A, S, P])
 					assert.True(t, ok)
 
 					*target = new(SignedBlock[A, S, P])
 					(*target).Justification = blockJustification
 
-					method, ok := args.Get(1).(string)
+					method, ok := args.Get(2).(string)
 					assert.True(t, ok)
 					assert.Equal(t, getBlockMethod, method)
 				},
@@ -248,13 +249,13 @@ func (td *testBlockData[A, S, P]) runTest(t *testing.T) {
 
 		genericChain := NewChain[A, S, P, *SignedBlock[A, S, P]](clientMock)
 
-		clientMock.On("Call", mock.Anything, mock.Anything, mock.Anything).
+		clientMock.On("CallContext", context.Background(), mock.Anything, mock.Anything, mock.Anything).
 			Run(
 				func(args mock.Arguments) {
-					_, ok := args.Get(0).(**SignedBlock[A, S, P])
+					_, ok := args.Get(1).(**SignedBlock[A, S, P])
 					assert.True(t, ok)
 
-					method, ok := args.Get(1).(string)
+					method, ok := args.Get(2).(string)
 					assert.True(t, ok)
 					assert.Equal(t, getBlockMethod, method)
 				},
