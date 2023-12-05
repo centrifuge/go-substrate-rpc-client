@@ -1,6 +1,6 @@
 module github.com/centrifuge/go-substrate-rpc-client/v4
 
-go 1.18
+go 1.21
 
 require (
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
