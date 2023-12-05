@@ -316,8 +316,6 @@ func TestFactory_CreateCallRegistry_Overrides(t *testing.T) {
 
 	f = NewFactory(fieldOverride).(*factory)
 
-	assert.Equal(t, f.fieldStorage[targetLookupIndex], &ValueDecoder[types.I64]{})
-
 	_, err = f.CreateCallRegistry(&meta)
 	assert.NoError(t, err)
 
@@ -541,8 +539,6 @@ func TestFactory_CreateEventRegistry_Overrides(t *testing.T) {
 
 	f := NewFactory(fieldOverride).(*factory)
 
-	assert.Equal(t, f.fieldStorage[targetLookupIndex], &ValueDecoder[types.DispatchInfo]{})
-
 	_, err = f.CreateEventRegistry(&meta)
 	assert.NoError(t, err)
 
@@ -723,6 +719,7 @@ func TestFactory_getTypeFields(t *testing.T) {
 	}
 
 	factory := NewFactory().(*factory)
+	factory.resetStorages()
 
 	res, err := factory.getTypeFields(testMeta, testFields)
 	assert.NoError(t, err)
@@ -776,6 +773,7 @@ func TestFactory_getTypeFields_FieldDecoderRetrievalError(t *testing.T) {
 	}
 
 	factory := NewFactory().(*factory)
+	factory.resetStorages()
 
 	res, err := factory.getTypeFields(testMeta, testFields)
 	assert.ErrorIs(t, err, ErrFieldDecoderRetrieval)
@@ -948,6 +946,7 @@ func TestFactory_getFieldDecoder_Composite(t *testing.T) {
 	}
 
 	factory := NewFactory().(*factory)
+	factory.resetStorages()
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
 	assert.NoError(t, err)
@@ -1016,6 +1015,7 @@ func TestFactory_getFieldDecoder_Composite_FieldError(t *testing.T) {
 	}
 
 	factory := NewFactory().(*factory)
+	factory.resetStorages()
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
 	assert.ErrorIs(t, err, ErrCompositeTypeFieldsRetrieval)
@@ -1074,6 +1074,7 @@ func TestFactory_getFieldDecoder_Variant(t *testing.T) {
 	}
 
 	factory := NewFactory().(*factory)
+	factory.resetStorages()
 
 	res, err := factory.getFieldDecoder(testMeta, testFieldName, testFieldTypeDef)
 	assert.NoError(t, err)
@@ -1638,6 +1639,7 @@ func TestFactory_getVariantFieldType_CompositeVariantTypeFieldError(t *testing.T
 	}
 
 	factory := NewFactory().(*factory)
+	factory.resetStorages()
 
 	res, err := factory.getVariantFieldDecoder(testMeta, testFieldTypeDef)
 	assert.ErrorIs(t, err, ErrVariantTypeFieldsRetrieval)
@@ -2070,8 +2072,6 @@ func TestFactory_Overrides(t *testing.T) {
 	}
 
 	f := NewFactory(fieldOverride).(*factory)
-
-	assert.Equal(t, f.fieldStorage[targetLookupIndex], &ValueDecoder[types.DispatchInfo]{})
 
 	reg, err := f.CreateEventRegistry(&meta)
 	assert.NoError(t, err)

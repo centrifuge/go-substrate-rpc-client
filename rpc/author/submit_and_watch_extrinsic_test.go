@@ -1,7 +1,6 @@
 package author_test
 
 import (
-	"fmt"
 	"testing"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
@@ -57,7 +56,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 			TransactionVersion: rv.TransactionVersion,
 		}
 
-		fmt.Printf("Sending %v from %#x to %#x with nonce %v\n", amount, signature.TestKeyringPairAlice.PublicKey, bob.AsID, nonce)
+		t.Logf("Sending %v from %#x to %#x with nonce %v\n", amount, signature.TestKeyringPairAlice.PublicKey, bob.AsID, nonce)
 
 		// Sign the transaction using Alice's default account
 		err = ext.Sign(signature.TestKeyringPairAlice, o)
