@@ -37,7 +37,7 @@ func NewAddressFromAccountID(b []byte) (Address, error) {
 	accountID, err := NewAccountID(b)
 
 	if err != nil {
-		return Address{}, nil
+		return Address{}, err
 	}
 
 	return Address{
