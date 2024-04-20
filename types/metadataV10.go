@@ -233,7 +233,7 @@ func (s StorageFunctionMetadataV10) IsMap() bool {
 
 func (s StorageFunctionMetadataV10) Hashers() ([]hash.Hash, error) {
 	if !s.IsMap() {
-		return nil, fmt.Errorf("Hashers() is only to be called on Maps")
+		return nil, errors.New("Hashers() is only to be called on Maps")
 	}
 
 	var hashers = collectHashersV10(s.Type)

@@ -17,7 +17,7 @@
 package types
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 )
@@ -42,7 +42,7 @@ func (b BytesBare) Encode(encoder scale.Encoder) error {
 
 // Decode does nothing and always returns an error. BytesBare is only used for encoding, not for decoding
 func (b *BytesBare) Decode(decoder scale.Decoder) error {
-	return fmt.Errorf("decoding of BytesBare is not supported")
+	return errors.New("decoding of BytesBare is not supported")
 }
 
 // Bytes8 represents an 8 byte array

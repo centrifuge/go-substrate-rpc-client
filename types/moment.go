@@ -17,7 +17,7 @@
 package types
 
 import (
-	"fmt"
+	"errors"
 	"math"
 	"time"
 
@@ -48,7 +48,7 @@ func (m *Moment) Decode(decoder scale.Decoder) error {
 
 	// Error in case of overflow
 	if u > math.MaxInt64 {
-		return fmt.Errorf("cannot decode a uint64 into a Moment if it overflows int64")
+		return errors.New("cannot decode a uint64 into a Moment if it overflows int64")
 	}
 
 	secs := u / MillisInSecond

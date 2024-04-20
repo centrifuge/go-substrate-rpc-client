@@ -17,7 +17,7 @@
 package types
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
@@ -93,7 +93,7 @@ func (e ExtrinsicPayloadV3) Encode(encoder scale.Encoder) error {
 
 // Decode does nothing and always returns an error. ExtrinsicPayloadV3 is only used for encoding, not for decoding
 func (e *ExtrinsicPayloadV3) Decode(decoder scale.Decoder) error {
-	return fmt.Errorf("decoding of ExtrinsicPayloadV3 is not supported")
+	return errors.New("decoding of ExtrinsicPayloadV3 is not supported")
 }
 
 type ExtrinsicPayloadV4 struct {
