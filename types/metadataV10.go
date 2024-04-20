@@ -255,7 +255,7 @@ func collectHashersV10(x StorageFunctionTypeV10) []StorageHasherV10 {
 	case x.IsDoubleMap:
 		return []StorageHasherV10{x.AsDoubleMap.Hasher, x.AsDoubleMap.Key2Hasher}
 	default:
-		panic("Unexpexted type")
+		panic("Unexpected type")
 	}
 }
 

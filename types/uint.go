@@ -180,7 +180,7 @@ func (i *U128) GobDecode(b []byte) error {
 	return i.Int.GobDecode(b)
 }
 
-// U256 is an usigned 256-bit integer, it is represented as a big.Int in Go.
+// U256 is an unsigned 256-bit integer, it is represented as a big.Int in Go.
 type U256 struct {
 	*big.Int
 }
