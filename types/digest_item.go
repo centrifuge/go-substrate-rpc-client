@@ -18,7 +18,6 @@ package types
 
 import (
 	"fmt"
-
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 )
 
@@ -151,7 +150,7 @@ func (c ChangesTrieSignal) Encode(encoder scale.Encoder) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("no such variant for ChangesTrieSignal")
+		return errors.New("no such variant for ChangesTrieSignal")
 	}
 
 	return nil
@@ -171,7 +170,7 @@ func (c *ChangesTrieSignal) Decode(decoder scale.Decoder) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("no such variant for ChangesTrieSignal")
+		return errors.New("no such variant for ChangesTrieSignal")
 	}
 
 	return nil

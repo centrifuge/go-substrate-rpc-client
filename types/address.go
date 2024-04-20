@@ -17,7 +17,7 @@
 package types
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
@@ -91,7 +91,7 @@ func (a *Address) Decode(decoder scale.Decoder) error {
 	}
 
 	if b == 0xfe {
-		return fmt.Errorf("decoding of Address with 0xfe prefix not supported")
+		return errors.New("decoding of Address with 0xfe prefix not supported")
 	}
 
 	if b == 0xfd {

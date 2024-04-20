@@ -18,6 +18,7 @@ package types
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
@@ -42,7 +43,7 @@ func (r *KeyValueOption) UnmarshalJSON(b []byte) error {
 	}
 	switch len(tmp) {
 	case 0:
-		return fmt.Errorf("expected at least one entry for KeyValueOption")
+		return errors.New("expected at least one entry for KeyValueOption")
 	case 2:
 		r.HasStorageData = true
 		data, err := codec.HexDecodeString(tmp[1])

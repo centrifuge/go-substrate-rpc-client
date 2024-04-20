@@ -17,6 +17,7 @@
 package types
 
 import (
+	"errors"
 	"fmt"
 	"io"
 
@@ -56,7 +57,7 @@ func CreateStorageKey(meta *Metadata, prefix, method string, args ...[]byte) (St
 
 		for i := nonNilCount; i < len(args); i++ {
 			if len(args[i]) != 0 {
-				return nil, fmt.Errorf("non-nil arguments cannot be preceded by nil arguments")
+				return nil, errors.New("non-nil arguments cannot be preceded by nil arguments")
 			}
 		}
 
