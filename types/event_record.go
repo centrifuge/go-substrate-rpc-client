@@ -71,24 +71,30 @@ type EventRecords struct {
 	Auctions_BidAccepted        []EventAuctionsBidAccepted        `test-gen-blockchain:"polkadot"`
 	Auctions_WinningOffset      []EventAuctionsWinningOffset      `test-gen-blockchain:"polkadot"`
 
-	Assets_Created             []EventAssetCreated             `test-gen-skip:"true"`
-	Assets_Issued              []EventAssetIssued              `test-gen-skip:"true"`
-	Assets_Transferred         []EventAssetTransferred         `test-gen-skip:"true"`
-	Assets_Burned              []EventAssetBurned              `test-gen-skip:"true"`
-	Assets_TeamChanged         []EventAssetTeamChanged         `test-gen-skip:"true"`
-	Assets_OwnerChanged        []EventAssetOwnerChanged        `test-gen-skip:"true"`
-	Assets_Frozen              []EventAssetFrozen              `test-gen-skip:"true"`
-	Assets_Thawed              []EventAssetThawed              `test-gen-skip:"true"`
-	Assets_AssetFrozen         []EventAssetAssetFrozen         `test-gen-skip:"true"`
-	Assets_AssetThawed         []EventAssetAssetThawed         `test-gen-skip:"true"`
-	Assets_Destroyed           []EventAssetDestroyed           `test-gen-skip:"true"`
-	Assets_ForceCreated        []EventAssetForceCreated        `test-gen-skip:"true"`
-	Assets_MetadataSet         []EventAssetMetadataSet         `test-gen-skip:"true"`
-	Assets_MetadataCleared     []EventAssetMetadataCleared     `test-gen-skip:"true"`
-	Assets_ApprovedTransfer    []EventAssetApprovedTransfer    `test-gen-skip:"true"`
-	Assets_ApprovalCancelled   []EventAssetApprovalCancelled   `test-gen-skip:"true"`
-	Assets_TransferredApproved []EventAssetTransferredApproved `test-gen-skip:"true"`
-	Assets_AssetStatusChanged  []EventAssetAssetStatusChanged  `test-gen-skip:"true"`
+	Assets_Created                []EventAssetCreated                `test-gen-skip:"true"`
+	Assets_Issued                 []EventAssetIssued                 `test-gen-skip:"true"`
+	Assets_Transferred            []EventAssetTransferred            `test-gen-skip:"true"`
+	Assets_Burned                 []EventAssetBurned                 `test-gen-skip:"true"`
+	Assets_TeamChanged            []EventAssetTeamChanged            `test-gen-skip:"true"`
+	Assets_OwnerChanged           []EventAssetOwnerChanged           `test-gen-skip:"true"`
+	Assets_Frozen                 []EventAssetFrozen                 `test-gen-skip:"true"`
+	Assets_Thawed                 []EventAssetThawed                 `test-gen-skip:"true"`
+	Assets_AssetFrozen            []EventAssetAssetFrozen            `test-gen-skip:"true"`
+	Assets_AssetThawed            []EventAssetAssetThawed            `test-gen-skip:"true"`
+	Assets_AccountsDestroyed      []EventAssetAccountsDestroyed      `test-gen-skip:"true"`
+	Assets_ApprovalsDestroyed     []EventAssetApprovalsDestroyed     `test-gen-skip:"true"`
+	Assets_DestructionStarted     []EventAssetDestructionStarted     `test-gen-skip:"true"`
+	Assets_Destroyed              []EventAssetDestroyed              `test-gen-skip:"true"`
+	Assets_ForceCreated           []EventAssetForceCreated           `test-gen-skip:"true"`
+	Assets_MetadataSet            []EventAssetMetadataSet            `test-gen-skip:"true"`
+	Assets_MetadataCleared        []EventAssetMetadataCleared        `test-gen-skip:"true"`
+	Assets_ApprovedTransfer       []EventAssetApprovedTransfer       `test-gen-skip:"true"`
+	Assets_ApprovalCancelled      []EventAssetApprovalCancelled      `test-gen-skip:"true"`
+	Assets_TransferredApproved    []EventAssetTransferredApproved    `test-gen-skip:"true"`
+	Assets_AssetStatusChanged     []EventAssetAssetStatusChanged     `test-gen-skip:"true"`
+	Assets_AssetMinBalanceChanged []EventAssetAssetMinBalanceChanged `test-gen-skip:"true"`
+	Assets_Touched                []EventAssetTouched                `test-gen-skip:"true"`
+	Assets_Blocked                []EventAssetBlocked                `test-gen-skip:"true"`
 
 	BagsList_Rebagged []EventBagsListRebagged `test-gen-blockchain:"polkadot"`
 
