@@ -1071,6 +1071,31 @@ type EventAssetAssetThawed struct {
 	Topics  []Hash
 }
 
+// EventAssetAccountsDestroyed is emitted when accounts were destroyed for given asset.
+type EventAssetAccountsDestroyed struct {
+	Phase             Phase
+	AssetID           U32
+	AccountsDestroyed U32
+	AccountsRemaining U32
+	Topics            []Hash
+}
+
+// EventAssetApprovalsDestroyed is emitted when approvals were destroyed for given asset.
+type EventAssetApprovalsDestroyed struct {
+	Phase              Phase
+	AssetID            U32
+	ApprovalsDestroyed U32
+	ApprovalsRemaining U32
+	Topics             []Hash
+}
+
+// EventAssetDestructionStarted is emitted when an asset class is in the process of being destroyed.
+type EventAssetDestructionStarted struct {
+	Phase   Phase
+	AssetID U32
+	Topics  []Hash
+}
+
 // EventAssetDestroyed is emitted when an asset class is destroyed.
 type EventAssetDestroyed struct {
 	Phase   Phase
@@ -1143,6 +1168,31 @@ type EventAssetTransferredApproved struct {
 type EventAssetAssetStatusChanged struct {
 	Phase   Phase
 	AssetID U32
+	Topics  []Hash
+}
+
+// EventAssetAssetMinBalanceChanged is emitted when the MinBalance of an asset has been updated by the asset owner.
+type EventAssetAssetMinBalanceChanged struct {
+	Phase         Phase
+	AssetID       U32
+	NewMinBalance U128
+	Topics        []Hash
+}
+
+// EventAssetTouched is emitted when some account Who was created with a deposit from Depositor.
+type EventAssetTouched struct {
+	Phase     Phase
+	AssetID   U32
+	Who       AccountID
+	Depositor AccountID
+	Topics    []Hash
+}
+
+// EventAssetBlocked is emitted when some account Who was blocked.
+type EventAssetBlocked struct {
+	Phase   Phase
+	AssetID U32
+	Who     AccountID
 	Topics  []Hash
 }
 
