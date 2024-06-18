@@ -160,3 +160,74 @@ func (e ExtrinsicPayloadV4) Encode(encoder scale.Encoder) error {
 func (e *ExtrinsicPayloadV4) Decode(decoder scale.Decoder) error {
 	return fmt.Errorf("decoding of ExtrinsicPayloadV4 is not supported")
 }
+
+type ExtrinsicPayloadV5 struct {
+	ExtrinsicPayloadV4
+	CheckMetadataMode CheckMetadataMode
+	CheckMetadataHash CheckMetadataHash
+}
+
+// Sign the extrinsic payload with the given derivation path
+func (e ExtrinsicPayloadV5) Sign(signer signature.KeyringPair) (Signature, error) {
+	b, err := codec.Encode(e)
+	if err != nil {
+		return Signature{}, err
+	}
+
+	sig, err := signature.Sign(b, signer.URI)
+	return NewSignature(sig), err
+}
+
+func (e ExtrinsicPayloadV5) Encode(encoder scale.Encoder) error {
+	err := encoder.Encode(e.Method)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.Era)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.Nonce)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.CheckMetadataMode)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.Tip)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.SpecVersion)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.TransactionVersion)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.GenesisHash)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.BlockHash)
+	if err != nil {
+		return err
+	}
+
+	err = encoder.Encode(e.CheckMetadataHash)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

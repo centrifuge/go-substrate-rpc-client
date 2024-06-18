@@ -32,12 +32,23 @@ type ExtrinsicSignatureV4 struct {
 	Tip       UCompact     // extra via balances::TakeFees (Compact<Balance> where Balance is u128))
 }
 
+type ExtrinsicSignatureV5 struct {
+	Signer            MultiAddress
+	Signature         MultiSignature
+	Era               ExtrinsicEra      // extra via system::CheckEra
+	Nonce             UCompact          // extra via system::CheckNonce (Compact<Index> where Index is u32))
+	Tip               UCompact          // extra via balances::TakeFees (Compact<Balance> where Balance is u128))
+	CheckMetadataMode CheckMetadataMode // additional via frame_metadata_hash_extension::CheckMetadataHash
+}
+
 type SignatureOptions struct {
-	Era                ExtrinsicEra // extra via system::CheckEra
-	Nonce              UCompact     // extra via system::CheckNonce (Compact<Index> where Index is u32)
-	Tip                UCompact     // extra via balances::TakeFees (Compact<Balance> where Balance is u128)
-	SpecVersion        U32          // additional via system::CheckSpecVersion
-	GenesisHash        Hash         // additional via system::CheckGenesis
-	BlockHash          Hash         // additional via system::CheckEra
-	TransactionVersion U32          // additional via system::CheckTxVersion
+	Era                ExtrinsicEra      // extra via system::CheckEra
+	Nonce              UCompact          // extra via system::CheckNonce (Compact<Index> where Index is u32)
+	Tip                UCompact          // extra via balances::TakeFees (Compact<Balance> where Balance is u128)
+	SpecVersion        U32               // additional via system::CheckSpecVersion
+	GenesisHash        Hash              // additional via system::CheckGenesis
+	BlockHash          Hash              // additional via system::CheckEra
+	TransactionVersion U32               // additional via system::CheckTxVersion
+	CheckMetadataMode  CheckMetadataMode // additional via frame_metadata_hash_extension::CheckMetadataHash
+	CheckMetadataHash  CheckMetadataHash // additional via frame_metadata_hash_extension::CheckMetadataHash}
 }
