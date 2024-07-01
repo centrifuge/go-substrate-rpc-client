@@ -96,19 +96,14 @@ func (e DynamicExtrinsic) Encode(encoder scale.Encoder) error {
 		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(),
 			e.Type())
 	}
-
-	// create a temporary buffer that will receive the plain encoded transaction (version, signature (optional),
-	// method/call)
 	var bb = bytes.Buffer{}
 	tempEnc := scale.NewEncoder(&bb)
 
-	// encode the version of the extrinsic
 	err := tempEnc.Encode(e.Version)
 	if err != nil {
 		return err
 	}
 
-	// encode the signature if signed
 	if e.IsSigned() {
 		err = tempEnc.Encode(e.Signature)
 		if err != nil {

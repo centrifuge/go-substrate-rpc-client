@@ -9,6 +9,10 @@ import (
 )
 
 // DynamicExtrinsicPayload is the payload type used by the DynamicExtrinsic.
+//
+// Please note that the order in which the fields are encoded is IMPORTANT, and it is not based
+// on the signed extensions ordering in the metadata.
+// This is the main reason for having this static type.
 type DynamicExtrinsicPayload struct {
 	Method             types.BytesBare
 	Era                *types.ExtrinsicEra

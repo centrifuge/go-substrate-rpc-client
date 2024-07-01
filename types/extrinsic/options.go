@@ -24,7 +24,7 @@ func WithNonce(nonce types.UCompact) DynamicExtrinsicSigningOption {
 	}
 }
 
-func WithCheckMetadata(mode extensions.CheckMetadataMode, metadataHash extensions.CheckMetadataHash) DynamicExtrinsicSigningOption {
+func WithMetadataMode(mode extensions.CheckMetadataMode, metadataHash extensions.CheckMetadataHash) DynamicExtrinsicSigningOption {
 	return func(payload *DynamicExtrinsicPayload, signature *DynamicExtrinsicSignature) {
 		payload.CheckMetadataMode = &mode
 		payload.CheckMetadataHash = &metadataHash
