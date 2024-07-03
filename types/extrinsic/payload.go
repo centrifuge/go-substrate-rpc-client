@@ -1,6 +1,9 @@
 package extrinsic
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
@@ -8,27 +11,79 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic/extensions"
 )
 
-// DynamicExtrinsicPayload is the payload type used by the DynamicExtrinsic.
-//
-// Please note that the order in which the fields are encoded is IMPORTANT, and it is not based
-// on the signed extensions ordering in the metadata.
-// This is the main reason for having this static type.
-type DynamicExtrinsicPayload struct {
-	Method             types.BytesBare
-	Era                *types.ExtrinsicEra
-	Nonce              *types.UCompact
-	CheckMetadataMode  *extensions.CheckMetadataMode
-	Tip                *types.UCompact
-	SpecVersion        *types.U32
-	TransactionVersion *types.U32
-	GenesisHash        *types.Hash
-	BlockHash          *types.Hash
-	CheckMetadataHash  *extensions.CheckMetadataHash
+type SignedField struct {
+	Name    SignedFieldName
+	Value   any
+	Mutated bool
+}
+
+type Payload struct {
+	EncodedCall       types.BytesBare
+	SignedFields      []*SignedField
+	SignedExtraFields []*SignedField
+}
+
+func (p *Payload) Encode(encoder scale.Encoder) error {
+	if err := encoder.Encode(p.EncodedCall); err != nil {
+		return fmt.Errorf("unable to encode method: %w", err)
+	}
+
+	for _, signedField := range p.SignedFields {
+		if !signedField.Mutated {
+			return fmt.Errorf("signed field '%s' was not mutated", signedField.Name)
+		}
+
+		if err := encoder.Encode(signedField.Value); err != nil {
+			return fmt.Errorf("unable to encode signed field: %w", err)
+		}
+	}
+
+	for _, signedExtraField := range p.SignedExtraFields {
+		if !signedExtraField.Mutated {
+			return fmt.Errorf("signed extra field '%s' was not mutated", signedExtraField.Name)
+		}
+
+		if err := encoder.Encode(signedExtraField.Value); err != nil {
+			return fmt.Errorf("unable to encode signed extra field: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func (p *Payload) MutateSignedFields(vals SignedFieldValues) error {
+	if p == nil {
+		return errors.New("payload is nil")
+	}
+
+	for _, signedField := range p.SignedFields {
+		signedFieldVal, ok := vals[signedField.Name]
+
+		if !ok {
+			continue
+		}
+
+		signedField.Value = signedFieldVal
+		signedField.Mutated = true
+	}
+
+	for _, signedExtraField := range p.SignedExtraFields {
+		signedFieldVal, ok := vals[signedExtraField.Name]
+
+		if !ok {
+			continue
+		}
+
+		signedExtraField.Value = signedFieldVal
+		signedExtraField.Mutated = true
+	}
+
+	return nil
 }
 
 // Sign encodes the payload and then signs the encoded bytes using the provided signer.
-func (e *DynamicExtrinsicPayload) Sign(signer signature.KeyringPair) (types.Signature, error) {
-	b, err := codec.Encode(e)
+func (p *Payload) Sign(signer signature.KeyringPair) (types.Signature, error) {
+	b, err := codec.Encode(p)
 	if err != nil {
 		return types.Signature{}, err
 	}
@@ -37,65 +92,123 @@ func (e *DynamicExtrinsicPayload) Sign(signer signature.KeyringPair) (types.Sign
 	return types.NewSignature(sig), err
 }
 
-// Encode encodes the payload to Scale.
-func (e *DynamicExtrinsicPayload) Encode(encoder scale.Encoder) error {
-	if err := encoder.Encode(e.Method); err != nil {
-		return err
+type SignedFieldName string
+
+const (
+	EraSignedField                   SignedFieldName = "era"
+	BlockHashSignedField             SignedFieldName = "block_hash"
+	NonceSignedField                 SignedFieldName = "nonce"
+	TipSignedField                   SignedFieldName = "tip"
+	AssetIDSignedField               SignedFieldName = "asset_id"
+	CheckMetadataHashModeSignedField SignedFieldName = "check_metadata_hash_mode"
+	CheckMetadataHashSignedField     SignedFieldName = "check_metadata_hash"
+	SpecVersionSignedField           SignedFieldName = "spec_version"
+	TransactionVersionSignedField    SignedFieldName = "transaction_version"
+	GenesisHashSignedField           SignedFieldName = "genesis_hash"
+)
+
+type PayloadMutatorFn func(payload *Payload)
+
+var PayloadMutatorFns = map[extensions.SignedExtensionName]PayloadMutatorFn{
+	extensions.CheckMortalitySignedExtension: func(payload *Payload) {
+		payload.SignedFields = append(payload.SignedFields, &SignedField{
+			Name:  EraSignedField,
+			Value: &types.ExtrinsicEra{},
+		})
+		payload.SignedExtraFields = append(payload.SignedExtraFields, &SignedField{
+			Name:  BlockHashSignedField,
+			Value: &types.Hash{},
+		})
+	},
+	extensions.CheckEraSignedExtension: func(payload *Payload) {
+		payload.SignedFields = append(payload.SignedFields, &SignedField{
+			Name:  EraSignedField,
+			Value: &types.ExtrinsicEra{},
+		})
+		payload.SignedExtraFields = append(payload.SignedExtraFields, &SignedField{
+			Name:  BlockHashSignedField,
+			Value: &types.Hash{},
+		})
+	},
+	extensions.CheckNonceSignedExtension: func(payload *Payload) {
+		payload.SignedFields = append(payload.SignedFields, &SignedField{
+			Name:  NonceSignedField,
+			Value: types.U32(0),
+		})
+	},
+	extensions.ChargeTransactionPaymentSignedExtension: func(payload *Payload) {
+		payload.SignedFields = append(payload.SignedFields, &SignedField{
+			Name:  TipSignedField,
+			Value: types.NewUCompactFromUInt(0),
+		})
+	},
+	extensions.ChargeAssetTxPaymentSignedExtension: func(payload *Payload) {
+		payload.SignedFields = append(payload.SignedFields, &SignedField{
+			Name:  TipSignedField,
+			Value: types.NewUCompactFromUInt(0),
+		})
+		payload.SignedExtraFields = append(payload.SignedExtraFields, &SignedField{
+			Name:  AssetIDSignedField,
+			Value: types.AssetID{},
+		})
+	},
+	extensions.CheckMetadataHashSignedExtension: func(payload *Payload) {
+		payload.SignedFields = append(payload.SignedFields, &SignedField{
+			Name:  CheckMetadataHashModeSignedField,
+			Value: extensions.CheckMetadataModeDisabled,
+		})
+		payload.SignedExtraFields = append(payload.SignedExtraFields, &SignedField{
+			Name:  CheckMetadataHashSignedField,
+			Value: &extensions.CheckMetadataHash{},
+		})
+	},
+	extensions.CheckSpecVersionSignedExtension: func(payload *Payload) {
+		payload.SignedExtraFields = append(payload.SignedExtraFields, &SignedField{
+			Name:  SpecVersionSignedField,
+			Value: types.U32(0),
+		})
+	},
+	extensions.CheckTxVersionSignedExtension: func(payload *Payload) {
+		payload.SignedExtraFields = append(payload.SignedExtraFields, &SignedField{
+			Name:  TransactionVersionSignedField,
+			Value: types.U32(0),
+		})
+	},
+	extensions.CheckGenesisSignedExtension: func(payload *Payload) {
+		payload.SignedExtraFields = append(payload.SignedExtraFields, &SignedField{
+			Name:  GenesisHashSignedField,
+			Value: &types.Hash{},
+		})
+	},
+	// There's nothing that we can add in the payload or signature in the following cases, however, these are added to
+	// ensure that the extension is acknowledged and that the mutator check is passing.
+	extensions.CheckNonZeroSenderSignedExtension:          func(payload *Payload) {},
+	extensions.CheckWeightSignedExtension:                 func(payload *Payload) {},
+	extensions.PreBalanceTransferExtensionSignedExtension: func(payload *Payload) {},
+}
+
+func createPayload(meta *types.Metadata, encodedCall []byte) (*Payload, error) {
+	payload := &Payload{
+		EncodedCall: encodedCall,
 	}
 
-	if e.Era != nil {
-		if err := encoder.Encode(e.Era); err != nil {
-			return err
+	for _, signedExtension := range meta.AsMetadataV14.Extrinsic.SignedExtensions {
+		signedExtensionType, ok := meta.AsMetadataV14.EfficientLookup[signedExtension.Type.Int64()]
+
+		if !ok {
+			return nil, fmt.Errorf("signed extension type '%d' is not defined", signedExtension.Type.Int64())
 		}
-	}
 
-	if e.Nonce != nil {
-		if err := encoder.Encode(e.Nonce); err != nil {
-			return err
+		signedExtensionName := extensions.SignedExtensionName(signedExtensionType.Path[len(signedExtensionType.Path)-1])
+
+		payloadMutatorFn, ok := PayloadMutatorFns[signedExtensionName]
+
+		if !ok {
+			return nil, fmt.Errorf("signed extension '%s' is not supported", signedExtensionName)
 		}
+
+		payloadMutatorFn(payload)
 	}
 
-	if e.CheckMetadataMode != nil {
-		if err := encoder.Encode(e.CheckMetadataMode); err != nil {
-			return err
-		}
-	}
-
-	if e.Tip != nil {
-		if err := encoder.Encode(e.Tip); err != nil {
-			return err
-		}
-	}
-
-	if e.SpecVersion != nil {
-		if err := encoder.Encode(e.SpecVersion); err != nil {
-			return err
-		}
-	}
-
-	if e.TransactionVersion != nil {
-		if err := encoder.Encode(e.TransactionVersion); err != nil {
-			return err
-		}
-	}
-
-	if e.GenesisHash != nil {
-		if err := encoder.Encode(e.GenesisHash); err != nil {
-			return err
-		}
-	}
-
-	if e.BlockHash != nil {
-		if err := encoder.Encode(e.BlockHash); err != nil {
-			return err
-		}
-	}
-
-	if e.CheckMetadataHash != nil {
-		if err := encoder.Encode(e.CheckMetadataHash); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return payload, nil
 }

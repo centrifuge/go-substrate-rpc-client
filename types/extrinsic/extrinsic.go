@@ -14,13 +14,13 @@ import (
 type DynamicExtrinsic struct {
 	// Version is the encoded version flag (which encodes the raw transaction version and signing information in one byte)
 	Version   byte
-	Signature DynamicExtrinsicSignature
+	Signature *Signature
 	// Method is the call this extrinsic wraps
-	Method types.Call
+	Method *types.Call
 }
 
 // NewExtrinsic creates a new Extrinsic from the provided Call
-func NewDynamicExtrinsic(c types.Call) DynamicExtrinsic {
+func NewDynamicExtrinsic(c *types.Call) DynamicExtrinsic {
 	return DynamicExtrinsic{
 		Version: types.ExtrinsicVersion4,
 		Method:  c,
@@ -47,22 +47,30 @@ func (e DynamicExtrinsic) Type() uint8 {
 }
 
 // Sign adds a signature to the extrinsic
-func (e *DynamicExtrinsic) Sign(signer signature.KeyringPair, meta *types.Metadata, opts ...DynamicExtrinsicSigningOption) error {
+func (e *DynamicExtrinsic) Sign(signer signature.KeyringPair, meta *types.Metadata, opts ...SigningOption) error {
 	if e.Type() != types.ExtrinsicVersion4 {
 		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(), e.Type())
 	}
 
 	encodedMethod, err := codec.Encode(e.Method)
 	if err != nil {
-		return err
+		return fmt.Errorf("encode method: %w", err)
 	}
 
-	extrinsicPayload := DynamicExtrinsicPayload{}
-	extrinsicPayload.Method = encodedMethod
-	extrinsicSignature := DynamicExtrinsicSignature{}
+	fieldValues := SignedFieldValues{}
 
 	for _, opt := range opts {
-		opt(&extrinsicPayload, &extrinsicSignature)
+		opt(fieldValues)
+	}
+
+	payload, err := createPayload(meta, encodedMethod)
+
+	if err != nil {
+		return fmt.Errorf("creating payload: %w", err)
+	}
+
+	if err := payload.MutateSignedFields(fieldValues); err != nil {
+		return fmt.Errorf("mutate signed fields: %w", err)
 	}
 
 	signerPubKey, err := types.NewMultiAddressFromAccountID(signer.PublicKey)
@@ -71,19 +79,18 @@ func (e *DynamicExtrinsic) Sign(signer signature.KeyringPair, meta *types.Metada
 		return err
 	}
 
-	sig, err := extrinsicPayload.Sign(signer)
+	sig, err := payload.Sign(signer)
 	if err != nil {
 		return err
 	}
 
-	extrinsicSignature.Signer = signerPubKey
-	extrinsicSignature.Signature = types.MultiSignature{IsSr25519: true, AsSr25519: sig}
-
-	if err := checkDynamicExtrinsicData(meta, &extrinsicPayload, &extrinsicSignature); err != nil {
-		return fmt.Errorf("dynamic extrinsic signature check failed: %w", err)
+	extSignature := &Signature{
+		Signer:       signerPubKey,
+		Signature:    types.MultiSignature{IsSr25519: true, AsSr25519: sig},
+		SignedFields: payload.SignedFields,
 	}
 
-	e.Signature = extrinsicSignature
+	e.Signature = extSignature
 
 	// mark the extrinsic as signed
 	e.Version |= types.ExtrinsicBitSigned
