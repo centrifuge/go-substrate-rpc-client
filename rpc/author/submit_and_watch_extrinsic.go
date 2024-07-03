@@ -65,38 +65,31 @@ func (s *ExtrinsicStatusSubscription) Unsubscribe() {
 // SubmitAndWatchExtrinsic will submit and subscribe to watch an extrinsic until unsubscribed, returning a subscription
 // that will receive server notifications containing the extrinsic status updates.
 func (a *author) SubmitAndWatchExtrinsic(xt types.Extrinsic) (*ExtrinsicStatusSubscription, error) { //nolint:lll
-	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
-	defer cancel()
-
-	c := make(chan types.ExtrinsicStatus)
-
-	enc, err := codec.EncodeToHex(xt)
+	hexEncodedExtrinsic, err := codec.EncodeToHex(xt)
 	if err != nil {
 		return nil, err
 	}
 
-	sub, err := a.client.Subscribe(ctx, "author", "submitAndWatchExtrinsic", "unwatchExtrinsic", "extrinsicUpdate",
-		c, enc)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ExtrinsicStatusSubscription{sub: sub, channel: c}, nil
+	return a.submitAndWatchExtrinsic(hexEncodedExtrinsic)
 }
 
 func (a *author) SubmitAndWatchDynamicExtrinsic(xt extrinsic.DynamicExtrinsic) (*ExtrinsicStatusSubscription, error) { //nolint:lll
+	hexEncodedExtrinsic, err := codec.EncodeToHex(xt)
+	if err != nil {
+		return nil, err
+	}
+
+	return a.submitAndWatchExtrinsic(hexEncodedExtrinsic)
+}
+
+func (a *author) submitAndWatchExtrinsic(hexEncodedExtrinsic string) (*ExtrinsicStatusSubscription, error) { //nolint:lll
 	ctx, cancel := context.WithTimeout(context.Background(), config.Default().SubscribeTimeout)
 	defer cancel()
 
 	c := make(chan types.ExtrinsicStatus)
 
-	enc, err := codec.EncodeToHex(xt)
-	if err != nil {
-		return nil, err
-	}
-
 	sub, err := a.client.Subscribe(ctx, "author", "submitAndWatchExtrinsic", "unwatchExtrinsic", "extrinsicUpdate",
-		c, enc)
+		c, hexEncodedExtrinsic)
 	if err != nil {
 		return nil, err
 	}
