@@ -11,15 +11,19 @@ import (
 	"math/big"
 )
 
+// DynamicExtrinsic is an extrinsic type that can be used on chains that
+// have a custom signed extension logic.
 type DynamicExtrinsic struct {
-	// Version is the encoded version flag (which encodes the raw transaction version and signing information in one byte)
-	Version   byte
+	// Version is the encoded version flag (which encodes the raw transaction version
+	// and signing information in one byte).
+	Version byte
+	// Signature is the extrinsic signature.
 	Signature *Signature
 	// Method is the call this extrinsic wraps
 	Method *types.Call
 }
 
-// NewExtrinsic creates a new Extrinsic from the provided Call
+// NewDynamicExtrinsic creates a new DynamicExtrinsic from the provided Call.
 func NewDynamicExtrinsic(c *types.Call) DynamicExtrinsic {
 	return DynamicExtrinsic{
 		Version: types.ExtrinsicVersion4,
@@ -27,7 +31,7 @@ func NewDynamicExtrinsic(c *types.Call) DynamicExtrinsic {
 	}
 }
 
-// MarshalJSON returns a JSON encoded byte array of Extrinsic
+// MarshalJSON returns a JSON encoded byte array of DynamicExtrinsic.
 func (e DynamicExtrinsic) MarshalJSON() ([]byte, error) {
 	s, err := codec.EncodeToHex(e)
 	if err != nil {
@@ -46,7 +50,7 @@ func (e DynamicExtrinsic) Type() uint8 {
 	return e.Version & types.ExtrinsicUnmaskVersion
 }
 
-// Sign adds a signature to the extrinsic
+// Sign adds a signature to the extrinsic.
 func (e *DynamicExtrinsic) Sign(signer signature.KeyringPair, meta *types.Metadata, opts ...SigningOption) error {
 	if e.Type() != types.ExtrinsicVersion4 {
 		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(), e.Type())
@@ -103,6 +107,7 @@ func (e DynamicExtrinsic) Encode(encoder scale.Encoder) error {
 		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(),
 			e.Type())
 	}
+
 	var bb = bytes.Buffer{}
 	tempEnc := scale.NewEncoder(&bb)
 

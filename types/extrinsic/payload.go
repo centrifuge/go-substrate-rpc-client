@@ -11,18 +11,33 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic/extensions"
 )
 
+// SignedField represents a field used in the Payload.
 type SignedField struct {
-	Name    SignedFieldName
-	Value   any
+	// Name of the field, this is omitted when the extrinsic is signed.
+	Name SignedFieldName
+
+	// Value of the field used when the extrinsic is signed.
+	Value any
+
+	// Mutated is used to keep track of changes done to the field.
 	Mutated bool
 }
 
+// Payload holds the encoded types.Call and the fields that are used for generating
+// the DynamicExtrinsic payload and signature.
+//
+// Notes - the ordering of the SignedFields and SignedExtraFields is the order in which they are provided in
+// the metadata.
 type Payload struct {
 	EncodedCall       types.BytesBare
 	SignedFields      []*SignedField
 	SignedExtraFields []*SignedField
 }
 
+// Encode the call bytes and the signed fields in the order that is provided during creation
+// from the metadata.
+//
+// The function also performs an extra check to ensure that all required fields were mutated.
 func (p *Payload) Encode(encoder scale.Encoder) error {
 	if err := encoder.Encode(p.EncodedCall); err != nil {
 		return fmt.Errorf("unable to encode method: %w", err)
@@ -51,6 +66,8 @@ func (p *Payload) Encode(encoder scale.Encoder) error {
 	return nil
 }
 
+// MutateSignedFields is mutating the payload's SignedFields and SignedExtraFields
+// based on the provided SignedFieldValues.
 func (p *Payload) MutateSignedFields(vals SignedFieldValues) error {
 	if p == nil {
 		return errors.New("payload is nil")
@@ -92,6 +109,7 @@ func (p *Payload) Sign(signer signature.KeyringPair) (types.Signature, error) {
 	return types.NewSignature(sig), err
 }
 
+// SignedFieldName is the type used for representing a field name.
 type SignedFieldName string
 
 const (
@@ -107,8 +125,10 @@ const (
 	GenesisHashSignedField           SignedFieldName = "genesis_hash"
 )
 
+// PayloadMutatorFn is the type used for mutating the Payload during creation.
 type PayloadMutatorFn func(payload *Payload)
 
+// PayloadMutatorFns is a map that holds a PayloadMutatorFn for each supported signed extension.
 var PayloadMutatorFns = map[extensions.SignedExtensionName]PayloadMutatorFn{
 	extensions.CheckMortalitySignedExtension: func(payload *Payload) {
 		payload.SignedFields = append(payload.SignedFields, &SignedField{
@@ -187,6 +207,10 @@ var PayloadMutatorFns = map[extensions.SignedExtensionName]PayloadMutatorFn{
 	extensions.PreBalanceTransferExtensionSignedExtension: func(payload *Payload) {},
 }
 
+// createPayload iterates over all signed extensions provided in the metadata and
+// attempts to load and use a PayloadMutatorFn for each one.
+//
+// If a PayloadMutatorFn is not found for a specific signed extension, it means that it is not currently supported.
 func createPayload(meta *types.Metadata, encodedCall []byte) (*Payload, error) {
 	payload := &Payload{
 		EncodedCall: encodedCall,

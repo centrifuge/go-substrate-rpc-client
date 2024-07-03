@@ -6,12 +6,17 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
+// Signature holds all the relevant fields for an extrinsic signature.
 type Signature struct {
 	Signer       types.MultiAddress
 	Signature    types.MultiSignature
 	SignedFields []*SignedField
 }
 
+// Encode is encoding the Signer, Signature, and SignedFields.
+//
+// Note - the ordering of the SignedFields is the order in which they are provided in
+// the metadata.
 func (s Signature) Encode(encoder scale.Encoder) error {
 	if err := encoder.Encode(s.Signer); err != nil {
 		return err
@@ -28,12 +33,4 @@ func (s Signature) Encode(encoder scale.Encoder) error {
 	}
 
 	return nil
-}
-
-func createSignature(signer types.MultiAddress, sig types.MultiSignature, signedFields []*SignedField) *Signature {
-	return &Signature{
-		Signer:       signer,
-		Signature:    sig,
-		SignedFields: signedFields,
-	}
 }
