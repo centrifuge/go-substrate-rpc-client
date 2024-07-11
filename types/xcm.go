@@ -19,47 +19,29 @@ package types
 import "github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 
 type AssetID struct {
-	IsConcrete    bool
-	MultiLocation MultiLocationV1
-
-	IsAbstract  bool
-	AbstractKey []U8
+	Parents  U8
+	Interior JunctionsV1
 }
 
 func (a *AssetID) Decode(decoder scale.Decoder) error {
-	b, err := decoder.ReadOneByte()
-	if err != nil {
+	if err := decoder.Decode(&a.Parents); err != nil {
 		return err
 	}
 
-	switch b {
-	case 0:
-		a.IsConcrete = true
-
-		return decoder.Decode(&a.MultiLocation)
-	case 1:
-		a.IsAbstract = true
-
-		return decoder.Decode(&a.AbstractKey)
+	if err := decoder.Decode(&a.Interior); err != nil {
+		return err
 	}
 
 	return nil
 }
 
 func (a AssetID) Encode(encoder scale.Encoder) error {
-	switch {
-	case a.IsConcrete:
-		if err := encoder.PushByte(0); err != nil {
-			return err
-		}
+	if err := encoder.Encode(a.Parents); err != nil {
+		return err
+	}
 
-		return encoder.Encode(&a.MultiLocation)
-	case a.IsAbstract:
-		if err := encoder.PushByte(1); err != nil {
-			return err
-		}
-
-		return encoder.Encode(&a.AbstractKey)
+	if err := encoder.Encode(a.Interior); err != nil {
+		return err
 	}
 
 	return nil

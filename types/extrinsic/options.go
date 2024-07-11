@@ -41,6 +41,13 @@ func WithTip(tip types.UCompact) SigningOption {
 	}
 }
 
+// WithAssetID returns a SigningOption that is used to add the asset ID to a Payload.
+func WithAssetID(assetID types.Option[types.AssetID]) SigningOption {
+	return func(vals SignedFieldValues) {
+		vals[AssetIDSignedField] = assetID
+	}
+}
+
 // WithSpecVersion returns a SigningOption that is used to add the spec version to a Payload.
 func WithSpecVersion(specVersion types.U32) SigningOption {
 	return func(vals SignedFieldValues) {
