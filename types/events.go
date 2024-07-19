@@ -40,7 +40,7 @@ type EventBalancesEndowed struct {
 	Topics  []Hash
 }
 
-// EventDustLost is emitted when an account is removed with a balance that is
+// EventBalancesDustLost is emitted when an account is removed with a balance that is
 // non-zero but below ExistentialDeposit, resulting in a loss.
 type EventBalancesDustLost struct {
 	Phase   Phase
@@ -58,7 +58,7 @@ type EventBalancesTransfer struct {
 	Topics []Hash
 }
 
-// EventBalanceSet is emitted when a balance is set by root
+// EventBalancesBalanceSet is emitted when a balance is set by root
 type EventBalancesBalanceSet struct {
 	Phase    Phase
 	Who      AccountID
@@ -67,7 +67,7 @@ type EventBalancesBalanceSet struct {
 	Topics   []Hash
 }
 
-// EventDeposit is emitted when an account receives some free balance
+// EventBalancesDeposit is emitted when an account receives some free balance
 type EventBalancesDeposit struct {
 	Phase   Phase
 	Who     AccountID
