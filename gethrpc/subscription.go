@@ -151,7 +151,7 @@ func (n *Notifier) takeSubscription() *Subscription {
 	return n.sub
 }
 
-// acticate is called after the subscription ID was sent to client. Notifications are
+// activate is called after the subscription ID was sent to client. Notifications are
 // buffered before activation. This prevents notifications being sent to the client before
 // the subscription ID is sent to the client.
 func (n *Notifier) activate() error {
