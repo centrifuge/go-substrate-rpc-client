@@ -34,6 +34,8 @@ type KeyringPair struct {
 	Address string
 	// PublicKey
 	PublicKey []byte
+	// key type
+	KeyType uint8
 }
 
 // KeyringPairFromSecret creates KeyPair based on seed/phrase and network
