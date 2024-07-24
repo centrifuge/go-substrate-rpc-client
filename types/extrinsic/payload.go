@@ -207,6 +207,7 @@ var PayloadMutatorFns = map[extensions.SignedExtensionName]PayloadMutatorFn{
 	extensions.PreBalanceTransferExtensionSignedExtension: func(payload *Payload) {},
 	extensions.StorageWeightReclaimSignedExtension:        func(payload *Payload) {},
 	extensions.PrevalidateAttestsSignedExtension:          func(payload *Payload) {},
+	extensions.CheckNetworkMembershipSignedExtension:      func(payload *Payload) {},
 }
 
 // createPayload iterates over all signed extensions provided in the metadata and
