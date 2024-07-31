@@ -80,7 +80,7 @@ func CreateStorageKey(meta *Metadata, prefix, method string, args ...[]byte) (St
 
 	// From metadata >= v14, there is only one representation of Map,
 	// which is more alike the old 'NMap': a Map with n keys (n >= 1).
-	// The old variants are now unified as thus IsMap() is true for all.
+	// The old variants are now unified thus IsMap() is true for all.
 	if entryMeta.IsMap() {
 		hashers, err := entryMeta.Hashers()
 		if err != nil {

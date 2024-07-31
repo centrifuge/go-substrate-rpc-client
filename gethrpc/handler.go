@@ -275,7 +275,7 @@ func (h *handler) handleResponse(msg *jsonrpcMessage) {
 		return
 	}
 	// For subscription responses, start the subscription if the server
-	// indicates success. EthSubscribe gets unblocked in either case through
+	// indicates success. EthSubscribe gets unblocked in either case though
 	// the op.resp channel.
 	defer close(op.resp)
 	if msg.Error != nil {
