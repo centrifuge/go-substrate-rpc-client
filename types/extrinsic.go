@@ -160,9 +160,16 @@ func (e *Extrinsic) Sign(signer signature.KeyringPair, o SignatureOptions) error
 		return err
 	}
 
+	var signature MultiSignature
+	if signer.KeyType == 0 {
+		signature = MultiSignature{IsSr25519: true, AsSr25519: sig}
+	} else if signer.KeyType == 1 {
+		signature = MultiSignature{IsEd25519: true, AsEd25519: sig}
+	}
+
 	extSig := ExtrinsicSignatureV4{
 		Signer:    signerPubKey,
-		Signature: MultiSignature{IsSr25519: true, AsSr25519: sig},
+		Signature: signature,
 		Era:       era,
 		Nonce:     o.Nonce,
 		Tip:       o.Tip,

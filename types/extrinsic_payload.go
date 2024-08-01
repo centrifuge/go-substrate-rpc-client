@@ -21,6 +21,7 @@ import (
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/signature/ed25519"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 )
 
@@ -106,6 +107,11 @@ func (e ExtrinsicPayloadV4) Sign(signer signature.KeyringPair) (Signature, error
 	b, err := codec.Encode(e)
 	if err != nil {
 		return Signature{}, err
+	}
+
+	if signer.KeyType == 1 {
+		sig, err := ed25519.Sign(b, signer.URI)
+		return NewSignature(sig), err
 	}
 
 	sig, err := signature.Sign(b, signer.URI)
