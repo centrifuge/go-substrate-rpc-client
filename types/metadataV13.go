@@ -261,7 +261,7 @@ func collectHashersV13(x StorageFunctionTypeV13) []StorageHasherV10 {
 	case x.IsNMap:
 		return x.AsNMap.Hashers
 	default:
-		panic("Unexpexted type")
+		panic("Unexpected type")
 	}
 }
 

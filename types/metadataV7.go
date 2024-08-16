@@ -242,7 +242,7 @@ func collectHashersV5(x StorageFunctionTypeV5) []StorageHasher {
 	case x.IsDoubleMap:
 		return []StorageHasher{x.AsDoubleMap.Hasher, x.AsDoubleMap.Key2Hasher}
 	default:
-		panic("Unexpexted type")
+		panic("Unexpected type")
 	}
 }
 
