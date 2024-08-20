@@ -2,6 +2,7 @@ package extensions
 
 import (
 	"errors"
+
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
@@ -9,7 +10,7 @@ import (
 type CheckMetadataMode byte
 
 var (
-	CheckMetadataModeDisabled CheckMetadataMode = 0
+	CheckMetadataModeDisabled CheckMetadataMode
 	CheckMetadataModeEnabled  CheckMetadataMode = 1
 )
 
