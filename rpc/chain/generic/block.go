@@ -3,6 +3,7 @@ package generic
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
 	"strings"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
@@ -13,7 +14,7 @@ import (
 // DefaultGenericSignedBlock is the SignedBlock with defaults for the generic types:
 //
 // Address - types.MultiAddress
-// Signature - types.MultiSignature
+// SignatureHash - types.MultiSignature
 // PaymentFields - DefaultPaymentFields
 type DefaultGenericSignedBlock = SignedBlock[
 	types.MultiAddress,
@@ -62,7 +63,7 @@ type GenericExtrinsic[A, S, P any] interface {
 // A - Signer, the default implementation for this is the types.MultiAddress type
 // which can support a variable number of addresses.
 //
-// S - Signature, the default implementation for this is the types.MultiSignature type which can support
+// S - SignatureHash, the default implementation for this is the types.MultiSignature type which can support
 // multiple signature curves.
 //
 // P - PaymentFields (ChargeAssetTx in substrate), the default implementation for this is the DefaultPaymentFields which
@@ -138,6 +139,7 @@ func (e *Extrinsic[A, S, P]) GetCall() types.Call {
 }
 
 // UnmarshalJSON fills Extrinsic with the JSON encoded byte array given by bz
+//
 //nolint:revive
 func (e *Extrinsic[A, S, P]) UnmarshalJSON(bz []byte) error {
 	var tmp string
@@ -176,18 +178,21 @@ func (e *Extrinsic[A, S, P]) UnmarshalJSON(bz []byte) error {
 }
 
 // IsSigned returns true if the extrinsic is signed.
+//
 //nolint:revive
 func (e *Extrinsic[A, S, P]) IsSigned() bool {
-	return e.Version&types.ExtrinsicBitSigned == types.ExtrinsicBitSigned
+	return e.Version&extrinsic.BitSigned == extrinsic.BitSigned
 }
 
 // Type returns the raw transaction version.
+//
 //nolint:revive
 func (e *Extrinsic[A, S, P]) Type() uint8 {
-	return e.Version & types.ExtrinsicUnmaskVersion
+	return e.Version & extrinsic.UnmaskVersion
 }
 
 // Decode decodes the extrinsic based on the data present in the decoder.
+//
 //nolint:revive
 func (e *Extrinsic[A, S, P]) Decode(decoder scale.Decoder) error {
 	// compact length encoding (1, 2, or 4 bytes) (may not be there for Extrinsics older than Jan 11 2019)
@@ -200,7 +205,7 @@ func (e *Extrinsic[A, S, P]) Decode(decoder scale.Decoder) error {
 	}
 
 	if e.IsSigned() {
-		if e.Type() != types.ExtrinsicVersion4 {
+		if e.Type() != extrinsic.Version4 {
 			return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(),
 				e.Type())
 		}

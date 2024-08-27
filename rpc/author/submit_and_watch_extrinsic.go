@@ -64,16 +64,7 @@ func (s *ExtrinsicStatusSubscription) Unsubscribe() {
 
 // SubmitAndWatchExtrinsic will submit and subscribe to watch an extrinsic until unsubscribed, returning a subscription
 // that will receive server notifications containing the extrinsic status updates.
-func (a *author) SubmitAndWatchExtrinsic(xt types.Extrinsic) (*ExtrinsicStatusSubscription, error) { //nolint:lll
-	hexEncodedExtrinsic, err := codec.EncodeToHex(xt)
-	if err != nil {
-		return nil, err
-	}
-
-	return a.submitAndWatchExtrinsic(hexEncodedExtrinsic)
-}
-
-func (a *author) SubmitAndWatchDynamicExtrinsic(xt extrinsic.DynamicExtrinsic) (*ExtrinsicStatusSubscription, error) { //nolint:lll
+func (a *author) SubmitAndWatchExtrinsic(xt extrinsic.Extrinsic) (*ExtrinsicStatusSubscription, error) { //nolint:lll
 	hexEncodedExtrinsic, err := codec.EncodeToHex(xt)
 	if err != nil {
 		return nil, err

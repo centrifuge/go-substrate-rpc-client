@@ -25,10 +25,8 @@ import (
 )
 
 type Author interface {
-	SubmitAndWatchExtrinsic(xt types.Extrinsic) (*ExtrinsicStatusSubscription, error)
-	SubmitAndWatchDynamicExtrinsic(xt extrinsic.DynamicExtrinsic) (*ExtrinsicStatusSubscription, error)
-	PendingExtrinsics() ([]types.Extrinsic, error)
-	SubmitExtrinsic(xt types.Extrinsic) (types.Hash, error)
+	SubmitAndWatchExtrinsic(xt extrinsic.Extrinsic) (*ExtrinsicStatusSubscription, error)
+	SubmitExtrinsic(xt extrinsic.Extrinsic) (types.Hash, error)
 }
 
 // author exposes methods for authoring of network items

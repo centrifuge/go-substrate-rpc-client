@@ -24,7 +24,7 @@ type SignedField struct {
 }
 
 // Payload holds the encoded types.Call and the fields that are used for generating
-// the DynamicExtrinsic payload and signature.
+// the Extrinsic payload and signature.
 //
 // Notes - the ordering of the SignedFields and SignedExtraFields is the order in which they are provided in
 // the metadata.
@@ -99,10 +99,10 @@ func (p *Payload) MutateSignedFields(vals SignedFieldValues) error {
 }
 
 // Sign encodes the payload and then signs the encoded bytes using the provided signer.
-func (p *Payload) Sign(signer signature.KeyringPair) (types.Signature, error) {
+func (p *Payload) Sign(signer signature.KeyringPair) (types.SignatureHash, error) {
 	b, err := codec.Encode(p)
 	if err != nil {
-		return types.Signature{}, err
+		return types.SignatureHash{}, err
 	}
 
 	sig, err := signature.Sign(b, signer.URI)

@@ -177,9 +177,9 @@ func (t *testChain[A, S, P]) GetTestFn() testFn {
 
 type AcalaMultiSignature struct {
 	IsEd25519     bool
-	AsEd25519     types.Signature
+	AsEd25519     types.SignatureHash
 	IsSr25519     bool
-	AsSr25519     types.Signature
+	AsSr25519     types.SignatureHash
 	IsEcdsa       bool
 	AsEcdsa       types.EcdsaSignature
 	IsEthereum    bool

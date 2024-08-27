@@ -14,27 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package author
+package block
 
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
 )
 
-// PendingExtrinsics returns all pending extrinsics, potentially grouped by sender
-func (a *author) PendingExtrinsics() ([]types.Extrinsic, error) {
-	var res []string
-	err := a.client.Call(&res, "author_pendingExtrinsics")
-	if err != nil {
-		return nil, err
-	}
+type SignedBlock struct {
+	Block         Block               `json:"block"`
+	Justification types.Justification `json:"justification"`
+}
 
-	xts := make([]types.Extrinsic, len(res))
-	for i, re := range res {
-		err = codec.DecodeFromHex(re, &xts[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return xts, err
+// Block encoded with header and extrinsics
+type Block struct {
+	Header     types.Header
+	Extrinsics []extrinsic.Extrinsic
 }

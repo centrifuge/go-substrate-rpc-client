@@ -21,6 +21,7 @@ package chain
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/block"
 )
 
 type Chain interface {
@@ -29,8 +30,8 @@ type Chain interface {
 	GetBlockHash(blockNumber uint64) (types.Hash, error)
 	GetBlockHashLatest() (types.Hash, error)
 	GetFinalizedHead() (types.Hash, error)
-	GetBlock(blockHash types.Hash) (*types.SignedBlock, error)
-	GetBlockLatest() (*types.SignedBlock, error)
+	GetBlock(blockHash types.Hash) (*block.SignedBlock, error)
+	GetBlockLatest() (*block.SignedBlock, error)
 	GetHeader(blockHash types.Hash) (*types.Header, error)
 	GetHeaderLatest() (*types.Header, error)
 }

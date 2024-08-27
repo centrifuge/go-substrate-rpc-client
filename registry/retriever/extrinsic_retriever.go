@@ -70,7 +70,7 @@ func NewExtrinsicRetriever[
 // DefaultExtrinsicRetriever is the ExtrinsicRetriever interface with default for the generic types:
 //
 // Address - types.MultiAddress
-// Signature - types.MultiSignature
+// SignatureHash - types.MultiSignature
 // PaymentFields - generic.DefaultPaymentFields
 type DefaultExtrinsicRetriever = ExtrinsicRetriever[
 	types.MultiAddress,
@@ -81,7 +81,7 @@ type DefaultExtrinsicRetriever = ExtrinsicRetriever[
 // NewDefaultExtrinsicRetriever returns a DefaultExtrinsicRetriever with defaults for the generic types:
 //
 // Address - types.MultiAddress
-// Signature - types.MultiSignature
+// SignatureHash - types.MultiSignature
 // PaymentFields - generic.DefaultPaymentFields
 // Block - *generic.DefaultGenericSignedBlock
 //

@@ -26,9 +26,9 @@ import (
 
 func TestSignature_EncodeDecode(t *testing.T) {
 	AssertRoundtrip(t, NewSignature(hash64))
-	AssertRoundTripFuzz[Signature](t, 100)
-	AssertDecodeNilData[Signature](t)
-	AssertEncodeEmptyObj[Signature](t, 64)
+	AssertRoundTripFuzz[SignatureHash](t, 100)
+	AssertDecodeNilData[SignatureHash](t)
+	AssertEncodeEmptyObj[SignatureHash](t, 64)
 }
 
 func TestSignature_EncodedLength(t *testing.T) {

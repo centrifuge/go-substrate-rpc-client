@@ -45,7 +45,7 @@ func NewChain[
 // DefaultChain is the Chain interface with defaults for the generic types:
 //
 // Address - types.MultiAddress
-// Signature - types.MultiSignature
+// SignatureHash - types.MultiSignature
 // PaymentFields - DefaultPaymentFields
 // Block - *DefaultGenericSignedBlock
 type DefaultChain = Chain[

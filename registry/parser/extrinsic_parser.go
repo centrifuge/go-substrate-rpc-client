@@ -13,7 +13,7 @@ import (
 // DefaultExtrinsic is the Extrinsic with defaults for the generic types:
 //
 // Address - types.MultiAddress
-// Signature - types.MultiSignature
+// SignatureHash - types.MultiSignature
 // PaymentFields - generic.DefaultPaymentFields
 type DefaultExtrinsic = Extrinsic[
 	types.MultiAddress,
@@ -102,7 +102,7 @@ func NewExtrinsicParser[A, S, P any]() ExtrinsicParser[A, S, P] {
 // DefaultExtrinsicParser is the ExtrinsicParser interface with defaults for the generic types:
 //
 // Address - types.MultiAddress
-// Signature - types.MultiSignature
+// SignatureHash - types.MultiSignature
 // PaymentFields - generic.DefaultPaymentFields
 type DefaultExtrinsicParser = ExtrinsicParser[
 	types.MultiAddress,
