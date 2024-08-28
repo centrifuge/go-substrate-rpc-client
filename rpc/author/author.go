@@ -20,6 +20,7 @@ package author
 
 import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
 )
@@ -27,6 +28,7 @@ import (
 type Author interface {
 	SubmitAndWatchExtrinsic(xt extrinsic.Extrinsic) (*ExtrinsicStatusSubscription, error)
 	SubmitExtrinsic(xt extrinsic.Extrinsic) (types.Hash, error)
+	PendingExtrinsics(meta *types.Metadata) ([]*registry.DecodedExtrinsic, error)
 }
 
 // author exposes methods for authoring of network items
