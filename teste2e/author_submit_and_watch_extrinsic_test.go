@@ -50,7 +50,7 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 	c, err := types.NewCall(meta, "Balances.transfer", bob, types.NewUCompactFromUInt(6969))
 	assert.NoError(t, err)
 
-	ext := extrinsic.NewExtrinsic(&c)
+	ext := extrinsic.NewExtrinsic(c)
 	assert.NoError(t, err)
 
 	genesisHash, err := api.RPC.Chain.GetBlockHash(0)

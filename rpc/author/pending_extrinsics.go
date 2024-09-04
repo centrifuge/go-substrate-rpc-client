@@ -14,28 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:generate mockery --name Author --filename author.go
-
 package author
 
-import (
-	"github.com/centrifuge/go-substrate-rpc-client/v4/client"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
-)
+// PendingExtrinsics returns all pending extrinsics.
+func (a *author) PendingExtrinsics() ([]string, error) {
+	var extrinsics []string
+	err := a.client.Call(&extrinsics, "author_pendingExtrinsics")
+	if err != nil {
+		return nil, err
+	}
 
-type Author interface {
-	SubmitAndWatchExtrinsic(xt extrinsic.Extrinsic) (*ExtrinsicStatusSubscription, error)
-	SubmitExtrinsic(xt extrinsic.Extrinsic) (types.Hash, error)
-	PendingExtrinsics() ([]string, error)
-}
-
-// author exposes methods for authoring of network items
-type author struct {
-	client client.Client
-}
-
-// NewAuthor creates a new author struct
-func NewAuthor(cl client.Client) Author {
-	return &author{cl}
+	return extrinsics, nil
 }

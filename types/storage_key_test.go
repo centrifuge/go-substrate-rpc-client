@@ -19,6 +19,7 @@ package types_test
 import (
 	"encoding/binary"
 	"fmt"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"strings"
 	"testing"
 
@@ -124,47 +125,83 @@ func TestCreateStorageKeyArgValidationForMapKey(t *testing.T) {
 	}
 }
 
+type KeyID struct {
+	Hash       Hash
+	KeyPurpose uint
+}
+
+func (k KeyID) Encode(encoder scale.Encoder) error {
+	if err := encoder.Encode(k.Hash); err != nil {
+		return err
+	}
+
+	return encoder.PushByte(byte(k.KeyPurpose))
+}
+
 func TestCreateStorageKeyArgValidationForDoubleMapKey(t *testing.T) {
-	for _, m := range []*Metadata{ExamplaryMetadataV13, DecodedMetadataV14Example()} {
+	for _, m := range []*Metadata{DecodedMetadataV14Example()} {
 		fmt.Println("Testing against metadata v", m.Version)
 
-		_, err := CreateStorageKey(m, "Staking", "ErasStakers")
-		assert.EqualError(t, err, "Staking:ErasStakers is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 2, received: 0")
+		_, err := CreateStorageKey(m, "Keystore", "Keys")
+		assert.EqualError(t, err, "Keystore:Keys is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 2, received: 0")
 
-		_, err = CreateStorageKey(m, "Staking", "ErasStakers", nil)
-		assert.EqualError(t, err, "Staking:ErasStakers is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 2, received: 0")
+		_, err = CreateStorageKey(m, "Keystore", "Keys", nil)
+		assert.EqualError(t, err, "Keystore:Keys is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 2, received: 0")
 
-		_, err = CreateStorageKey(m, "Staking", "ErasStakers", nil, []byte{})
-		assert.EqualError(t, err, "Staking:ErasStakers is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 2, received: 0")
+		_, err = CreateStorageKey(m, "Keystore", "Keys", nil, []byte{})
+		assert.EqualError(t, err, "Keystore:Keys is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 2, received: 0")
 
-		_, err = CreateStorageKey(m, "Staking", "ErasStakers", nil, []byte{0x01})
+		_, err = CreateStorageKey(m, "Keystore", "Keys", nil, []byte{0x01})
 		assert.EqualError(t, err, "non-nil arguments cannot be preceded by nil arguments")
 
-		_, err = CreateStorageKey(m, "Staking", "ErasStakers", []byte{0x01})
-		assert.EqualError(t, err, "Staking:ErasStakers is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 2, received: 1")
+		_, err = CreateStorageKey(m, "Keystore", "Keys", []byte{0x01})
+		assert.EqualError(t, err, "Keystore:Keys is a map, therefore requires that number of arguments should exactly match number of hashers in metadata. Expected: 2, received: 1")
 
 		// Serialize EraIndex and AccountId
-		accountIdSerialized := MustHexDecodeString(AlicePubKey)
-		var eraIndex uint32 = 3
-		eraIndexSerialized := make([]byte, 4)
-		binary.LittleEndian.PutUint32(eraIndexSerialized, eraIndex)
+		accountID, err := NewAccountIDFromHexString(AlicePubKey)
+		assert.NoError(t, err)
+		encodedAccountID, err := Encode(accountID)
+		assert.NoError(t, err)
+
+		keyID := KeyID{
+			Hash:       Hash{1, 2, 3, 4},
+			KeyPurpose: 5,
+		}
+		encodedKeyID, err := Encode(keyID)
+		assert.NoError(t, err)
 
 		// Build expected answer
 		expectedKeyBuilder := strings.Builder{}
-		hexStr, err := Hex(xxhash.New128([]byte("Staking")).Sum(nil))
+
+		hexStr, err := Hex(xxhash.New128([]byte("Keystore")).Sum(nil))
 		assert.NoError(t, err)
 		expectedKeyBuilder.WriteString(hexStr)
-		hexStr, err = Hex(xxhash.New128([]byte("ErasStakers")).Sum(nil))
-		assert.NoError(t, err)
-		expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
-		hexStr, err = Hex(xxhash.New64Concat(eraIndexSerialized).Sum(nil))
-		assert.NoError(t, err)
-		expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
-		hexStr, err = Hex(xxhash.New64Concat(accountIdSerialized).Sum(nil))
+
+		hexStr, err = Hex(xxhash.New128([]byte("Keys")).Sum(nil))
 		assert.NoError(t, err)
 		expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
 
-		key, err := CreateStorageKey(m, "Staking", "ErasStakers", eraIndexSerialized, accountIdSerialized)
+		accountIDHash, err := hash.NewBlake2b128Concat(nil)
+		assert.NoError(t, err)
+
+		_, err = accountIDHash.Write(encodedAccountID)
+		assert.NoError(t, err)
+
+		hexStr, err = Hex(accountIDHash.Sum(nil))
+		assert.NoError(t, err)
+		expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
+
+		keyIDHash, err := hash.NewBlake2b128Concat(nil)
+		assert.NoError(t, err)
+
+		_, err = keyIDHash.Write(encodedKeyID)
+		assert.NoError(t, err)
+
+		hexStr, err = Hex(keyIDHash.Sum(nil))
+		assert.NoError(t, err)
+		expectedKeyBuilder.WriteString(strings.TrimPrefix(hexStr, "0x"))
+
+		key, err := CreateStorageKey(m, "Keystore", "Keys", encodedAccountID, encodedKeyID)
 		assert.NoError(t, err)
 		hex, err := Hex(key)
 		assert.NoError(t, err)

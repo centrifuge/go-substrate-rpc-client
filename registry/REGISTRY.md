@@ -5,7 +5,7 @@ By leveraging the on-chain metadata, GSRPC is more robust to changes on types, a
 
 This registry can be used afterwards to decode data read from live chains (events & extrinsics).
 
-## How to parse events and its types
+## How to parse events and their fields
 First we instantiate the API with the client node and open a connection: 
 ```go
 testURL := "wss://fullnode.parachain.centrifuge.io" // Your endpoint
@@ -68,16 +68,12 @@ for _, event := range events {
 
 ## Extended Usage
 Since docs get outdated fairly quick, here are links to tests that will always be up-to-date.
-### Populate Call, Error & Events Registries
-[Browse me](registry_test.go)
+### Populate Call, Error & Events Registries, Extrinsic Decoder
+[Factory tests](factory_test.go)
+[Decoder tests](decoder_test.go)
 
 ### Event retriever
 [TestLive_EventRetriever_GetEvents](retriever/event_retriever_live_test.go)
-### Extrinsic retriever
-Since chain runtimes can be customized, modifying core types such as Accounts, Signature payloads or Payment payloads, the code supports a customizable way of passing those custom types to the extrinsic retriever.
 
-On the other hand, since a great majority of chains do not need to change these types, the tool provides a default for the most common used ones.
-#### Using Chain Defaults
-[TestExtrinsicRetriever_NewDefault](retriever/extrinsic_retriever_test.go#L179)
-#### Using Custom core types
+### Extrinsic retriever
 [TestLive_ExtrinsicRetriever_GetExtrinsics](retriever/extrinsic_retriever_live_test.go)

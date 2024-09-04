@@ -33,10 +33,11 @@ func (c *chain) GetBlockLatest() (*block.SignedBlock, error) {
 }
 
 func (c *chain) getBlock(blockHash *types.Hash) (*block.SignedBlock, error) {
-	var SignedBlock block.SignedBlock
-	err := client.CallWithBlockHash(c.client, &SignedBlock, "chain_getBlock", blockHash)
+	var res block.SignedBlock
+	err := client.CallWithBlockHash(c.client, &res, "chain_getBlock", blockHash)
 	if err != nil {
 		return nil, err
 	}
-	return &SignedBlock, err
+
+	return &res, nil
 }

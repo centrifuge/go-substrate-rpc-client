@@ -14,20 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package block
+package author_test
 
 import (
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
+	"testing"
+
+	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/config"
+	"github.com/stretchr/testify/assert"
 )
 
-type SignedBlock struct {
-	Block         Block               `json:"block"`
-	Justification types.Justification `json:"justification"`
-}
-
-// Block encoded with header and extrinsics
-type Block struct {
-	Header     types.Header
-	Extrinsics []extrinsic.Extrinsic
+func TestAuthor_PendingExtrinsics(t *testing.T) {
+	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
+	assert.NoError(t, err)
+	_, err = api.RPC.Author.PendingExtrinsics()
+	assert.NoError(t, err)
 }

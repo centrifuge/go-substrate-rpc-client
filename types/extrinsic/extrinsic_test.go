@@ -21,13 +21,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic/extensions"
-	testUtils "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
 )
 
-func TestExtrinsic_Unsigned_EncodeDecode(t *testing.T) {
+func TestExtrinsic_Unsigned_Encode(t *testing.T) {
 	var meta types.Metadata
 
 	err := codec.DecodeFromHex(types.MetadataV14Data, &meta)
@@ -48,15 +47,9 @@ func TestExtrinsic_Unsigned_EncodeDecode(t *testing.T) {
 		"10"+"74657374", // remark
 		extEnc,
 	)
-
-	var extDec Extrinsic
-	err = codec.DecodeFromHex(extEnc, &extDec)
-	assert.NoError(t, err)
-
-	assert.Equal(t, ext, extDec)
 }
 
-func TestExtrinsic_Signed_EncodeEncode(t *testing.T) {
+func TestExtrinsic_Signed_Encode(t *testing.T) {
 	var meta types.Metadata
 
 	err := codec.DecodeFromHex(types.MetadataV14Data, &meta)
@@ -117,18 +110,4 @@ func TestExtrinsic_Signed_EncodeEncode(t *testing.T) {
 			"0000"+ // call index
 			"10"+"74657374", // remark
 	)
-}
-
-func TestExtrinsic_JSONMarshalUnmarshal(t *testing.T) {
-	var meta types.Metadata
-
-	err := codec.DecodeFromHex(types.MetadataV14Data, &meta)
-	assert.NoError(t, err)
-
-	c, err := types.NewCall(&meta, "System.remark", []byte("test"))
-	assert.NoError(t, err)
-
-	ext := NewExtrinsic(c)
-
-	testUtils.AssertJSONRoundTrip(t, &ext)
 }

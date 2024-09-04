@@ -65,9 +65,9 @@ func TestMetadataV14FindCallIndex(t *testing.T) {
 	var meta Metadata
 	err := DecodeFromHex(MetadataV14Data, &meta)
 	assert.NoError(t, err)
-	index, err := meta.FindCallIndex("Balances.transfer")
+	index, err := meta.FindCallIndex("Balances.transfer_keep_alive")
 	assert.NoError(t, err)
-	assert.Equal(t, index, CallIndex{SectionIndex: 6, MethodIndex: 0})
+	assert.Equal(t, CallIndex{SectionIndex: 0x14, MethodIndex: 0x3}, index)
 }
 
 // Verify that we get an error when querying for an invalid
@@ -78,18 +78,6 @@ func TestMetadataV14FindCallIndexNonExistent(t *testing.T) {
 	assert.NoError(t, err)
 	_, err = meta.FindCallIndex("Doesnt.Exist")
 	assert.Error(t, err)
-}
-
-// Verify that we obtain the right modName, varName pair for a given Event id
-func TestMetadataV14FindEventNamesForEventID(t *testing.T) {
-	var meta Metadata
-	err := DecodeFromHex(MetadataV14Data, &meta)
-	assert.NoError(t, err)
-
-	modName, varName, err := meta.FindEventNamesForEventID(EventID{6, 2})
-	assert.NoError(t, err)
-	assert.Equal(t, modName, NewText("Balances"))
-	assert.Equal(t, varName, NewText("Transfer"))
 }
 
 // Verify that we get an error when passing an invalid module ID
@@ -304,12 +292,12 @@ func TestMetadataV14_FindError(t *testing.T) {
 	assert.NotNil(t, metaErr)
 
 	// System - no error at index
-	metaErr, err = meta.FindError(0, [4]U8{6})
+	metaErr, err = meta.FindError(0, [4]U8{98})
 	assert.Error(t, err)
 	assert.Nil(t, metaErr)
 
 	// No module at index
-	metaErr, err = meta.FindError(200, [4]U8{0})
+	metaErr, err = meta.FindError(255, [4]U8{0})
 	assert.Error(t, err)
 	assert.Nil(t, metaErr)
 }

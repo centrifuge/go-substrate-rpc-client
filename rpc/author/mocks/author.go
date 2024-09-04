@@ -17,15 +17,15 @@ type Author struct {
 }
 
 // PendingExtrinsics provides a mock function with given fields:
-func (_m *Author) PendingExtrinsics() ([]extrinsic.Extrinsic, error) {
+func (_m *Author) PendingExtrinsics() ([]string, error) {
 	ret := _m.Called()
 
-	var r0 []extrinsic.Extrinsic
-	if rf, ok := ret.Get(0).(func() []extrinsic.Extrinsic); ok {
+	var r0 []string
+	if rf, ok := ret.Get(0).(func() []string); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]extrinsic.Extrinsic)
+			r0 = ret.Get(0).([]string)
 		}
 	}
 

@@ -1,10 +1,13 @@
 package registry
 
 import (
+	"bytes"
 	"fmt"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
 )
 
 // FieldDecoder is the interface implemented by all the different types that are available.
@@ -198,120 +201,42 @@ func (t *TypeDecoder) Decode(decoder *scale.Decoder) (DecodedFields, error) {
 	return decodedFields, nil
 }
 
-// DecodedExtrinsic is the type returned when an extrinsic is decoded.
-type DecodedExtrinsic struct {
-	Version       byte
-	DecodedFields DecodedFields
-}
-
-// IsSigned returns true if the extrinsic is signed.
-func (d DecodedExtrinsic) IsSigned() bool {
-	return d.Version&extrinsic.BitSigned == extrinsic.BitSigned
-}
-
-const (
-	ExtrinsicAddressFieldName   = "Address"
-	ExtrinsicSignatureFieldName = "Signature"
-	ExtrinsicExtraFieldName     = "Extra"
-	ExtrinsicCallFieldName      = "Call"
-)
-
-// ExtrinsicDecoder holds all the decoders for all the fields of an extrinsic.
-type ExtrinsicDecoder struct {
-	Fields []*Field
-}
-
-func (d *ExtrinsicDecoder) getFieldWithName(fieldName string) (*Field, error) {
-	for _, field := range d.Fields {
-		if field.Name == fieldName {
-			return field, nil
-		}
+// getPrimitiveDecoder parses a primitive type definition and returns a ValueDecoder.
+func getPrimitiveDecoder(primitiveTypeDef types.Si0TypeDefPrimitive) (FieldDecoder, error) {
+	switch primitiveTypeDef {
+	case types.IsBool:
+		return &ValueDecoder[bool]{}, nil
+	case types.IsChar:
+		return &ValueDecoder[byte]{}, nil
+	case types.IsStr:
+		return &ValueDecoder[string]{}, nil
+	case types.IsU8:
+		return &ValueDecoder[types.U8]{}, nil
+	case types.IsU16:
+		return &ValueDecoder[types.U16]{}, nil
+	case types.IsU32:
+		return &ValueDecoder[types.U32]{}, nil
+	case types.IsU64:
+		return &ValueDecoder[types.U64]{}, nil
+	case types.IsU128:
+		return &ValueDecoder[types.U128]{}, nil
+	case types.IsU256:
+		return &ValueDecoder[types.U256]{}, nil
+	case types.IsI8:
+		return &ValueDecoder[types.I8]{}, nil
+	case types.IsI16:
+		return &ValueDecoder[types.I16]{}, nil
+	case types.IsI32:
+		return &ValueDecoder[types.I32]{}, nil
+	case types.IsI64:
+		return &ValueDecoder[types.I64]{}, nil
+	case types.IsI128:
+		return &ValueDecoder[types.I128]{}, nil
+	case types.IsI256:
+		return &ValueDecoder[types.I256]{}, nil
+	default:
+		return nil, ErrPrimitiveTypeNotSupported.WithMsg("primitive type %v", primitiveTypeDef)
 	}
-
-	return nil, ErrExtrinsicFieldNotFound.WithMsg("expected field name '%s'", fieldName)
-}
-
-func (d *ExtrinsicDecoder) decodeField(fieldName string, decoder *scale.Decoder) (*DecodedField, error) {
-	addressField, err := d.getFieldWithName(fieldName)
-
-	if err != nil {
-		return nil, err
-	}
-
-	decodedField, err := addressField.Decode(decoder)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return decodedField, nil
-}
-
-// Decode is used to decode the fields of an extrinsic in the following order:
-//
-// 1. Address
-// 2. Signature
-// 3. Extra
-// 4. Call
-//
-// NOTE - the decoding order is different from the order of the Extrinsic parameters provided in the metadata.
-func (d *ExtrinsicDecoder) Decode(decoder *scale.Decoder) (*DecodedExtrinsic, error) {
-	if d == nil {
-		return nil, ErrNilExtrinsicDecoder
-	}
-
-	decodedExtrinsic := &DecodedExtrinsic{}
-
-	// compact length encoding (1, 2, or 4 bytes) (may not be there for Extrinsics older than Jan 11 2019)
-	_, err := decoder.DecodeUintCompact()
-
-	if err != nil {
-		return nil, ErrExtrinsicCompactLengthDecoding.Wrap(err)
-	}
-
-	if err := decoder.Decode(&decodedExtrinsic.Version); err != nil {
-		return nil, ErrExtrinsicVersionDecoding.Wrap(err)
-	}
-
-	var decodedFields DecodedFields
-
-	decodedAddress, err := d.decodeField(ExtrinsicAddressFieldName, decoder)
-
-	if err != nil {
-		return nil, err
-	}
-
-	decodedFields = append(decodedFields, decodedAddress)
-
-	if decodedExtrinsic.IsSigned() {
-		decodedSignature, err := d.decodeField(ExtrinsicSignatureFieldName, decoder)
-
-		if err != nil {
-			return nil, err
-		}
-
-		decodedFields = append(decodedFields, decodedSignature)
-	}
-
-	decodedExtraField, err := d.decodeField(ExtrinsicExtraFieldName, decoder)
-
-	if err != nil {
-		return nil, err
-	}
-
-	decodedFields = append(decodedFields, decodedExtraField)
-
-	decodedCall, err := d.decodeField(ExtrinsicCallFieldName, decoder)
-
-	if err != nil {
-		return nil, err
-	}
-
-	decodedFields = append(decodedFields, decodedCall)
-
-	decodedExtrinsic.DecodedFields = decodedFields
-
-	return decodedExtrinsic, nil
 }
 
 // Field represents one field of a TypeDecoder.
@@ -454,4 +379,125 @@ func convertSliceToType[T any](slice []any) ([]T, error) {
 	}
 
 	return res, nil
+}
+
+// DecodedExtrinsic is the type returned when an extrinsic is decoded.
+type DecodedExtrinsic struct {
+	Version       byte
+	DecodedFields DecodedFields
+}
+
+// IsSigned returns true if the extrinsic is signed.
+func (d DecodedExtrinsic) IsSigned() bool {
+	return d.Version&extrinsic.BitSigned == extrinsic.BitSigned
+}
+
+// ExtrinsicDecoder holds all the decoders for all the fields of an extrinsic.
+type ExtrinsicDecoder struct {
+	Fields []*Field
+}
+
+func (d *ExtrinsicDecoder) getFieldWithName(fieldName string) (*Field, error) {
+	for _, field := range d.Fields {
+		if field.Name == fieldName {
+			return field, nil
+		}
+	}
+
+	return nil, ErrExtrinsicFieldNotFound.WithMsg("expected field name '%s'", fieldName)
+}
+
+func (d *ExtrinsicDecoder) decodeField(fieldName string, decoder *scale.Decoder) (*DecodedField, error) {
+	extrinsicField, err := d.getFieldWithName(fieldName)
+
+	if err != nil {
+		return nil, err
+	}
+
+	decodedField, err := extrinsicField.Decode(decoder)
+
+	if err != nil {
+		return nil, ErrExtrinsicFieldDecoding.Wrap(err).WithMsg("field name - '%s'", fieldName)
+	}
+
+	return decodedField, nil
+}
+
+func (d *ExtrinsicDecoder) DecodeHex(hexEncodedExtrinsic string) (*DecodedExtrinsic, error) {
+	extrinsicBytes, err := hexutil.Decode(hexEncodedExtrinsic)
+
+	if err != nil {
+		return nil, err
+	}
+
+	decoder := scale.NewDecoder(bytes.NewReader(extrinsicBytes))
+
+	return d.Decode(decoder)
+}
+
+// Decode is used to decode the fields of an extrinsic in the following order:
+//
+// 1. Address
+// 2. Signature
+// 3. Extra
+// 4. Call
+//
+// NOTE - the decoding order is different from the order of the Extrinsic parameters provided in the metadata.
+func (d *ExtrinsicDecoder) Decode(decoder *scale.Decoder) (*DecodedExtrinsic, error) {
+	if d == nil {
+		return nil, ErrNilExtrinsicDecoder
+	}
+
+	decodedExtrinsic := &DecodedExtrinsic{}
+
+	// compact length encoding (1, 2, or 4 bytes) (may not be there for Extrinsics older than Jan 11 2019)
+	_, err := decoder.DecodeUintCompact()
+
+	if err != nil {
+		return nil, ErrExtrinsicCompactLengthDecoding.Wrap(err)
+	}
+
+	if err := decoder.Decode(&decodedExtrinsic.Version); err != nil {
+		return nil, ErrExtrinsicVersionDecoding.Wrap(err)
+	}
+
+	var decodedFields DecodedFields
+
+	if decodedExtrinsic.IsSigned() {
+		decodedAddress, err := d.decodeField(ExtrinsicAddressName, decoder)
+
+		if err != nil {
+			return nil, err
+		}
+
+		decodedFields = append(decodedFields, decodedAddress)
+
+		decodedSignature, err := d.decodeField(ExtrinsicSignatureName, decoder)
+
+		if err != nil {
+			return nil, err
+		}
+
+		decodedFields = append(decodedFields, decodedSignature)
+
+		decodedExtraField, err := d.decodeField(ExtrinsicExtraName, decoder)
+
+		if err != nil {
+			return nil, err
+		}
+
+		decodedFields = append(decodedFields, decodedExtraField)
+	}
+
+	decodedCall, err := d.decodeField(ExtrinsicCallName, decoder)
+
+	if err != nil {
+		return nil, err
+	}
+
+	decodedFields = append(decodedFields, decodedCall)
+
+	decodedExtrinsic.DecodedFields = decodedFields
+
+	return decodedExtrinsic, nil
 }

@@ -24,6 +24,8 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/block"
 )
 
+//go:generate mockery --name Chain --filename chain.go
+
 type Chain interface {
 	SubscribeFinalizedHeads() (*FinalizedHeadsSubscription, error)
 	SubscribeNewHeads() (*NewHeadsSubscription, error)

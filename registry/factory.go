@@ -21,6 +21,7 @@ type Factory interface {
 // CallRegistry maps a call name to its TypeDecoder.
 type CallRegistry map[types.CallIndex]*TypeDecoder
 
+// ErrorID is the type using for identifying an error in the metadata.
 type ErrorID struct {
 	ModuleIndex types.U8
 	ErrorIndex  [4]types.U8
@@ -207,17 +208,6 @@ func (f *factory) CreateEventRegistry(meta *types.Metadata) (EventRegistry, erro
 	return eventRegistry, nil
 }
 
-const (
-	// ExpectedExtrinsicParams is the count of params that we expect for the Extrinsic metadata type.
-	//
-	// The parameters are expected to be in the following order:
-	// 1. Address
-	// 2. Call
-	// 3. Signature
-	// 4. Extra
-	ExpectedExtrinsicParams = 4
-)
-
 // CreateExtrinsicDecoder creates an ExtrinsicDecoder based on the Extrinsic information provided in the metadata.
 func (f *factory) CreateExtrinsicDecoder(meta *types.Metadata) (*ExtrinsicDecoder, error) {
 	f.resetStorages()
@@ -226,11 +216,17 @@ func (f *factory) CreateExtrinsicDecoder(meta *types.Metadata) (*ExtrinsicDecode
 
 	extrinsicType := meta.AsMetadataV14.EfficientLookup[extrinsicLookupID.Int64()]
 
-	if len(extrinsicType.Params) != ExpectedExtrinsicParams {
-		return nil, ErrInvalidExtrinsicParams
+	extrinsicParams, err := extractExtrinsicParams(extrinsicType, meta)
+
+	if err != nil {
+		return nil, err
 	}
 
-	extrinsicFields, err := f.getTypeParams(meta, extrinsicType.Params)
+	if err := validateExtrinsicParams(extrinsicParams); err != nil {
+		return nil, err
+	}
+
+	extrinsicFields, err := f.getTypeParams(meta, extrinsicParams)
 
 	if err != nil {
 		return nil, ErrExtrinsicFieldRetrieval
@@ -243,6 +239,34 @@ func (f *factory) CreateExtrinsicDecoder(meta *types.Metadata) (*ExtrinsicDecode
 	return &ExtrinsicDecoder{
 		Fields: extrinsicFields,
 	}, nil
+}
+
+const (
+	ExtrinsicAddressName   = "Address"
+	ExtrinsicSignatureName = "Signature"
+	ExtrinsicExtraName     = "Extra"
+	ExtrinsicCallName      = "Call"
+)
+
+var expectedExtrinsicParams = map[string]struct{}{
+	ExtrinsicAddressName:   {},
+	ExtrinsicSignatureName: {},
+	ExtrinsicExtraName:     {},
+	ExtrinsicCallName:      {},
+}
+
+func validateExtrinsicParams(params []types.Si1TypeParameter) error {
+	if len(params) != ExpectedExtrinsicParamsCount {
+		return ErrInvalidExtrinsicParams
+	}
+
+	for _, param := range params {
+		if _, ok := expectedExtrinsicParams[string(param.Name)]; !ok {
+			return ErrUnexpectedExtrinsicParam.WithMsg("param - '%s'", param.Name)
+		}
+	}
+
+	return nil
 }
 
 // resolveRecursiveDecoders resolves all recursive decoders with their according FieldDecoder.
@@ -425,26 +449,22 @@ func (f *factory) getFieldDecoder(
 	}
 }
 
-const (
-	variantItemFieldNameFormat = "variant_item_%d"
-)
-
 // getVariantFieldDecoder parses a variant type definition and returns a VariantDecoder.
 func (f *factory) getVariantFieldDecoder(meta *types.Metadata, typeDef types.Si1TypeDef) (FieldDecoder, error) {
 	variantDecoder := &VariantDecoder{}
 
 	fieldDecoderMap := make(map[byte]FieldDecoder)
 
-	for i, variant := range typeDef.Variant.Variants {
+	for _, variant := range typeDef.Variant.Variants {
 		if len(variant.Fields) == 0 {
 			fieldDecoderMap[byte(variant.Index)] = &NoopDecoder{}
 			continue
 		}
 
-		variantFieldName := fmt.Sprintf(variantItemFieldNameFormat, i)
+		variantName := getVariantName(variant)
 
 		compositeDecoder := &CompositeDecoder{
-			FieldName: variantFieldName,
+			FieldName: variantName,
 		}
 
 		fields, err := f.getTypeFields(meta, variant.Fields)
@@ -464,6 +484,18 @@ func (f *factory) getVariantFieldDecoder(meta *types.Metadata, typeDef types.Si1
 }
 
 const (
+	variantItemFieldNameFormat = "variant_item_%d"
+)
+
+func getVariantName(variant types.Si1Variant) string {
+	if variant.Name != "" {
+		return string(variant.Name)
+	}
+
+	return fmt.Sprintf(variantItemFieldNameFormat, variant.Index)
+}
+
+const (
 	tupleItemFieldNameFormat = "tuple_item_%d"
 )
 
@@ -475,7 +507,7 @@ func (f *factory) getCompactFieldDecoder(meta *types.Metadata, fieldName string,
 		return &ValueDecoder[types.UCompact]{}, nil
 	case typeDef.IsTuple:
 		if typeDef.Tuple == nil {
-			return &ValueDecoder[any]{}, nil
+			return &NoopDecoder{}, nil
 		}
 
 		compositeDecoder := &CompositeDecoder{
@@ -639,54 +671,6 @@ func (f *factory) getBitSequenceDecoder(
 	return bitSequenceDecoder, nil
 }
 
-func getBitOrderString(path types.Si1Path) string {
-	pathLen := len(path)
-
-	if pathLen == 0 {
-		return ""
-	}
-
-	return string(path[pathLen-1])
-}
-
-// getPrimitiveDecoder parses a primitive type definition and returns a ValueDecoder.
-func getPrimitiveDecoder(primitiveTypeDef types.Si0TypeDefPrimitive) (FieldDecoder, error) {
-	switch primitiveTypeDef {
-	case types.IsBool:
-		return &ValueDecoder[bool]{}, nil
-	case types.IsChar:
-		return &ValueDecoder[byte]{}, nil
-	case types.IsStr:
-		return &ValueDecoder[string]{}, nil
-	case types.IsU8:
-		return &ValueDecoder[types.U8]{}, nil
-	case types.IsU16:
-		return &ValueDecoder[types.U16]{}, nil
-	case types.IsU32:
-		return &ValueDecoder[types.U32]{}, nil
-	case types.IsU64:
-		return &ValueDecoder[types.U64]{}, nil
-	case types.IsU128:
-		return &ValueDecoder[types.U128]{}, nil
-	case types.IsU256:
-		return &ValueDecoder[types.U256]{}, nil
-	case types.IsI8:
-		return &ValueDecoder[types.I8]{}, nil
-	case types.IsI16:
-		return &ValueDecoder[types.I16]{}, nil
-	case types.IsI32:
-		return &ValueDecoder[types.I32]{}, nil
-	case types.IsI64:
-		return &ValueDecoder[types.I64]{}, nil
-	case types.IsI128:
-		return &ValueDecoder[types.I128]{}, nil
-	case types.IsI256:
-		return &ValueDecoder[types.I256]{}, nil
-	default:
-		return nil, ErrPrimitiveTypeNotSupported.WithMsg("primitive type %v", primitiveTypeDef)
-	}
-}
-
 // getStoredFieldDecoder will attempt to return a FieldDecoder from storage,
 // and perform an extra check for recursive decoders.
 func (f *factory) getStoredFieldDecoder(fieldLookupIndex int64) (FieldDecoder, bool) {
@@ -703,6 +687,71 @@ func (f *factory) getStoredFieldDecoder(fieldLookupIndex int64) (FieldDecoder, b
 	f.fieldStorage[fieldLookupIndex] = &RecursiveDecoder{}
 
 	return nil, false
+}
+
+const (
+	// ExpectedExtrinsicParamsCount is the count of generic params that we expect for a generic Extrinsic type from the metadata.
+	//
+	// The parameters are expected to be in the following order:
+	// 1. Address
+	// 2. Call
+	// 3. Signature
+	// 4. Extra
+	ExpectedExtrinsicParamsCount = 4
+)
+
+// genericExtrinsicPath represents the expected metadata path of a generic extrinsic.
+var genericExtrinsicPath = types.Si1Path{
+	"sp_runtime",
+	"generic",
+	"unchecked_extrinsic",
+	"UncheckedExtrinsic",
+}
+
+// isGenericExtrinsic checks if the metadata path of the extrinsic path matches the one of the
+// generic extrinsic.
+func isGenericExtrinsic(path types.Si1Path) bool {
+	if len(path) != len(genericExtrinsicPath) {
+		return false
+	}
+
+	for i := range path {
+		if path[i] != genericExtrinsicPath[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// extractExtrinsicParams returns the extrinsic params if the provided extrinsic type is generic, otherwise,
+// it extracts the generic extrinsic and then returns its params.
+func extractExtrinsicParams(extrinsicType *types.Si1Type, meta *types.Metadata) ([]types.Si1TypeParameter, error) {
+	if isGenericExtrinsic(extrinsicType.Path) {
+		return extrinsicType.Params, nil
+	}
+
+	// If the metadata extrinsic type is not generic, its type is expected to be a composite with 1 field.
+	if !extrinsicType.Def.IsComposite || len(extrinsicType.Def.Composite.Fields) != 1 {
+		return nil, ErrInvalidExtrinsicType
+	}
+
+	// This composite field is the `sp_runtime::generic::unchecked_extrinsic::UncheckedExtrinsic`.
+	genericUncheckedExtrinsic := extrinsicType.Def.Composite.Fields[0]
+
+	genericUncheckedExtrinsicType := meta.AsMetadataV14.EfficientLookup[genericUncheckedExtrinsic.Type.Int64()]
+
+	return genericUncheckedExtrinsicType.Params, nil
+}
+
+func getBitOrderString(path types.Si1Path) string {
+	pathLen := len(path)
+
+	if pathLen == 0 {
+		return ""
+	}
+
+	return string(path[pathLen-1])
 }
 
 const (

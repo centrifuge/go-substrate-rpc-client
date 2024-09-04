@@ -72,7 +72,7 @@ func TestChain_SubmitExtrinsic(t *testing.T) {
 	c, err := types.NewCall(meta, "Balances.transfer", bob, types.NewUCompactFromUInt(6969))
 	assert.NoError(t, err)
 
-	ext := extrinsic.NewExtrinsic(&c)
+	ext := extrinsic.NewExtrinsic(c)
 
 	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
 	assert.NoError(t, err)

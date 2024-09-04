@@ -47,7 +47,7 @@ func TestAuthor_SubmitExtrinsic(t *testing.T) {
 
 	for {
 		// Create the extrinsic
-		ext := extrinsic.NewExtrinsic(&c)
+		ext := extrinsic.NewExtrinsic(c)
 		genesisHash, err := api.RPC.Chain.GetBlockHash(0)
 		assert.NoError(t, err)
 

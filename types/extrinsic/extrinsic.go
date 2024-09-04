@@ -4,13 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"math/big"
-	"strings"
-
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
+	"math/big"
 )
 
 const (
@@ -54,46 +52,6 @@ func (e Extrinsic) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 	return json.Marshal(s)
-}
-
-// UnmarshalJSON fills Extrinsic with the JSON encoded byte array given by bz
-func (e *Extrinsic) UnmarshalJSON(bz []byte) error {
-	var tmp string
-	if err := json.Unmarshal(bz, &tmp); err != nil {
-		return err
-	}
-
-	// HACK 11 Jan 2019 - before https://github.com/paritytech/substrate/pull/1388
-	// extrinsics didn't have the length, cater for both approaches. This is very
-	// inconsistent with any other `Vec<u8>` implementation
-	var l types.UCompact
-	err := codec.DecodeFromHex(tmp, &l)
-	if err != nil {
-		return err
-	}
-
-	prefix, err := codec.EncodeToHex(l)
-	if err != nil {
-		return err
-	}
-
-	// determine whether length prefix is there
-	if strings.HasPrefix(tmp, prefix) {
-		return codec.DecodeFromHex(tmp, e)
-	}
-
-	// not there, prepend with compact encoded length prefix
-	dec, err := codec.HexDecodeString(tmp)
-	if err != nil {
-		return err
-	}
-	length := types.NewUCompactFromUInt(uint64(len(dec)))
-	bprefix, err := codec.Encode(length)
-	if err != nil {
-		return err
-	}
-	bprefix = append(bprefix, dec...)
-	return codec.Decode(bprefix, e)
 }
 
 // IsSigned returns true if the extrinsic is signed
@@ -154,41 +112,6 @@ func (e *Extrinsic) Sign(signer signature.KeyringPair, meta *types.Metadata, opt
 
 	// mark the extrinsic as signed
 	e.Version |= BitSigned
-
-	return nil
-}
-
-func (e *Extrinsic) Decode(decoder scale.Decoder) error {
-	// compact length encoding (1, 2, or 4 bytes) (may not be there for Extrinsics older than Jan 11 2019)
-	_, err := decoder.DecodeUintCompact()
-	if err != nil {
-		return err
-	}
-
-	// version, signature bitmask (1 byte)
-	err = decoder.Decode(&e.Version)
-	if err != nil {
-		return err
-	}
-
-	// signature
-	if e.IsSigned() {
-		if e.Type() != Version4 {
-			return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(),
-				e.Type())
-		}
-
-		err = decoder.Decode(&e.Signature)
-		if err != nil {
-			return err
-		}
-	}
-
-	// call
-	err = decoder.Decode(&e.Method)
-	if err != nil {
-		return err
-	}
 
 	return nil
 }

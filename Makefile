@@ -37,16 +37,10 @@ test-dockerized: run-substrate-docker
 run-substrate-docker: 		## starts the Substrate Docker image
 	@docker-compose up -d substrate
 
-generate-test-data:		## generate data for types decode test
-	@go generate -tags=types_test ./types/test/...
-
-test-types-decode:      ## run tests for types decode
-	@go test -tags=types_test ./types/test/...
-
 generate-mocks:      ## generate mocks
 	@docker run -v `pwd`:/app -w /app --entrypoint /bin/sh vektra/mockery:v2.13.0-beta.1 -c 'go generate ./...'
 
 help: 				## shows this help
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
 
-.PHONY: install-deps lint lint-fix test test-cover test-dockerized run-substrate-docker clean generate-test-data
+.PHONY: clean lint lint-fix test test-cover test-dockerized run-substrate-docker generate-mocks
