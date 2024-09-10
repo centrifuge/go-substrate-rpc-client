@@ -690,7 +690,8 @@ func (f *factory) getStoredFieldDecoder(fieldLookupIndex int64) (FieldDecoder, b
 }
 
 const (
-	// ExpectedExtrinsicParamsCount is the count of generic params that we expect for a generic Extrinsic type from the metadata.
+	// ExpectedExtrinsicParamsCount is the count of generic params that we expect for a
+	// generic Extrinsic type from the metadata.
 	//
 	// The parameters are expected to be in the following order:
 	// 1. Address

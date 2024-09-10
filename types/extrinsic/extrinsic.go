@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"math/big"
+
 	libErr "github.com/centrifuge/go-substrate-rpc-client/v4/error"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
-	"math/big"
 )
 
 const (
@@ -78,6 +79,7 @@ func (e Extrinsic) Type() uint8 {
 // Sign adds a signature to the extrinsic.
 func (e *Extrinsic) Sign(signer signature.KeyringPair, meta *types.Metadata, opts ...SigningOption) error {
 	if e.Type() != Version4 {
+		//nolint:lll
 		return ErrInvalidVersion.WithMsg("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(), e.Type())
 	}
 

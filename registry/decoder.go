@@ -3,11 +3,11 @@ package registry
 import (
 	"bytes"
 	"fmt"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 // FieldDecoder is the interface implemented by all the different types that are available.

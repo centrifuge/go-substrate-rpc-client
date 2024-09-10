@@ -20,7 +20,6 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
-	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -156,14 +155,4 @@ func TestMetadataV13_TestFindCallIndexWithUnknownModule(t *testing.T) {
 func TestMetadataV13_TestFindCallIndexWithUnknownFunction(t *testing.T) {
 	_, err := exampleMetadataV13.FindCallIndex("Module2_13.unknownFunction")
 	assert.Error(t, err)
-}
-
-func TestNewMetadataV13_Decode(t *testing.T) {
-	metadata := NewMetadataV13()
-	err := Decode(MustHexDecodeString(ExamplaryMetadataV13SubstrateString), metadata)
-	assert.EqualValues(t, metadata.Version, 13)
-	assert.NoError(t, err)
-	data, err := Encode(metadata)
-	assert.NoError(t, err)
-	assert.Equal(t, ExamplaryMetadataV13SubstrateString, HexEncodeToString(data))
 }

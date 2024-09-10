@@ -2,6 +2,7 @@ package block
 
 import (
 	"errors"
+
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
