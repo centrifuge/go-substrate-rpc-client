@@ -741,6 +741,10 @@ func extractExtrinsicParams(extrinsicType *types.Si1Type, meta *types.Metadata) 
 
 	genericUncheckedExtrinsicType := meta.AsMetadataV14.EfficientLookup[genericUncheckedExtrinsic.Type.Int64()]
 
+	if !isGenericExtrinsic(genericUncheckedExtrinsicType.Path) {
+		return nil, ErrInvalidGenericExtrinsicType
+	}
+
 	return genericUncheckedExtrinsicType.Params, nil
 }
 

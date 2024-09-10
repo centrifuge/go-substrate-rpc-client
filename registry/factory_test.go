@@ -718,7 +718,7 @@ func TestFactory_CreateExtrinsicDecoder_WithLiveMetadata(t *testing.T) {
 	}
 }
 
-func TestFactory_CreateExtrinsicDecoder_ExtrinsicParamsExtractionError(t *testing.T) {
+func TestFactory_CreateExtrinsicDecoder_ExtrinsicParamsExtraction_InvalidExtrinsicTypeError(t *testing.T) {
 	extrinsicLookupID := uint64(123)
 
 	testMeta := &types.Metadata{
@@ -731,6 +731,7 @@ func TestFactory_CreateExtrinsicDecoder_ExtrinsicParamsExtractionError(t *testin
 			EfficientLookup: map[int64]*types.Si1Type{
 				int64(extrinsicLookupID): {
 					Def: types.Si1TypeDef{
+						// `extractExtrinsicParams` expects a composite type with 1 field.
 						IsPrimitive: true,
 					},
 				},
@@ -742,6 +743,46 @@ func TestFactory_CreateExtrinsicDecoder_ExtrinsicParamsExtractionError(t *testin
 
 	res, err := factory.CreateExtrinsicDecoder(testMeta)
 	assert.ErrorIs(t, err, ErrInvalidExtrinsicType)
+	assert.Nil(t, res)
+}
+
+func TestFactory_CreateExtrinsicDecoder_ExtrinsicParamsExtraction_InvalidGenericExtrinsicTypeError(t *testing.T) {
+	extrinsicLookupID := uint64(123)
+	genericExtrinsicLookupID := uint64(456)
+
+	testMeta := &types.Metadata{
+		AsMetadataV14: types.MetadataV14{
+			Extrinsic: types.ExtrinsicV14{
+				Type:             types.Si1LookupTypeID{UCompact: types.NewUCompactFromUInt(extrinsicLookupID)},
+				Version:          0,
+				SignedExtensions: nil,
+			},
+			EfficientLookup: map[int64]*types.Si1Type{
+				int64(extrinsicLookupID): {
+					Def: types.Si1TypeDef{
+						IsComposite: true,
+						Composite: types.Si1TypeDefComposite{
+							Fields: []types.Si1Field{
+								{
+									Type: types.Si1LookupTypeID{UCompact: types.NewUCompactFromUInt(genericExtrinsicLookupID)},
+								},
+							},
+						},
+					},
+				},
+				int64(genericExtrinsicLookupID): {
+					// No path provided here will cause `isGenericExtrinsic` to returns false
+					// on the second check from `extractExtrinsicParams`.
+					Def: types.Si1TypeDef{},
+				},
+			},
+		},
+	}
+
+	factory := NewFactory()
+
+	res, err := factory.CreateExtrinsicDecoder(testMeta)
+	assert.ErrorIs(t, err, ErrInvalidGenericExtrinsicType)
 	assert.Nil(t, res)
 }
 

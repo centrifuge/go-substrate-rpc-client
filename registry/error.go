@@ -58,6 +58,7 @@ const (
 	ErrExtrinsicFieldRetrieval               = libErr.Error("extrinsic field retrieval")
 	ErrInvalidExtrinsicParams                = libErr.Error("invalid extrinsic params")
 	ErrInvalidExtrinsicType                  = libErr.Error("invalid extrinsic type")
+	ErrInvalidGenericExtrinsicType           = libErr.Error("invalid generic extrinsic type")
 	ErrNilExtrinsicDecoder                   = libErr.Error("nil type decoder")
 	ErrExtrinsicFieldNotFound                = libErr.Error("extrinsic field not found")
 	ErrExtrinsicCompactLengthDecoding        = libErr.Error("extrinsic compact length decoding")
