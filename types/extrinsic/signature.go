@@ -1,10 +1,13 @@
 package extrinsic
 
 import (
-	"fmt"
-
+	libErr "github.com/centrifuge/go-substrate-rpc-client/v4/error"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+)
+
+const (
+	ErrSignatureFieldEncoding = libErr.Error("signature field encoding failed")
 )
 
 // Signature holds all the relevant fields for an extrinsic signature.
@@ -29,7 +32,7 @@ func (s Signature) Encode(encoder scale.Encoder) error {
 
 	for _, signedField := range s.SignedFields {
 		if err := encoder.Encode(signedField.Value); err != nil {
-			return fmt.Errorf("unable to encode signed field: %w", err)
+			return ErrSignatureFieldEncoding.Wrap(err)
 		}
 	}
 

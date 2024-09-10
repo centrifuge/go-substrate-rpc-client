@@ -111,3 +111,97 @@ func TestExtrinsic_Signed_Encode(t *testing.T) {
 			"10"+"74657374", // remark
 	)
 }
+
+func TestExtrinsic_Sign(t *testing.T) {
+	call := types.Call{}
+	extrinsic := NewExtrinsic(call)
+
+	var meta types.Metadata
+
+	err := codec.DecodeFromHex(types.MetadataV14Data, &meta)
+	assert.NoError(t, err)
+
+	err = extrinsic.Sign(signature.TestKeyringPairAlice, &meta,
+		WithEra(types.ExtrinsicEra{IsImmortalEra: true}, types.Hash{}),
+		WithNonce(types.NewUCompactFromUInt(uint64(0))),
+		WithTip(types.NewUCompactFromUInt(0)),
+		WithSpecVersion(123),
+		WithTransactionVersion(456),
+		WithGenesisHash(types.Hash{}),
+		WithMetadataMode(extensions.CheckMetadataModeDisabled, extensions.CheckMetadataHash{Hash: types.NewEmptyOption[types.H256]()}),
+	)
+	assert.NoError(t, err)
+	assert.True(t, extrinsic.Version&BitSigned > 1)
+	assert.NotNil(t, extrinsic.Signature)
+}
+
+func TestExtrinsic_Sign_InvalidVersionError(t *testing.T) {
+	extrinsic := &Extrinsic{}
+
+	var meta types.Metadata
+
+	err := codec.DecodeFromHex(types.MetadataV14Data, &meta)
+	assert.NoError(t, err)
+
+	err = extrinsic.Sign(signature.TestKeyringPairAlice, &meta,
+		WithEra(types.ExtrinsicEra{IsImmortalEra: true}, types.Hash{}),
+		WithNonce(types.NewUCompactFromUInt(uint64(0))),
+		WithTip(types.NewUCompactFromUInt(0)),
+		WithSpecVersion(123),
+		WithTransactionVersion(456),
+		WithGenesisHash(types.Hash{}),
+		WithMetadataMode(extensions.CheckMetadataModeDisabled, extensions.CheckMetadataHash{Hash: types.NewEmptyOption[types.H256]()}),
+	)
+	assert.ErrorIs(t, err, ErrInvalidVersion)
+}
+
+func TestExtrinsic_Sign_PayloadCreationError(t *testing.T) {
+	call := types.Call{}
+	extrinsic := NewExtrinsic(call)
+
+	var meta types.Metadata
+
+	err := codec.DecodeFromHex(types.MetadataV14Data, &meta)
+	assert.NoError(t, err)
+
+	meta.AsMetadataV14.Extrinsic.SignedExtensions = append(
+		meta.AsMetadataV14.Extrinsic.SignedExtensions,
+		types.SignedExtensionMetadataV14{
+			Identifier:       "unsupported_extension",
+			Type:             types.Si1LookupTypeID{},
+			AdditionalSigned: types.Si1LookupTypeID{},
+		},
+	)
+
+	err = extrinsic.Sign(signature.TestKeyringPairAlice, &meta,
+		WithEra(types.ExtrinsicEra{IsImmortalEra: true}, types.Hash{}),
+		WithNonce(types.NewUCompactFromUInt(uint64(0))),
+		WithTip(types.NewUCompactFromUInt(0)),
+		WithSpecVersion(123),
+		WithTransactionVersion(456),
+		WithGenesisHash(types.Hash{}),
+		WithMetadataMode(extensions.CheckMetadataModeDisabled, extensions.CheckMetadataHash{Hash: types.NewEmptyOption[types.H256]()}),
+	)
+	assert.ErrorIs(t, err, ErrPayloadCreation)
+}
+
+func TestExtrinsic_Sign_MultiAddressCreationError(t *testing.T) {
+	call := types.Call{}
+	extrinsic := NewExtrinsic(call)
+
+	var meta types.Metadata
+
+	err := codec.DecodeFromHex(types.MetadataV14Data, &meta)
+	assert.NoError(t, err)
+
+	err = extrinsic.Sign(signature.KeyringPair{}, &meta,
+		WithEra(types.ExtrinsicEra{IsImmortalEra: true}, types.Hash{}),
+		WithNonce(types.NewUCompactFromUInt(uint64(0))),
+		WithTip(types.NewUCompactFromUInt(0)),
+		WithSpecVersion(123),
+		WithTransactionVersion(456),
+		WithGenesisHash(types.Hash{}),
+		WithMetadataMode(extensions.CheckMetadataModeDisabled, extensions.CheckMetadataHash{Hash: types.NewEmptyOption[types.H256]()}),
+	)
+	assert.ErrorIs(t, err, ErrMultiAddressCreation)
+}

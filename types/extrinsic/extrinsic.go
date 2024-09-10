@@ -4,11 +4,22 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	libErr "github.com/centrifuge/go-substrate-rpc-client/v4/error"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"math/big"
+)
+
+const (
+	ErrEncodeToHex          = libErr.Error("encode to hex")
+	ErrScaleEncode          = libErr.Error("scale encode")
+	ErrInvalidVersion       = libErr.Error("invalid version")
+	ErrPayloadCreation      = libErr.Error("payload creation")
+	ErrPayloadMutation      = libErr.Error("payload mutation")
+	ErrMultiAddressCreation = libErr.Error("multi address creation")
+	ErrPayloadSigning       = libErr.Error("payload signing")
 )
 
 const (
@@ -49,7 +60,7 @@ func NewExtrinsic(c types.Call) Extrinsic {
 func (e Extrinsic) MarshalJSON() ([]byte, error) {
 	s, err := codec.EncodeToHex(e)
 	if err != nil {
-		return nil, err
+		return nil, ErrEncodeToHex.Wrap(err)
 	}
 	return json.Marshal(s)
 }
@@ -67,12 +78,12 @@ func (e Extrinsic) Type() uint8 {
 // Sign adds a signature to the extrinsic.
 func (e *Extrinsic) Sign(signer signature.KeyringPair, meta *types.Metadata, opts ...SigningOption) error {
 	if e.Type() != Version4 {
-		return fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(), e.Type())
+		return ErrInvalidVersion.WithMsg("unsupported extrinsic version: %v (isSigned: %v, type: %v)", e.Version, e.IsSigned(), e.Type())
 	}
 
 	encodedMethod, err := codec.Encode(e.Method)
 	if err != nil {
-		return fmt.Errorf("encode method: %w", err)
+		return ErrScaleEncode.Wrap(err)
 	}
 
 	fieldValues := SignedFieldValues{}
@@ -84,22 +95,22 @@ func (e *Extrinsic) Sign(signer signature.KeyringPair, meta *types.Metadata, opt
 	payload, err := createPayload(meta, encodedMethod)
 
 	if err != nil {
-		return fmt.Errorf("creating payload: %w", err)
+		return ErrPayloadCreation.Wrap(err)
 	}
 
 	if err := payload.MutateSignedFields(fieldValues); err != nil {
-		return fmt.Errorf("mutate signed fields: %w", err)
+		return ErrPayloadMutation.Wrap(err)
 	}
 
 	signerPubKey, err := types.NewMultiAddressFromAccountID(signer.PublicKey)
 
 	if err != nil {
-		return err
+		return ErrMultiAddressCreation.Wrap(err)
 	}
 
 	sig, err := payload.Sign(signer)
 	if err != nil {
-		return err
+		return ErrPayloadSigning.Wrap(err)
 	}
 
 	extSignature := &Signature{

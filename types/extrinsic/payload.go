@@ -1,14 +1,25 @@
 package extrinsic
 
 import (
-	"errors"
-	"fmt"
+	libErr "github.com/centrifuge/go-substrate-rpc-client/v4/error"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic/extensions"
+)
+
+const (
+	ErrCallEncoding                    = libErr.Error("call encoding")
+	ErrSignedFieldNotMutated           = libErr.Error("signed field not mutated")
+	ErrPayloadSignedFieldEncoding      = libErr.Error("signed field encoding")
+	ErrSignedExtraFieldNotMutated      = libErr.Error("signed extra field not mutated")
+	ErrSignedExtraFieldEncoding        = libErr.Error("signed extra field encoding")
+	ErrPayloadNil                      = libErr.Error("payload is nil")
+	ErrPayloadEncoding                 = libErr.Error("payload encoding")
+	ErrSignedExtensionTypeNotDefined   = libErr.Error("signed extension type not defined")
+	ErrSignedExtensionTypeNotSupported = libErr.Error("signed extension type not supported")
 )
 
 // SignedField represents a field used in the Payload.
@@ -40,26 +51,26 @@ type Payload struct {
 // The function also performs an extra check to ensure that all required fields were mutated.
 func (p *Payload) Encode(encoder scale.Encoder) error {
 	if err := encoder.Encode(p.EncodedCall); err != nil {
-		return fmt.Errorf("unable to encode method: %w", err)
+		return ErrCallEncoding.Wrap(err)
 	}
 
 	for _, signedField := range p.SignedFields {
 		if !signedField.Mutated {
-			return fmt.Errorf("signed field '%s' was not mutated", signedField.Name)
+			return ErrSignedFieldNotMutated.WithMsg("signed field '%s'", signedField.Name)
 		}
 
 		if err := encoder.Encode(signedField.Value); err != nil {
-			return fmt.Errorf("unable to encode signed field: %w", err)
+			return ErrPayloadSignedFieldEncoding.Wrap(err)
 		}
 	}
 
 	for _, signedExtraField := range p.SignedExtraFields {
 		if !signedExtraField.Mutated {
-			return fmt.Errorf("signed extra field '%s' was not mutated", signedExtraField.Name)
+			return ErrSignedExtraFieldNotMutated.WithMsg("signed extra field '%s'", signedExtraField.Name)
 		}
 
 		if err := encoder.Encode(signedExtraField.Value); err != nil {
-			return fmt.Errorf("unable to encode signed extra field: %w", err)
+			return ErrSignedExtraFieldEncoding.Wrap(err)
 		}
 	}
 
@@ -70,7 +81,7 @@ func (p *Payload) Encode(encoder scale.Encoder) error {
 // based on the provided SignedFieldValues.
 func (p *Payload) MutateSignedFields(vals SignedFieldValues) error {
 	if p == nil {
-		return errors.New("payload is nil")
+		return ErrPayloadNil
 	}
 
 	for _, signedField := range p.SignedFields {
@@ -99,14 +110,20 @@ func (p *Payload) MutateSignedFields(vals SignedFieldValues) error {
 }
 
 // Sign encodes the payload and then signs the encoded bytes using the provided signer.
-func (p *Payload) Sign(signer signature.KeyringPair) (types.SignatureHash, error) {
+func (p *Payload) Sign(signer signature.KeyringPair) (sig types.SignatureHash, err error) {
 	b, err := codec.Encode(p)
 	if err != nil {
-		return types.SignatureHash{}, err
+		return sig, ErrPayloadEncoding.Wrap(err)
 	}
 
-	sig, err := signature.Sign(b, signer.URI)
-	return types.NewSignature(sig), err
+	signatureBytes, err := signature.Sign(b, signer.URI)
+	if err != nil {
+		return sig, ErrPayloadSigning.Wrap(err)
+	}
+
+	sig = types.NewSignature(signatureBytes)
+
+	return sig, nil
 }
 
 // SignedFieldName is the type used for representing a field name.
@@ -223,7 +240,7 @@ func createPayload(meta *types.Metadata, encodedCall []byte) (*Payload, error) {
 		signedExtensionType, ok := meta.AsMetadataV14.EfficientLookup[signedExtension.Type.Int64()]
 
 		if !ok {
-			return nil, fmt.Errorf("signed extension type '%d' is not defined", signedExtension.Type.Int64())
+			return nil, ErrSignedExtensionTypeNotDefined.WithMsg("lookup ID - '%d'", signedExtension.Type.Int64())
 		}
 
 		signedExtensionName := extensions.SignedExtensionName(signedExtensionType.Path[len(signedExtensionType.Path)-1])
@@ -231,7 +248,7 @@ func createPayload(meta *types.Metadata, encodedCall []byte) (*Payload, error) {
 		payloadMutatorFn, ok := PayloadMutatorFns[signedExtensionName]
 
 		if !ok {
-			return nil, fmt.Errorf("signed extension '%s' is not supported", signedExtensionName)
+			return nil, ErrSignedExtensionTypeNotSupported.WithMsg("signed extension '%s'", signedExtensionName)
 		}
 
 		payloadMutatorFn(payload)
