@@ -51,7 +51,6 @@ func TestMain(m *testing.M) {
 type MockSrv struct {
 	blockHashLatest          types.Hash
 	metadataString           string
-	metadata                 *types.Metadata
 	runtimeVersion           types.RuntimeVersion
 	storageKeyHex            string
 	storageKeyHexEmpty       string
@@ -177,8 +176,7 @@ type ChildStorageTrieTestVal struct {
 // config.Default().RPCURL
 var mockSrv = MockSrv{
 	blockHashLatest:          types.Hash{1, 2, 3},
-	metadata:                 types.ExamplaryMetadataV4,
-	metadataString:           types.ExamplaryMetadataV4String,
+	metadataString:           types.MetadataV14Data,
 	runtimeVersion:           types.RuntimeVersion{APIs: []types.RuntimeVersionAPI{{APIID: "0xdf6acb689907609b", Version: 0x2}, {APIID: "0x37e397fc7c91f5e4", Version: 0x1}, {APIID: "0x40fe3ad401f8959a", Version: 0x3}, {APIID: "0xd2bc9897eed08f15", Version: 0x1}, {APIID: "0xf78b278be53f454c", Version: 0x1}, {APIID: "0xed99c5acb25eedf5", Version: 0x2}, {APIID: "0xdd718d5cc53262d4", Version: 0x1}, {APIID: "0x7801759919ee83e5", Version: 0x1}}, AuthoringVersion: 0xa, ImplName: "substrate-node", ImplVersion: 0x3e, SpecName: "node", SpecVersion: 0x3c}, //nolint:lll
 	storageKeyHex:            "0x0e4944cfd98d6f4cc374d16f5a4e3f9c",
 	storageKeyHexEmpty:       "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
