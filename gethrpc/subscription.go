@@ -47,7 +47,7 @@ func NewID() ID {
 	return globalGen()
 }
 
-// randomIDGenerator returns a function generates a random IDs.
+// randomIDGenerator returns a function that generates a random IDs.
 func randomIDGenerator() func() ID {
 	seed, err := binary.ReadVarint(bufio.NewReader(crand.Reader))
 	if err != nil {
@@ -97,7 +97,7 @@ type Notifier struct {
 // CreateSubscription returns a new subscription that is coupled to the
 // RPC connection. By default subscriptions are inactive and notifications
 // are dropped until the subscription is marked as active. This is done
-// by the RPC server after the subscription ID is send to the client.
+// by the RPC server after the subscription ID is sent to the client.
 func (n *Notifier) CreateSubscription() *Subscription {
 	n.mu.Lock()
 	defer n.mu.Unlock()
@@ -152,7 +152,7 @@ func (n *Notifier) takeSubscription() *Subscription {
 }
 
 // activate is called after the subscription ID was sent to client. Notifications are
-// buffered before activation. This prevents notifications being sent to the client before
+// buffered before activation. This prevents notifications from being sent to the client before
 // the subscription ID is sent to the client.
 func (n *Notifier) activate() error {
 	n.mu.Lock()
