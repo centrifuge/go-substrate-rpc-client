@@ -3,7 +3,7 @@ The GSRPC Registry can parse target metadata information into an in-memory regis
 
 By leveraging the on-chain metadata, GSRPC is more robust to changes on types, allowing clients to only keep updated the types that are relevant to their business operation.
 
-This registry can be used afterwards to decode data read from live chains (events & extrinsics).
+This registry can be used afterwards to decode data read from live chains (events & extrinsic).
 
 ## How to parse events and its types
 First we instantiate the API with the client node and open a connection: 
