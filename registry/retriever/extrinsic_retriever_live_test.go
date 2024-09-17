@@ -3,10 +3,7 @@
 package retriever
 
 import (
-	"errors"
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"log"
 	"os"
 	"strconv"
@@ -102,55 +99,4 @@ func TestLive_ExtrinsicRetriever_GetExtrinsics(t *testing.T) {
 	}
 
 	wg.Wait()
-}
-
-type AcalaMultiSignature struct {
-	IsEd25519     bool
-	AsEd25519     types.SignatureHash
-	IsSr25519     bool
-	AsSr25519     types.SignatureHash
-	IsEcdsa       bool
-	AsEcdsa       types.EcdsaSignature
-	IsEthereum    bool
-	AsEthereum    [65]byte
-	IsEip1559     bool
-	AsEip1559     [65]byte
-	IsAcalaEip712 bool
-	AsAcalaEip712 [65]byte
-}
-
-func (m *AcalaMultiSignature) Decode(decoder scale.Decoder) error {
-	b, err := decoder.ReadOneByte()
-	if err != nil {
-		return err
-	}
-
-	switch b {
-	case 0:
-		m.IsEd25519 = true
-		err = decoder.Decode(&m.AsEd25519)
-	case 1:
-		m.IsSr25519 = true
-		err = decoder.Decode(&m.AsSr25519)
-	case 2:
-		m.IsEcdsa = true
-		err = decoder.Decode(&m.AsEcdsa)
-	case 3:
-		m.IsEthereum = true
-		err = decoder.Decode(&m.AsEthereum)
-	case 4:
-		m.IsEip1559 = true
-		err = decoder.Decode(&m.AsEip1559)
-	case 5:
-		m.IsAcalaEip712 = true
-		err = decoder.Decode(&m.AsAcalaEip712)
-	default:
-		return errors.New("signature not supported")
-	}
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
