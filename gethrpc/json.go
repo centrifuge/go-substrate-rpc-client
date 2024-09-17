@@ -226,7 +226,7 @@ func (c *jsonCodec) Closed() <-chan interface{} {
 	return c.closed
 }
 
-// parseMessage parses raw bytes as a (batch of) JSON-RPC message(s). There are no error
+// parseMessage parses raw bytes as a (batch of) JSON-RPC message(s). There is no error
 // checks in this function because the raw message has already been syntax-checked when it
 // is called. Any non-JSON-RPC messages in the input return the zero value of
 // jsonrpcMessage.
