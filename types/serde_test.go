@@ -27,5 +27,5 @@ func TestSerDeOptionsFromMetadata(t *testing.T) {
 	meta := DecodedMetadataV14Example()
 
 	opts := SerDeOptionsFromMetadata(meta)
-	assert.False(t, opts.NoPalletIndices)
+	assert.True(t, opts.NoPalletIndices)
 }

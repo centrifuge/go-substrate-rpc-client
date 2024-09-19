@@ -18,6 +18,7 @@ package gsrpc_test
 
 import (
 	"fmt"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
 	"math/big"
 	"time"
 
@@ -215,7 +216,7 @@ func Example_makeASimpleTransfer() {
 	}
 
 	// Create the extrinsic
-	ext := types.NewExtrinsic(c)
+	ext := extrinsic.NewExtrinsic(c)
 
 	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
 	if err != nil {
@@ -239,18 +240,16 @@ func Example_makeASimpleTransfer() {
 	}
 
 	nonce := uint32(accountInfo.Nonce)
-	o := types.SignatureOptions{
-		BlockHash:          genesisHash,
-		Era:                types.ExtrinsicEra{IsMortalEra: false},
-		GenesisHash:        genesisHash,
-		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
-		SpecVersion:        rv.SpecVersion,
-		Tip:                types.NewUCompactFromUInt(100),
-		TransactionVersion: rv.TransactionVersion,
-	}
 
 	// Sign the transaction using Alice's default account
-	err = ext.Sign(signature.TestKeyringPairAlice, o)
+	err = ext.Sign(signature.TestKeyringPairAlice, meta, extrinsic.WithEra(types.ExtrinsicEra{IsImmortalEra: true}, genesisHash),
+		extrinsic.WithNonce(types.NewUCompactFromUInt(uint64(nonce))),
+		extrinsic.WithTip(types.NewUCompactFromUInt(0)),
+		extrinsic.WithSpecVersion(rv.SpecVersion),
+		extrinsic.WithTransactionVersion(rv.TransactionVersion),
+		extrinsic.WithGenesisHash(genesisHash),
+	)
+
 	if err != nil {
 		panic(err)
 	}
@@ -428,7 +427,7 @@ func Example_transactionWithEvents() {
 	}
 
 	// Create the extrinsic
-	ext := types.NewExtrinsic(c)
+	ext := extrinsic.NewExtrinsic(c)
 
 	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
 	if err != nil {
@@ -454,20 +453,17 @@ func Example_transactionWithEvents() {
 
 	nonce := uint32(accountInfo.Nonce)
 
-	o := types.SignatureOptions{
-		BlockHash:          genesisHash,
-		Era:                types.ExtrinsicEra{IsMortalEra: false},
-		GenesisHash:        genesisHash,
-		Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
-		SpecVersion:        rv.SpecVersion,
-		Tip:                types.NewUCompactFromUInt(0),
-		TransactionVersion: rv.TransactionVersion,
-	}
-
 	fmt.Printf("Sending %v from %#x to %#x with nonce %v", amount, signature.TestKeyringPairAlice.PublicKey, bob.AsAccountID, nonce)
 
 	// Sign the transaction using Alice's default account
-	err = ext.Sign(signature.TestKeyringPairAlice, o)
+	err = ext.Sign(signature.TestKeyringPairAlice, meta, extrinsic.WithEra(types.ExtrinsicEra{IsImmortalEra: true}, genesisHash),
+		extrinsic.WithNonce(types.NewUCompactFromUInt(uint64(nonce))),
+		extrinsic.WithTip(types.NewUCompactFromUInt(0)),
+		extrinsic.WithSpecVersion(rv.SpecVersion),
+		extrinsic.WithTransactionVersion(rv.TransactionVersion),
+		extrinsic.WithGenesisHash(genesisHash),
+	)
+
 	if err != nil {
 		panic(err)
 	}

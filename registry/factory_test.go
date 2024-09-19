@@ -2,7 +2,6 @@ package registry
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"testing"
 
@@ -298,7 +297,7 @@ func TestFactory_CreateCallRegistry_Overrides(t *testing.T) {
 	t.Log("Metadata was decoded successfully")
 
 	// Lookup index for U64 in the test.CentrifugeMetadataHex
-	targetLookupIndex := int64(10)
+	targetLookupIndex := int64(11)
 
 	f := NewFactory().(*factory)
 
@@ -676,6 +675,247 @@ func TestFactory_CreateEventRegistry_GetTypeFieldError(t *testing.T) {
 	assert.Empty(t, reg)
 }
 
+func TestFactory_CreateExtrinsicDecoder_WithLiveMetadata(t *testing.T) {
+	var tests = []struct {
+		Chain       string
+		MetadataHex string
+	}{
+		{
+			Chain:       "centrifuge",
+			MetadataHex: test.CentrifugeMetadataHex,
+		},
+		{
+			Chain:       "polkadot",
+			MetadataHex: test.PolkadotMetadataHex,
+		},
+		{
+			Chain:       "acala",
+			MetadataHex: test.AcalaMetaHex,
+		},
+		{
+			Chain:       "statemint",
+			MetadataHex: test.StatemintMetaHex,
+		},
+		{
+			Chain:       "moonbeam",
+			MetadataHex: test.MoonbeamMetaHex,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Chain, func(t *testing.T) {
+			var meta types.Metadata
+
+			err := codec.DecodeFromHex(test.MetadataHex, &meta)
+			assert.NoError(t, err)
+
+			factory := NewFactory()
+
+			extDecoder, err := factory.CreateExtrinsicDecoder(&meta)
+			assert.NoError(t, err)
+			assert.NotNil(t, extDecoder)
+		})
+	}
+}
+
+func TestFactory_CreateExtrinsicDecoder_ExtrinsicParamsExtraction_InvalidExtrinsicTypeError(t *testing.T) {
+	extrinsicLookupID := uint64(123)
+
+	testMeta := &types.Metadata{
+		AsMetadataV14: types.MetadataV14{
+			Extrinsic: types.ExtrinsicV14{
+				Type:             types.Si1LookupTypeID{UCompact: types.NewUCompactFromUInt(extrinsicLookupID)},
+				Version:          0,
+				SignedExtensions: nil,
+			},
+			EfficientLookup: map[int64]*types.Si1Type{
+				int64(extrinsicLookupID): {
+					Def: types.Si1TypeDef{
+						// `extractExtrinsicParams` expects a composite type with 1 field.
+						IsPrimitive: true,
+					},
+				},
+			},
+		},
+	}
+
+	factory := NewFactory()
+
+	res, err := factory.CreateExtrinsicDecoder(testMeta)
+	assert.ErrorIs(t, err, ErrInvalidExtrinsicType)
+	assert.Nil(t, res)
+}
+
+func TestFactory_CreateExtrinsicDecoder_ExtrinsicParamsExtraction_InvalidGenericExtrinsicTypeError(t *testing.T) {
+	extrinsicLookupID := uint64(123)
+	genericExtrinsicLookupID := uint64(456)
+
+	testMeta := &types.Metadata{
+		AsMetadataV14: types.MetadataV14{
+			Extrinsic: types.ExtrinsicV14{
+				Type:             types.Si1LookupTypeID{UCompact: types.NewUCompactFromUInt(extrinsicLookupID)},
+				Version:          0,
+				SignedExtensions: nil,
+			},
+			EfficientLookup: map[int64]*types.Si1Type{
+				int64(extrinsicLookupID): {
+					Def: types.Si1TypeDef{
+						IsComposite: true,
+						Composite: types.Si1TypeDefComposite{
+							Fields: []types.Si1Field{
+								{
+									Type: types.Si1LookupTypeID{UCompact: types.NewUCompactFromUInt(genericExtrinsicLookupID)},
+								},
+							},
+						},
+					},
+				},
+				int64(genericExtrinsicLookupID): {
+					// No path provided here will cause `isGenericExtrinsic` to returns false
+					// on the second check from `extractExtrinsicParams`.
+					Def: types.Si1TypeDef{},
+				},
+			},
+		},
+	}
+
+	factory := NewFactory()
+
+	res, err := factory.CreateExtrinsicDecoder(testMeta)
+	assert.ErrorIs(t, err, ErrInvalidGenericExtrinsicType)
+	assert.Nil(t, res)
+}
+
+func TestFactory_CreateExtrinsicDecoder_InvalidExtrinsicParams(t *testing.T) {
+	extrinsicLookupID := uint64(123)
+
+	testMeta := &types.Metadata{
+		AsMetadataV14: types.MetadataV14{
+			Extrinsic: types.ExtrinsicV14{
+				Type:             types.Si1LookupTypeID{UCompact: types.NewUCompactFromUInt(extrinsicLookupID)},
+				Version:          0,
+				SignedExtensions: nil,
+			},
+			EfficientLookup: map[int64]*types.Si1Type{
+				int64(extrinsicLookupID): {
+					Path: genericExtrinsicPath,
+					Params: []types.Si1TypeParameter{
+						{
+							Name:    "param_1",
+							HasType: false,
+							Type:    types.Si1LookupTypeID{},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	factory := NewFactory()
+
+	res, err := factory.CreateExtrinsicDecoder(testMeta)
+	assert.ErrorIs(t, err, ErrInvalidExtrinsicParams)
+	assert.Nil(t, res)
+}
+
+func TestFactory_CreateExtrinsicDecoder_UnexpectedExtrinsicParam(t *testing.T) {
+	extrinsicLookupID := uint64(123)
+
+	testMeta := &types.Metadata{
+		AsMetadataV14: types.MetadataV14{
+			Extrinsic: types.ExtrinsicV14{
+				Type:             types.Si1LookupTypeID{UCompact: types.NewUCompactFromUInt(extrinsicLookupID)},
+				Version:          0,
+				SignedExtensions: nil,
+			},
+			EfficientLookup: map[int64]*types.Si1Type{
+				int64(extrinsicLookupID): {
+					Path: genericExtrinsicPath,
+					Params: []types.Si1TypeParameter{
+						{
+							Name:    "param_1",
+							HasType: false,
+							Type:    types.Si1LookupTypeID{},
+						},
+						{
+							Name:    "param_2",
+							HasType: false,
+							Type:    types.Si1LookupTypeID{},
+						},
+						{
+							Name:    "param_3",
+							HasType: false,
+							Type:    types.Si1LookupTypeID{},
+						},
+						{
+							Name:    "param_4",
+							HasType: false,
+							Type:    types.Si1LookupTypeID{},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	factory := NewFactory()
+
+	res, err := factory.CreateExtrinsicDecoder(testMeta)
+	assert.ErrorIs(t, err, ErrUnexpectedExtrinsicParam)
+	assert.Nil(t, res)
+}
+
+func TestFactory_CreateExtrinsicDecoder_ExtrinsicFieldRetrievalError(t *testing.T) {
+	extrinsicLookupID := uint64(123)
+
+	testMeta := &types.Metadata{
+		AsMetadataV14: types.MetadataV14{
+			Extrinsic: types.ExtrinsicV14{
+				Type:             types.Si1LookupTypeID{UCompact: types.NewUCompactFromUInt(extrinsicLookupID)},
+				Version:          0,
+				SignedExtensions: nil,
+			},
+			EfficientLookup: map[int64]*types.Si1Type{
+				int64(extrinsicLookupID): {
+					Path: genericExtrinsicPath,
+					Params: []types.Si1TypeParameter{
+						{
+							Name:    ExtrinsicAddressName,
+							HasType: false,
+							Type: types.Si1LookupTypeID{
+								// This lookup type ID is not added in the lookup map which should
+								// cause an error.
+								UCompact: types.NewUCompactFromUInt(uint64(456)),
+							},
+						},
+						{
+							Name:    ExtrinsicSignatureName,
+							HasType: false,
+							Type:    types.Si1LookupTypeID{},
+						},
+						{
+							Name:    ExtrinsicExtraName,
+							HasType: false,
+							Type:    types.Si1LookupTypeID{},
+						},
+						{
+							Name:    ExtrinsicCallName,
+							HasType: false,
+							Type:    types.Si1LookupTypeID{},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	factory := NewFactory()
+
+	res, err := factory.CreateExtrinsicDecoder(testMeta)
+	assert.ErrorIs(t, err, ErrExtrinsicFieldRetrieval)
+	assert.Nil(t, res)
+}
+
 func TestFactory_getTypeFields(t *testing.T) {
 	fieldLookUpID := 123
 
@@ -722,6 +962,59 @@ func TestFactory_getTypeFields(t *testing.T) {
 	factory.resetStorages()
 
 	res, err := factory.getTypeFields(testMeta, testFields)
+	assert.NoError(t, err)
+	assert.Len(t, res, 1)
+
+	assert.Equal(t, testFieldName, res[0].Name)
+	assert.Equal(t, &ValueDecoder[types.UCompact]{}, res[0].FieldDecoder)
+	assert.Equal(t, int64(fieldLookUpID), res[0].LookupIndex)
+}
+
+func TestFactory_getTypeParams(t *testing.T) {
+	fieldLookUpID := 123
+
+	testFieldName := "TestFieldName"
+	testParams := []types.Si1TypeParameter{
+		{
+			Name: types.Text(testFieldName),
+			Type: types.Si1LookupTypeID{
+				UCompact: types.NewUCompactFromUInt(uint64(fieldLookUpID)),
+			},
+		},
+	}
+
+	compactFieldTypeLookupID := 456
+
+	testFieldTypeDef := types.Si1TypeDef{
+		IsCompact: true,
+		Compact: types.Si1TypeDefCompact{
+			Type: types.Si1LookupTypeID{
+				UCompact: types.NewUCompactFromUInt(uint64(compactFieldTypeLookupID)),
+			},
+		},
+	}
+
+	compactFieldTypeDef := types.Si1TypeDef{
+		IsPrimitive: true,
+	}
+
+	testMeta := &types.Metadata{
+		AsMetadataV14: types.MetadataV14{
+			EfficientLookup: map[int64]*types.Si1Type{
+				int64(fieldLookUpID): {
+					Def: testFieldTypeDef,
+				},
+				int64(compactFieldTypeLookupID): {
+					Def: compactFieldTypeDef,
+				},
+			},
+		},
+	}
+
+	factory := NewFactory().(*factory)
+	factory.resetStorages()
+
+	res, err := factory.getTypeParams(testMeta, testParams)
 	assert.NoError(t, err)
 	assert.Len(t, res, 1)
 
@@ -2047,14 +2340,6 @@ func TestFactory_getTupleType_TupleItemFieldDecoderError(t *testing.T) {
 	assert.Nil(t, res)
 }
 
-func Test_getPrimitiveType_UnsupportedTypeError(t *testing.T) {
-	primitiveTypeDef := types.Si0TypeDefPrimitive(32)
-
-	res, err := getPrimitiveDecoder(primitiveTypeDef)
-	assert.ErrorIs(t, err, ErrPrimitiveTypeNotSupported)
-	assert.Nil(t, res)
-}
-
 func TestFactory_Overrides(t *testing.T) {
 	var meta types.Metadata
 
@@ -2064,7 +2349,7 @@ func TestFactory_Overrides(t *testing.T) {
 	t.Log("Metadata was decoded successfully")
 
 	// Lookup index for DispatchInfo in the test.CentrifugeMetadataHex
-	targetLookupIndex := int64(21)
+	targetLookupIndex := int64(22)
 
 	fieldOverride := FieldOverride{
 		FieldLookupIndex: targetLookupIndex,
@@ -2117,378 +2402,6 @@ func TestFactory_Overrides(t *testing.T) {
 		},
 	)
 	assert.Equal(t, testDispatchInfo, value)
-}
-
-func Test_TypeDecoder(t *testing.T) {
-	testData := []any{
-		types.U8(1),
-		types.U16(2),
-		types.U32(3),
-	}
-
-	typeDecoder := &TypeDecoder{
-		Name: "test_decoder_1",
-		Fields: []*Field{
-			{
-				Name:         "field_1",
-				FieldDecoder: &ValueDecoder[types.U8]{},
-				LookupIndex:  0,
-			},
-			{
-				Name:         "field_2",
-				FieldDecoder: &ValueDecoder[types.U16]{},
-				LookupIndex:  1,
-			},
-			{
-				Name:         "field_3",
-				FieldDecoder: &ValueDecoder[types.U32]{},
-				LookupIndex:  2,
-			},
-		},
-	}
-
-	encodedTestData, err := encodeTestData(testData)
-	assert.NoError(t, err)
-
-	decoder := scale.NewDecoder(bytes.NewReader(encodedTestData))
-
-	res, err := typeDecoder.Decode(decoder)
-	assert.NoError(t, err)
-	assert.Len(t, res, len(testData))
-	assert.Equal(t, typeDecoder.Fields[0].Name, res[0].Name)
-	assert.Equal(t, typeDecoder.Fields[0].LookupIndex, res[0].LookupIndex)
-	assert.Equal(t, testData[0], res[0].Value)
-}
-
-func Test_TypeDecoder_FieldDecodingError(t *testing.T) {
-	testData := []any{
-		types.U32(3),
-	}
-
-	typeDecoder := &TypeDecoder{
-		Name: "test_decoder_1",
-		Fields: []*Field{
-			{
-				Name:         "field_1",
-				FieldDecoder: &ValueDecoder[[32]types.U8]{},
-				LookupIndex:  0,
-			},
-		},
-	}
-
-	encodedTestData, err := encodeTestData(testData)
-	assert.NoError(t, err)
-
-	decoder := scale.NewDecoder(bytes.NewReader(encodedTestData))
-
-	res, err := typeDecoder.Decode(decoder)
-	assert.ErrorIs(t, err, ErrTypeFieldDecoding)
-	assert.Nil(t, res)
-}
-
-func Test_ProcessDecodedFieldValue(t *testing.T) {
-	testData := []any{
-		types.U8(1),
-		types.U16(2),
-		types.U32(3),
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	// Field index match
-	res, err := ProcessDecodedFieldValue[types.U32](
-		decodedFields,
-		func(fieldIndex int, field *DecodedField) bool {
-			return fieldIndex == len(testData)-1
-		},
-		func(value any) (types.U32, error) {
-			res, ok := value.(types.U32)
-			assert.True(t, ok)
-
-			return res, nil
-		},
-	)
-
-	assert.NoError(t, err)
-	assert.Equal(t, testData[2], res)
-
-	// Field name match
-	res, err = ProcessDecodedFieldValue[types.U32](
-		decodedFields,
-		func(fieldIndex int, field *DecodedField) bool {
-			return field.Name == "decoded_field_2"
-		},
-		func(value any) (types.U32, error) {
-			res, ok := value.(types.U32)
-			assert.True(t, ok)
-
-			return res, nil
-		},
-	)
-
-	assert.NoError(t, err)
-	assert.Equal(t, testData[2], res)
-
-	// Field lookup index match
-	res, err = ProcessDecodedFieldValue[types.U32](
-		decodedFields,
-		func(fieldIndex int, field *DecodedField) bool {
-			return field.LookupIndex == 2
-		},
-		func(value any) (types.U32, error) {
-			res, ok := value.(types.U32)
-			assert.True(t, ok)
-
-			return res, nil
-		},
-	)
-
-	assert.NoError(t, err)
-	assert.Equal(t, testData[2], res)
-}
-
-func Test_ProcessDecodedFieldValue_FieldNotFoundError(t *testing.T) {
-	testData := []any{
-		types.U8(1),
-		types.U16(2),
-		types.U32(3),
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	res, err := ProcessDecodedFieldValue[types.U32](
-		decodedFields,
-		func(fieldIndex int, field *DecodedField) bool {
-			return false
-		},
-		func(value any) (types.U32, error) {
-			res, ok := value.(types.U32)
-			assert.True(t, ok)
-
-			return res, nil
-		},
-	)
-
-	assert.ErrorIs(t, err, ErrDecodedFieldNotFound)
-	assert.Equal(t, types.U32(0), res)
-}
-
-func Test_ProcessDecodedFieldValue_FieldValueProcessingError(t *testing.T) {
-	testData := []any{
-		types.U8(1),
-		types.U16(2),
-		types.U32(3),
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	res, err := ProcessDecodedFieldValue[types.U32](
-		decodedFields,
-		func(fieldIndex int, field *DecodedField) bool {
-			return fieldIndex == len(testData)-1
-		},
-		func(value any) (types.U32, error) {
-			return 0, errors.New("error")
-		},
-	)
-
-	assert.ErrorIs(t, err, ErrDecodedFieldValueProcessingError)
-	assert.Equal(t, types.U32(0), res)
-}
-
-func Test_GetDecodedFieldAsType(t *testing.T) {
-	testData := []any{
-		types.U8(1),
-		types.U16(2),
-		types.U32(3),
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	res, err := GetDecodedFieldAsType[types.U8](
-		decodedFields,
-		func(fieldIndex int, field *DecodedField) bool {
-			return fieldIndex == 0
-		},
-	)
-
-	assert.NoError(t, err)
-	assert.Equal(t, testData[0], res)
-}
-
-func Test_GetDecodedFieldAsType_FieldNotFound(t *testing.T) {
-	testData := []any{
-		types.U8(1),
-		types.U16(2),
-		types.U32(3),
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	res, err := GetDecodedFieldAsType[types.U8](
-		decodedFields,
-		func(fieldIndex int, field *DecodedField) bool {
-			return fieldIndex == len(testData)
-		},
-	)
-
-	assert.ErrorIs(t, err, ErrDecodedFieldNotFound)
-	assert.Equal(t, types.U8(0), res)
-}
-
-func Test_GetDecodedFieldAsType_ValueTypeMismatch(t *testing.T) {
-	testData := []any{
-		types.U8(1),
-		types.U16(2),
-		types.U32(3),
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	res, err := GetDecodedFieldAsType[types.U8](
-		decodedFields,
-		func(fieldIndex int, field *DecodedField) bool {
-			return fieldIndex == len(testData)-1
-		},
-	)
-
-	assert.ErrorIs(t, err, ErrDecodedFieldValueTypeMismatch)
-	assert.Equal(t, types.U8(0), res)
-}
-
-func Test_GetDecodedFieldAsSliceOfType(t *testing.T) {
-	testData := []any{
-		types.U8(1),
-		[]any{
-			types.U16(0),
-			types.U16(1),
-			types.U16(2),
-		},
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	res, err := GetDecodedFieldAsSliceOfType[types.U16](
-		decodedFields,
-		func(fieldIndex int, field *DecodedField) bool {
-			return fieldIndex == len(testData)-1
-		},
-	)
-
-	assert.NoError(t, err)
-	assert.Equal(t, []types.U16{0, 1, 2}, res)
-}
-
-func Test_GetDecodedFieldAsSliceOfType_DecodedFieldNotFound(t *testing.T) {
-	testData := []any{
-		types.U8(1),
-		[]any{
-			types.U16(0),
-			types.U16(1),
-			types.U16(2),
-		},
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	res, err := GetDecodedFieldAsSliceOfType[types.U16](
-		decodedFields,
-		func(fieldIndex int, field *DecodedField) bool {
-			return fieldIndex == len(testData)
-		},
-	)
-
-	assert.ErrorIs(t, err, ErrDecodedFieldNotFound)
-	assert.Nil(t, res)
-}
-
-func Test_GetDecodedFieldAsSliceOfType_NotAGenericSlice(t *testing.T) {
-	testData := []any{
-		types.U8(1),
-		// Slices in decoded fields are expected to be []any
-		[]types.U16{
-			0,
-			1,
-			2,
-		},
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	res, err := GetDecodedFieldAsSliceOfType[types.U16](
-		decodedFields,
-		func(fieldIndex int, field *DecodedField) bool {
-			return fieldIndex == len(testData)-1
-		},
-	)
-
-	assert.ErrorIs(t, err, ErrDecodedFieldValueNotAGenericSlice)
-	assert.Nil(t, res)
-}
-
-func Test_GetDecodedFieldAsSliceOfType_SliceItemTypeMismatch(t *testing.T) {
-	testData := []any{
-		types.U8(1),
-		[]any{
-			types.U16(0),
-			types.U16(1),
-			types.U16(2),
-		},
-	}
-
-	decodedFields := testDataToDecodedFields(testData)
-
-	res, err := GetDecodedFieldAsSliceOfType[types.U8](
-		decodedFields,
-		func(fieldIndex int, field *DecodedField) bool {
-			return fieldIndex == len(testData)-1
-		},
-	)
-
-	assert.ErrorIs(t, err, ErrDecodedFieldValueTypeMismatch)
-	assert.Nil(t, res)
-}
-
-type errStruct struct{}
-
-func (e *errStruct) Decode(_ scale.Decoder) error {
-	return errors.New("error")
-}
-
-type decodedFieldTest struct {
-	FirstField  types.U8
-	SecondField types.U16
-	ThirdField  types.U32
-
-	Error bool
-}
-
-func (d *decodedFieldTest) Decode(decoder scale.Decoder) error {
-	if err := decoder.Decode(&d.FirstField); err != nil {
-		return err
-	}
-
-	if err := decoder.Decode(&d.SecondField); err != nil {
-		return err
-	}
-
-	return decoder.Decode(&d.ThirdField)
-}
-
-func (d decodedFieldTest) Encode(encoder scale.Encoder) error {
-	if d.Error {
-		return errors.New("encode error")
-	}
-
-	if err := encoder.Encode(d.FirstField); err != nil {
-		return err
-	}
-
-	if err := encoder.Encode(d.SecondField); err != nil {
-		return err
-	}
-
-	return encoder.Encode(d.ThirdField)
 }
 
 func testDataToDecodedFields(data []any) DecodedFields {
@@ -2653,8 +2566,8 @@ func (a *testAsserter) assertRegistryItemFieldIsCorrect(t *testing.T, meta types
 			assert.True(t, ok, "expected compact field type in registry")
 		case compactFieldType.Def.IsTuple:
 			if metaFieldTypeDef.Tuple == nil {
-				_, ok := registryItemFieldType.(*ValueDecoder[any])
-				assert.True(t, ok, "expected empty tuple field type")
+				_, ok := registryItemFieldType.(*NoopDecoder)
+				assert.True(t, ok, "expected noop decoder")
 				return
 			}
 

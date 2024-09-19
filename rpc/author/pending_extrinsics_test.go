@@ -17,7 +17,6 @@
 package author_test
 
 import (
-	"fmt"
 	"testing"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
@@ -28,9 +27,6 @@ import (
 func TestAuthor_PendingExtrinsics(t *testing.T) {
 	api, err := gsrpc.NewSubstrateAPI(config.Default().RPCURL)
 	assert.NoError(t, err)
-	res, err := api.RPC.Author.PendingExtrinsics()
+	_, err = api.RPC.Author.PendingExtrinsics()
 	assert.NoError(t, err)
-	for _, ext := range res {
-		fmt.Printf("Pending txn from %v with nonce %v\n", ext.Signature.Signer, ext.Signature.Nonce)
-	}
 }

@@ -17,7 +17,6 @@ var (
 	eventTestURLs = []string{
 		"wss://fullnode.parachain.centrifuge.io",
 		"wss://rpc.polkadot.io",
-		"wss://statemint-rpc.polkadot.io",
 		"wss://acala-rpc-0.aca-api.network",
 		"wss://wss.api.moonbeam.network",
 	}

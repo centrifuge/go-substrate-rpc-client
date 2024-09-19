@@ -17,19 +17,31 @@
 package state
 
 import (
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestState_GetMetadataLatest(t *testing.T) {
+	var meta types.Metadata
+
+	err := codec.DecodeFromHex(types.MetadataV14Data, &meta)
+	assert.NoError(t, err)
+
 	md, err := testState.GetMetadataLatest()
 	assert.NoError(t, err)
-	assert.Equal(t, *mockSrv.metadata, *md)
+	assert.Equal(t, meta, *md)
 }
 
 func TestState_GetMetadata(t *testing.T) {
+	var meta types.Metadata
+
+	err := codec.DecodeFromHex(types.MetadataV14Data, &meta)
+	assert.NoError(t, err)
+
 	md, err := testState.GetMetadata(mockSrv.blockHashLatest)
 	assert.NoError(t, err)
-	assert.Equal(t, *mockSrv.metadata, *md)
+	assert.Equal(t, meta, *md)
 }

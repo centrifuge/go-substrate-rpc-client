@@ -4,6 +4,8 @@ package mocks
 
 import (
 	chain "github.com/centrifuge/go-substrate-rpc-client/v4/rpc/chain"
+	block "github.com/centrifuge/go-substrate-rpc-client/v4/types/block"
+
 	mock "github.com/stretchr/testify/mock"
 
 	types "github.com/centrifuge/go-substrate-rpc-client/v4/types"
@@ -15,15 +17,15 @@ type Chain struct {
 }
 
 // GetBlock provides a mock function with given fields: blockHash
-func (_m *Chain) GetBlock(blockHash types.Hash) (*types.SignedBlock, error) {
+func (_m *Chain) GetBlock(blockHash types.Hash) (*block.SignedBlock, error) {
 	ret := _m.Called(blockHash)
 
-	var r0 *types.SignedBlock
-	if rf, ok := ret.Get(0).(func(types.Hash) *types.SignedBlock); ok {
+	var r0 *block.SignedBlock
+	if rf, ok := ret.Get(0).(func(types.Hash) *block.SignedBlock); ok {
 		r0 = rf(blockHash)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*types.SignedBlock)
+			r0 = ret.Get(0).(*block.SignedBlock)
 		}
 	}
 
@@ -84,15 +86,15 @@ func (_m *Chain) GetBlockHashLatest() (types.Hash, error) {
 }
 
 // GetBlockLatest provides a mock function with given fields:
-func (_m *Chain) GetBlockLatest() (*types.SignedBlock, error) {
+func (_m *Chain) GetBlockLatest() (*block.SignedBlock, error) {
 	ret := _m.Called()
 
-	var r0 *types.SignedBlock
-	if rf, ok := ret.Get(0).(func() *types.SignedBlock); ok {
+	var r0 *block.SignedBlock
+	if rf, ok := ret.Get(0).(func() *block.SignedBlock); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*types.SignedBlock)
+			r0 = ret.Get(0).(*block.SignedBlock)
 		}
 	}
 

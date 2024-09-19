@@ -81,6 +81,29 @@ func (_m *FactoryMock) CreateEventRegistry(meta *types.Metadata) (EventRegistry,
 	return r0, r1
 }
 
+// CreateExtrinsicDecoder provides a mock function with given fields: meta
+func (_m *FactoryMock) CreateExtrinsicDecoder(meta *types.Metadata) (*ExtrinsicDecoder, error) {
+	ret := _m.Called(meta)
+
+	var r0 *ExtrinsicDecoder
+	if rf, ok := ret.Get(0).(func(*types.Metadata) *ExtrinsicDecoder); ok {
+		r0 = rf(meta)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ExtrinsicDecoder)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*types.Metadata) error); ok {
+		r1 = rf(meta)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type NewFactoryMockT interface {
 	mock.TestingT
 	Cleanup(func())

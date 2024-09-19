@@ -4,6 +4,8 @@ package mocks
 
 import (
 	author "github.com/centrifuge/go-substrate-rpc-client/v4/rpc/author"
+	extrinsic "github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
+
 	mock "github.com/stretchr/testify/mock"
 
 	types "github.com/centrifuge/go-substrate-rpc-client/v4/types"
@@ -15,15 +17,15 @@ type Author struct {
 }
 
 // PendingExtrinsics provides a mock function with given fields:
-func (_m *Author) PendingExtrinsics() ([]types.Extrinsic, error) {
+func (_m *Author) PendingExtrinsics() ([]string, error) {
 	ret := _m.Called()
 
-	var r0 []types.Extrinsic
-	if rf, ok := ret.Get(0).(func() []types.Extrinsic); ok {
+	var r0 []string
+	if rf, ok := ret.Get(0).(func() []string); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]types.Extrinsic)
+			r0 = ret.Get(0).([]string)
 		}
 	}
 
@@ -38,11 +40,11 @@ func (_m *Author) PendingExtrinsics() ([]types.Extrinsic, error) {
 }
 
 // SubmitAndWatchExtrinsic provides a mock function with given fields: xt
-func (_m *Author) SubmitAndWatchExtrinsic(xt types.Extrinsic) (*author.ExtrinsicStatusSubscription, error) {
+func (_m *Author) SubmitAndWatchExtrinsic(xt extrinsic.Extrinsic) (*author.ExtrinsicStatusSubscription, error) {
 	ret := _m.Called(xt)
 
 	var r0 *author.ExtrinsicStatusSubscription
-	if rf, ok := ret.Get(0).(func(types.Extrinsic) *author.ExtrinsicStatusSubscription); ok {
+	if rf, ok := ret.Get(0).(func(extrinsic.Extrinsic) *author.ExtrinsicStatusSubscription); ok {
 		r0 = rf(xt)
 	} else {
 		if ret.Get(0) != nil {
@@ -51,7 +53,7 @@ func (_m *Author) SubmitAndWatchExtrinsic(xt types.Extrinsic) (*author.Extrinsic
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(types.Extrinsic) error); ok {
+	if rf, ok := ret.Get(1).(func(extrinsic.Extrinsic) error); ok {
 		r1 = rf(xt)
 	} else {
 		r1 = ret.Error(1)
@@ -61,11 +63,11 @@ func (_m *Author) SubmitAndWatchExtrinsic(xt types.Extrinsic) (*author.Extrinsic
 }
 
 // SubmitExtrinsic provides a mock function with given fields: xt
-func (_m *Author) SubmitExtrinsic(xt types.Extrinsic) (types.Hash, error) {
+func (_m *Author) SubmitExtrinsic(xt extrinsic.Extrinsic) (types.Hash, error) {
 	ret := _m.Called(xt)
 
 	var r0 types.Hash
-	if rf, ok := ret.Get(0).(func(types.Extrinsic) types.Hash); ok {
+	if rf, ok := ret.Get(0).(func(extrinsic.Extrinsic) types.Hash); ok {
 		r0 = rf(xt)
 	} else {
 		if ret.Get(0) != nil {
@@ -74,7 +76,7 @@ func (_m *Author) SubmitExtrinsic(xt types.Extrinsic) (types.Hash, error) {
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(types.Extrinsic) error); ok {
+	if rf, ok := ret.Get(1).(func(extrinsic.Extrinsic) error); ok {
 		r1 = rf(xt)
 	} else {
 		r1 = ret.Error(1)

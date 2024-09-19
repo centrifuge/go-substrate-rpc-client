@@ -18,6 +18,7 @@ package teste2e
 
 import (
 	"fmt"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types/extrinsic"
 	"testing"
 	"time"
 
@@ -49,10 +50,9 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 	c, err := types.NewCall(meta, "Balances.transfer", bob, types.NewUCompactFromUInt(6969))
 	assert.NoError(t, err)
 
-	ext := types.NewExtrinsic(c)
+	ext := extrinsic.NewExtrinsic(c)
 	assert.NoError(t, err)
 
-	era := types.ExtrinsicEra{IsMortalEra: false}
 	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
 	assert.NoError(t, err)
 
@@ -71,18 +71,14 @@ func TestAuthor_SubmitAndWatchExtrinsic(t *testing.T) {
 		assert.True(t, ok)
 
 		nonce := uint32(accountInfo.Nonce)
-		o := types.SignatureOptions{
-			// BlockHash:   blockHash,
-			BlockHash:          genesisHash, // BlockHash needs to == GenesisHash if era is immortal. // TODO: add an error?
-			Era:                era,
-			GenesisHash:        genesisHash,
-			Nonce:              types.NewUCompactFromUInt(uint64(nonce)),
-			SpecVersion:        rv.SpecVersion,
-			Tip:                types.NewUCompactFromUInt(0),
-			TransactionVersion: rv.TransactionVersion,
-		}
 
-		err = ext.Sign(from, o)
+		err = ext.Sign(from, meta, extrinsic.WithEra(types.ExtrinsicEra{IsImmortalEra: true}, genesisHash),
+			extrinsic.WithNonce(types.NewUCompactFromUInt(uint64(nonce))),
+			extrinsic.WithTip(types.NewUCompactFromUInt(0)),
+			extrinsic.WithSpecVersion(rv.SpecVersion),
+			extrinsic.WithTransactionVersion(rv.TransactionVersion),
+			extrinsic.WithGenesisHash(genesisHash),
+		)
 		assert.NoError(t, err)
 
 		sub, err = api.RPC.Author.SubmitAndWatchExtrinsic(ext)

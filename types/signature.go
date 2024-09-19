@@ -18,18 +18,18 @@ package types
 
 import "fmt"
 
-// Signature is a H512
-type Signature H512
+// SignatureHash is a H512
+type SignatureHash H512
 
-// NewSignature creates a new Signature type
-func NewSignature(b []byte) Signature {
-	h := Signature{}
+// NewSignature creates a new SignatureHash type
+func NewSignature(b []byte) SignatureHash {
+	h := SignatureHash{}
 	copy(h[:], b)
 	return h
 }
 
 // Hex returns a hex string representation of the value (not of the encoded value)
-func (h Signature) Hex() string {
+func (h SignatureHash) Hex() string {
 	return fmt.Sprintf("%#x", h[:])
 }
 

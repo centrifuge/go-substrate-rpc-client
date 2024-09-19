@@ -20,7 +20,6 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
-	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/test_utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -131,27 +130,4 @@ func TestFindEventNamesForEventIDV10(t *testing.T) {
 func TestFindStorageEntryMetadataV10(t *testing.T) {
 	_, err := exampleMetadataV10.FindStorageEntryMetadata("myStoragePrefix", "myStorageFunc2")
 	assert.NoError(t, err)
-}
-
-func TestMetadataV10_Decode(t *testing.T) {
-	metadata := NewMetadataV10()
-
-	err := Decode(MustHexDecodeString(ExamplaryMetadataV10String), metadata)
-	assert.NoError(t, err)
-
-	assert.Equal(t, *ExamplaryMetadataV10, *metadata)
-}
-
-func TestMetadataV10Polkadot_Decode(t *testing.T) {
-	metadata := NewMetadataV10()
-
-	err := Decode(MustHexDecodeString(ExamplaryMetadataV10PolkadotString), metadata)
-	assert.NoError(t, err)
-
-	assert.Equal(t, *ExamplaryMetadataV10Polkadot, *metadata)
-}
-
-func TestMetadataV10_ExistsModuleMetadata(t *testing.T) {
-	assert.True(t, exampleMetadataV10.ExistsModuleMetadata("EmptyModule"))
-	assert.False(t, exampleMetadataV10.ExistsModuleMetadata("NotExistModule"))
 }

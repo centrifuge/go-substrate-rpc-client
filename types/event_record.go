@@ -33,6 +33,9 @@ import (
 // Be careful using this in your own structs – it only works as the last value in a struct since it will consume the
 // remainder of the encoded data. The reason for this is that it does not contain any length encoding, so it would
 // not know where to stop.
+//
+// Deprecated: EventRecordsRaw relies on static event definition that is no longer maintained,
+// please check retriever.EventRetriever.
 type EventRecordsRaw []byte
 
 // Encode implements encoding for Data, which just unwraps the bytes of Data
@@ -63,414 +66,414 @@ func (e *EventRecordsRaw) Decode(decoder scale.Decoder) error {
 //
 //nolint:stylecheck,lll,revive
 type EventRecords struct {
-	Auctions_AuctionStarted     []EventAuctionsAuctionStarted     `test-gen-blockchain:"polkadot"`
-	Auctions_AuctionClosed      []EventAuctionsAuctionClosed      `test-gen-blockchain:"polkadot"`
-	Auctions_Reserved           []EventAuctionsReserved           `test-gen-blockchain:"polkadot"`
-	Auctions_Unreserved         []EventAuctionsUnreserved         `test-gen-blockchain:"polkadot"`
-	Auctions_ReserveConfiscated []EventAuctionsReserveConfiscated `test-gen-blockchain:"polkadot"`
-	Auctions_BidAccepted        []EventAuctionsBidAccepted        `test-gen-blockchain:"polkadot"`
-	Auctions_WinningOffset      []EventAuctionsWinningOffset      `test-gen-blockchain:"polkadot"`
+	Auctions_AuctionStarted     []EventAuctionsAuctionStarted
+	Auctions_AuctionClosed      []EventAuctionsAuctionClosed
+	Auctions_Reserved           []EventAuctionsReserved
+	Auctions_Unreserved         []EventAuctionsUnreserved
+	Auctions_ReserveConfiscated []EventAuctionsReserveConfiscated
+	Auctions_BidAccepted        []EventAuctionsBidAccepted
+	Auctions_WinningOffset      []EventAuctionsWinningOffset
 
-	Assets_Created             []EventAssetCreated             `test-gen-skip:"true"`
-	Assets_Issued              []EventAssetIssued              `test-gen-skip:"true"`
-	Assets_Transferred         []EventAssetTransferred         `test-gen-skip:"true"`
-	Assets_Burned              []EventAssetBurned              `test-gen-skip:"true"`
-	Assets_TeamChanged         []EventAssetTeamChanged         `test-gen-skip:"true"`
-	Assets_OwnerChanged        []EventAssetOwnerChanged        `test-gen-skip:"true"`
-	Assets_Frozen              []EventAssetFrozen              `test-gen-skip:"true"`
-	Assets_Thawed              []EventAssetThawed              `test-gen-skip:"true"`
-	Assets_AssetFrozen         []EventAssetAssetFrozen         `test-gen-skip:"true"`
-	Assets_AssetThawed         []EventAssetAssetThawed         `test-gen-skip:"true"`
-	Assets_Destroyed           []EventAssetDestroyed           `test-gen-skip:"true"`
-	Assets_ForceCreated        []EventAssetForceCreated        `test-gen-skip:"true"`
-	Assets_MetadataSet         []EventAssetMetadataSet         `test-gen-skip:"true"`
-	Assets_MetadataCleared     []EventAssetMetadataCleared     `test-gen-skip:"true"`
-	Assets_ApprovedTransfer    []EventAssetApprovedTransfer    `test-gen-skip:"true"`
-	Assets_ApprovalCancelled   []EventAssetApprovalCancelled   `test-gen-skip:"true"`
-	Assets_TransferredApproved []EventAssetTransferredApproved `test-gen-skip:"true"`
-	Assets_AssetStatusChanged  []EventAssetAssetStatusChanged  `test-gen-skip:"true"`
+	Assets_Created             []EventAssetCreated
+	Assets_Issued              []EventAssetIssued
+	Assets_Transferred         []EventAssetTransferred
+	Assets_Burned              []EventAssetBurned
+	Assets_TeamChanged         []EventAssetTeamChanged
+	Assets_OwnerChanged        []EventAssetOwnerChanged
+	Assets_Frozen              []EventAssetFrozen
+	Assets_Thawed              []EventAssetThawed
+	Assets_AssetFrozen         []EventAssetAssetFrozen
+	Assets_AssetThawed         []EventAssetAssetThawed
+	Assets_Destroyed           []EventAssetDestroyed
+	Assets_ForceCreated        []EventAssetForceCreated
+	Assets_MetadataSet         []EventAssetMetadataSet
+	Assets_MetadataCleared     []EventAssetMetadataCleared
+	Assets_ApprovedTransfer    []EventAssetApprovedTransfer
+	Assets_ApprovalCancelled   []EventAssetApprovalCancelled
+	Assets_TransferredApproved []EventAssetTransferredApproved
+	Assets_AssetStatusChanged  []EventAssetAssetStatusChanged
 
-	BagsList_Rebagged []EventBagsListRebagged `test-gen-blockchain:"polkadot"`
+	BagsList_Rebagged []EventBagsListRebagged
 
-	Balances_BalanceSet         []EventBalancesBalanceSet         `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_Deposit            []EventBalancesDeposit            `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_DustLost           []EventBalancesDustLost           `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_Endowed            []EventBalancesEndowed            `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_Reserved           []EventBalancesReserved           `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_ReserveRepatriated []EventBalancesReserveRepatriated `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_Slashed            []EventBalancesSlashed            `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_Transfer           []EventBalancesTransfer           `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_Unreserved         []EventBalancesUnreserved         `test-gen-blockchain:"centrifuge-parachain"`
-	Balances_Withdraw           []EventBalancesWithdraw           `test-gen-blockchain:"centrifuge-parachain"`
+	Balances_BalanceSet         []EventBalancesBalanceSet
+	Balances_Deposit            []EventBalancesDeposit
+	Balances_DustLost           []EventBalancesDustLost
+	Balances_Endowed            []EventBalancesEndowed
+	Balances_Reserved           []EventBalancesReserved
+	Balances_ReserveRepatriated []EventBalancesReserveRepatriated
+	Balances_Slashed            []EventBalancesSlashed
+	Balances_Transfer           []EventBalancesTransfer
+	Balances_Unreserved         []EventBalancesUnreserved
+	Balances_Withdraw           []EventBalancesWithdraw
 
-	Bounties_BountyProposed     []EventBountiesBountyProposed     `test-gen-blockchain:"polkadot"`
-	Bounties_BountyRejected     []EventBountiesBountyRejected     `test-gen-blockchain:"polkadot"`
-	Bounties_BountyBecameActive []EventBountiesBountyBecameActive `test-gen-blockchain:"polkadot"`
-	Bounties_BountyAwarded      []EventBountiesBountyAwarded      `test-gen-blockchain:"polkadot"`
-	Bounties_BountyClaimed      []EventBountiesBountyClaimed      `test-gen-blockchain:"polkadot"`
-	Bounties_BountyCanceled     []EventBountiesBountyCanceled     `test-gen-blockchain:"polkadot"`
-	Bounties_BountyExtended     []EventBountiesBountyExtended     `test-gen-blockchain:"polkadot"`
+	Bounties_BountyProposed     []EventBountiesBountyProposed
+	Bounties_BountyRejected     []EventBountiesBountyRejected
+	Bounties_BountyBecameActive []EventBountiesBountyBecameActive
+	Bounties_BountyAwarded      []EventBountiesBountyAwarded
+	Bounties_BountyClaimed      []EventBountiesBountyClaimed
+	Bounties_BountyCanceled     []EventBountiesBountyCanceled
+	Bounties_BountyExtended     []EventBountiesBountyExtended
 
-	ChildBounties_Added    []EventChildBountiesAdded    `test-gen-skip:"true"`
-	ChildBounties_Awarded  []EventChildBountiesAwarded  `test-gen-skip:"true"`
-	ChildBounties_Claimed  []EventChildBountiesClaimed  `test-gen-skip:"true"`
-	ChildBounties_Canceled []EventChildBountiesCanceled `test-gen-skip:"true"`
+	ChildBounties_Added    []EventChildBountiesAdded
+	ChildBounties_Awarded  []EventChildBountiesAwarded
+	ChildBounties_Claimed  []EventChildBountiesClaimed
+	ChildBounties_Canceled []EventChildBountiesCanceled
 
-	Claims_Claimed []EventClaimsClaimed `test-gen-blockchain:"polkadot"`
+	Claims_Claimed []EventClaimsClaimed
 
-	CollatorSelection_NewInvulnerables     []EventCollatorSelectionNewInvulnerables     `test-gen-blockchain:"altair"`
-	CollatorSelection_NewDesiredCandidates []EventCollatorSelectionNewDesiredCandidates `test-gen-blockchain:"altair"`
-	CollatorSelection_NewCandidacyBond     []EventCollatorSelectionNewCandidacyBond     `test-gen-blockchain:"altair"`
-	CollatorSelection_CandidateAdded       []EventCollatorSelectionCandidateAdded       `test-gen-blockchain:"altair"`
-	CollatorSelection_CandidateRemoved     []EventCollatorSelectionCandidateRemoved     `test-gen-blockchain:"altair"`
+	CollatorSelection_NewInvulnerables     []EventCollatorSelectionNewInvulnerables
+	CollatorSelection_NewDesiredCandidates []EventCollatorSelectionNewDesiredCandidates
+	CollatorSelection_NewCandidacyBond     []EventCollatorSelectionNewCandidacyBond
+	CollatorSelection_CandidateAdded       []EventCollatorSelectionCandidateAdded
+	CollatorSelection_CandidateRemoved     []EventCollatorSelectionCandidateRemoved
 
-	Contracts_CodeRemoved         []EventContractsCodeRemoved         `test-gen-skip:"true"`
-	Contracts_CodeStored          []EventContractsCodeStored          `test-gen-skip:"true"`
-	Contracts_ContractCodeUpdated []EventContractsContractCodeUpdated `test-gen-skip:"true"`
-	Contracts_ContractEmitted     []EventContractsContractEmitted     `test-gen-skip:"true"`
-	Contracts_Instantiated        []EventContractsInstantiated        `test-gen-skip:"true"`
-	Contracts_Terminated          []EventContractsTerminated          `test-gen-skip:"true"`
+	Contracts_CodeRemoved         []EventContractsCodeRemoved
+	Contracts_CodeStored          []EventContractsCodeStored
+	Contracts_ContractCodeUpdated []EventContractsContractCodeUpdated
+	Contracts_ContractEmitted     []EventContractsContractEmitted
+	Contracts_Instantiated        []EventContractsInstantiated
+	Contracts_Terminated          []EventContractsTerminated
 
-	ConvictionVoting_Delegated   []EventConvictionVotingDelegated   `test-gen-skip:"true"`
-	ConvictionVoting_Undelegated []EventConvictionVotingUndelegated `test-gen-skip:"true"`
+	ConvictionVoting_Delegated   []EventConvictionVotingDelegated
+	ConvictionVoting_Undelegated []EventConvictionVotingUndelegated
 
-	Council_Approved       []EventCouncilApproved       `test-gen-blockchain:"centrifuge-parachain"`
-	Council_Closed         []EventCouncilClosed         `test-gen-blockchain:"centrifuge-parachain"`
-	Council_Disapproved    []EventCouncilDisapproved    `test-gen-blockchain:"centrifuge-parachain"`
-	Council_Executed       []EventCouncilExecuted       `test-gen-blockchain:"centrifuge-parachain"`
-	Council_MemberExecuted []EventCouncilMemberExecuted `test-gen-blockchain:"centrifuge-parachain"`
-	Council_Proposed       []EventCouncilProposed       `test-gen-blockchain:"centrifuge-parachain"`
-	Council_Voted          []EventCouncilVoted          `test-gen-blockchain:"centrifuge-parachain"`
+	Council_Approved       []EventCouncilApproved
+	Council_Closed         []EventCouncilClosed
+	Council_Disapproved    []EventCouncilDisapproved
+	Council_Executed       []EventCouncilExecuted
+	Council_MemberExecuted []EventCouncilMemberExecuted
+	Council_Proposed       []EventCouncilProposed
+	Council_Voted          []EventCouncilVoted
 
-	Crowdloan_Created           []EventCrowdloanCreated           `test-gen-blockchain:"polkadot"`
-	Crowdloan_Contributed       []EventCrowdloanContributed       `test-gen-blockchain:"polkadot"`
-	Crowdloan_Withdrew          []EventCrowdloanWithdrew          `test-gen-blockchain:"polkadot"`
-	Crowdloan_PartiallyRefunded []EventCrowdloanPartiallyRefunded `test-gen-blockchain:"polkadot"`
-	Crowdloan_AllRefunded       []EventCrowdloanAllRefunded       `test-gen-blockchain:"polkadot"`
-	Crowdloan_Dissolved         []EventCrowdloanDissolved         `test-gen-blockchain:"polkadot"`
-	Crowdloan_HandleBidResult   []EventCrowdloanHandleBidResult   `test-gen-blockchain:"polkadot"`
-	Crowdloan_Edited            []EventCrowdloanEdited            `test-gen-blockchain:"polkadot"`
-	Crowdloan_MemoUpdated       []EventCrowdloanMemoUpdated       `test-gen-blockchain:"polkadot"`
-	Crowdloan_AddedToNewRaise   []EventCrowdloanAddedToNewRaise   `test-gen-blockchain:"polkadot"`
+	Crowdloan_Created           []EventCrowdloanCreated
+	Crowdloan_Contributed       []EventCrowdloanContributed
+	Crowdloan_Withdrew          []EventCrowdloanWithdrew
+	Crowdloan_PartiallyRefunded []EventCrowdloanPartiallyRefunded
+	Crowdloan_AllRefunded       []EventCrowdloanAllRefunded
+	Crowdloan_Dissolved         []EventCrowdloanDissolved
+	Crowdloan_HandleBidResult   []EventCrowdloanHandleBidResult
+	Crowdloan_Edited            []EventCrowdloanEdited
+	Crowdloan_MemoUpdated       []EventCrowdloanMemoUpdated
+	Crowdloan_AddedToNewRaise   []EventCrowdloanAddedToNewRaise
 
-	Democracy_Blacklisted     []EventDemocracyBlacklisted     `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Cancelled       []EventDemocracyCancelled       `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Delegated       []EventDemocracyDelegated       `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Executed        []EventDemocracyExecuted        `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_ExternalTabled  []EventDemocracyExternalTabled  `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_NotPassed       []EventDemocracyNotPassed       `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Passed          []EventDemocracyPassed          `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_PreimageInvalid []EventDemocracyPreimageInvalid `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_PreimageMissing []EventDemocracyPreimageMissing `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_PreimageNoted   []EventDemocracyPreimageNoted   `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_PreimageReaped  []EventDemocracyPreimageReaped  `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_PreimageUsed    []EventDemocracyPreimageUsed    `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Proposed        []EventDemocracyProposed        `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Seconded        []EventDemocracySeconded        `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Started         []EventDemocracyStarted         `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Tabled          []EventDemocracyTabled          `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Undelegated     []EventDemocracyUndelegated     `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Vetoed          []EventDemocracyVetoed          `test-gen-blockchain:"centrifuge-parachain"`
-	Democracy_Voted           []EventDemocracyVoted           `test-gen-blockchain:"centrifuge-parachain"`
+	Democracy_Blacklisted     []EventDemocracyBlacklisted
+	Democracy_Cancelled       []EventDemocracyCancelled
+	Democracy_Delegated       []EventDemocracyDelegated
+	Democracy_Executed        []EventDemocracyExecuted
+	Democracy_ExternalTabled  []EventDemocracyExternalTabled
+	Democracy_NotPassed       []EventDemocracyNotPassed
+	Democracy_Passed          []EventDemocracyPassed
+	Democracy_PreimageInvalid []EventDemocracyPreimageInvalid
+	Democracy_PreimageMissing []EventDemocracyPreimageMissing
+	Democracy_PreimageNoted   []EventDemocracyPreimageNoted
+	Democracy_PreimageReaped  []EventDemocracyPreimageReaped
+	Democracy_PreimageUsed    []EventDemocracyPreimageUsed
+	Democracy_Proposed        []EventDemocracyProposed
+	Democracy_Seconded        []EventDemocracySeconded
+	Democracy_Started         []EventDemocracyStarted
+	Democracy_Tabled          []EventDemocracyTabled
+	Democracy_Undelegated     []EventDemocracyUndelegated
+	Democracy_Vetoed          []EventDemocracyVetoed
+	Democracy_Voted           []EventDemocracyVoted
 
-	ElectionProviderMultiPhase_SolutionStored       []EventElectionProviderMultiPhaseSolutionStored       `test-gen-blockchain:"polkadot"`
-	ElectionProviderMultiPhase_ElectionFinalized    []EventElectionProviderMultiPhaseElectionFinalized    `test-gen-blockchain:"polkadot"`
-	ElectionProviderMultiPhase_Rewarded             []EventElectionProviderMultiPhaseRewarded             `test-gen-blockchain:"polkadot"`
-	ElectionProviderMultiPhase_Slashed              []EventElectionProviderMultiPhaseSlashed              `test-gen-blockchain:"polkadot"`
-	ElectionProviderMultiPhase_SignedPhaseStarted   []EventElectionProviderMultiPhaseSignedPhaseStarted   `test-gen-blockchain:"polkadot"`
-	ElectionProviderMultiPhase_UnsignedPhaseStarted []EventElectionProviderMultiPhaseUnsignedPhaseStarted `test-gen-blockchain:"polkadot"`
+	ElectionProviderMultiPhase_SolutionStored       []EventElectionProviderMultiPhaseSolutionStored
+	ElectionProviderMultiPhase_ElectionFinalized    []EventElectionProviderMultiPhaseElectionFinalized
+	ElectionProviderMultiPhase_Rewarded             []EventElectionProviderMultiPhaseRewarded
+	ElectionProviderMultiPhase_Slashed              []EventElectionProviderMultiPhaseSlashed
+	ElectionProviderMultiPhase_SignedPhaseStarted   []EventElectionProviderMultiPhaseSignedPhaseStarted
+	ElectionProviderMultiPhase_UnsignedPhaseStarted []EventElectionProviderMultiPhaseUnsignedPhaseStarted
 
-	Elections_CandidateSlashed  []EventElectionsCandidateSlashed  `test-gen-blockchain:"altair"`
-	Elections_ElectionError     []EventElectionsElectionError     `test-gen-blockchain:"altair"`
-	Elections_EmptyTerm         []EventElectionsEmptyTerm         `test-gen-blockchain:"altair"`
-	Elections_MemberKicked      []EventElectionsMemberKicked      `test-gen-blockchain:"altair"`
-	Elections_NewTerm           []EventElectionsNewTerm           `test-gen-blockchain:"altair"`
-	Elections_Renounced         []EventElectionsRenounced         `test-gen-blockchain:"altair"`
-	Elections_SeatHolderSlashed []EventElectionsSeatHolderSlashed `test-gen-blockchain:"altair"`
+	Elections_CandidateSlashed  []EventElectionsCandidateSlashed
+	Elections_ElectionError     []EventElectionsElectionError
+	Elections_EmptyTerm         []EventElectionsEmptyTerm
+	Elections_MemberKicked      []EventElectionsMemberKicked
+	Elections_NewTerm           []EventElectionsNewTerm
+	Elections_Renounced         []EventElectionsRenounced
+	Elections_SeatHolderSlashed []EventElectionsSeatHolderSlashed
 
-	Gilt_BidPlaced    []EventGiltBidPlaced    `test-gen-skip:"true"`
-	Gilt_BidRetracted []EventGiltBidRetracted `test-gen-skip:"true"`
-	Gilt_GiltIssued   []EventGiltGiltIssued   `test-gen-skip:"true"`
-	Gilt_GiltThawed   []EventGiltGiltThawed   `test-gen-skip:"true"`
+	Gilt_BidPlaced    []EventGiltBidPlaced
+	Gilt_BidRetracted []EventGiltBidRetracted
+	Gilt_GiltIssued   []EventGiltGiltIssued
+	Gilt_GiltThawed   []EventGiltGiltThawed
 
-	Grandpa_NewAuthorities []EventGrandpaNewAuthorities `test-gen-blockchain:"polkadot"`
-	Grandpa_Paused         []EventGrandpaPaused         `test-gen-blockchain:"polkadot"`
-	Grandpa_Resumed        []EventGrandpaResumed        `test-gen-blockchain:"polkadot"`
+	Grandpa_NewAuthorities []EventGrandpaNewAuthorities
+	Grandpa_Paused         []EventGrandpaPaused
+	Grandpa_Resumed        []EventGrandpaResumed
 
-	Hrmp_OpenChannelRequested []EventHRMPOpenChannelRequested `test-gen-blockchain:"polkadot"`
-	Hrmp_OpenChannelCanceled  []EventHRMPOpenChannelCanceled  `test-gen-blockchain:"polkadot"`
-	Hrmp_OpenChannelAccepted  []EventHRMPOpenChannelAccepted  `test-gen-blockchain:"polkadot"`
-	Hrmp_ChannelClosed        []EventHRMPChannelClosed        `test-gen-blockchain:"polkadot"`
+	Hrmp_OpenChannelRequested []EventHRMPOpenChannelRequested
+	Hrmp_OpenChannelCanceled  []EventHRMPOpenChannelCanceled
+	Hrmp_OpenChannelAccepted  []EventHRMPOpenChannelAccepted
+	Hrmp_ChannelClosed        []EventHRMPChannelClosed
 
-	Identity_IdentityCleared      []EventIdentityCleared              `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_IdentityKilled       []EventIdentityKilled               `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_IdentitySet          []EventIdentitySet                  `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_JudgementGiven       []EventIdentityJudgementGiven       `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_JudgementRequested   []EventIdentityJudgementRequested   `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_JudgementUnrequested []EventIdentityJudgementUnrequested `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_RegistrarAdded       []EventIdentityRegistrarAdded       `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_SubIdentityAdded     []EventIdentitySubIdentityAdded     `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_SubIdentityRemoved   []EventIdentitySubIdentityRemoved   `test-gen-blockchain:"centrifuge-parachain"`
-	Identity_SubIdentityRevoked   []EventIdentitySubIdentityRevoked   `test-gen-blockchain:"centrifuge-parachain"`
+	Identity_IdentityCleared      []EventIdentityCleared
+	Identity_IdentityKilled       []EventIdentityKilled
+	Identity_IdentitySet          []EventIdentitySet
+	Identity_JudgementGiven       []EventIdentityJudgementGiven
+	Identity_JudgementRequested   []EventIdentityJudgementRequested
+	Identity_JudgementUnrequested []EventIdentityJudgementUnrequested
+	Identity_RegistrarAdded       []EventIdentityRegistrarAdded
+	Identity_SubIdentityAdded     []EventIdentitySubIdentityAdded
+	Identity_SubIdentityRemoved   []EventIdentitySubIdentityRemoved
+	Identity_SubIdentityRevoked   []EventIdentitySubIdentityRevoked
 
-	ImOnline_AllGood           []EventImOnlineAllGood           `test-gen-blockchain:"polkadot"`
-	ImOnline_HeartbeatReceived []EventImOnlineHeartbeatReceived `test-gen-blockchain:"polkadot"`
-	ImOnline_SomeOffline       []EventImOnlineSomeOffline       `test-gen-blockchain:"polkadot"`
+	ImOnline_AllGood           []EventImOnlineAllGood
+	ImOnline_HeartbeatReceived []EventImOnlineHeartbeatReceived
+	ImOnline_SomeOffline       []EventImOnlineSomeOffline
 
-	Indices_IndexAssigned []EventIndicesIndexAssigned `test-gen-blockchain:"polkadot"`
-	Indices_IndexFreed    []EventIndicesIndexFreed    `test-gen-blockchain:"polkadot"`
-	Indices_IndexFrozen   []EventIndicesIndexFrozen   `test-gen-blockchain:"polkadot"`
+	Indices_IndexAssigned []EventIndicesIndexAssigned
+	Indices_IndexFreed    []EventIndicesIndexFreed
+	Indices_IndexFrozen   []EventIndicesIndexFrozen
 
-	Lottery_LotteryStarted []EventLotteryLotteryStarted `test-gen-skip:"true"`
-	Lottery_CallsUpdated   []EventLotteryCallsUpdated   `test-gen-skip:"true"`
-	Lottery_Winner         []EventLotteryWinner         `test-gen-skip:"true"`
-	Lottery_TicketBought   []EventLotteryTicketBought   `test-gen-skip:"true"`
+	Lottery_LotteryStarted []EventLotteryLotteryStarted
+	Lottery_CallsUpdated   []EventLotteryCallsUpdated
+	Lottery_Winner         []EventLotteryWinner
+	Lottery_TicketBought   []EventLotteryTicketBought
 
-	Multisig_MultisigApproval  []EventMultisigApproval    `test-gen-blockchain:"altair"`
-	Multisig_MultisigCancelled []EventMultisigCancelled   `test-gen-blockchain:"altair"`
-	Multisig_MultisigExecuted  []EventMultisigExecuted    `test-gen-blockchain:"altair"`
-	Multisig_NewMultisig       []EventMultisigNewMultisig `test-gen-blockchain:"altair"`
+	Multisig_MultisigApproval  []EventMultisigApproval
+	Multisig_MultisigCancelled []EventMultisigCancelled
+	Multisig_MultisigExecuted  []EventMultisigExecuted
+	Multisig_NewMultisig       []EventMultisigNewMultisig
 
-	NftSales_ForSale []EventNftSalesForSale `test-gen-blockchain:"altair"`
-	NftSales_Removed []EventNftSalesRemoved `test-gen-blockchain:"altair"`
-	NftSales_Sold    []EventNftSalesSold    `test-gen-blockchain:"altair"`
+	NftSales_ForSale []EventNftSalesForSale
+	NftSales_Removed []EventNftSalesRemoved
+	NftSales_Sold    []EventNftSalesSold
 
-	Offences_Offence []EventOffencesOffence `test-gen-blockchain:"polkadot"`
+	Offences_Offence []EventOffencesOffence
 
-	OrmlAssetRegistry_RegisteredAsset []EventOrmlAssetRegistryRegisteredAsset `test-gen-blockchain:"polkadot"`
-	OrmlAssetRegistry_UpdatedAsset    []EventOrmlAssetRegistryUpdatedAsset    `test-gen-blockchain:"polkadot"`
+	OrmlAssetRegistry_RegisteredAsset []EventOrmlAssetRegistryRegisteredAsset
+	OrmlAssetRegistry_UpdatedAsset    []EventOrmlAssetRegistryUpdatedAsset
 
-	OrmlTokens_Endowed            []EventOrmlTokensEndowed            `test-gen-blockchain:"centrifuge-parachain"`
-	OrmlTokens_DustLost           []EventOrmlTokensDustLost           `test-gen-blockchain:"centrifuge-parachain"`
-	OrmlTokens_Transfer           []EventOrmlTokensTransfer           `test-gen-blockchain:"centrifuge-parachain"`
-	OrmlTokens_Reserved           []EventOrmlTokensReserved           `test-gen-blockchain:"centrifuge-parachain"`
-	OrmlTokens_Unreserved         []EventOrmlTokensUnreserved         `test-gen-blockchain:"centrifuge-parachain"`
-	OrmlTokens_ReserveRepatriated []EventOrmlTokensReserveRepatriated `test-gen-blockchain:"centrifuge-parachain"`
-	OrmlTokens_BalanceSet         []EventOrmlTokensBalanceSet         `test-gen-blockchain:"centrifuge-parachain"`
-	OrmlTokens_TotalIssuanceSet   []EventOrmlTokensTotalIssuanceSet   `test-gen-blockchain:"centrifuge-parachain"`
-	OrmlTokens_Withdrawn          []EventOrmlTokensWithdrawn          `test-gen-blockchain:"centrifuge-parachain"`
-	OrmlTokens_Slashed            []EventOrmlTokensSlashed            `test-gen-blockchain:"centrifuge-parachain"`
-	OrmlTokens_Deposited          []EventOrmlTokensDeposited          `test-gen-blockchain:"centrifuge-parachain"`
-	OrmlTokens_LockSet            []EventOrmlTokensLockSet            `test-gen-blockchain:"centrifuge-parachain"`
-	OrmlTokens_LockRemoved        []EventOrmlTokensLockRemoved        `test-gen-blockchain:"centrifuge-parachain"`
-	OrmlTokens_Locked             []EventOrmlTokensLocked             `test-gen-blockchain:"centrifuge-parachain"`
-	OrmlTokens_Unlocked           []EventOrmlTokensUnlocked           `test-gen-blockchain:"centrifuge-parachain"`
+	OrmlTokens_Endowed            []EventOrmlTokensEndowed
+	OrmlTokens_DustLost           []EventOrmlTokensDustLost
+	OrmlTokens_Transfer           []EventOrmlTokensTransfer
+	OrmlTokens_Reserved           []EventOrmlTokensReserved
+	OrmlTokens_Unreserved         []EventOrmlTokensUnreserved
+	OrmlTokens_ReserveRepatriated []EventOrmlTokensReserveRepatriated
+	OrmlTokens_BalanceSet         []EventOrmlTokensBalanceSet
+	OrmlTokens_TotalIssuanceSet   []EventOrmlTokensTotalIssuanceSet
+	OrmlTokens_Withdrawn          []EventOrmlTokensWithdrawn
+	OrmlTokens_Slashed            []EventOrmlTokensSlashed
+	OrmlTokens_Deposited          []EventOrmlTokensDeposited
+	OrmlTokens_LockSet            []EventOrmlTokensLockSet
+	OrmlTokens_LockRemoved        []EventOrmlTokensLockRemoved
+	OrmlTokens_Locked             []EventOrmlTokensLocked
+	OrmlTokens_Unlocked           []EventOrmlTokensUnlocked
 
-	Paras_CurrentCodeUpdated   []EventParasCurrentCodeUpdated   `test-gen-blockchain:"polkadot"`
-	Paras_CurrentHeadUpdated   []EventParasCurrentHeadUpdated   `test-gen-blockchain:"polkadot"`
-	Paras_CodeUpgradeScheduled []EventParasCodeUpgradeScheduled `test-gen-blockchain:"polkadot"`
-	Paras_NewHeadNoted         []EventParasNewHeadNoted         `test-gen-blockchain:"polkadot"`
-	Paras_ActionQueued         []EventParasActionQueued         `test-gen-blockchain:"polkadot"`
-	Paras_PvfCheckStarted      []EventParasPvfCheckStarted      `test-gen-blockchain:"polkadot"`
-	Paras_PvfCheckAccepted     []EventParasPvfCheckAccepted     `test-gen-blockchain:"polkadot"`
-	Paras_PvfCheckRejected     []EventParasPvfCheckRejected     `test-gen-blockchain:"polkadot"`
+	Paras_CurrentCodeUpdated   []EventParasCurrentCodeUpdated
+	Paras_CurrentHeadUpdated   []EventParasCurrentHeadUpdated
+	Paras_CodeUpgradeScheduled []EventParasCodeUpgradeScheduled
+	Paras_NewHeadNoted         []EventParasNewHeadNoted
+	Paras_ActionQueued         []EventParasActionQueued
+	Paras_PvfCheckStarted      []EventParasPvfCheckStarted
+	Paras_PvfCheckAccepted     []EventParasPvfCheckAccepted
+	Paras_PvfCheckRejected     []EventParasPvfCheckRejected
 
-	ParasDisputes_DisputeInitiated []EventParasDisputesDisputeInitiated `test-gen-skip:"true"`
-	ParasDisputes_DisputeConcluded []EventParasDisputesDisputeConcluded `test-gen-skip:"true"`
-	ParasDisputes_DisputeTimedOut  []EventParasDisputesDisputeTimedOut  `test-gen-skip:"true"`
-	ParasDisputes_Revert           []EventParasDisputesRevert           `test-gen-skip:"true"`
+	ParasDisputes_DisputeInitiated []EventParasDisputesDisputeInitiated
+	ParasDisputes_DisputeConcluded []EventParasDisputesDisputeConcluded
+	ParasDisputes_DisputeTimedOut  []EventParasDisputesDisputeTimedOut
+	ParasDisputes_Revert           []EventParasDisputesRevert
 
-	ParaInclusion_CandidateBacked   []EventParaInclusionCandidateBacked   `test-gen-blockchain:"polkadot"`
-	ParaInclusion_CandidateIncluded []EventParaInclusionCandidateIncluded `test-gen-blockchain:"polkadot"`
-	ParaInclusion_CandidateTimedOut []EventParaInclusionCandidateTimedOut `test-gen-blockchain:"polkadot"`
+	ParaInclusion_CandidateBacked   []EventParaInclusionCandidateBacked
+	ParaInclusion_CandidateIncluded []EventParaInclusionCandidateIncluded
+	ParaInclusion_CandidateTimedOut []EventParaInclusionCandidateTimedOut
 
-	ParachainSystem_ValidationFunctionStored    []EventParachainSystemValidationFunctionStored    `test-gen-blockchain:"centrifuge-parachain"`
-	ParachainSystem_ValidationFunctionApplied   []EventParachainSystemValidationFunctionApplied   `test-gen-blockchain:"centrifuge-parachain"`
-	ParachainSystem_ValidationFunctionDiscarded []EventParachainSystemValidationFunctionDiscarded `test-gen-blockchain:"centrifuge-parachain"`
-	ParachainSystem_UpgradeAuthorized           []EventParachainSystemUpgradeAuthorized           `test-gen-blockchain:"centrifuge-parachain"`
-	ParachainSystem_DownwardMessagesReceived    []EventParachainSystemDownwardMessagesReceived    `test-gen-blockchain:"centrifuge-parachain"`
-	ParachainSystem_DownwardMessagesProcessed   []EventParachainSystemDownwardMessagesProcessed   `test-gen-blockchain:"centrifuge-parachain"`
+	ParachainSystem_ValidationFunctionStored    []EventParachainSystemValidationFunctionStored
+	ParachainSystem_ValidationFunctionApplied   []EventParachainSystemValidationFunctionApplied
+	ParachainSystem_ValidationFunctionDiscarded []EventParachainSystemValidationFunctionDiscarded
+	ParachainSystem_UpgradeAuthorized           []EventParachainSystemUpgradeAuthorized
+	ParachainSystem_DownwardMessagesReceived    []EventParachainSystemDownwardMessagesReceived
+	ParachainSystem_DownwardMessagesProcessed   []EventParachainSystemDownwardMessagesProcessed
 
-	Preimage_Cleared   []EventPreimageCleared   `test-gen-skip:"true"`
-	Preimage_Noted     []EventPreimageNoted     `test-gen-skip:"true"`
-	Preimage_Requested []EventPreimageRequested `test-gen-skip:"true"`
+	Preimage_Cleared   []EventPreimageCleared
+	Preimage_Noted     []EventPreimageNoted
+	Preimage_Requested []EventPreimageRequested
 
-	Proxy_Announced     []EventProxyAnnounced     `test-gen-blockchain:"centrifuge-parachain"`
-	Proxy_PureCreated   []EventProxyPureCreated   `test-gen-blockchain:"centrifuge-parachain"`
-	Proxy_ProxyAdded    []EventProxyProxyAdded    `test-gen-blockchain:"centrifuge-parachain"`
-	Proxy_ProxyExecuted []EventProxyProxyExecuted `test-gen-blockchain:"centrifuge-parachain"`
-	Proxy_ProxyRemoved  []EventProxyProxyRemoved  `test-gen-blockchain:"centrifuge-parachain"`
+	Proxy_Announced     []EventProxyAnnounced
+	Proxy_PureCreated   []EventProxyPureCreated
+	Proxy_ProxyAdded    []EventProxyProxyAdded
+	Proxy_ProxyExecuted []EventProxyProxyExecuted
+	Proxy_ProxyRemoved  []EventProxyProxyRemoved
 
-	Recovery_AccountRecovered  []EventRecoveryAccountRecovered `test-gen-skip:"true"`
-	Recovery_RecoveryClosed    []EventRecoveryClosed           `test-gen-skip:"true"`
-	Recovery_RecoveryCreated   []EventRecoveryCreated          `test-gen-skip:"true"`
-	Recovery_RecoveryInitiated []EventRecoveryInitiated        `test-gen-skip:"true"`
-	Recovery_RecoveryRemoved   []EventRecoveryRemoved          `test-gen-skip:"true"`
-	Recovery_RecoveryVouched   []EventRecoveryVouched          `test-gen-skip:"true"`
+	Recovery_AccountRecovered  []EventRecoveryAccountRecovered
+	Recovery_RecoveryClosed    []EventRecoveryClosed
+	Recovery_RecoveryCreated   []EventRecoveryCreated
+	Recovery_RecoveryInitiated []EventRecoveryInitiated
+	Recovery_RecoveryRemoved   []EventRecoveryRemoved
+	Recovery_RecoveryVouched   []EventRecoveryVouched
 
-	Registrar_Registered   []EventRegistrarRegistered   `test-gen-skip:"true"`
-	Registrar_Deregistered []EventRegistrarDeregistered `test-gen-skip:"true"`
-	Registrar_Reserved     []EventRegistrarReserved     `test-gen-skip:"true"`
+	Registrar_Registered   []EventRegistrarRegistered
+	Registrar_Deregistered []EventRegistrarDeregistered
+	Registrar_Reserved     []EventRegistrarReserved
 
-	Referenda_Submitted               []EventReferendaSubmitted               `test-gen-skip:"true"`
-	Referenda_DecisionDepositPlaced   []EventReferendaDecisionDepositPlaced   `test-gen-skip:"true"`
-	Referenda_DecisionDepositRefunded []EventReferendaDecisionDepositRefunded `test-gen-skip:"true"`
-	Referenda_DepositSlashed          []EventReferendaDecisionSlashed         `test-gen-skip:"true"`
-	Referenda_DecisionStarted         []EventReferendaDecisionStarted         `test-gen-skip:"true"`
-	Referenda_ConfirmStarted          []EventReferendaConfirmStarted          `test-gen-skip:"true"`
-	Referenda_ConfirmAborted          []EventReferendaConfirmAborted          `test-gen-skip:"true"`
-	Referenda_Confirmed               []EventReferendaConfirmed               `test-gen-skip:"true"`
-	Referenda_Approved                []EventReferendaApproved                `test-gen-skip:"true"`
-	Referenda_Rejected                []EventReferendaRejected                `test-gen-skip:"true"`
-	Referenda_TimedOut                []EventReferendaTimedOut                `test-gen-skip:"true"`
-	Referenda_Cancelled               []EventReferendaCancelled               `test-gen-skip:"true"`
-	Referenda_Killed                  []EventReferendaKilled                  `test-gen-skip:"true"`
+	Referenda_Submitted               []EventReferendaSubmitted
+	Referenda_DecisionDepositPlaced   []EventReferendaDecisionDepositPlaced
+	Referenda_DecisionDepositRefunded []EventReferendaDecisionDepositRefunded
+	Referenda_DepositSlashed          []EventReferendaDecisionSlashed
+	Referenda_DecisionStarted         []EventReferendaDecisionStarted
+	Referenda_ConfirmStarted          []EventReferendaConfirmStarted
+	Referenda_ConfirmAborted          []EventReferendaConfirmAborted
+	Referenda_Confirmed               []EventReferendaConfirmed
+	Referenda_Approved                []EventReferendaApproved
+	Referenda_Rejected                []EventReferendaRejected
+	Referenda_TimedOut                []EventReferendaTimedOut
+	Referenda_Cancelled               []EventReferendaCancelled
+	Referenda_Killed                  []EventReferendaKilled
 
-	Scheduler_CallLookupFailed []EventSchedulerCallLookupFailed `test-gen-blockchain:"polkadot"`
-	Scheduler_Canceled         []EventSchedulerCanceled         `test-gen-blockchain:"polkadot"`
-	Scheduler_Dispatched       []EventSchedulerDispatched       `test-gen-blockchain:"polkadot"`
-	Scheduler_Scheduled        []EventSchedulerScheduled        `test-gen-blockchain:"polkadot"`
+	Scheduler_CallLookupFailed []EventSchedulerCallLookupFailed
+	Scheduler_Canceled         []EventSchedulerCanceled
+	Scheduler_Dispatched       []EventSchedulerDispatched
+	Scheduler_Scheduled        []EventSchedulerScheduled
 
-	Session_NewSession []EventSessionNewSession `test-gen-blockchain:"centrifuge-parachain"`
+	Session_NewSession []EventSessionNewSession
 
-	Slots_NewLeasePeriod []EventSlotsNewLeasePeriod `test-gen-blockchain:"polkadot"`
-	Slots_Leased         []EventSlotsLeased         `test-gen-blockchain:"polkadot"`
+	Slots_NewLeasePeriod []EventSlotsNewLeasePeriod
+	Slots_Leased         []EventSlotsLeased
 
-	Society_AutoUnbid                []EventSocietyAutoUnbid                `test-gen-skip:"true"`
-	Society_Bid                      []EventSocietyBid                      `test-gen-skip:"true"`
-	Society_CandidateSuspended       []EventSocietyCandidateSuspended       `test-gen-skip:"true"`
-	Society_Challenged               []EventSocietyChallenged               `test-gen-skip:"true"`
-	Society_DefenderVote             []EventSocietyDefenderVote             `test-gen-skip:"true"`
-	Society_Deposit                  []EventSocietyDeposit                  `test-gen-skip:"true"`
-	Society_Founded                  []EventSocietyFounded                  `test-gen-skip:"true"`
-	Society_Inducted                 []EventSocietyInducted                 `test-gen-skip:"true"`
-	Society_MemberSuspended          []EventSocietyMemberSuspended          `test-gen-skip:"true"`
-	Society_NewMaxMembers            []EventSocietyNewMaxMembers            `test-gen-skip:"true"`
-	Society_SuspendedMemberJudgement []EventSocietySuspendedMemberJudgement `test-gen-skip:"true"`
-	Society_Unbid                    []EventSocietyUnbid                    `test-gen-skip:"true"`
-	Society_Unfounded                []EventSocietyUnfounded                `test-gen-skip:"true"`
-	Society_Unvouch                  []EventSocietyUnvouch                  `test-gen-skip:"true"`
-	Society_Vote                     []EventSocietyVote                     `test-gen-skip:"true"`
-	Society_Vouch                    []EventSocietyVouch                    `test-gen-skip:"true"`
+	Society_AutoUnbid                []EventSocietyAutoUnbid
+	Society_Bid                      []EventSocietyBid
+	Society_CandidateSuspended       []EventSocietyCandidateSuspended
+	Society_Challenged               []EventSocietyChallenged
+	Society_DefenderVote             []EventSocietyDefenderVote
+	Society_Deposit                  []EventSocietyDeposit
+	Society_Founded                  []EventSocietyFounded
+	Society_Inducted                 []EventSocietyInducted
+	Society_MemberSuspended          []EventSocietyMemberSuspended
+	Society_NewMaxMembers            []EventSocietyNewMaxMembers
+	Society_SuspendedMemberJudgement []EventSocietySuspendedMemberJudgement
+	Society_Unbid                    []EventSocietyUnbid
+	Society_Unfounded                []EventSocietyUnfounded
+	Society_Unvouch                  []EventSocietyUnvouch
+	Society_Vote                     []EventSocietyVote
+	Society_Vouch                    []EventSocietyVouch
 
-	Staking_Bonded                     []EventStakingBonded                     `test-gen-blockchain:"polkadot"`
-	Staking_Chilled                    []EventStakingChilled                    `test-gen-blockchain:"polkadot"`
-	Staking_EraPaid                    []EventStakingEraPaid                    `test-gen-blockchain:"polkadot"`
-	Staking_Kicked                     []EventStakingKicked                     `test-gen-blockchain:"polkadot"`
-	Staking_OldSlashingReportDiscarded []EventStakingOldSlashingReportDiscarded `test-gen-blockchain:"polkadot"`
-	Staking_PayoutStarted              []EventStakingPayoutStarted              `test-gen-blockchain:"polkadot"`
-	Staking_Rewarded                   []EventStakingRewarded                   `test-gen-blockchain:"polkadot"`
-	Staking_Slashed                    []EventStakingSlashed                    `test-gen-blockchain:"polkadot"`
-	Staking_StakersElected             []EventStakingStakersElected             `test-gen-blockchain:"polkadot"`
-	Staking_StakingElectionFailed      []EventStakingStakingElectionFailed      `test-gen-blockchain:"polkadot"`
-	Staking_Unbonded                   []EventStakingUnbonded                   `test-gen-blockchain:"polkadot"`
-	Staking_Withdrawn                  []EventStakingWithdrawn                  `test-gen-blockchain:"polkadot"`
+	Staking_Bonded                     []EventStakingBonded
+	Staking_Chilled                    []EventStakingChilled
+	Staking_EraPaid                    []EventStakingEraPaid
+	Staking_Kicked                     []EventStakingKicked
+	Staking_OldSlashingReportDiscarded []EventStakingOldSlashingReportDiscarded
+	Staking_PayoutStarted              []EventStakingPayoutStarted
+	Staking_Rewarded                   []EventStakingRewarded
+	Staking_Slashed                    []EventStakingSlashed
+	Staking_StakersElected             []EventStakingStakersElected
+	Staking_StakingElectionFailed      []EventStakingStakingElectionFailed
+	Staking_Unbonded                   []EventStakingUnbonded
+	Staking_Withdrawn                  []EventStakingWithdrawn
 
-	StateTrieMigration_Migrated              []EventStateTrieMigrationMigrated              `test-gen-skip:"true"`
-	StateTrieMigration_Slashed               []EventStateTrieMigrationSlashed               `test-gen-skip:"true"`
-	StateTrieMigration_AutoMigrationFinished []EventStateTrieMigrationAutoMigrationFinished `test-gen-skip:"true"`
-	StateTrieMigration_Halted                []EventStateTrieMigrationHalted                `test-gen-skip:"true"`
+	StateTrieMigration_Migrated              []EventStateTrieMigrationMigrated
+	StateTrieMigration_Slashed               []EventStateTrieMigrationSlashed
+	StateTrieMigration_AutoMigrationFinished []EventStateTrieMigrationAutoMigrationFinished
+	StateTrieMigration_Halted                []EventStateTrieMigrationHalted
 
-	Sudo_KeyChanged []EventSudoKeyChanged `test-gen-skip:"true"`
-	Sudo_Sudid      []EventSudoSudid      `test-gen-skip:"true"`
-	Sudo_SudoAsDone []EventSudoAsDone     `test-gen-skip:"true"`
+	Sudo_KeyChanged []EventSudoKeyChanged
+	Sudo_Sudid      []EventSudoSudid
+	Sudo_SudoAsDone []EventSudoAsDone
 
-	System_CodeUpdated      []EventSystemCodeUpdated      `test-gen-blockchain:"centrifuge-parachain"`
-	System_ExtrinsicFailed  []EventSystemExtrinsicFailed  `test-gen-blockchain:"centrifuge-parachain"`
-	System_ExtrinsicSuccess []EventSystemExtrinsicSuccess `test-gen-blockchain:"centrifuge-parachain"`
-	System_KilledAccount    []EventSystemKilledAccount    `test-gen-blockchain:"centrifuge-parachain"`
-	System_NewAccount       []EventSystemNewAccount       `test-gen-blockchain:"centrifuge-parachain"`
-	System_Remarked         []EventSystemRemarked         `test-gen-blockchain:"centrifuge-parachain"`
+	System_CodeUpdated      []EventSystemCodeUpdated
+	System_ExtrinsicFailed  []EventSystemExtrinsicFailed
+	System_ExtrinsicSuccess []EventSystemExtrinsicSuccess
+	System_KilledAccount    []EventSystemKilledAccount
+	System_NewAccount       []EventSystemNewAccount
+	System_Remarked         []EventSystemRemarked
 
-	TechnicalCommittee_Approved       []EventTechnicalCommitteeApproved       `test-gen-blockchain:"polkadot"`
-	TechnicalCommittee_Closed         []EventTechnicalCommitteeClosed         `test-gen-blockchain:"polkadot"`
-	TechnicalCommittee_Disapproved    []EventTechnicalCommitteeDisapproved    `test-gen-blockchain:"polkadot"`
-	TechnicalCommittee_Executed       []EventTechnicalCommitteeExecuted       `test-gen-blockchain:"polkadot"`
-	TechnicalCommittee_MemberExecuted []EventTechnicalCommitteeMemberExecuted `test-gen-blockchain:"polkadot"`
-	TechnicalCommittee_Proposed       []EventTechnicalCommitteeProposed       `test-gen-blockchain:"polkadot"`
-	TechnicalCommittee_Voted          []EventTechnicalCommitteeVoted          `test-gen-blockchain:"polkadot"`
+	TechnicalCommittee_Approved       []EventTechnicalCommitteeApproved
+	TechnicalCommittee_Closed         []EventTechnicalCommitteeClosed
+	TechnicalCommittee_Disapproved    []EventTechnicalCommitteeDisapproved
+	TechnicalCommittee_Executed       []EventTechnicalCommitteeExecuted
+	TechnicalCommittee_MemberExecuted []EventTechnicalCommitteeMemberExecuted
+	TechnicalCommittee_Proposed       []EventTechnicalCommitteeProposed
+	TechnicalCommittee_Voted          []EventTechnicalCommitteeVoted
 
-	TechnicalMembership_Dummy          []EventTechnicalMembershipDummy          `test-gen-blockchain:"polkadot"`
-	TechnicalMembership_KeyChanged     []EventTechnicalMembershipKeyChanged     `test-gen-blockchain:"polkadot"`
-	TechnicalMembership_MemberAdded    []EventTechnicalMembershipMemberAdded    `test-gen-blockchain:"polkadot"`
-	TechnicalMembership_MemberRemoved  []EventTechnicalMembershipMemberRemoved  `test-gen-blockchain:"polkadot"`
-	TechnicalMembership_MembersReset   []EventTechnicalMembershipMembersReset   `test-gen-blockchain:"polkadot"`
-	TechnicalMembership_MembersSwapped []EventTechnicalMembershipMembersSwapped `test-gen-blockchain:"polkadot"`
+	TechnicalMembership_Dummy          []EventTechnicalMembershipDummy
+	TechnicalMembership_KeyChanged     []EventTechnicalMembershipKeyChanged
+	TechnicalMembership_MemberAdded    []EventTechnicalMembershipMemberAdded
+	TechnicalMembership_MemberRemoved  []EventTechnicalMembershipMemberRemoved
+	TechnicalMembership_MembersReset   []EventTechnicalMembershipMembersReset
+	TechnicalMembership_MembersSwapped []EventTechnicalMembershipMembersSwapped
 
-	Tips_NewTip       []EventTipsNewTip       `test-gen-blockchain:"polkadot"`
-	Tips_TipClosed    []EventTipsTipClosed    `test-gen-blockchain:"polkadot"`
-	Tips_TipClosing   []EventTipsTipClosing   `test-gen-blockchain:"polkadot"`
-	Tips_TipRetracted []EventTipsTipRetracted `test-gen-blockchain:"polkadot"`
-	Tips_TipSlashed   []EventTipsTipSlashed   `test-gen-blockchain:"polkadot"`
+	Tips_NewTip       []EventTipsNewTip
+	Tips_TipClosed    []EventTipsTipClosed
+	Tips_TipClosing   []EventTipsTipClosing
+	Tips_TipRetracted []EventTipsTipRetracted
+	Tips_TipSlashed   []EventTipsTipSlashed
 
-	TransactionStorage_Stored       []EventTransactionStorageStored       `test-gen-skip:"true"`
-	TransactionStorage_Renewed      []EventTransactionStorageRenewed      `test-gen-skip:"true"`
-	TransactionStorage_ProofChecked []EventTransactionStorageProofChecked `test-gen-skip:"true"`
+	TransactionStorage_Stored       []EventTransactionStorageStored
+	TransactionStorage_Renewed      []EventTransactionStorageRenewed
+	TransactionStorage_ProofChecked []EventTransactionStorageProofChecked
 
-	TransactionPayment_TransactionFeePaid []EventTransactionPaymentTransactionFeePaid `test-gen-blockchain:"westend"`
+	TransactionPayment_TransactionFeePaid []EventTransactionPaymentTransactionFeePaid
 
-	Treasury_Proposed        []EventTreasuryProposed        `test-gen-blockchain:"altair"`
-	Treasury_Spending        []EventTreasurySpending        `test-gen-blockchain:"altair"`
-	Treasury_Awarded         []EventTreasuryAwarded         `test-gen-blockchain:"altair"`
-	Treasury_Rejected        []EventTreasuryRejected        `test-gen-blockchain:"altair"`
-	Treasury_Burnt           []EventTreasuryBurnt           `test-gen-blockchain:"altair"`
-	Treasury_Rollover        []EventTreasuryRollover        `test-gen-blockchain:"altair"`
-	Treasury_Deposit         []EventTreasuryDeposit         `test-gen-blockchain:"altair"`
-	Treasury_SpendApproved   []EventTreasurySpendApproved   `test-gen-blockchain:"altair"`
-	Treasury_UpdatedInactive []EventTreasuryUpdatedInactive `test-gen-blockchain:"altair"`
+	Treasury_Proposed        []EventTreasuryProposed
+	Treasury_Spending        []EventTreasurySpending
+	Treasury_Awarded         []EventTreasuryAwarded
+	Treasury_Rejected        []EventTreasuryRejected
+	Treasury_Burnt           []EventTreasuryBurnt
+	Treasury_Rollover        []EventTreasuryRollover
+	Treasury_Deposit         []EventTreasuryDeposit
+	Treasury_SpendApproved   []EventTreasurySpendApproved
+	Treasury_UpdatedInactive []EventTreasuryUpdatedInactive
 
-	Uniques_ApprovalCancelled    []EventUniquesApprovalCancelled    `test-gen-blockchain:"altair"`
-	Uniques_ApprovedTransfer     []EventUniquesApprovedTransfer     `test-gen-blockchain:"altair"`
-	Uniques_AssetStatusChanged   []EventUniquesAssetStatusChanged   `test-gen-blockchain:"altair"`
-	Uniques_AttributeCleared     []EventUniquesAttributeCleared     `test-gen-blockchain:"altair"`
-	Uniques_AttributeSet         []EventUniquesAttributeSet         `test-gen-blockchain:"altair"`
-	Uniques_Burned               []EventUniquesBurned               `test-gen-blockchain:"altair"`
-	Uniques_ClassFrozen          []EventUniquesClassFrozen          `test-gen-blockchain:"altair"`
-	Uniques_ClassMetadataCleared []EventUniquesClassMetadataCleared `test-gen-blockchain:"altair"`
-	Uniques_ClassMetadataSet     []EventUniquesClassMetadataSet     `test-gen-blockchain:"altair"`
-	Uniques_ClassThawed          []EventUniquesClassThawed          `test-gen-blockchain:"altair"`
-	Uniques_Created              []EventUniquesCreated              `test-gen-blockchain:"altair"`
-	Uniques_Destroyed            []EventUniquesDestroyed            `test-gen-blockchain:"altair"`
-	Uniques_ForceCreated         []EventUniquesForceCreated         `test-gen-blockchain:"altair"`
-	Uniques_Frozen               []EventUniquesFrozen               `test-gen-blockchain:"altair"`
-	Uniques_Issued               []EventUniquesIssued               `test-gen-blockchain:"altair"`
-	Uniques_MetadataCleared      []EventUniquesMetadataCleared      `test-gen-blockchain:"altair"`
-	Uniques_MetadataSet          []EventUniquesMetadataSet          `test-gen-blockchain:"altair"`
-	Uniques_OwnerChanged         []EventUniquesOwnerChanged         `test-gen-blockchain:"altair"`
-	Uniques_Redeposited          []EventUniquesRedeposited          `test-gen-blockchain:"altair"`
-	Uniques_TeamChanged          []EventUniquesTeamChanged          `test-gen-blockchain:"altair"`
-	Uniques_Thawed               []EventUniquesThawed               `test-gen-blockchain:"altair"`
-	Uniques_Transferred          []EventUniquesTransferred          `test-gen-blockchain:"altair"`
+	Uniques_ApprovalCancelled    []EventUniquesApprovalCancelled
+	Uniques_ApprovedTransfer     []EventUniquesApprovedTransfer
+	Uniques_AssetStatusChanged   []EventUniquesAssetStatusChanged
+	Uniques_AttributeCleared     []EventUniquesAttributeCleared
+	Uniques_AttributeSet         []EventUniquesAttributeSet
+	Uniques_Burned               []EventUniquesBurned
+	Uniques_ClassFrozen          []EventUniquesClassFrozen
+	Uniques_ClassMetadataCleared []EventUniquesClassMetadataCleared
+	Uniques_ClassMetadataSet     []EventUniquesClassMetadataSet
+	Uniques_ClassThawed          []EventUniquesClassThawed
+	Uniques_Created              []EventUniquesCreated
+	Uniques_Destroyed            []EventUniquesDestroyed
+	Uniques_ForceCreated         []EventUniquesForceCreated
+	Uniques_Frozen               []EventUniquesFrozen
+	Uniques_Issued               []EventUniquesIssued
+	Uniques_MetadataCleared      []EventUniquesMetadataCleared
+	Uniques_MetadataSet          []EventUniquesMetadataSet
+	Uniques_OwnerChanged         []EventUniquesOwnerChanged
+	Uniques_Redeposited          []EventUniquesRedeposited
+	Uniques_TeamChanged          []EventUniquesTeamChanged
+	Uniques_Thawed               []EventUniquesThawed
+	Uniques_Transferred          []EventUniquesTransferred
 
-	Ump_InvalidFormat          []EventUMPInvalidFormat          `test-gen-blockchain:"polkadot"`
-	Ump_UnsupportedVersion     []EventUMPUnsupportedVersion     `test-gen-blockchain:"polkadot"`
-	Ump_ExecutedUpward         []EventUMPExecutedUpward         `test-gen-blockchain:"polkadot"`
-	Ump_WeightExhausted        []EventUMPWeightExhausted        `test-gen-blockchain:"polkadot"`
-	Ump_UpwardMessagesReceived []EventUMPUpwardMessagesReceived `test-gen-blockchain:"polkadot"`
-	Ump_OverweightEnqueued     []EventUMPOverweightEnqueued     `test-gen-blockchain:"polkadot"`
-	Ump_OverweightServiced     []EventUMPOverweightServiced     `test-gen-blockchain:"polkadot"`
+	Ump_InvalidFormat          []EventUMPInvalidFormat
+	Ump_UnsupportedVersion     []EventUMPUnsupportedVersion
+	Ump_ExecutedUpward         []EventUMPExecutedUpward
+	Ump_WeightExhausted        []EventUMPWeightExhausted
+	Ump_UpwardMessagesReceived []EventUMPUpwardMessagesReceived
+	Ump_OverweightEnqueued     []EventUMPOverweightEnqueued
+	Ump_OverweightServiced     []EventUMPOverweightServiced
 
-	Utility_BatchCompleted   []EventUtilityBatchCompleted   `test-gen-blockchain:"centrifuge-parachain"`
-	Utility_BatchInterrupted []EventUtilityBatchInterrupted `test-gen-blockchain:"centrifuge-parachain"`
-	Utility_DispatchedAs     []EventUtilityBatchInterrupted `test-gen-blockchain:"centrifuge-parachain"`
-	Utility_ItemCompleted    []EventUtilityItemCompleted    `test-gen-blockchain:"centrifuge-parachain"`
+	Utility_BatchCompleted   []EventUtilityBatchCompleted
+	Utility_BatchInterrupted []EventUtilityBatchInterrupted
+	Utility_DispatchedAs     []EventUtilityBatchInterrupted
+	Utility_ItemCompleted    []EventUtilityItemCompleted
 
-	Vesting_VestingCompleted []EventVestingVestingCompleted `test-gen-blockchain:"centrifuge-parachain"`
-	Vesting_VestingUpdated   []EventVestingVestingUpdated   `test-gen-blockchain:"centrifuge-parachain"`
+	Vesting_VestingCompleted []EventVestingVestingCompleted
+	Vesting_VestingUpdated   []EventVestingVestingUpdated
 
-	VoterList_Rebagged     []EventVoterListRebagged     `test-gen-blockchain:"polkadot"`
-	VoterList_ScoreUpdated []EventVoterListScoreUpdated `test-gen-blockchain:"polkadot"`
+	VoterList_Rebagged     []EventVoterListRebagged
+	VoterList_ScoreUpdated []EventVoterListScoreUpdated
 
-	Whitelist_CallWhitelisted           []EventWhitelistCallWhitelisted        `test-gen-skip:"true"`
-	Whitelist_WhitelistedCallRemoved    []EventWhitelistWhitelistedCallRemoved `test-gen-skip:"true"`
-	Whitelist_WhitelistedCallDispatched []EventWhitelistWhitelistedCallRemoved `test-gen-skip:"true"`
+	Whitelist_CallWhitelisted           []EventWhitelistCallWhitelisted
+	Whitelist_WhitelistedCallRemoved    []EventWhitelistWhitelistedCallRemoved
+	Whitelist_WhitelistedCallDispatched []EventWhitelistWhitelistedCallRemoved
 
-	XcmPallet_Attempted                 []EventXcmPalletAttempted                 `test-gen-blockchain:"polkadot"`
-	XcmPallet_Sent                      []EventXcmPalletSent                      `test-gen-blockchain:"polkadot"`
-	XcmPallet_UnexpectedResponse        []EventXcmPalletUnexpectedResponse        `test-gen-blockchain:"polkadot"`
-	XcmPallet_ResponseReady             []EventXcmPalletResponseReady             `test-gen-blockchain:"polkadot"`
-	XcmPallet_Notified                  []EventXcmPalletNotified                  `test-gen-blockchain:"polkadot"`
-	XcmPallet_NotifyOverweight          []EventXcmPalletNotifyOverweight          `test-gen-blockchain:"polkadot"`
-	XcmPallet_NotifyDispatchError       []EventXcmPalletNotifyDispatchError       `test-gen-blockchain:"polkadot"`
-	XcmPallet_NotifyDecodeFailed        []EventXcmPalletNotifyDecodeFailed        `test-gen-blockchain:"polkadot"`
-	XcmPallet_InvalidResponder          []EventXcmPalletInvalidResponder          `test-gen-blockchain:"polkadot"`
-	XcmPallet_InvalidResponderVersion   []EventXcmPalletInvalidResponderVersion   `test-gen-blockchain:"polkadot"`
-	XcmPallet_ResponseTaken             []EventXcmPalletResponseTaken             `test-gen-blockchain:"polkadot"`
-	XcmPallet_AssetsTrapped             []EventXcmPalletAssetsTrapped             `test-gen-blockchain:"polkadot"`
-	XcmPallet_VersionChangeNotified     []EventXcmPalletVersionChangeNotified     `test-gen-blockchain:"polkadot"`
-	XcmPallet_SupportedVersionChanged   []EventXcmPalletSupportedVersionChanged   `test-gen-blockchain:"polkadot"`
-	XcmPallet_NotifyTargetSendFail      []EventXcmPalletNotifyTargetSendFail      `test-gen-blockchain:"polkadot"`
-	XcmPallet_NotifyTargetMigrationFail []EventXcmPalletNotifyTargetMigrationFail `test-gen-blockchain:"polkadot"`
+	XcmPallet_Attempted                 []EventXcmPalletAttempted
+	XcmPallet_Sent                      []EventXcmPalletSent
+	XcmPallet_UnexpectedResponse        []EventXcmPalletUnexpectedResponse
+	XcmPallet_ResponseReady             []EventXcmPalletResponseReady
+	XcmPallet_Notified                  []EventXcmPalletNotified
+	XcmPallet_NotifyOverweight          []EventXcmPalletNotifyOverweight
+	XcmPallet_NotifyDispatchError       []EventXcmPalletNotifyDispatchError
+	XcmPallet_NotifyDecodeFailed        []EventXcmPalletNotifyDecodeFailed
+	XcmPallet_InvalidResponder          []EventXcmPalletInvalidResponder
+	XcmPallet_InvalidResponderVersion   []EventXcmPalletInvalidResponderVersion
+	XcmPallet_ResponseTaken             []EventXcmPalletResponseTaken
+	XcmPallet_AssetsTrapped             []EventXcmPalletAssetsTrapped
+	XcmPallet_VersionChangeNotified     []EventXcmPalletVersionChangeNotified
+	XcmPallet_SupportedVersionChanged   []EventXcmPalletSupportedVersionChanged
+	XcmPallet_NotifyTargetSendFail      []EventXcmPalletNotifyTargetSendFail
+	XcmPallet_NotifyTargetMigrationFail []EventXcmPalletNotifyTargetMigrationFail
 }
 
 // DecodeEventRecords decodes the events records from an EventRecordRaw into a target t using the given Metadata m

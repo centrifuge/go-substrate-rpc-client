@@ -20,7 +20,6 @@ import (
 	"testing"
 
 	. "github.com/centrifuge/go-substrate-rpc-client/v4/types"
-	. "github.com/centrifuge/go-substrate-rpc-client/v4/types/codec"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -77,29 +76,6 @@ var exampleModuleMetadataV122 = ModuleMetadataV12{
 		Errors:     []ErrorMetadataV8{exampleErrorMetadataV8},
 	},
 	Index: 2,
-}
-
-func TestNewMetadataV12_Decode(t *testing.T) {
-	tests := []struct {
-		name, hexData string
-	}{
-		{
-			"PolkadotV12", ExamplaryMetadataV12PolkadotString,
-		},
-	}
-
-	for _, s := range tests {
-		t.Run(s.name, func(t *testing.T) {
-			metadata := NewMetadataV12()
-			err := Decode(MustHexDecodeString(s.hexData), metadata)
-			assert.EqualValues(t, metadata.Version, 12)
-			assert.NoError(t, err)
-			data, err := Encode(metadata)
-			assert.NoError(t, err)
-			assert.Equal(t, s.hexData, HexEncodeToString(data))
-		})
-
-	}
 }
 
 func TestMetadataV12_ExistsModuleMetadata(t *testing.T) {
