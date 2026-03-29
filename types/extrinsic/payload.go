@@ -225,6 +225,10 @@ var PayloadMutatorFns = map[extensions.SignedExtensionName]PayloadMutatorFn{
 	extensions.StorageWeightReclaimSignedExtension:        func(payload *Payload) {},
 	extensions.PrevalidateAttestsSignedExtension:          func(payload *Payload) {},
 	extensions.CheckNetworkMembershipSignedExtension:      func(payload *Payload) {},
+	// AuthorizeCall adds no implicit/signed payload fields for ordinary signed transfers (PhantomData in runtime).
+	extensions.AuthorizeCallSignedExtension: func(payload *Payload) {},
+	// SetOrigin: origin is already implied by the signature for standard account-signed extrinsics.
+	extensions.SetOriginSignedExtension: func(payload *Payload) {},
 }
 
 // createPayload iterates over all signed extensions provided in the metadata and
@@ -241,6 +245,12 @@ func createPayload(meta *types.Metadata, encodedCall []byte) (*Payload, error) {
 
 		if !ok {
 			return nil, ErrSignedExtensionTypeNotDefined.WithMsg("lookup ID - '%d'", signedExtension.Type.Int64())
+		}
+
+		// Some runtimes list a signed extension whose portable type has no path (synthetic id only). Those extensions
+		// encode no extra data in the signer payload (same as PhantomData-style extensions).
+		if len(signedExtensionType.Path) == 0 {
+			continue
 		}
 
 		signedExtensionName := extensions.SignedExtensionName(signedExtensionType.Path[len(signedExtensionType.Path)-1])

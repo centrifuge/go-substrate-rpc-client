@@ -19,4 +19,8 @@ const (
 	StorageWeightReclaimSignedExtension        SignedExtensionName = "StorageWeightReclaim"
 	PrevalidateAttestsSignedExtension          SignedExtensionName = "PrevalidateAttests"
 	CheckNetworkMembershipSignedExtension      SignedExtensionName = "CheckNetworkMembership"
+	// AuthorizeCall is frame_system::AuthorizeCall (Polkadot SDK); empty payload fields for standard signed extrinsics.
+	AuthorizeCallSignedExtension SignedExtensionName = "AuthorizeCall"
+	// SetOrigin is frame_system::SetOrigin (transaction extension); no extra signing payload for normal signed transfers.
+	SetOriginSignedExtension SignedExtensionName = "SetOrigin"
 )
